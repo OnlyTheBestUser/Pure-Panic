@@ -96,16 +96,10 @@
     <ClInclude Include="NavigationMap.h">
       <Filter>Pathfinding</Filter>
     </ClInclude>
-    <ClInclude Include="QuadTree.h">
-      <Filter>CollisionDetection</Filter>
-    </ClInclude>
     <ClInclude Include="CapsuleVolume.h">
       <Filter>CollisionDetection</Filter>
     </ClInclude>
     <ClInclude Include="Spring.h">
-      <Filter>Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="PositionConstraint.h">
       <Filter>Physics</Filter>
     </ClInclude>
     <ClInclude Include="BehaviourNode.h">
@@ -123,41 +117,11 @@
     <ClInclude Include="BehaviourAction.h">
       <Filter>AI</Filter>
     </ClInclude>
-    <ClInclude Include="OrientationConstraint.h">
-      <Filter>Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="SpringConstraint.h">
-      <Filter>Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="Paddle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LockOrientationConstraint.h">
-      <Filter>Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="Pendulum.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Checkpoint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SpinningConstraint.h">
-      <Filter>Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="StateAI.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Twister.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SpeedUp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Gate.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Octree.h">
+      <Filter>CollisionDetection</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -203,44 +167,11 @@
     <ClCompile Include="NavigationMesh.cpp">
       <Filter>Pathfinding</Filter>
     </ClCompile>
-    <ClCompile Include="QuadTree.cpp">
-      <Filter>CollisionDetection</Filter>
-    </ClCompile>
-    <ClCompile Include="PositionConstraint.cpp">
-      <Filter>Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="OrientationConstraint.cpp">
-      <Filter>Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="SpringConstraint.cpp">
-      <Filter>Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="Paddle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LockOrientationConstraint.cpp">
-      <Filter>Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="Pendulum.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SpinningConstraint.cpp">
-      <Filter>Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="StateAI.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Twister.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SpeedUp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Gate.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Octree.cpp">
+      <Filter>CollisionDetection</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

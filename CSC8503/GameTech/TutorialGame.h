@@ -26,9 +26,7 @@ namespace NCL {
 			}
 
 			bool Win() const { 
-				if(player)
-					return player->Win(); 
-				return false;
+				return won;
 			}
 
 		protected:
@@ -45,7 +43,6 @@ namespace NCL {
 			void InitMixedGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing);
 			void InitCubeGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, const Vector3& cubeDims);
 			void InitDefaultFloor();
-			void BridgeConstraintTest(Vector3 cubeSize = Vector3(8, 1, 2), Vector3 startPos = Vector3(-100, 200, 0));
 	
 			bool SelectObject();
 			void MoveSelectedObject(float dt);
@@ -59,13 +56,7 @@ namespace NCL {
 			GameObject* AddCapsuleToWorld(const Vector3& position, float halfHeight, float radius, float inverseMass = 10.0f);
 
 			GameObject* AddPlayerToWorld(const Vector3& position);
-			Player* AddPlayerBallToWorld(const Vector3& position);
-			Checkpoint* AddCheckpointToWorld(const Vector3& position, Vector3 dimensions, bool OBB, float inverseMass, int layer, bool isTrigger);
-			GameObject* AddEnemyToWorld(const Vector3& position);
-			GameObject* AddBonusToWorld(const Vector3& position);
 
-
-			StateGameObject* AddStateObjectWorld(const Vector3& position);
 			StateGameObject* testStateObject;
 
 			GameTechRenderer*	renderer;
@@ -106,8 +97,7 @@ namespace NCL {
 				lockedObject = o;
 			}
 
-			Player* player;
-
+			bool won = false;
 		};
 	}
 }

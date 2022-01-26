@@ -86,11 +86,8 @@ bool GameWorld::Raycast(Ray& r, RayCollision& closestCollision, bool closestObje
 			continue;
 		}
 		bool skip = false;
-		for (auto layers : layerConstraints) {
-			//   Ray             Ignore objects
-			if (layers.x == r.GetLayer() && layers.y == i->GetLayer()) { // check
-				skip = true;
-			}
+		if (!((r.GetCollisionLayers() & i->GetCollisionLayers()) != 0)) { // check
+			skip = true;
 		}
 
 		if (!skip) {
@@ -140,15 +137,6 @@ void GameWorld::GetConstraintIterators(
 	std::vector<Constraint*>::const_iterator& last) const {
 	first	= constraints.begin();
 	last	= constraints.end();
-}
-
-bool GameWorld::LayerCollides(int layer1, int layer2) const
-{
-	for (auto layer : layerConstraints) {
-		if ((layer.x == layer1 && layer.y == layer2) || (layer.x == layer2 && layer.y == layer1))
-			return false;
-	}
-	return true;
 }
 
 

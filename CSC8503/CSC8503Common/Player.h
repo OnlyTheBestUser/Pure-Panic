@@ -13,7 +13,7 @@ namespace NCL {
             Player(string name = "", Vector3 ch = Vector3(0, 2, 0)) : GameObject(name), checkpoint(ch), spawnPos(ch) {};
             ~Player() {};
 
-            void OnCollisionBegin(GameObject* other) override;
+            void OnCollisionBegin(GameObject* other, Vector3 localA, Vector3 localB, Vector3 normal) override;
             void Update(float dt) override;
 
             float GetTimeTaken() const { return timeTaken; }

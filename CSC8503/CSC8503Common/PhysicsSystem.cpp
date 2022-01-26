@@ -42,7 +42,7 @@ void PhysicsSystem::BuildStaticList()
 	std::vector<GameObject*>::const_iterator first;
 	std::vector<GameObject*>::const_iterator last;
 	gameWorld.GetObjectIterators(first, last);
-	staticTree = new QuadTree<GameObject*>(Vector3(1024, 1024, 1024), 7, 6);
+	staticTree = new Octree<GameObject*>(Vector3(1024, 1024, 1024), 7, 6);
 
 	for (auto i = first; i != last; ++i) {
 		(*i)->UpdateBroadphaseAABB(); // Force update
@@ -177,8 +177,8 @@ rocket launcher, gaining a point when the player hits the gold coin, and so on).
 void PhysicsSystem::UpdateCollisionList() {
 	for (std::set<CollisionDetection::CollisionInfo>::iterator i = allCollisions.begin(); i != allCollisions.end(); ) {
 		if ((*i).framesLeft == numCollisionFrames) {
-			i->a->OnCollisionBegin(i->b);
-			i->b->OnCollisionBegin(i->a);
+			i->a->OnCollisionBegin(i->b, i->point.localA, i->point.localB, i->point.normal);
+			i->b->OnCollisionBegin(i->a, i->point.localB, i->point.localA, -i->point.normal);
 		}
 		(*i).framesLeft = (*i).framesLeft - 1;
 		if ((*i).framesLeft < 0) {
@@ -346,8 +346,7 @@ compare the collisions that we absolutely need to.
 
 void PhysicsSystem::BroadPhase() {
 	broadphaseCollisions.clear();
-	QuadTree<GameObject*> tree(Vector3(1024, 1024, 1024), 7, 6);
-
+	Octree<GameObject*> tree(Vector3(1024, 1024, 1024), 7, 6);
 	std::vector<GameObject*>::const_iterator first;
 	std::vector<GameObject*>::const_iterator last;
 	gameWorld.GetObjectIterators(first, last);
@@ -362,10 +361,11 @@ void PhysicsSystem::BroadPhase() {
 		tree.Insert(*i, pos, halfSizes);
 	}
 
+	//tree.DebugDraw(Debug::RED);
 	//staticTree->DebugDraw(Debug::BLUE);
 	// Test dynamic against static
-	std::list<QuadTreeEntry<GameObject*>> list;
-	tree.OperateOnContents([&](std::list<QuadTreeEntry<GameObject*>>& data) {
+	std::list<OctreeEntry<GameObject*>> list;
+	tree.OperateOnContents([&](std::list<OctreeEntry<GameObject*>>& data) {
 		CollisionDetection::CollisionInfo info;
 		for (auto i = data.begin(); i != data.end(); ++i) {
 			list.clear();
@@ -374,7 +374,7 @@ void PhysicsSystem::BroadPhase() {
 			for (auto j = list.begin(); j != list.end(); j++) {
 				info.a = min((*i).object, (*j).object);
 				info.b = max((*i).object, (*j).object);
-				if (gameWorld.LayerCollides(info.a->GetLayer(), info.b->GetLayer())) {
+				if ((info.a->GetCollisionLayers() & info.b->GetCollisionLayers()) != 0) {
 					broadphaseCollisions.insert(info);
 				}
 			}
@@ -382,15 +382,15 @@ void PhysicsSystem::BroadPhase() {
 		});
 	//tree.DebugDraw(Debug::RED);
 	// Test all dynamic objects against eachother
-	tree.OperateOnContents([&](std::list<QuadTreeEntry<GameObject*>>& data) {
+	tree.OperateOnContents([&](std::list<OctreeEntry<GameObject*>>& data) {
 		CollisionDetection::CollisionInfo info;
 		for (auto i = data.begin(); i != data.end(); ++i) {
 			for (auto j = std::next(i); j != data.end(); ++j) {
 				//is this pair of items already in the collision set - 
-				// if the same pair is in another quadtree node together etc
+				// if the same pair is in another Octree node together etc
 				info.a = min((*i).object, (*j).object);
 				info.b = max((*i).object, (*j).object);
-				if (gameWorld.LayerCollides(info.a->GetLayer(), info.b->GetLayer()) && !(!info.a->IsDynamic() && !info.b->IsDynamic())) {
+				if (((info.a->GetCollisionLayers() & info.b->GetCollisionLayers()) != 0) && !(!info.a->IsDynamic() && !info.b->IsDynamic())) {
 					broadphaseCollisions.insert(info);
 				}
 			}
@@ -417,8 +417,8 @@ void PhysicsSystem::NarrowPhase() {
 					ImpulseResolveCollision(*info.a, *info.b, info.point);	
 			}
 
-			info.a->OnCollisionBegin(info.b);
-			info.b->OnCollisionBegin(info.a);
+			info.a->OnCollisionBegin(info.b, info.point.localA, info.point.localB, info.point.normal);
+			info.b->OnCollisionBegin(info.a, info.point.localB, info.point.localA, -info.point.normal);
 
 			allCollisions.insert(info); // insert into our main set
 		}
