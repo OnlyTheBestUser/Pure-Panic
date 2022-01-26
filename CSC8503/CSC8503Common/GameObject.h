@@ -63,9 +63,9 @@ namespace NCL {
 			}
 			void SetName(string k) { name = k; }
 
-			virtual void OnCollisionBegin(GameObject* otherObject) {
+			virtual void OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vector3 localB, Vector3 normal) {
 				//std::cout << "OnCollisionBegin event occured!\n";
-
+				//std::cout << "Object " << worldID << " collides with " << otherObject->GetWorldID() << ". Local A: " << localA << ", Local B: " << localB << ", normal: " << normal << std::endl;
 			}
 
 			virtual void OnCollisionEnd(GameObject* otherObject) {

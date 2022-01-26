@@ -177,8 +177,8 @@ rocket launcher, gaining a point when the player hits the gold coin, and so on).
 void PhysicsSystem::UpdateCollisionList() {
 	for (std::set<CollisionDetection::CollisionInfo>::iterator i = allCollisions.begin(); i != allCollisions.end(); ) {
 		if ((*i).framesLeft == numCollisionFrames) {
-			i->a->OnCollisionBegin(i->b);
-			i->b->OnCollisionBegin(i->a);
+			i->a->OnCollisionBegin(i->b, i->point.localA, i->point.localB, i->point.normal);
+			i->b->OnCollisionBegin(i->a, i->point.localB, i->point.localA, -i->point.normal);
 		}
 		(*i).framesLeft = (*i).framesLeft - 1;
 		if ((*i).framesLeft < 0) {
@@ -417,8 +417,8 @@ void PhysicsSystem::NarrowPhase() {
 					ImpulseResolveCollision(*info.a, *info.b, info.point);	
 			}
 
-			info.a->OnCollisionBegin(info.b);
-			info.b->OnCollisionBegin(info.a);
+			info.a->OnCollisionBegin(info.b, info.point.localA, info.point.localB, info.point.normal);
+			info.b->OnCollisionBegin(info.a, info.point.localB, info.point.localA, -info.point.normal);
 
 			allCollisions.insert(info); // insert into our main set
 		}
