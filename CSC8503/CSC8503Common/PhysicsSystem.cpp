@@ -42,7 +42,7 @@ void PhysicsSystem::BuildStaticList()
 	std::vector<GameObject*>::const_iterator first;
 	std::vector<GameObject*>::const_iterator last;
 	gameWorld.GetObjectIterators(first, last);
-	staticTree = new QuadTree<GameObject*>(Vector3(1024, 1024, 1024), 7, 6);
+	staticTree = new Octree<GameObject*>(Vector3(1024, 1024, 1024), 7, 6);
 
 	for (auto i = first; i != last; ++i) {
 		(*i)->UpdateBroadphaseAABB(); // Force update
@@ -346,8 +346,7 @@ compare the collisions that we absolutely need to.
 
 void PhysicsSystem::BroadPhase() {
 	broadphaseCollisions.clear();
-	QuadTree<GameObject*> tree(Vector3(1024, 1024, 1024), 7, 6);
-
+	Octree<GameObject*> tree(Vector3(1024, 1024, 1024), 7, 6);
 	std::vector<GameObject*>::const_iterator first;
 	std::vector<GameObject*>::const_iterator last;
 	gameWorld.GetObjectIterators(first, last);
@@ -362,10 +361,11 @@ void PhysicsSystem::BroadPhase() {
 		tree.Insert(*i, pos, halfSizes);
 	}
 
+	//tree.DebugDraw(Debug::RED);
 	//staticTree->DebugDraw(Debug::BLUE);
 	// Test dynamic against static
-	std::list<QuadTreeEntry<GameObject*>> list;
-	tree.OperateOnContents([&](std::list<QuadTreeEntry<GameObject*>>& data) {
+	std::list<OctreeEntry<GameObject*>> list;
+	tree.OperateOnContents([&](std::list<OctreeEntry<GameObject*>>& data) {
 		CollisionDetection::CollisionInfo info;
 		for (auto i = data.begin(); i != data.end(); ++i) {
 			list.clear();
@@ -382,12 +382,12 @@ void PhysicsSystem::BroadPhase() {
 		});
 	//tree.DebugDraw(Debug::RED);
 	// Test all dynamic objects against eachother
-	tree.OperateOnContents([&](std::list<QuadTreeEntry<GameObject*>>& data) {
+	tree.OperateOnContents([&](std::list<OctreeEntry<GameObject*>>& data) {
 		CollisionDetection::CollisionInfo info;
 		for (auto i = data.begin(); i != data.end(); ++i) {
 			for (auto j = std::next(i); j != data.end(); ++j) {
 				//is this pair of items already in the collision set - 
-				// if the same pair is in another quadtree node together etc
+				// if the same pair is in another Octree node together etc
 				info.a = min((*i).object, (*j).object);
 				info.b = max((*i).object, (*j).object);
 				if (gameWorld.LayerCollides(info.a->GetLayer(), info.b->GetLayer()) && !(!info.a->IsDynamic() && !info.b->IsDynamic())) {

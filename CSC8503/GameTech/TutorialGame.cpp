@@ -4,11 +4,7 @@
 #include "../../Plugins/OpenGLRendering/OGLShader.h"
 #include "../../Plugins/OpenGLRendering/OGLTexture.h"
 #include "../../Common/TextureLoader.h"
-#include "../CSC8503Common/PositionConstraint.h"
-#include "../CSC8503Common/OrientationConstraint.h"
-#include "StateGameObject.h"
 #include "../../Common/Quaternion.h"
-#include "../CSC8503Common/Checkpoint.h"
 using namespace NCL;
 using namespace CSC8503;
 
@@ -87,7 +83,6 @@ void TutorialGame::UpdateGame(float dt) {
 	case RESET: {
 		InitCamera();
 		InitWorld();
-		player->Reset();
 		selectionObject = nullptr;
 		break;
 	}
@@ -98,11 +93,6 @@ void TutorialGame::UpdateGame(float dt) {
 	//Debug::DrawLine(Vector3(360, 0, 0), Vector3(360, 0, 360), Debug::RED);
 	//Debug::DrawLine(Vector3(360, 0, 360), Vector3(0, 0, 360), Debug::RED);
 	//Debug::DrawLine(Vector3(0, 0, 360), Vector3(0, 0, 0), Debug::RED);
-
-	if (player) {
-		renderer->DrawString("Time Taken: " + std::to_string(player->GetTimeTaken()) + "s", Vector2(5, 10), Debug::RED);
-		renderer->DrawString("Score: " + std::to_string(player->GetScore()), Vector2(5, 15), Debug::RED);
-	}
 
 	renderer->Update(dt);
 
@@ -115,10 +105,6 @@ void TutorialGame::UpdateGameWorld(float dt)
 
 	if (!inSelectionMode) {
 		world->GetMainCamera()->UpdateCamera(dt);
-	}
-
-	if (testStateObject) {
-		testStateObject->Update(dt);
 	}
 
 	UpdateKeys();
@@ -183,12 +169,6 @@ void TutorialGame::UpdateKeys() {
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::G)) {
 		useGravity = !useGravity; //Toggle gravity!
 		physics->UseGravity(useGravity);
-	}
-
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::R)) {
-		player->GetPhysicsObject()->SetAngularVelocity(Vector3());
-		player->GetPhysicsObject()->SetLinearVelocity(Vector3());
-		player->GetTransform().SetPosition(player->GetCheckpoint());
 	}
 
 	//Running certain physics updates in a consistent order might cause some
@@ -341,47 +321,7 @@ void TutorialGame::InitWorld() {
 	sphere1->SetLayer(1);
 	sphere2->SetLayer(1);
 
-	BridgeConstraintTest();
-
 	physics->BuildStaticList();
-}
-
-void TutorialGame::BridgeConstraintTest(Vector3 cubeSize, Vector3 startPos) {
-
-	float invCubeMass = 5;
-	int numLinks = 15;
-	float maxDistance = 6;
-	float cubeDistance = 5;
-	float stepDown = 2.0f;
-	float horizontalDist = sqrt((cubeDistance * cubeDistance) - (stepDown * stepDown));
-
-	GameObject* start = AddCubeToWorld(startPos + Vector3(), cubeSize, true, 0, 0);
-	start->GetPhysicsObject()->SetElasticity(0.8f);
-	start->GetPhysicsObject()->SetFriction(0.05f);
-	start->GetTransform().SetOrientation(Quaternion(0.05f, 0, 0, 1.0));
-	GameObject* end = AddCubeToWorld(startPos + Vector3(0, -(numLinks + 2) * stepDown - 20.0f, (numLinks + 2) * horizontalDist), cubeSize, true, 0, 0);
-	end->GetPhysicsObject()->SetElasticity(0.8f);
-	end->GetPhysicsObject()->SetFriction(0.05f);
-	end->GetTransform().SetOrientation(Quaternion(0.05f, 0, 0, 1.0));
-
-	GameObject* previous = start;
-
-	for (int i = 0; i < numLinks; ++i) {
-		GameObject* block = AddCubeToWorld(startPos + Vector3(0, -(i + 1) * stepDown, (i + 1) * horizontalDist), cubeSize, true, invCubeMass);
-		block->GetPhysicsObject()->SetElasticity(0.8f);
-		block->GetPhysicsObject()->SetFriction(0.05f);
-		block->GetTransform().SetOrientation(Quaternion(0.05f, 0, 0, 1.0));
-		block->SetDynamic(true);
-		PositionConstraint* constraint = new PositionConstraint(previous, block, maxDistance);
-		OrientationConstraint* orientCon = new OrientationConstraint(previous, block, Vector3(5, 0, 0));
-		world->AddConstraint(constraint);
-		world->AddConstraint(orientCon);
-		previous = block;
-	}
-	PositionConstraint* constraint = new PositionConstraint(previous, end, maxDistance);
-	OrientationConstraint* orientCon = new OrientationConstraint(previous, end, Vector3(5, 0, 0));
-	world->AddConstraint(constraint);
-	world->AddConstraint(orientCon);
 }
 
 /*
@@ -546,8 +486,6 @@ void TutorialGame::InitDefaultFloor() {
 
 void TutorialGame::InitGameExamples() {
 	AddPlayerToWorld(Vector3(0, 5, 0));
-	AddEnemyToWorld(Vector3(5, 5, 0));
-	AddBonusToWorld(Vector3(10, 5, 0));
 	AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f, 1.0f);
 }
 
@@ -581,125 +519,6 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position) {
 	//lockedObject = character;
 
 	return character;
-}
-
-Player* NCL::CSC8503::TutorialGame::AddPlayerBallToWorld(const Vector3& position)
-{
-	Player* player = new Player();
-	Vector3 sphereSize = Vector3(1.0f, 1.0f, 1.0f);
-	SphereVolume* volume = new SphereVolume(1.0f);
-	player->SetBoundingVolume((CollisionVolume*)volume);
-
-	player->GetTransform()
-		.SetScale(sphereSize)
-		.SetPosition(position);
-
-	player->SetRenderObject(new RenderObject(&player->GetTransform(), sphereMesh, basicTex, basicShader));
-	player->SetPhysicsObject(new PhysicsObject(&player->GetTransform(), player->GetBoundingVolume()));
-	player->GetPhysicsObject()->SetInverseMass(10.0f);
-	player->GetPhysicsObject()->InitSphereInertia();
-	player->GetPhysicsObject()->SetElasticity(0.9f);
-	player->GetPhysicsObject()->SetFriction(0.2f);
-	world->AddGameObject(player);
-
-	player->SetName("player");
-	player->SetLayer(1);
-
-	player->GetRenderObject()->SetDefaultTexture(playerTex);
-	player->SetDynamic(true);
-
-	return player;
-}
-
-Checkpoint* TutorialGame::AddCheckpointToWorld(const Vector3& position, Vector3 dimensions, bool OBB, float inverseMass, int layer, bool isTrigger)
-{
-	Checkpoint* cube = new Checkpoint();
-	OBBVolume* volume = new OBBVolume(dimensions);
-	cube->SetBoundingVolume((CollisionVolume*)volume);
-	cube->GetTransform()
-		.SetPosition(position)
-		.SetScale(dimensions * 2);
-
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, basicShader));
-	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
-
-	cube->GetPhysicsObject()->SetInverseMass(inverseMass);
-	cube->GetPhysicsObject()->InitCubeInertia();
-	cube->GetPhysicsObject()->SetElasticity(0.2f);
-
-	world->AddGameObject(cube);
-
-	cube->SetLayer(layer);
-	cube->SetTrigger(isTrigger);
-
-	return cube;
-}
-
-GameObject* TutorialGame::AddEnemyToWorld(const Vector3& position) {
-	float meshSize		= 3.0f;
-	float inverseMass	= 0.5f;
-
-	GameObject* character = new GameObject("Enemy");
-
-	AABBVolume* volume = new AABBVolume(Vector3(0.3f, 0.9f, 0.3f) * meshSize);
-	character->SetBoundingVolume((CollisionVolume*)volume);
-
-	character->GetTransform()
-		.SetScale(Vector3(meshSize, meshSize, meshSize))
-		.SetPosition(position);
-
-	character->SetRenderObject(new RenderObject(&character->GetTransform(), enemyMesh, nullptr, basicShader));
-	character->SetPhysicsObject(new PhysicsObject(&character->GetTransform(), character->GetBoundingVolume()));
-
-	character->GetPhysicsObject()->SetInverseMass(inverseMass);
-	character->GetPhysicsObject()->InitSphereInertia();
-
-	world->AddGameObject(character);
-
-	return character;
-}
-
-GameObject* TutorialGame::AddBonusToWorld(const Vector3& position) {
-	GameObject* apple = new GameObject();
-
-	SphereVolume* volume = new SphereVolume(1.0f);
-	apple->SetBoundingVolume((CollisionVolume*)volume);
-	apple->GetTransform()
-		.SetScale(Vector3(0.25, 0.25, 0.25))
-		.SetPosition(position);
-
-	apple->SetRenderObject(new RenderObject(&apple->GetTransform(), bonusMesh, nullptr, basicShader));
-	apple->SetPhysicsObject(new PhysicsObject(&apple->GetTransform(), apple->GetBoundingVolume()));
-
-	apple->GetPhysicsObject()->SetInverseMass(1.0f);
-	apple->GetPhysicsObject()->InitSphereInertia();
-
-	apple->GetRenderObject()->SetColour(Vector4(1.0f, 0.84f, 0.0f, 1.0f));
-
-	world->AddGameObject(apple);
-
-	return apple;
-}
-
-StateGameObject* NCL::CSC8503::TutorialGame::AddStateObjectWorld(const Vector3& position)
-{
-	StateGameObject* apple = new StateGameObject();
-
-	SphereVolume* volume = new SphereVolume(0.25f);
-	apple->SetBoundingVolume((CollisionVolume*)volume);
-	apple->GetTransform()
-		.SetScale(Vector3(0.25, 0.25, 0.25))
-		.SetPosition(position);
-
-	apple->SetRenderObject(new RenderObject(&apple->GetTransform(), bonusMesh, nullptr, basicShader));
-	apple->SetPhysicsObject(new PhysicsObject(&apple->GetTransform(), apple->GetBoundingVolume()));
-
-	apple->GetPhysicsObject()->SetInverseMass(1.0f);
-	apple->GetPhysicsObject()->InitSphereInertia();
-
-	world->AddGameObject(apple);
-
-	return apple;
 }
 
 

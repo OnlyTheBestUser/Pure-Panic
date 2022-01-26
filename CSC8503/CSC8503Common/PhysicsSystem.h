@@ -48,7 +48,7 @@ namespace NCL {
 			void ResolveSpringCollision(GameObject& a , GameObject&b, CollisionDetection::ContactPoint& p) const;
 
 			GameWorld& gameWorld;
-			QuadTree<GameObject*>* staticTree;
+			Octree<GameObject*>* staticTree;
 
 			bool	applyGravity;
 			Vector3 gravity;

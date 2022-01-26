@@ -2,7 +2,7 @@
 #include <vector>
 #include "Ray.h"
 #include "CollisionDetection.h"
-#include "QuadTree.h"
+#include "Octree.h"
 #include "NavigationGrid.h"
 namespace NCL {
 		class Camera;

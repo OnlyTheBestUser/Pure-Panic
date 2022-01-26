@@ -142,19 +142,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="GameTechRenderer.cpp" />
-    <ClCompile Include="LevelOne.cpp" />
-    <ClCompile Include="LevelTwo.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainMenu.cpp" />
-    <ClCompile Include="StateGameObject.cpp" />
     <ClCompile Include="TutorialGame.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameTechRenderer.h" />
-    <ClInclude Include="LevelOne.h" />
-    <ClInclude Include="LevelTwo.h" />
     <ClInclude Include="MainMenu.h" />
-    <ClInclude Include="StateGameObject.h" />
     <ClInclude Include="TutorialGame.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
