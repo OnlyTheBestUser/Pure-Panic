@@ -288,8 +288,6 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	world->AddLayerConstraint(Vector2(-1, 0));
-
 	GameObject* a = AddCubeToWorld(Vector3(15, 2, 15), Vector3(1, 1, 1), true, 10.0f, 1, false, true);
 	GameObject* b = AddCubeToWorld(Vector3(10, 2, 15), Vector3(1, 1, 1), true, 10.0f, 1, false, true);
 	a->GetRenderObject()->SetColour(Debug::CYAN);
@@ -311,15 +309,15 @@ void TutorialGame::InitWorld() {
 	GameObject* sphere1 = AddSphereToWorld(Vector3(10, 5, 20), 1.0f, 10.0f, false, false, true);
 	GameObject* sphere2 = AddSphereToWorld(Vector3(15, 5, 20), 1.0f, 10.0f, false, false, true);
 
-	a->SetLayer(1);
-	b->SetLayer(1);
-	c->SetLayer(1);
-	d->SetLayer(1);
-	e->SetLayer(1);
-	cap1->SetLayer(1);
-	cap2->SetLayer(1);
-	sphere1->SetLayer(1);
-	sphere2->SetLayer(1);
+	a->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	b->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	c->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	d->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	e->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
+	cap2->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
+	sphere1->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	sphere2->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 
 	physics->BuildStaticList();
 }
@@ -347,7 +345,7 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
 	floor->GetPhysicsObject()->InitCubeInertia();
 
 	world->AddGameObject(floor);
-	floor->SetLayer(0);
+	floor->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	return floor;
 }
 
@@ -436,8 +434,21 @@ GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimens
 	cube->GetPhysicsObject()->SetElasticity(0.2f);
 
 	world->AddGameObject(cube);
-
-	cube->SetLayer(layer);
+	switch (layer)
+	{
+	default:
+		cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+		break;
+	case 1:
+		cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+		break;
+	case 2:
+		cube->SetCollisionLayers(CollisionLayer::LAYER_TWO);
+		break;
+	case 3:
+		cube->SetCollisionLayers(CollisionLayer::LAYER_THREE);
+		break;
+	}
 	cube->SetTrigger(isTrigger);
 	cube->SetDynamic(dynamic);
 	return cube;
@@ -554,6 +565,7 @@ bool TutorialGame::SelectObject() {
 			}
 
 			Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
+			ray.SetCollisionLayers(CollisionLayer::LAYER_ONE);
 
 			RayCollision closestCollision;
 			if (world->Raycast(ray, closestCollision, true)) {

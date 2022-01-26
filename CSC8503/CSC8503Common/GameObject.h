@@ -11,6 +11,14 @@ using std::vector;
 
 namespace NCL {
 	namespace CSC8503 {
+		enum CollisionLayer {
+			LAYER_ONE = (1 << 0),
+			LAYER_TWO = (1 << 1),
+			LAYER_THREE = (1 << 2),
+			LAYER_FOUR = (1 << 3),
+			LAYER_FIVE = (1 << 4),
+			LAYER_SIX = (1 << 5)
+		};
 
 		class GameObject	{
 		public:
@@ -81,8 +89,13 @@ namespace NCL {
 				return worldID;
 			}
 
-			void SetLayer(int l) {	layer = l; }
-			int GetLayer() const { return layer; }
+			void SetCollisionLayers(int layers) {
+				collisionLayers = layers;
+			}
+
+			int	GetCollisionLayers() const {
+				return collisionLayers;
+			}
 
 			void SetTrigger(bool x) { isTrigger = x; }
 			bool IsTrigger() const { return isTrigger; }
@@ -103,7 +116,7 @@ namespace NCL {
 
 			bool dynamic = false;
 
-			int layer = 0;
+			int collisionLayers = 0;
 			bool isTrigger = false;
 
 			Vector3 broadphaseAABB;

@@ -374,7 +374,7 @@ void PhysicsSystem::BroadPhase() {
 			for (auto j = list.begin(); j != list.end(); j++) {
 				info.a = min((*i).object, (*j).object);
 				info.b = max((*i).object, (*j).object);
-				if (gameWorld.LayerCollides(info.a->GetLayer(), info.b->GetLayer())) {
+				if ((info.a->GetCollisionLayers() & info.b->GetCollisionLayers()) != 0) {
 					broadphaseCollisions.insert(info);
 				}
 			}
@@ -390,7 +390,7 @@ void PhysicsSystem::BroadPhase() {
 				// if the same pair is in another Octree node together etc
 				info.a = min((*i).object, (*j).object);
 				info.b = max((*i).object, (*j).object);
-				if (gameWorld.LayerCollides(info.a->GetLayer(), info.b->GetLayer()) && !(!info.a->IsDynamic() && !info.b->IsDynamic())) {
+				if (((info.a->GetCollisionLayers() & info.b->GetCollisionLayers()) != 0) && !(!info.a->IsDynamic() && !info.b->IsDynamic())) {
 					broadphaseCollisions.insert(info);
 				}
 			}
