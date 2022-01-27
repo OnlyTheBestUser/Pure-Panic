@@ -565,7 +565,6 @@ bool TutorialGame::SelectObject() {
 			}
 
 			Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
-			ray.SetCollisionLayers(CollisionLayer::LAYER_ONE);
 
 			RayCollision closestCollision;
 			if (world->Raycast(ray, closestCollision, true)) {
