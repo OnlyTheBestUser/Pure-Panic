@@ -12,9 +12,9 @@ using namespace CSC8503;
 
 Matrix4 biasMatrix = Matrix4::Translation(Vector3(0.5, 0.5, 0.5)) * Matrix4::Scale(Vector3(0.5, 0.5, 0.5));
 
-GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetWindow()), gameWorld(world)	{
+GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetWindow()), GameRenderCommands(world)	{
 	glEnable(GL_DEPTH_TEST);
-
+	gameWorld = world;
 	shadowShader = new OGLShader("GameTechShadowVert.glsl", "GameTechShadowFrag.glsl");
 
 	glGenTextures(1, &shadowTex);
@@ -97,7 +97,7 @@ void GameTechRenderer::LoadSkybox() {
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
-void GameTechRenderer::RenderFrame() {
+void GameTechRenderer::RenderScene() {
 	glEnable(GL_CULL_FACE);
 	glClearColor(1, 1, 1, 1);
 	BuildObjectList();
@@ -108,24 +108,10 @@ void GameTechRenderer::RenderFrame() {
 	glDisable(GL_CULL_FACE); //Todo - text indices are going the wrong way...
 }
 
-void GameTechRenderer::BuildObjectList() {
-	activeObjects.clear();
-
-	gameWorld.OperateOnContents(
-		[&](GameObject* o) {
-			if (o->IsActive()) {
-				const RenderObject* g = o->GetRenderObject();
-				if (g) {
-					activeObjects.emplace_back(g);
-				}
-			}
-		}
-	);
+void GameTechRenderer::RenderFrame() {
+	RenderScene();
 }
 
-void GameTechRenderer::SortObjectList() {
-	//Who cares!
-}
 
 void GameTechRenderer::RenderShadowMap() {
 	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);

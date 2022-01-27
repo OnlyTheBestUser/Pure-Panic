@@ -5,6 +5,7 @@
 #include "../../Plugins/OpenGLRendering/OGLMesh.h"
 
 #include "../CSC8503Common/GameWorld.h"
+#include "../GameTech/GameRenderCommands.h"
 
 namespace NCL {
 	class Maths::Vector3;
@@ -12,7 +13,7 @@ namespace NCL {
 	namespace CSC8503 {
 		class RenderObject;
 
-		class GameTechRenderer : public OGLRenderer	{
+		class GameTechRenderer : public OGLRenderer, public GameRenderCommands	{
 		public:
 			GameTechRenderer(GameWorld& world);
 			~GameTechRenderer();
@@ -25,17 +26,13 @@ namespace NCL {
 
 			OGLShader*		defaultShader;
 
-			GameWorld&	gameWorld;
+			
+			void RenderShadowMap() override;
+			void RenderCamera() override;
+			void RenderSkybox() override;
 
-			void BuildObjectList();
-			void SortObjectList();
-			void RenderShadowMap();
-			void RenderCamera(); 
-			void RenderSkybox();
-
-			void LoadSkybox();
-
-			vector<const RenderObject*> activeObjects;
+			void LoadSkybox() override;
+			void RenderScene() override;
 
 			OGLShader*  skyboxShader;
 			OGLMesh*	skyboxMesh;
