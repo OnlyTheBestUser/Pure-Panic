@@ -9,9 +9,6 @@ https://research.ncl.ac.uk/game/
 #pragma once
 #include "../../Common/RendererBase.h"
 
-#include "../../Common/Vector3.h"
-#include "../../Common/Vector4.h"
-
 
 #ifdef _WIN32
 #include "windows.h"
@@ -59,8 +56,8 @@ namespace NCL {
 
 			virtual bool SetVerticalSync(VerticalSyncState s);
 
-			void DrawString(const std::string& text, const Vector2&pos, const Vector4& colour = Vector4(0.75f, 0.75f, 0.75f,1), float size = 20.0f );
-			void DrawLine(const Vector3& start, const Vector3& end, const Vector4& colour);
+			void DrawString(const std::string& text, const Vector2&pos, const Vector4& colour = Vector4(0.75f, 0.75f, 0.75f,1), float size = 20.0f ) override;
+			void DrawLine(const Vector3& start, const Vector3& end, const Vector4& colour) override;
 
 			virtual Matrix4 SetupDebugLineMatrix()	const;
 			virtual Matrix4 SetupDebugStringMatrix()const;

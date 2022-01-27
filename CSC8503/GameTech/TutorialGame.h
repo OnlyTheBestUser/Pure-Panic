@@ -59,7 +59,7 @@ namespace NCL {
 
 			StateGameObject* testStateObject;
 
-			GameTechRenderer*	renderer;
+			RendererBase*	renderer;
 			PhysicsSystem*		physics;
 			GameWorld*			world;
 
