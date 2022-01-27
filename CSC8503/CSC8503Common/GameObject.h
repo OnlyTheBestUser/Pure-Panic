@@ -116,7 +116,7 @@ namespace NCL {
 
 			bool dynamic = false;
 
-			int collisionLayers = 0;
+			int collisionLayers = CollisionLayer::LAYER_ONE;
 			bool isTrigger = false;
 
 			Vector3 broadphaseAABB;
