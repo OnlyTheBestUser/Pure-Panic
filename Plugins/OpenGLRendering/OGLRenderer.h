@@ -68,6 +68,10 @@ namespace NCL {
 			void EndFrame()		override;
 			void SwapBuffers()  override;
 
+			void UpdateShaderMatrices(OGLShader* shader, Matrix4 proj, Matrix4 view);
+			void UpdateModelShaderMatrices(OGLShader* shader, Matrix4 model);
+			void UpdateModelShaderMatrices(OGLShader* shader, Matrix4 model, Matrix4 shadow);
+
 			void DrawDebugData();
 			void DrawDebugStrings();
 			void DrawDebugLines();
