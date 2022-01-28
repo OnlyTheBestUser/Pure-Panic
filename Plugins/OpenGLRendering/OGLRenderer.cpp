@@ -121,6 +121,27 @@ void OGLRenderer::SwapBuffers()   {
 	::SwapBuffers(deviceContext);
 }
 
+void OGLRenderer::UpdateShaderMatrices(OGLShader* shader, Matrix4 projMatrix, Matrix4 viewMatrix) {
+	int projLocation = glGetUniformLocation(shader->GetProgramID(), "projMatrix");
+	int viewLocation = glGetUniformLocation(shader->GetProgramID(), "viewMatrix");
+	glUniformMatrix4fv(projLocation, 1, false, (float*)&projMatrix);
+	glUniformMatrix4fv(viewLocation, 1, false, (float*)&viewMatrix);
+}
+
+void OGLRenderer::UpdateModelShaderMatrices(OGLShader* shader, Matrix4 modelMatrix) {
+	int modelLocation = 0;
+	modelLocation = glGetUniformLocation(shader->GetProgramID(), "modelMatrix");
+	glUniformMatrix4fv(modelLocation, 1, false, (float*)&modelMatrix);
+}
+
+void OGLRenderer::UpdateModelShaderMatrices(OGLShader* shader, Matrix4 modelMatrix, Matrix4 shadowMatrix) {
+	UpdateModelShaderMatrices(shader, modelMatrix);
+	int shadowLocation = 0;
+	shadowLocation = glGetUniformLocation(shader->GetProgramID(), "shadowMatrix");
+	glUniformMatrix4fv(shadowLocation, 1, false, (float*)&shadowMatrix);
+}
+
+
 void OGLRenderer::BindShader(ShaderBase*s) {
 	if (!s) {
 		glUseProgram(0);

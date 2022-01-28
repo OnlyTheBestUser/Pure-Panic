@@ -12,7 +12,7 @@ namespace NCL {
 
 		static void DrawAxisLines(const Matrix4 &modelMatrix, float scaleBoost = 1.0f, float time = 0.0f);
 
-		static void SetRenderer(OGLRenderer* r) {
+		static void SetRenderer(RendererBase* r) {
 			renderer = r;
 		}
 
@@ -50,7 +50,7 @@ namespace NCL {
 		static std::vector<DebugStringEntry>	stringEntries;
 		static std::vector<DebugLineEntry>	lineEntries;
 
-		static OGLRenderer* renderer;
+		static RendererBase* renderer;
 	};
 }
 
