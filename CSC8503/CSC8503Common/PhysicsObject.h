@@ -6,8 +6,17 @@ using namespace NCL::Maths;
 
 namespace NCL {
 	class CollisionVolume;
-	
+
 	namespace CSC8503 {
+		enum CollisionLayer {
+			LAYER_ONE = (1 << 0),
+			LAYER_TWO = (1 << 1),
+			LAYER_THREE = (1 << 2),
+			LAYER_FOUR = (1 << 3),
+			LAYER_FIVE = (1 << 4),
+			LAYER_SIX = (1 << 5)
+		};
+
 		class Transform;
 
 		class PhysicsObject	{
@@ -84,6 +93,9 @@ namespace NCL {
 			void SetFriction(bool k) { useFriction = k; }
 			bool UsesFriction() const { return useFriction; }
 
+			void SetCollisionLayers(int layers) { collisionLayers = layers; }
+			int	GetCollisionLayers() const { return collisionLayers; }
+
 		protected:
 			const CollisionVolume* volume;
 			Transform*		transform;
@@ -106,6 +118,8 @@ namespace NCL {
 			Vector3 torque;
 			Vector3 inverseInertia;
 			Matrix3 inverseInteriaTensor;
+
+			int collisionLayers = 0;
 		};
 	}
 }
