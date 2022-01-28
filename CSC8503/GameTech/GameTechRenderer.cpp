@@ -243,7 +243,7 @@ void GameTechRenderer::RenderCamera(Camera* camera) {
 
 		Matrix4 modelMatrix = (*i).GetTransform()->GetMatrix();		
 		Matrix4 fullShadowMat = shadowMatrix * modelMatrix;
-		UpdateModelShaderMatrices(shader, modelMatrix, shadowMatrix);
+		UpdateModelShaderMatrices(shader, modelMatrix, fullShadowMat);
 
 		glUniform4fv(colourLocation, 1, (float*)&i->GetColour());
 
