@@ -1,6 +1,7 @@
 #pragma once
 #include "../../Common/Vector3.h"
 #include "../../Common/Matrix3.h"
+#include <queue>
 
 using namespace NCL::Maths;
 
@@ -84,6 +85,15 @@ namespace NCL {
 			void SetFriction(bool k) { useFriction = k; }
 			bool UsesFriction() const { return useFriction; }
 
+			void Wake() { sleeping = false; }
+			void Sleep() { sleeping = true; }
+			bool isSleeping() const { return sleeping; }
+
+			void AddToPreviousVelocities(float velocityDotProduct) { previousVelocityDotProducts.push(velocityDotProduct); }
+			void RemoveFromPreviousVelocities() { previousVelocityDotProducts.pop(); }
+			int GetPrevVelocitiesSize() const { return previousVelocityDotProducts.size(); }
+			std::queue<float> GetPrevVelocities() const { return previousVelocityDotProducts; }
+
 		protected:
 			const CollisionVolume* volume;
 			Transform*		transform;
@@ -91,6 +101,9 @@ namespace NCL {
 			float inverseMass;
 			float elasticity;
 			float friction;
+
+			bool sleeping = false;
+			std::queue<float> previousVelocityDotProducts;
 
 			bool useGravity = true;
 			bool useFriction = true;

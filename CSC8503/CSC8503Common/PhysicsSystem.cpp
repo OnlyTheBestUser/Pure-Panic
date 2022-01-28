@@ -78,6 +78,7 @@ int constraintIterationCount = 10;
 //This is the fixed timestep we'd LIKE to have
 const int   idealHZ = 120;
 const float idealDT = 1.0f / idealHZ;
+const float epsilon = 0.0;
 
 /*
 This is the fixed update we actually have...
@@ -112,6 +113,17 @@ void PhysicsSystem::Update(float dt) {
 	}
 
 	while(dTOffset >= realDT) {
+		// Wake objects if new forces have been applied above a threshold
+		std::vector<GameObject*>::const_iterator first;
+		std::vector<GameObject*>::const_iterator last;
+		gameWorld.GetObjectIterators(first, last);
+		for (auto i = first; i != last; ++i) {
+			PhysicsObject* object = (*i)->GetPhysicsObject();
+			if (object == nullptr)
+				continue;
+			if (object->GetLinearVelocity().Length() > epsilon || object->GetForce().Length() > epsilon)
+				object->Wake();
+		}
 
 		IntegrateAccel(realDT); //Update accelerations from external forces
 		if (useBroadPhase) {
@@ -121,8 +133,51 @@ void PhysicsSystem::Update(float dt) {
 		else {
 			BasicCollisionDetection();
 		}
-		// TODO
+		
+		// for all objects in world, update their queue of previous velocities dot products
+		gameWorld.GetObjectIterators(first, last);
+		for (auto i = first; i != last; ++i) {
+			PhysicsObject* object = (*i)->GetPhysicsObject();
+			if (object == nullptr)
+				continue;
 
+			// only ever want a queue of set length, so if gonna be longer remove the oldest and add latest
+			const int maxQueueSize = 6;
+			if (object->GetPrevVelocitiesSize() >= maxQueueSize)
+				object->RemoveFromPreviousVelocities();
+			object->AddToPreviousVelocities(Vector3::Dot(object->GetLinearVelocity(), Vector3(1, 1, 1)));
+
+			// Check if 2 consecutive values in the queue are of the same sign, if so continue, if not sleep object as its bouncing permanently on the floor
+			if (object->GetPrevVelocitiesSize() == maxQueueSize)
+			{
+				std::queue<float> queue = object->GetPrevVelocities();
+				bool shouldSleep = true;
+				float queuePrev = queue.front();
+				queue.pop();
+				while(!queue.empty())
+				{
+					float queueNext = queue.front();
+					queue.pop();
+					// Check if values are same sign or it is gonna start moving from rest, set sleeping to false
+					if ((queuePrev/abs(queuePrev)) == (queueNext/abs(queueNext))
+						|| (queuePrev == 0.0) && ((queueNext / abs(queueNext)) != 0.0)
+						|| ((queuePrev / abs(queuePrev)) != 0.0) && (queueNext == 0.0))
+					{
+						shouldSleep = false;
+					}
+					queuePrev = queueNext;
+				}
+				// if object should sleep remove all velocity and set to sleep
+				if (shouldSleep)
+				{
+					object->SetLinearVelocity(Vector3(0, 0, 0));
+					object->Sleep();
+				}
+			}
+		}
+		// --------------------------------------------------------------
+
+		// TODO
 		//This is our simple iterative solver - 
 		//we just run things multiple times, slowly moving things forward
 		//and then rechecking that the constraints have been met		
@@ -130,6 +185,7 @@ void PhysicsSystem::Update(float dt) {
 		for (int i = 0; i < constraintIterationCount; ++i) {
 			UpdateConstraints(constraintDt);	
 		}
+
 		IntegrateVelocity(realDT); //update positions from new velocity changes
 
 		dTOffset -= realDT;
@@ -141,7 +197,7 @@ void PhysicsSystem::Update(float dt) {
 
 	t.Tick();
 	float updateTime = t.GetTimeDeltaSeconds();
-
+	
 	//Uh oh, physics is taking too long...
 	if (updateTime > realDT) {
 		realHZ /= 2;
@@ -443,6 +499,9 @@ void PhysicsSystem::IntegrateAccel(float dt) {
 		PhysicsObject* object = (*i)->GetPhysicsObject();
 		if (object == nullptr)
 			continue;
+		if (object->isSleeping())
+			continue;
+
 		float inverseMass = object->GetInverseMass();
 
 		Vector3 linearVel = object->GetLinearVelocity();
@@ -483,6 +542,9 @@ void PhysicsSystem::IntegrateVelocity(float dt) {
 		PhysicsObject* object = (*i)->GetPhysicsObject();
 		if (object == nullptr)
 			continue;
+		if (object->isSleeping())
+			continue;
+
 		Transform& transform = (*i)->GetTransform();
 		// Position stuff
 		Vector3 position = transform.GetPosition();
