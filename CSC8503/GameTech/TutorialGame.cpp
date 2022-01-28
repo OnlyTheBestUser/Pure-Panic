@@ -5,6 +5,11 @@
 #include "../../Plugins/OpenGLRendering/OGLTexture.h"
 #include "../../Common/TextureLoader.h"
 #include "../../Common/Quaternion.h"
+
+#include "..//CSC8503Common/InputHandler.h"
+#include "..//CSC8503Common/GameActor.h"
+#include "..//CSC8503Common/Command.h"
+
 using namespace NCL;
 using namespace CSC8503;
 
@@ -26,6 +31,20 @@ TutorialGame::TutorialGame()	{
 	//physics->SetGravity(Vector3(0, 9.8f, 0));
 	//physics->SetLinearDamping(10.0f);
 	InitialiseAssets();
+
+	inputHandler = new InputHandler();
+	GameActor* g = new GameActor();
+
+	Command* f = new MoveForwardCommand(g);
+	Command* b = new MoveBackwardCommand(g);
+	Command* l = new MoveLeftCommand(g);
+	Command* r = new MoveRightCommand(g);
+
+	inputHandler->BindButtonW(f);
+	inputHandler->BindButtonS(b);
+	inputHandler->BindButtonA(l);
+	inputHandler->BindButtonD(r);
+
 }
 
 /*
@@ -87,6 +106,8 @@ void TutorialGame::UpdateGame(float dt) {
 		break;
 	}
 	}
+
+	inputHandler->HandleInput();
 
 	//Debug::DrawLine(Vector3(), Vector3(0, 20, 0), Debug::RED);
 	//Debug::DrawLine(Vector3(), Vector3(360, 0, 0), Debug::RED);

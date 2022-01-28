@@ -25,6 +25,9 @@
     <Filter Include="Pathfinding">
       <UniqueIdentifier>{84f869c2-c73b-4eb0-ace4-ff4d685ef4ee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Input Handling">
+      <UniqueIdentifier>{f1226dc9-d3d1-4557-b16d-d16067ca991a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameWorld.h">
@@ -123,6 +126,18 @@
     <ClInclude Include="Octree.h">
       <Filter>CollisionDetection</Filter>
     </ClInclude>
+    <ClInclude Include="Command.h">
+      <Filter>Input Handling</Filter>
+    </ClInclude>
+    <ClInclude Include="GameActor.h">
+      <Filter>Input Handling</Filter>
+    </ClInclude>
+    <ClInclude Include="InputHandler.h">
+      <Filter>Input Handling</Filter>
+    </ClInclude>
+    <ClInclude Include="MoveForwardCommand.h">
+      <Filter>Input Handling</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameWorld.cpp">
@@ -172,6 +187,12 @@
     </ClCompile>
     <ClCompile Include="Octree.cpp">
       <Filter>CollisionDetection</Filter>
+    </ClCompile>
+    <ClCompile Include="InputHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MoveForwardCommand.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
