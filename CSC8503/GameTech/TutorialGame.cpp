@@ -5,6 +5,7 @@
 #include "../../Plugins/OpenGLRendering/OGLTexture.h"
 #include "../../Common/TextureLoader.h"
 #include "../../Common/Quaternion.h"
+#include "../CSC8503Common/PaintBlob.h"
 using namespace NCL;
 using namespace CSC8503;
 
@@ -308,6 +309,8 @@ void TutorialGame::InitWorld() {
 
 	GameObject* sphere1 = AddSphereToWorld(Vector3(10, 5, 20), 1.0f, 10.0f, false, false, true);
 	GameObject* sphere2 = AddSphereToWorld(Vector3(15, 5, 20), 1.0f, 10.0f, false, false, true);
+	sphere1->SetTrigger(true);
+	sphere2->SetTrigger(true);
 
 	a->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	b->SetCollisionLayers(CollisionLayer::LAYER_ONE);
@@ -357,7 +360,7 @@ physics worlds. You'll probably need another function for the creation of OBB cu
 
 */
 GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius, float inverseMass, bool rubber, bool hollow, bool dynamic) {
-	GameObject* sphere = new GameObject("Sphere");
+	PaintBlob* sphere = new PaintBlob();
 	
 	// Raycasting Tutorial 1 - Further Work Part 1
 	//sphere->SetLayer(1);
@@ -388,6 +391,8 @@ GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius
 	sphere->SetDynamic(dynamic);
 	return sphere;
 }
+
+
 
 GameObject* TutorialGame::AddCapsuleToWorld(const Vector3& position, float halfHeight, float radius, float inverseMass) {
 	GameObject* capsule = new GameObject("Capsule");

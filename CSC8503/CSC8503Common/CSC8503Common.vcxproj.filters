@@ -25,6 +25,9 @@
     <Filter Include="Pathfinding">
       <UniqueIdentifier>{84f869c2-c73b-4eb0-ace4-ff4d685ef4ee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameObjects">
+      <UniqueIdentifier>{ec94a095-7e2c-422c-bf3c-be7f30fe3ffe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameWorld.h">
@@ -122,6 +125,9 @@
     </ClInclude>
     <ClInclude Include="Octree.h">
       <Filter>CollisionDetection</Filter>
+    </ClInclude>
+    <ClInclude Include="PaintBlob.h">
+      <Filter>GameObjects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
