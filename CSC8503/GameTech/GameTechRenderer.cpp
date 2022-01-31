@@ -107,9 +107,9 @@ void GameTechRenderer::RenderFrame() {
 }
 
 void GameTechRenderer::RenderPerspective(Camera* camera) {
-	RenderShadowMap(gameWorld.GetMainCamera());
-	RenderSkybox(gameWorld.GetMainCamera());
-	RenderCamera(gameWorld.GetMainCamera());
+	RenderShadowMap(camera);
+	RenderSkybox(camera);
+	RenderCamera(camera);
 }
 
 void GameTechRenderer::BuildObjectList() {

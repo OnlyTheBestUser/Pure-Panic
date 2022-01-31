@@ -48,6 +48,9 @@ namespace NCL {
 			GLuint		shadowFBO;
 			Matrix4     shadowMatrix;
 
+			// Post Processing FBO
+			GLuint		postProcessFBO;
+
 			Vector4		lightColour;
 			float		lightRadius;
 			Vector3		lightPosition;
