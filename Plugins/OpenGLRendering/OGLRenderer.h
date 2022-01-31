@@ -71,6 +71,7 @@ namespace NCL {
 			void UpdateShaderMatrices(OGLShader* shader, Matrix4 proj, Matrix4 view);
 			void UpdateModelShaderMatrices(OGLShader* shader, Matrix4 model);
 			void UpdateModelShaderMatrices(OGLShader* shader, Matrix4 model, Matrix4 shadow);
+			void UpdateLightUniforms(OGLShader* shader, Vector3 lightPos, Vector4 lightColor, float lightRadius);
 
 			void DrawDebugData();
 			void DrawDebugStrings();

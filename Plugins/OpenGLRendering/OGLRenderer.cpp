@@ -141,6 +141,18 @@ void OGLRenderer::UpdateModelShaderMatrices(OGLShader* shader, Matrix4 modelMatr
 	glUniformMatrix4fv(shadowLocation, 1, false, (float*)&shadowMatrix);
 }
 
+void OGLRenderer::UpdateLightUniforms(OGLShader* shader, Vector3 lightPos, Vector4 lightColor, float lightRadius) {
+	int lightPosLocation = 0;
+	int lightColourLocation = 0;
+	int lightRadiusLocation = 0;
+	lightPosLocation = glGetUniformLocation(shader->GetProgramID(), "lightPos");
+	lightColourLocation = glGetUniformLocation(shader->GetProgramID(), "lightColour");
+	lightRadiusLocation = glGetUniformLocation(shader->GetProgramID(), "lightRadius");
+	glUniform3fv(lightPosLocation, 1, (float*)&lightPos);
+	glUniform4fv(lightColourLocation, 1, (float*)&lightColor);
+	glUniform1f(lightRadiusLocation, lightRadius);
+}
+
 
 void OGLRenderer::BindShader(ShaderBase*s) {
 	if (!s) {
