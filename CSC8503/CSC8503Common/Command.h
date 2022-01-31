@@ -1,5 +1,6 @@
 #pragma once
 #include "GameActor.h"
+#include "PhysicsSystem.h"
 
 namespace NCL {
 	namespace CSC8503 {
@@ -59,6 +60,22 @@ namespace NCL {
 			GameActor* actor;
 		};
 
+#pragma endregion
+
+#pragma region World Commands
+		class ToggleGravityCommand : public Command {
+		public:
+			ToggleGravityCommand(PhysicsSystem* physics) : physics(physics) {};
+			virtual ~ToggleGravityCommand() {};
+			void execute() {
+				if (physics->GetGravity())
+					physics->UseGravity(false);
+				else
+					physics->UseGravity(true);
+			}
+		protected:
+			PhysicsSystem* physics;
+		};
 #pragma endregion
 	}
 }

@@ -19,8 +19,9 @@ TutorialGame::TutorialGame()	{
 	physics		= new PhysicsSystem(*world);
 
 	forceMagnitude	= 30.0f;
-	useGravity		= false;
+	useGravity		= true;
 	inSelectionMode = false;
+	physics->UseGravity(true);
 
 	testStateObject = nullptr;
 
@@ -32,6 +33,35 @@ TutorialGame::TutorialGame()	{
 	//physics->SetLinearDamping(10.0f);
 	InitialiseAssets();
 
+#pragma region Commands
+
+	/*
+		Command Design Pattern Explanation
+
+		The command design pattern I've implemented comes down to three classes, all of which can be found in the Input Handling filter:
+		Command.h:
+			This contains all the commands you will use to affect the world (via input handling). There are a few examples
+			in the class itself of how to use them.
+
+		GameActor.h:
+			This is a gameobject child that you will control using inputs, I've given the class a set of default methods, which
+			can be overriden if you derive a Player class from GameActor for example. Use the commands class above to attach methods
+			to commands, which can in turn be assigned to keys in the input handler.
+
+		InputHandler.h:
+			This is where keys are assigned, each key you want to assign is made as a Command* pointer variable. The handleInputs method
+			is called every frame, it will loop through each of the keys, see if they are assigned to a command, if so it checks if the key is
+			pressed and executes accordingly. 
+
+		Basically, all this means is that the hard coding of key checking is done in a separate file, and commands are kept in their own file, 
+		so everything is organised and neat. 
+
+		To use this, as shown in the example below, you need to instantiate an input handler and some commands, and bind the commands to the buttons.
+		It makes it very easy and readable to change which keys do what. If there is a specific gameobject you wish to register inputs for, you need
+		to instantiate a GameActor and pass it into the Commands accordingly.
+			
+	*/
+
 	inputHandler = new InputHandler();
 	GameActor* g = new GameActor();
 
@@ -39,12 +69,14 @@ TutorialGame::TutorialGame()	{
 	Command* b = new MoveBackwardCommand(g);
 	Command* l = new MoveLeftCommand(g);
 	Command* r = new MoveRightCommand(g);
+	Command* toggleGrav = new ToggleGravityCommand(physics);
 
 	inputHandler->BindButtonW(f);
 	inputHandler->BindButtonS(b);
 	inputHandler->BindButtonA(l);
 	inputHandler->BindButtonD(r);
-
+	inputHandler->BindButtonG(toggleGrav);
+#pragma endregion
 }
 
 /*
@@ -130,7 +162,7 @@ void TutorialGame::UpdateGameWorld(float dt)
 
 	UpdateKeys();
 
-	if (useGravity) {
+	if (physics->GetGravity()) {
 		Debug::Print("(G)ravity on", Vector2(5, 95));
 	}
 	else {
@@ -187,10 +219,10 @@ void TutorialGame::UpdateKeys() {
 		InitCamera(); //F2 will reset the camera to a specific default place
 	}
 
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::G)) {
-		useGravity = !useGravity; //Toggle gravity!
-		physics->UseGravity(useGravity);
-	}
+	//if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::G)) {
+	//	useGravity = !useGravity; //Toggle gravity!
+	//	physics->UseGravity(useGravity);
+	//}
 
 	//Running certain physics updates in a consistent order might cause some
 	//bias in the calculations - the same objects might keep 'winning' the constraint

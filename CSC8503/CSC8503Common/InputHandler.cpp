@@ -9,27 +9,33 @@ void InputHandler::HandleInput()
 {
 
 	// Loop through keys
-	if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::W)) {
-		if (buttonW_) {
+	if (buttonW_) {
+		if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::W)) {
 			buttonW_->execute();
 		}
 	}
 
-	if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::A)) {
-		if (buttonA_) {
+	if (buttonA_) {
+		if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::A)) {
 			buttonA_->execute();
 		}
 	}
 
-	if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::S)) {
-		if (buttonS_) {
+	if (buttonS_) {
+		if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::S)) {
 			buttonS_->execute();
 		}
 	}
 
-	if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::D)) {
-		if (buttonD_) {
+	if (buttonD_) {
+		if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::D)) {
 			buttonD_->execute();
+		}
+	}
+
+	if (buttonG_) {
+		if (Window::GetKeyboard()->KeyPressed(NCL::KeyboardKeys::G)) {
+			buttonG_->execute();
 		}
 	}
 }
