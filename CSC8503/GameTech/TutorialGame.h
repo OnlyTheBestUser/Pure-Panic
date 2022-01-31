@@ -13,6 +13,7 @@ namespace NCL {
 		};
 
 		class StateGameObject;
+		class InputHandler;
 		class Checkpoint;
 		class TutorialGame		{
 		public:
@@ -30,6 +31,8 @@ namespace NCL {
 			}
 
 		protected:
+			InputHandler* inputHandler;
+
 			void InitialiseAssets();
 
 			void InitCamera();
