@@ -290,35 +290,35 @@ void TutorialGame::InitWorld() {
 	physics->Clear();
 
 	GameObject* a = AddCubeToWorld(Vector3(15, 2, 15), Vector3(1, 1, 1), true, 10.0f, 1, false, true);
-	//GameObject* b = AddCubeToWorld(Vector3(10, 2, 15), Vector3(1, 1, 1), true, 10.0f, 1, false, true);
+	GameObject* b = AddCubeToWorld(Vector3(10, 2, 15), Vector3(1, 1, 1), true, 10.0f, 1, false, true);
 	a->GetRenderObject()->SetColour(Debug::CYAN);
-	//b->GetRenderObject()->SetColour(Debug::CYAN);
+	b->GetRenderObject()->SetColour(Debug::CYAN);
 
-	/*GameObject* c = AddCubeToWorld(Vector3(10, 2, 10), Vector3(1, 1, 1), false, 10.0f, 1, false, true);
+	GameObject* c = AddCubeToWorld(Vector3(10, 2, 10), Vector3(1, 1, 1), false, 10.0f, 1, false, true);
 	GameObject* d = AddCubeToWorld(Vector3(15, 2, 10), Vector3(1, 1, 1), false, 10.0f, 1, false, true);
 	c->GetPhysicsObject()->SetFriction(false);
-	d->GetPhysicsObject()->SetFriction(false);*/
+	d->GetPhysicsObject()->SetFriction(false);
 
 	// Floor
 	GameObject* e = AddCubeToWorld(Vector3(0, -2, 0), Vector3(250, 2, 250), false, 0, 0);
 
-	/*GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
+	GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
 	GameObject* cap2 = AddCapsuleToWorld(Vector3(10, 5, 0), 3.0f, 1.5f);
 	cap1->SetDynamic(true);
-	cap2->SetDynamic(true);*/
+	cap2->SetDynamic(true);
 
 	GameObject* sphere1 = AddSphereToWorld(Vector3(10, 5, 20), 1.0f, 10.0f, false, false, true);
-	//GameObject* sphere2 = AddSphereToWorld(Vector3(15, 5, 20), 1.0f, 10.0f, false, false, true);
+	GameObject* sphere2 = AddSphereToWorld(Vector3(15, 5, 20), 1.0f, 10.0f, false, false, true);
 
 	a->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	/*b->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	b->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	c->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	d->SetCollisionLayers(CollisionLayer::LAYER_ONE);*/
+	d->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	e->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	/*cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
-	cap2->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);*/
+	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
+	cap2->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
 	sphere1->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	//sphere2->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	sphere2->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 
 	physics->BuildStaticList();
 }

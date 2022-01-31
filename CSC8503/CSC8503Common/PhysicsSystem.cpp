@@ -448,7 +448,7 @@ void PhysicsSystem::CheckToWake()
 void PhysicsSystem::CheckToSleep()
 {
 	const int maxQueueSize = 6;
-	const float bounceTolerance = 0.1;
+	const float bounceTolerance = 0.5;
 
 	// for all objects in world, update their queue of previous velocities dot products
 	std::vector<GameObject*>::const_iterator first;
@@ -504,7 +504,6 @@ void PhysicsSystem::CheckToSleep()
 					}
 				}
 
-				// TESTING OUT WITH POS
 				if (abs(posQueueNext - posQueuePrev) * 1000 > bounceTolerance)
 					posShouldSleep = false;
 
@@ -519,7 +518,7 @@ void PhysicsSystem::CheckToSleep()
 					velShouldSleep = false;
 				}
 			}
-
+			
 			// if object should sleep remove all velocity and set to sleep
 			if (abs(lastPos - firstPos) * 1000 < bounceTolerance && posShouldSleep && velShouldSleep)
 			{
@@ -527,7 +526,6 @@ void PhysicsSystem::CheckToSleep()
 				object->Sleep();
 			}
 		}
-		std::cout << std::endl;
 	}
 }
 
