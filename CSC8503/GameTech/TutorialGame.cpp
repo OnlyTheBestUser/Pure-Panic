@@ -289,12 +289,12 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	/*GameObject* a = AddCubeToWorld(Vector3(15, 2, 15), Vector3(1, 1, 1), true, 10.0f, 1, false, true);
-	GameObject* b = AddCubeToWorld(Vector3(10, 2, 15), Vector3(1, 1, 1), true, 10.0f, 1, false, true);
+	GameObject* a = AddCubeToWorld(Vector3(15, 2, 15), Vector3(1, 1, 1), true, 10.0f, 1, false, true);
+	//GameObject* b = AddCubeToWorld(Vector3(10, 2, 15), Vector3(1, 1, 1), true, 10.0f, 1, false, true);
 	a->GetRenderObject()->SetColour(Debug::CYAN);
-	b->GetRenderObject()->SetColour(Debug::CYAN);
+	//b->GetRenderObject()->SetColour(Debug::CYAN);
 
-	GameObject* c = AddCubeToWorld(Vector3(10, 2, 10), Vector3(1, 1, 1), false, 10.0f, 1, false, true);
+	/*GameObject* c = AddCubeToWorld(Vector3(10, 2, 10), Vector3(1, 1, 1), false, 10.0f, 1, false, true);
 	GameObject* d = AddCubeToWorld(Vector3(15, 2, 10), Vector3(1, 1, 1), false, 10.0f, 1, false, true);
 	c->GetPhysicsObject()->SetFriction(false);
 	d->GetPhysicsObject()->SetFriction(false);*/
@@ -310,8 +310,8 @@ void TutorialGame::InitWorld() {
 	GameObject* sphere1 = AddSphereToWorld(Vector3(10, 5, 20), 1.0f, 10.0f, false, false, true);
 	//GameObject* sphere2 = AddSphereToWorld(Vector3(15, 5, 20), 1.0f, 10.0f, false, false, true);
 
-	/*a->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	b->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	a->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	/*b->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	c->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	d->SetCollisionLayers(CollisionLayer::LAYER_ONE);*/
 	e->SetCollisionLayers(CollisionLayer::LAYER_ONE);

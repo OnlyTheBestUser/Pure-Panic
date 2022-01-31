@@ -78,7 +78,6 @@ int constraintIterationCount = 10;
 //This is the fixed timestep we'd LIKE to have
 const int   idealHZ = 120;
 const float idealDT = 1.0f / idealHZ;
-const float epsilon = 0.0;
 
 /*
 This is the fixed update we actually have...
@@ -113,18 +112,7 @@ void PhysicsSystem::Update(float dt) {
 	}
 
 	while(dTOffset >= realDT) {
-		// Wake objects if new forces have been applied above a threshold
-		std::vector<GameObject*>::const_iterator first;
-		std::vector<GameObject*>::const_iterator last;
-		gameWorld.GetObjectIterators(first, last);
-		for (auto i = first; i != last; ++i) {
-			PhysicsObject* object = (*i)->GetPhysicsObject();
-			if (object == nullptr)
-				continue;
-			if (object->GetLinearVelocity().Length() > epsilon || object->GetForce().Length() > epsilon)
-				object->Wake();
-		}
-
+		CheckToWake();
 		IntegrateAccel(realDT); //Update accelerations from external forces
 		if (useBroadPhase) {
 			BroadPhase();
@@ -133,48 +121,8 @@ void PhysicsSystem::Update(float dt) {
 		else {
 			BasicCollisionDetection();
 		}
-		
-		// for all objects in world, update their queue of previous velocities dot products
-		gameWorld.GetObjectIterators(first, last);
-		for (auto i = first; i != last; ++i) {
-			PhysicsObject* object = (*i)->GetPhysicsObject();
-			if (object == nullptr)
-				continue;
 
-			// only ever want a queue of set length, so if gonna be longer remove the oldest and add latest
-			const int maxQueueSize = 6;
-			if (object->GetPrevVelocitiesSize() >= maxQueueSize)
-				object->RemoveFromPreviousVelocities();
-			object->AddToPreviousVelocities(Vector3::Dot(object->GetLinearVelocity(), Vector3(1, 1, 1)));
-
-			// Check if 2 consecutive values in the queue are of the same sign, if so continue, if not sleep object as its bouncing permanently on the floor
-			if (object->GetPrevVelocitiesSize() == maxQueueSize)
-			{
-				std::queue<float> queue = object->GetPrevVelocities();
-				bool shouldSleep = true;
-				float queuePrev = queue.front();
-				queue.pop();
-				while(!queue.empty())
-				{
-					float queueNext = queue.front();
-					queue.pop();
-					// Check if values are same sign or it is gonna start moving from rest, set sleeping to false
-					if ((queuePrev/abs(queuePrev)) == (queueNext/abs(queueNext))
-						|| (queuePrev == 0.0) && ((queueNext / abs(queueNext)) != 0.0)
-						|| ((queuePrev / abs(queuePrev)) != 0.0) && (queueNext == 0.0))
-					{
-						shouldSleep = false;
-					}
-					queuePrev = queueNext;
-				}
-				// if object should sleep remove all velocity and set to sleep
-				if (shouldSleep)
-				{
-					object->SetLinearVelocity(Vector3(0, 0, 0));
-					object->Sleep();
-				}
-			}
-		}
+		CheckToSleep();
 		// --------------------------------------------------------------
 
 		// TODO
@@ -478,6 +426,108 @@ void PhysicsSystem::NarrowPhase() {
 
 			allCollisions.insert(info); // insert into our main set
 		}
+	}
+}
+
+void PhysicsSystem::CheckToWake()
+{
+	const float threshold = 0.1;
+	// Wake objects if new forces have been applied above a threshold
+	std::vector<GameObject*>::const_iterator first;
+	std::vector<GameObject*>::const_iterator last;
+	gameWorld.GetObjectIterators(first, last);
+	for (auto i = first; i != last; ++i) {
+		PhysicsObject* object = (*i)->GetPhysicsObject();
+		if (object == nullptr)
+			continue;
+		if (object->GetLinearVelocity().Length() > threshold || object->GetForce().Length() > threshold)
+			object->Wake();
+	}
+}
+
+void PhysicsSystem::CheckToSleep()
+{
+	const int maxQueueSize = 6;
+	const float bounceTolerance = 0.1;
+
+	// for all objects in world, update their queue of previous velocities dot products
+	std::vector<GameObject*>::const_iterator first;
+	std::vector<GameObject*>::const_iterator last;
+	gameWorld.GetObjectIterators(first, last);
+	for (auto i = first; i != last; ++i) {
+		PhysicsObject* object = (*i)->GetPhysicsObject();
+		if (object == nullptr)
+			continue;
+
+		// only ever want a queue of set length, so if gonna be longer remove the oldest and add latest
+		if (object->GetPrevVelocitiesSize() >= maxQueueSize)
+			object->RemoveFromPreviousVelocities();
+		object->AddToPreviousVelocities(Vector3::Dot(object->GetLinearVelocity(), Vector3(1, 1, 1)));
+
+		if (object->GetPreviousPositionsSize() >= maxQueueSize)
+			object->RemoveFromPreviousPositions();
+		object->AddToPreviousPositions(object->GetTransform()->GetPosition().Length());
+
+		// Check if 2 consecutive values in the queue are of the same sign, if so continue, if not sleep object as its bouncing permanently on the floor
+		if (object->GetPrevVelocitiesSize() == maxQueueSize)
+		{
+			std::queue<float> velQueue = object->GetPrevVelocities();
+			std::queue<float> posQueue = object->GetPreviousPositions();
+			bool velShouldSleep = true;
+			bool posShouldSleep = true;
+			float velQueuePrev = velQueue.front();
+			float velAverage = velQueuePrev;
+			velQueue.pop();
+			float firstPos = posQueue.front();
+			float lastPos = 0.0;
+			float posQueuePrev = firstPos;
+			posQueue.pop();
+
+			while (!velQueue.empty())
+			{
+				float velQueueNext = velQueue.front();
+				velAverage += velQueueNext;
+				velQueue.pop();
+				float posQueueNext = posQueue.front();
+				lastPos = posQueueNext;
+				posQueue.pop();
+
+				// Check if values are same sign or it is gonna start moving from rest, set sleeping to false
+				// -------------------- ONLY WORKS FOR AABB & SPHERE -------------------
+				if (object->GetVolumeType() == "AABB" || object->GetVolumeType() == "SPHERE")
+				{
+					if ((velQueuePrev / abs(velQueuePrev)) == (velQueueNext / abs(velQueueNext))
+						|| (velQueuePrev == 0.0) && ((velQueueNext / abs(velQueueNext)) != 0.0)
+						|| ((velQueuePrev / abs(velQueuePrev)) != 0.0) && (velQueueNext == 0.0))
+					{
+						velShouldSleep = false;
+					}
+				}
+
+				// TESTING OUT WITH POS
+				if (abs(posQueueNext - posQueuePrev) * 1000 > bounceTolerance)
+					posShouldSleep = false;
+
+				velQueuePrev = velQueueNext;
+				posQueuePrev = posQueueNext;
+			}
+			
+			if (object->GetVolumeType() == "OBB" || object->GetVolumeType() == "CAPSULE")
+			{
+				if ((velAverage / 5) > 0.001)
+				{
+					velShouldSleep = false;
+				}
+			}
+
+			// if object should sleep remove all velocity and set to sleep
+			if (abs(lastPos - firstPos) * 1000 < bounceTolerance && posShouldSleep && velShouldSleep)
+			{
+				object->SetLinearVelocity(Vector3(0, 0, 0));
+				object->Sleep();
+			}
+		}
+		std::cout << std::endl;
 	}
 }
 
