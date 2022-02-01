@@ -683,16 +683,31 @@ bool NCL::CollisionDetection::AABBCapsuleIntersection(const AABBVolume& volumeB,
 	Vector3 pointB = worldTransformA.GetPosition() - (worldTransformA.GetOrientation() * (Vector3(0, 1, 0) * (volumeA.GetHalfHeight() - volumeA.GetRadius())));
 
 	Vector3 cubePos = Maths::Clamp(worldTransformA.GetPosition(), worldTransformB.GetPosition() - volumeB.GetHalfDimensions(), worldTransformB.GetPosition() + volumeB.GetHalfDimensions());
-	
+	Vector3 cubePos1 = Maths::Clamp(pointA, worldTransformB.GetPosition() - volumeB.GetHalfDimensions(), worldTransformB.GetPosition() + volumeB.GetHalfDimensions());
+	Vector3 cubePos2 = Maths::Clamp(pointB, worldTransformB.GetPosition() - volumeB.GetHalfDimensions(), worldTransformB.GetPosition() + volumeB.GetHalfDimensions());
+
 	Vector3 capsuleDir = pointA - pointB;
 	float capsuleLength = capsuleDir.Length();
 	capsuleDir.Normalise();
-
-	//Debug::DrawLine(cubePos, cubePos + Vector3(0, 5, 0), Debug::GREEN);
+	/*
+		Debug::DrawLine(cubePos, cubePos + Vector3(0, 5, 0), Debug::GREEN);
+		Debug::DrawLine(cubePos1, cubePos1 + Vector3(0, 5, 0), Debug::YELLOW);
+		Debug::DrawLine(cubePos2, cubePos2 + Vector3(0, 5, 0), Debug::YELLOW);*/
 	float dot = Maths::Clamp(Vector3::Dot(cubePos - pointB, capsuleDir), 0.0f, capsuleLength);
+	float dot1 = Maths::Clamp(Vector3::Dot(cubePos1 - pointB, capsuleDir), 0.0f, capsuleLength);
+	float dot2 = Maths::Clamp(Vector3::Dot(cubePos2 - pointB, capsuleDir), 0.0f, capsuleLength);
 
 	Vector3 spherePos = pointB + (capsuleDir * dot);
-//	Debug::DrawLine(spherePos, cubePos, Debug::CYAN);
+	Vector3 spherePos1 = pointB + (capsuleDir * dot1);
+	Vector3 spherePos2 = pointB + (capsuleDir * dot2);
+
+
+	if ((spherePos1 - cubePos1).Length() < (spherePos - cubePos).Length())
+		spherePos = spherePos1;
+	else if ((spherePos2 - cubePos2).Length() < (spherePos - cubePos).Length())
+		spherePos = spherePos2;
+
+	//Debug::DrawLine(spherePos, cubePos, Debug::CYAN);
 
 	SphereVolume s(volumeA.GetRadius());
 	Transform t;
@@ -701,7 +716,7 @@ bool NCL::CollisionDetection::AABBCapsuleIntersection(const AABBVolume& volumeB,
 
 	bool collided = AABBSphereIntersection(volumeB, worldTransformB, s, t, collisionInfo);
 	collisionInfo.point.localB += t.GetPosition() - worldTransformA.GetPosition();
-//	Debug::DrawLine(worldTransformA.GetPosition() + collisionInfo.point.localB, worldTransformA.GetPosition() + collisionInfo.point.localB + Vector3(0, 10, 0), Debug::MAGENTA);
+	//Debug::DrawLine(worldTransformA.GetPosition() + collisionInfo.point.localB, worldTransformA.GetPosition() + collisionInfo.point.localB + Vector3(0, 10, 0), Debug::MAGENTA);
 	return collided;
 }
 
