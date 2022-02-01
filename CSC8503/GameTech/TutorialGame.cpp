@@ -14,7 +14,8 @@ TutorialGame::TutorialGame()	{
 	physics		= new PhysicsSystem(*world);
 
 	forceMagnitude	= 30.0f;
-	useGravity		= false;
+	useGravity		= true;
+	physics->UseGravity(useGravity);
 	inSelectionMode = false;
 
 	testStateObject = nullptr;

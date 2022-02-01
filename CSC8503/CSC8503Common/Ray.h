@@ -38,7 +38,7 @@ namespace NCL {
 		protected:
 			Vector3 position;	//World space position
 			Vector3 direction;	//Normalised world space direction
-			int collisionLayers = 0;
+			int collisionLayers = 1;
 		};
 	}
 }

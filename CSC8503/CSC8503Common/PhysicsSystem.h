@@ -36,6 +36,9 @@ namespace NCL {
 
 			void ClearForces();
 
+			void CheckToWake();
+			void CheckToSleep();
+
 			void IntegrateAccel(float dt);
 			void IntegrateVelocity(float dt);
 

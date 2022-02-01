@@ -1,6 +1,7 @@
 #pragma once
 #include "../../Common/Vector3.h"
 #include "../../Common/Matrix3.h"
+#include <queue>
 
 using namespace NCL::Maths;
 
@@ -93,6 +94,26 @@ namespace NCL {
 			void SetFriction(bool k) { useFriction = k; }
 			bool UsesFriction() const { return useFriction; }
 
+			void Wake() { sleeping = false; }
+			void Sleep() { sleeping = true; }
+			bool isSleeping() const { return sleeping; }
+			
+			// ----------------------------------------------------------------------------------
+			std::string GetVolumeType() const;
+			// ----------------------------------------------------------------------------------
+
+			void AddToPreviousVelocities(float velocityDotProduct) { previousVelocityDotProducts.push(velocityDotProduct); }
+			void RemoveFromPreviousVelocities() { previousVelocityDotProducts.pop(); }
+			int GetPrevVelocitiesSize() const { return previousVelocityDotProducts.size(); }
+			std::queue<float> GetPrevVelocities() const { return previousVelocityDotProducts; }
+			
+			void AddToPreviousPositions(float position) { previousPositions.push(position); }
+			void RemoveFromPreviousPositions() { previousPositions.pop(); }
+			int GetPreviousPositionsSize() const { return previousPositions.size(); }
+			std::queue<float> GetPreviousPositions() const { return previousPositions; }
+
+			Transform* GetTransform() const { return transform; }
+      
 			void SetCollisionLayers(int layers) { collisionLayers = layers; }
 			int	GetCollisionLayers() const { return collisionLayers; }
 
@@ -103,6 +124,10 @@ namespace NCL {
 			float inverseMass;
 			float elasticity;
 			float friction;
+
+			bool sleeping = false;
+			std::queue<float> previousVelocityDotProducts;
+			std::queue<float> previousPositions;
 
 			bool useGravity = true;
 			bool useFriction = true;
