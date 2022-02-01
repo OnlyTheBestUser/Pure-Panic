@@ -11,14 +11,6 @@ using std::vector;
 
 namespace NCL {
 	namespace CSC8503 {
-		enum CollisionLayer {
-			LAYER_ONE = (1 << 0),
-			LAYER_TWO = (1 << 1),
-			LAYER_THREE = (1 << 2),
-			LAYER_FOUR = (1 << 3),
-			LAYER_FIVE = (1 << 4),
-			LAYER_SIX = (1 << 5)
-		};
 
 		class GameObject	{
 		public:
@@ -81,21 +73,11 @@ namespace NCL {
 			void UpdateBroadphaseAABB();
 			virtual void Update(float dt) {};
 
-			void SetWorldID(int newID) {
-				worldID = newID;
-			}
+			void SetWorldID(int newID) { worldID = newID; }
+			int GetWorldID() const { return worldID; }
 
-			int		GetWorldID() const {
-				return worldID;
-			}
-
-			void SetCollisionLayers(int layers) {
-				collisionLayers = layers;
-			}
-
-			int	GetCollisionLayers() const {
-				return collisionLayers;
-			}
+			void SetCollisionLayers(int layers) { GetPhysicsObject()->SetCollisionLayers(layers); }
+			int	GetCollisionLayers() const { return GetPhysicsObject()->GetCollisionLayers(); }
 
 			void SetTrigger(bool x) { isTrigger = x; }
 			bool IsTrigger() const { return isTrigger; }
@@ -115,8 +97,6 @@ namespace NCL {
 			string	name;
 
 			bool dynamic = false;
-
-			int collisionLayers = 0;
 			bool isTrigger = false;
 
 			Vector3 broadphaseAABB;
