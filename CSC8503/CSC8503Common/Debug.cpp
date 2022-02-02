@@ -1,5 +1,9 @@
 #include "Debug.h"
 #include "../../Common/Matrix4.h"
+#include "../../Common/Matrix3.h"
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 using namespace NCL;
 
 RendererBase* Debug::renderer = nullptr;
@@ -32,12 +36,66 @@ void Debug::Print(const std::string& text, const Vector2&pos, const Vector4& col
 void Debug::DrawLine(const Vector3& startpoint, const Vector3& endpoint, const Vector4& colour, float time) {
 	DebugLineEntry newEntry;
 
-	newEntry.start	= startpoint;
-	newEntry.end	= endpoint;
+	newEntry.start = startpoint;
+	newEntry.end = endpoint;
 	newEntry.colour = colour;
-	newEntry.time	= time;
+	newEntry.time = time;
 
 	lineEntries.emplace_back(newEntry);
+}
+
+void Debug::DrawCube(const Vector3& center, const Vector3& halfSizes, const Vector4& colour, float time, const Quaternion& rotation) {
+	Vector3 adjSizes = halfSizes + Vector3(0.01f, 0.01f, 0.01f);
+	Matrix3 rot = Matrix3(rotation);
+
+	Vector3 topFrontRight = center + adjSizes;
+	Vector3 bottomLeftBack = center - adjSizes;
+
+	//Top-front-right corner points
+	Debug::DrawLine(center + rot * adjSizes, center + rot * (adjSizes * Vector3(-1, 1, 1)), colour, time);
+	Debug::DrawLine(center + rot * adjSizes, center + rot * (adjSizes * Vector3(1, -1, 1)), colour, time);
+	Debug::DrawLine(center + rot * adjSizes, center + rot * (adjSizes * Vector3(1, 1, -1)), colour, time);
+	//Bottom-back-left corner points
+	Debug::DrawLine(center - rot * adjSizes, center + rot * (adjSizes * Vector3(1, -1, -1)), colour, time);
+	Debug::DrawLine(center - rot * adjSizes, center + rot * (adjSizes * Vector3(-1, 1, -1)), colour, time);
+	Debug::DrawLine(center - rot * adjSizes, center + rot * (adjSizes * Vector3(-1, -1, 1)), colour, time);
+	//The connecting lines
+	Debug::DrawLine(center + rot * (adjSizes * Vector3(-1, 1, 1)), center + rot * (adjSizes * Vector3(-1, 1, -1)), colour, time);
+	Debug::DrawLine(center + rot * (adjSizes * Vector3(1, -1, 1)), center + rot * (adjSizes * Vector3(1, -1, -1)), colour, time);
+	Debug::DrawLine(center + rot * (adjSizes * Vector3(1, -1, -1)), center + rot * (adjSizes * Vector3(1, 1, -1)), colour, time);
+	Debug::DrawLine(center + rot * (adjSizes * Vector3(1, -1, 1)), center + rot * (adjSizes * Vector3(-1, -1, 1)), colour, time);
+	Debug::DrawLine(center + rot * (adjSizes * Vector3(-1, -1, 1)), center + rot * (adjSizes * Vector3(-1, 1, 1)), colour, time);
+	Debug::DrawLine(center + rot * (adjSizes * Vector3(-1, 1, -1)), center + rot * (adjSizes * Vector3(1, 1, -1)), colour, time);
+}
+
+void Debug::DrawSphere(const Vector3& centre, const float& radius, const Vector4& colour, float time) {
+	float step = 0.5f;
+	float adjRadius = radius + 0.05f;
+	//To allow lines to be on the surface of the sphere at lower 'resolutions'
+	Vector3 prevPoint = centre + Vector3(adjRadius, 0, 0);
+
+	//Draw One along xy axis...
+	for (float angle = 0.0f; angle < 2 * M_PI; angle += step) {
+		Vector3 pointOnSphere = Vector3(cos(angle) * adjRadius + centre.x, sin(angle) * adjRadius + centre.y, centre.z);
+		Debug::DrawLine(prevPoint, pointOnSphere, colour, time);
+		prevPoint = pointOnSphere;
+	}
+	prevPoint = centre + Vector3(0, 0, adjRadius);
+
+	//And one along the zy axis...
+	for (float angle = 0.0f; angle < 2 * M_PI; angle += step) {
+		Vector3 pointOnSphere = Vector3(centre.x, sin(angle) * adjRadius + centre.y, cos(angle) * adjRadius + centre.z);
+		Debug::DrawLine(prevPoint, pointOnSphere, colour, time);
+		prevPoint = pointOnSphere;
+	}
+	prevPoint = centre + Vector3(adjRadius, 0, 0);
+
+	//And one along the xz axis...
+	for (float angle = 0.0f; angle < 2 * M_PI; angle += step) {
+		Vector3 pointOnSphere = Vector3(cos(angle) * adjRadius + centre.x, centre.y, sin(angle) * adjRadius + centre.z);
+		Debug::DrawLine(prevPoint, pointOnSphere, colour, time);
+		prevPoint = pointOnSphere;
+	}
 }
 
 void Debug::DrawAxisLines(const Matrix4& modelMatrix, float scaleBoost, float time) {

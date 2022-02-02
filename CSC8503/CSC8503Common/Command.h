@@ -1,6 +1,7 @@
 #pragma once
 #include "GameActor.h"
 #include "PhysicsSystem.h"
+#include "../GameTech/TutorialGame.h"
 
 namespace NCL {
 	namespace CSC8503 {
@@ -75,6 +76,20 @@ namespace NCL {
 			}
 		protected:
 			PhysicsSystem* physics;
+		};
+
+		class ToggleDebugCommand : public Command {
+		public:
+			ToggleDebugCommand(TutorialGame* game) : game(game) {};
+			virtual ~ToggleDebugCommand() {};
+			void execute() {
+				if (game->GetDebugDrawing())
+					game->SetDebugDrawing(false);
+				else
+					game->SetDebugDrawing(true);
+			}
+		protected:
+			TutorialGame* game;
 		};
 #pragma endregion
 	}
