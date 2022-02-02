@@ -779,16 +779,13 @@ https://wickedengine.net/2020/04/26/capsule-collision-detection/
 
 bool NCL::CollisionDetection::CapsuleIntersection(const CapsuleVolume& volumeA, const Transform& worldTransformA, const CapsuleVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo)
 {
-
 	// Cap A
 	Vector3 aPointA = worldTransformA.GetPosition() + (worldTransformA.GetOrientation() * (Vector3(0, 1, 0) * (volumeA.GetHalfHeight() - volumeA.GetRadius())));
 	Vector3 aPointB = worldTransformA.GetPosition() - (worldTransformA.GetOrientation() * (Vector3(0, 1, 0) * (volumeA.GetHalfHeight() - volumeA.GetRadius())));
-	Vector3 aNormal = (aPointA - aPointB).Normalised();
 
 	// Cap B
 	Vector3 bPointA = worldTransformB.GetPosition() + (worldTransformB.GetOrientation() * (Vector3(0, 1, 0) * (volumeB.GetHalfHeight() - volumeB.GetRadius())));
 	Vector3 bPointB = worldTransformB.GetPosition() - (worldTransformB.GetOrientation() * (Vector3(0, 1, 0) * (volumeB.GetHalfHeight() - volumeB.GetRadius())));
-	Vector3 bNormal = (bPointA - bPointB).Normalised();
 
 	// Distances
 	float d0 = Vector3::Dot(bPointA - aPointA, bPointA - aPointA);
@@ -806,20 +803,23 @@ bool NCL::CollisionDetection::CapsuleIntersection(const CapsuleVolume& volumeA, 
 	bestA = ClosestPointOnLine(aPointA, aPointB, bestB);
 
 	SphereVolume aS(volumeA.GetRadius());
-	Transform aT;
+	Transform aT = worldTransformA;
 	aT.SetPosition(bestA);
 	aT.SetScale(Vector3(volumeA.GetRadius(), volumeA.GetRadius(), volumeA.GetRadius()));
+	//aT.SetScale(worldTransformA.GetScale());
 
 	SphereVolume bS(volumeB.GetRadius());
-	Transform bT;
+	Transform bT = worldTransformB;
 	bT.SetPosition(bestB);
 	bT.SetScale(Vector3(volumeB.GetRadius(), volumeB.GetRadius(), volumeB.GetRadius()));
+	//bT.SetScale(worldTransformB.GetScale());
 
-	bool hit = SphereIntersection(aS, aT, bS, bT, collisionInfo);
-	if (hit) {
-		collisionInfo.point.localA += bestA - worldTransformA.GetPosition();
-		collisionInfo.point.localB += bestB - worldTransformB.GetPosition();
-	}
+	return SphereIntersection(aS, aT, bS, bT, collisionInfo);
+}
 
-	return hit;
+Vector3 CollisionDetection::ClosestPointOnLine(Vector3 A, Vector3 B, Vector3 p)
+{
+	Vector3 AB = B-A;
+	float t = Vector3::Dot(p - A, AB) / Vector3::Dot(AB, AB);
+	return A + AB * NCL::Maths::Clamp(t, 0.0f, 1.0f);
 }

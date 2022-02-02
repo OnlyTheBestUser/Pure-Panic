@@ -520,11 +520,6 @@ void PhysicsSystem::CheckToSleep()
 				}
 			}
 
-			// ----------------------------------------------------------------------------------------
-			if (object->GetVolumeType() == "CAPSULE")
-				velShouldSleep = false;
-			// ----------------------------------------------------------------------------------------
-			
 			// if object should sleep remove all velocity and set to sleep
 			if (abs(lastPos - firstPos) * 1000 < bounceTolerance && posShouldSleep && velShouldSleep)
 			{
