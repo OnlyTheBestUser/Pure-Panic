@@ -7,6 +7,7 @@ using namespace NCL::Maths;
 
 namespace NCL {
 	class CollisionVolume;
+	enum class VolumeType;
 
 	namespace CSC8503 {
 		enum CollisionLayer {
@@ -99,7 +100,7 @@ namespace NCL {
 			bool isSleeping() const { return sleeping; }
 			
 			// ----------------------------------------------------------------------------------
-			std::string GetVolumeType() const;
+			VolumeType GetVolumeType() const;
 			// ----------------------------------------------------------------------------------
 
 			void AddToPreviousVelocities(float velocityDotProduct) { previousVelocityDotProducts.push(velocityDotProduct); }

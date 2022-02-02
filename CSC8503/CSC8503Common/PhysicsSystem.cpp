@@ -36,7 +36,6 @@ void PhysicsSystem::SetGravity(const Vector3& g) {
 	gravity = g;
 }
 
-
 void PhysicsSystem::BuildStaticList()
 {
 	std::vector<GameObject*>::const_iterator first;
@@ -494,7 +493,7 @@ void PhysicsSystem::CheckToSleep()
 
 				// Check if values are same sign or it is gonna start moving from rest, set sleeping to false
 				// -------------------- ONLY WORKS FOR AABB & SPHERE -------------------
-				if (object->GetVolumeType() == "AABB" || object->GetVolumeType() == "SPHERE")
+				if (object->GetVolumeType() == VolumeType::AABB || object->GetVolumeType() == VolumeType::Sphere)
 				{
 					if ((velQueuePrev / abs(velQueuePrev)) == (velQueueNext / abs(velQueueNext))
 						|| (velQueuePrev == 0.0) && ((velQueueNext / abs(velQueueNext)) != 0.0)
@@ -511,7 +510,7 @@ void PhysicsSystem::CheckToSleep()
 				posQueuePrev = posQueueNext;
 			}
 			
-			if (object->GetVolumeType() == "OBB" || object->GetVolumeType() == "CAPSULE")
+			if (object->GetVolumeType() == VolumeType::OBB || object->GetVolumeType() == VolumeType::Capsule)
 			{
 				if ((velAverage / 5) > 0.001)
 				{
