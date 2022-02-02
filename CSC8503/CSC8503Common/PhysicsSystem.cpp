@@ -440,7 +440,8 @@ void PhysicsSystem::CheckToWake()
 		PhysicsObject* object = (*i)->GetPhysicsObject();
 		if (object == nullptr)
 			continue;
-		if (object->GetLinearVelocity().Length() > threshold || object->GetForce().Length() > threshold)
+		if (object->GetLinearVelocity().Length() > threshold || object->GetForce().Length() > threshold
+			|| object->GetLinearVelocity().Length() < -threshold || object->GetForce().Length() < -threshold)
 			object->Wake();
 	}
 }
@@ -518,7 +519,7 @@ void PhysicsSystem::CheckToSleep()
 					velShouldSleep = false;
 				}
 			}
-			
+
 			// if object should sleep remove all velocity and set to sleep
 			if (abs(lastPos - firstPos) * 1000 < bounceTolerance && posShouldSleep && velShouldSleep)
 			{
