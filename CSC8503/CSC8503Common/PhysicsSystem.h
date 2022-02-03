@@ -36,11 +36,11 @@ namespace NCL {
 
 			void ClearForces();
 
-			void CheckToWake();
-			void CheckToSleep();
+			void CheckToWake(PhysicsObject* object);
+			void CheckToSleep(PhysicsObject* object);
 
-			void IntegrateAccel(float dt);
-			void IntegrateVelocity(float dt);
+			void IntegrateAccel(float dt, PhysicsObject* object);
+			void IntegrateVelocity(float dt, PhysicsObject* object, Transform& transform);
 
 			void UpdateConstraints(float dt);
 
