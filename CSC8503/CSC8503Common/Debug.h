@@ -1,5 +1,6 @@
 #pragma once
 #include "../../Plugins/OpenGLRendering/OGLRenderer.h"
+#include "../../Common/Quaternion.h"
 #include <vector>
 #include <string>
 
@@ -9,7 +10,10 @@ namespace NCL {
 	public:
 		static void Print(const std::string& text, const Vector2&pos, const Vector4& colour = Vector4(1, 1, 1, 1));
 		static void DrawLine(const Vector3& startpoint, const Vector3& endpoint, const Vector4& colour = Vector4(1, 1, 1, 1), float time = 0.0f);
-
+		static void DrawCube(const Vector3& centre, const Vector3& halfSizes, const Vector4& colour = Vector4(1, 1, 1, 1), float time = 0.0f, const Quaternion & rotation = Quaternion(0, 0, 0, 0));
+		static void DrawSphere(const Vector3& centre, const float& radius, const Vector4& colour = Vector4(1, 1, 1, 1), float time = 0.0f);
+		static void DrawCircle(const Vector3& centre, const float& radius, const Quaternion& rotation = Quaternion(0,0,0,0), const Vector4& colour = Vector4(1, 1, 1, 1), float time = 0.0f);
+		static void DrawCapsule(const Vector3& centre, const float& radius, const float& height, const Quaternion& rotation = Quaternion(0,0,0,0), const Vector4& colour = Vector4(1, 1, 1, 1), float time = 0.0f);
 		static void DrawAxisLines(const Matrix4 &modelMatrix, float scaleBoost = 1.0f, float time = 0.0f);
 
 		static void SetRenderer(RendererBase* r) {

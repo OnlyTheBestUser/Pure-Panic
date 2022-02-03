@@ -17,6 +17,7 @@ namespace NCL {
 			void BindButtonLeftClick(Command* c)	{ buttonLeftClick_ = c; }
 			void BindButtonShift(Command* c)		{ buttonShift_ = c; }
 			void BindButtonG(Command* c)			{ buttonG_ = c; }
+			void BindButtonJ(Command* c)			{ buttonJ_ = c; }
 
 		private:
 			Command* buttonW_;
@@ -27,6 +28,7 @@ namespace NCL {
 			Command* buttonLeftClick_;
 			Command* buttonShift_;
 			Command* buttonG_;
+			Command* buttonJ_;
 
 			//std::vector<Command*> commandsToExecute;
 		};
