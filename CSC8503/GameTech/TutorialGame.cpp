@@ -178,6 +178,7 @@ void TutorialGame::UpdateGameWorld(float dt)
 		world->GetObjectIterators(first, last);
 		for (auto i = first; i != last; i++) {
 			DebugDrawCollider((*i)->GetBoundingVolume(), &(*i)->GetTransform());
+			DebugDrawVelocity((*i)->GetPhysicsObject()->GetLinearVelocity(), &(*i)->GetTransform());
 		}
 	}
 
@@ -215,6 +216,23 @@ void TutorialGame::DebugDrawCollider(const CollisionVolume* c, Transform* worldT
 	case VolumeType::Capsule: Debug::DrawCapsule(worldTransform->GetPosition(), ((CapsuleVolume*)c)->GetRadius(), ((CapsuleVolume*)c)->GetHalfHeight(), worldTransform->GetOrientation(), col); break;
 	default: break;
 	}
+}
+
+void TutorialGame::DebugDrawVelocity(const Vector3& velocity, Transform* worldTransform) {
+	Vector4 col = Vector4(1, 0, 1, 1);
+	Debug::DrawArrow(worldTransform->GetPosition(), worldTransform->GetPosition() + velocity, col);
+}
+
+void TutorialGame::DebugDrawObjectInfo(const GameObject* obj) {
+	Vector3 pos = selectionObject->GetTransform().GetPosition();
+	Vector3 rot = selectionObject->GetTransform().GetOrientation().ToEuler();
+	string name = obj->GetName();
+	string n = "Name: " + (name == "" ? "-" : name);
+	string p = "Pos: (" + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z) + ")";
+	string r = "Rot: (" + std::to_string(rot.x) + ", " + std::to_string(rot.y) + ", " + std::to_string(rot.z) + ")";
+	renderer->DrawString(n, Vector2(1, 3), Debug::WHITE, 15.0f);
+	renderer->DrawString(p, Vector2(1, 6), Debug::WHITE, 15.0f);
+	renderer->DrawString(r, Vector2(1, 9), Debug::WHITE, 15.0f);
 }
 
 void TutorialGame::UpdatePauseScreen(float dt)
@@ -715,9 +733,7 @@ void TutorialGame::MoveSelectedObject(float dt) {
 		}
 	}
 
-	Vector3 pos = selectionObject->GetTransform().GetPosition();
-	string s = "Pos: " + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z) + ")";
-	renderer->DrawString(s, Vector2(5, 5));
+	DebugDrawObjectInfo(selectionObject);
 
 	if (Window::GetKeyboard()->KeyHeld(NCL::KeyboardKeys::F))
 		selectionObject->Interact(dt);

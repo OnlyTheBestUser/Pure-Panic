@@ -22,12 +22,13 @@ const Vector4 Debug::MAGENTA	= Vector4(1, 0, 1, 1);
 const Vector4 Debug::CYAN		= Vector4(0, 1, 1, 1);
 
 
-void Debug::Print(const std::string& text, const Vector2&pos, const Vector4& colour) {
+void Debug::Print(const std::string& text, const Vector2&pos, const float& size, const Vector4& colour) {
 	DebugStringEntry newEntry;
 
 	newEntry.data		= text;
 	newEntry.position	= pos;
 	newEntry.colour		= colour;
+	newEntry.size = size;
 
 	stringEntries.emplace_back(newEntry);
 }
@@ -41,6 +42,15 @@ void Debug::DrawLine(const Vector3& startpoint, const Vector3& endpoint, const V
 	newEntry.time	= time;
 
 	lineEntries.emplace_back(newEntry);
+}
+
+void Debug::DrawArrow(const Vector3& startpoint, const Vector3& endpoint, const Vector4& colour, float time) {
+	DrawLine(startpoint, endpoint, colour, time);
+	Vector3 lineDir = endpoint - startpoint;
+	Vector3 perpDir1 = Vector3(-lineDir.y, lineDir.x, lineDir.z).Normalised() * 0.3f;
+	Vector3 arrowStart = endpoint - lineDir * 0.1f;
+	DrawLine(arrowStart + perpDir1, endpoint, colour, time);
+	DrawLine(arrowStart - perpDir1, endpoint, colour, time);
 }
 
 void Debug::DrawCube(const Vector3& center, const Vector3& halfSizes, const Vector4& colour, float time, const Quaternion& rotation) {
@@ -121,7 +131,7 @@ void Debug::FlushRenderables(float dt) {
 		return;
 	}
 	for (const auto& i : stringEntries) {
-		renderer->DrawString(i.data, i.position);
+		renderer->DrawString(i.data, i.position, i.colour, i.size);
 	}
 	int trim = 0;
 	for (int i = 0; i < lineEntries.size(); ) {

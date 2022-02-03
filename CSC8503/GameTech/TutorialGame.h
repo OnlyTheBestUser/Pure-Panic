@@ -51,6 +51,8 @@ namespace NCL {
 			void MoveSelectedObject(float dt);
 			void DebugObjectMovement();
 			void DebugDrawCollider(const CollisionVolume* c, Transform* worldTransform);
+			void DebugDrawVelocity(const Vector3& vel, Transform* worldTransform);
+			void DebugDrawObjectInfo(const GameObject* obj);
 			void LockedObjectMovement();
 
 			GameObject* AddFloorToWorld(const Vector3& position);
