@@ -683,15 +683,29 @@ bool NCL::CollisionDetection::AABBCapsuleIntersection(const AABBVolume& volumeB,
 	Vector3 pointB = worldTransformA.GetPosition() - (worldTransformA.GetOrientation() * (Vector3(0, 1, 0) * (volumeA.GetHalfHeight() - volumeA.GetRadius())));
 
 	Vector3 cubePos = Maths::Clamp(worldTransformA.GetPosition(), worldTransformB.GetPosition() - volumeB.GetHalfDimensions(), worldTransformB.GetPosition() + volumeB.GetHalfDimensions());
-	
+	Vector3 cubePos1 = Maths::Clamp(pointA, worldTransformB.GetPosition() - volumeB.GetHalfDimensions(), worldTransformB.GetPosition() + volumeB.GetHalfDimensions());
+	Vector3 cubePos2 = Maths::Clamp(pointB, worldTransformB.GetPosition() - volumeB.GetHalfDimensions(), worldTransformB.GetPosition() + volumeB.GetHalfDimensions());
+
 	Vector3 capsuleDir = pointA - pointB;
 	float capsuleLength = capsuleDir.Length();
 	capsuleDir.Normalise();
-
-	//Debug::DrawLine(cubePos, cubePos + Vector3(0, 5, 0), Debug::GREEN);
+	/*
+		Debug::DrawLine(cubePos, cubePos + Vector3(0, 5, 0), Debug::GREEN);
+		Debug::DrawLine(cubePos1, cubePos1 + Vector3(0, 5, 0), Debug::YELLOW);
+		Debug::DrawLine(cubePos2, cubePos2 + Vector3(0, 5, 0), Debug::YELLOW);*/
 	float dot = Maths::Clamp(Vector3::Dot(cubePos - pointB, capsuleDir), 0.0f, capsuleLength);
+	float dot1 = Maths::Clamp(Vector3::Dot(cubePos1 - pointB, capsuleDir), 0.0f, capsuleLength);
+	float dot2 = Maths::Clamp(Vector3::Dot(cubePos2 - pointB, capsuleDir), 0.0f, capsuleLength);
 
 	Vector3 spherePos = pointB + (capsuleDir * dot);
+	Vector3 spherePos1 = pointB + (capsuleDir * dot1);
+	Vector3 spherePos2 = pointB + (capsuleDir * dot2);
+
+	if ((spherePos1 - cubePos1).Length() < (spherePos - cubePos).Length())
+		spherePos = spherePos1;
+	else if ((spherePos2 - cubePos2).Length() < (spherePos - cubePos).Length())
+		spherePos = spherePos2;
+
 //	Debug::DrawLine(spherePos, cubePos, Debug::CYAN);
 
 	SphereVolume s(volumeA.GetRadius());
@@ -764,16 +778,13 @@ https://wickedengine.net/2020/04/26/capsule-collision-detection/
 
 bool NCL::CollisionDetection::CapsuleIntersection(const CapsuleVolume& volumeA, const Transform& worldTransformA, const CapsuleVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo)
 {
-
 	// Cap A
 	Vector3 aPointA = worldTransformA.GetPosition() + (worldTransformA.GetOrientation() * (Vector3(0, 1, 0) * (volumeA.GetHalfHeight() - volumeA.GetRadius())));
 	Vector3 aPointB = worldTransformA.GetPosition() - (worldTransformA.GetOrientation() * (Vector3(0, 1, 0) * (volumeA.GetHalfHeight() - volumeA.GetRadius())));
-	Vector3 aNormal = (aPointA - aPointB).Normalised();
 
 	// Cap B
 	Vector3 bPointA = worldTransformB.GetPosition() + (worldTransformB.GetOrientation() * (Vector3(0, 1, 0) * (volumeB.GetHalfHeight() - volumeB.GetRadius())));
 	Vector3 bPointB = worldTransformB.GetPosition() - (worldTransformB.GetOrientation() * (Vector3(0, 1, 0) * (volumeB.GetHalfHeight() - volumeB.GetRadius())));
-	Vector3 bNormal = (bPointA - bPointB).Normalised();
 
 	// Distances
 	float d0 = Vector3::Dot(bPointA - aPointA, bPointA - aPointA);
@@ -791,20 +802,23 @@ bool NCL::CollisionDetection::CapsuleIntersection(const CapsuleVolume& volumeA, 
 	bestA = ClosestPointOnLine(aPointA, aPointB, bestB);
 
 	SphereVolume aS(volumeA.GetRadius());
-	Transform aT;
+	Transform aT = worldTransformA;
 	aT.SetPosition(bestA);
 	aT.SetScale(Vector3(volumeA.GetRadius(), volumeA.GetRadius(), volumeA.GetRadius()));
+	//aT.SetScale(worldTransformA.GetScale());
 
 	SphereVolume bS(volumeB.GetRadius());
-	Transform bT;
+	Transform bT = worldTransformB;
 	bT.SetPosition(bestB);
 	bT.SetScale(Vector3(volumeB.GetRadius(), volumeB.GetRadius(), volumeB.GetRadius()));
+	//bT.SetScale(worldTransformB.GetScale());
 
-	bool hit = SphereIntersection(aS, aT, bS, bT, collisionInfo);
-	if (hit) {
-		collisionInfo.point.localA += bestA - worldTransformA.GetPosition();
-		collisionInfo.point.localB += bestB - worldTransformB.GetPosition();
-	}
+	return SphereIntersection(aS, aT, bS, bT, collisionInfo);
+}
 
-	return hit;
+Vector3 CollisionDetection::ClosestPointOnLine(Vector3 A, Vector3 B, Vector3 p)
+{
+	Vector3 AB = B - A;
+	float t = Vector3::Dot(p - A, AB) / Vector3::Dot(AB, AB);
+	return A + AB * NCL::Maths::Clamp(t, 0.0f, 1.0f);
 }

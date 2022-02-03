@@ -533,7 +533,6 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position) {
 	return character;
 }
 
-
 /*
 
 Every frame, this code will let you perform a raycast, to see if there's an object

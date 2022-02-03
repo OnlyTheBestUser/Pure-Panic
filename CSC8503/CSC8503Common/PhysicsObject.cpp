@@ -17,12 +17,10 @@ PhysicsObject::~PhysicsObject()	{
 
 }
 
-// ----------------------------------------------------------------------------------
 VolumeType PhysicsObject::GetVolumeType() const
 {
 	return volume->type;
 }
-// ----------------------------------------------------------------------------------
 
 void PhysicsObject::ApplyAngularImpulse(const Vector3& force) {
 	if (force.Length() > 0) {
