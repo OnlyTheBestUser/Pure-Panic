@@ -10,7 +10,9 @@ using namespace CSC8503;
 
 TutorialGame::TutorialGame()	{
 	world		= new GameWorld();
-	//renderer	= new GameTechRenderer(*world);
+#ifdef _WIN64
+	renderer	= new GameTechRenderer(*world);
+#endif
 	physics		= new PhysicsSystem(*world);
 
 	forceMagnitude	= 30.0f;
@@ -290,8 +292,8 @@ void TutorialGame::InitWorld() {
 
 	GameObject* a = AddCubeToWorld(Vector3(15, 2, 15), Vector3(1, 1, 1), true, 10.0f, 1, false, true);
 	GameObject* b = AddCubeToWorld(Vector3(10, 2, 15), Vector3(1, 1, 1), true, 10.0f, 1, false, true);
-	a->GetRenderObject()->SetColour(Debug::CYAN);
-	b->GetRenderObject()->SetColour(Debug::CYAN);
+	//a->GetRenderObject()->SetColour(Debug::CYAN);
+	//b->GetRenderObject()->SetColour(Debug::CYAN);
 
 	GameObject* c = AddCubeToWorld(Vector3(10, 2, 10), Vector3(1, 1, 1), false, 10.0f, 1, false, true);
 	GameObject* d = AddCubeToWorld(Vector3(15, 2, 10), Vector3(1, 1, 1), false, 10.0f, 1, false, true);

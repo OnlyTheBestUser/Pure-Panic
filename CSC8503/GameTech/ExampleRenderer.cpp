@@ -1,3 +1,4 @@
+#ifdef _ORBIS
 #include "ExampleRenderer.h"
 #include "../CSC8503Common/RenderObject.h"
 #include "../CSC8503Common/Transform.h"
@@ -117,3 +118,4 @@ void ExampleRenderer::DrawRenderObject(CSC8503::RenderObject* o) {
 	realShader->SubmitShaderSwitch(*currentGFXContext);
 	realMesh->SubmitDraw(*currentGFXContext, Gnm::ShaderStage::kShaderStageVs);
 }
+#endif

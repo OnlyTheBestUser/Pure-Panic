@@ -1,3 +1,4 @@
+#ifdef _ORBIS
 #pragma once
 #include "../../Plugins/PlayStation4/PS4RendererBase.h"
 
@@ -32,4 +33,5 @@ namespace NCL {
 		};
 	}
 }
+#endif
 
