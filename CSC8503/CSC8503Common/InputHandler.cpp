@@ -38,10 +38,4 @@ void InputHandler::HandleInput()
 			buttonG_->execute();
 		}
 	}
-
-	if (buttonJ_) {
-		if (Window::GetKeyboard()->KeyPressed(NCL::KeyboardKeys::J)) {
-			buttonG_->execute();
-		}
-	}
 }

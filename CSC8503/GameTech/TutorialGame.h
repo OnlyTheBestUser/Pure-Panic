@@ -30,9 +30,6 @@ namespace NCL {
 				return won;
 			}
 
-			bool GetDebugDrawing();
-			void SetDebugDrawing(bool state);
-
 		protected:
 			InputHandler* inputHandler;
 
@@ -53,7 +50,6 @@ namespace NCL {
 			bool SelectObject();
 			void MoveSelectedObject(float dt);
 			void DebugObjectMovement();
-			void DebugDrawCollider(const CollisionVolume* c, Transform* worldTransform);
 			void LockedObjectMovement();
 
 			GameObject* AddFloorToWorld(const Vector3& position);
@@ -63,7 +59,6 @@ namespace NCL {
 			GameObject* AddCapsuleToWorld(const Vector3& position, float halfHeight, float radius, float inverseMass = 10.0f);
 
 			GameObject* AddPlayerToWorld(const Vector3& position);
-
 
 			StateGameObject* testStateObject;
 
@@ -79,7 +74,6 @@ namespace NCL {
 
 			bool useGravity;
 			bool inSelectionMode;
-			bool debugDraw;
 
 			float		forceMagnitude;
 
