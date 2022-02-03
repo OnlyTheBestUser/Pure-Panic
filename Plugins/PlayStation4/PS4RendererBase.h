@@ -16,6 +16,10 @@ using namespace sce;
 using namespace Gnmx;
 using namespace Gnmx::Toolkit;
 
+namespace NCL::CSC8503 {
+	class RenderObject;
+}
+
 namespace NCL::Maths {
 	class Matrix4;
 }
@@ -36,8 +40,6 @@ namespace NCL::PS4 {
 	class PS4Shader;
 	class PS4Mesh;
 
-	class RenderObject;
-
 	class PS4RendererBase :
 		public RendererBase, public PS4MemoryAware
 	{
@@ -56,6 +58,9 @@ namespace NCL::PS4 {
 		void	SetRenderBuffer(PS4ScreenBuffer*buffer, bool clearColour, bool clearDepth, bool clearStencil);
 		void	ClearBuffer(bool colour, bool depth, bool stencil);
 		PS4ScreenBuffer* GenerateScreenBuffer(uint width, uint height, bool colour = true, bool depth = true, bool stencil = false);
+
+		void DrawString(const std::string& text, const Vector2& pos, const Vector4& colour = Vector4(0.75f, 0.75f, 0.75f, 1), float size = 20.0f) override;
+		void DrawLine(const Vector3& start, const Vector3& end, const Vector4& colour) override;
 
 	private:
 		void	InitialiseMemoryAllocators();

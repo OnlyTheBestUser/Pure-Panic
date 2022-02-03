@@ -1,3 +1,4 @@
+#ifdef _WIN64
 #include "GameTechRenderer.h"
 #include "../CSC8503Common/GameObject.h"
 #include "../../Common/Camera.h"
@@ -260,3 +261,5 @@ Matrix4 GameTechRenderer::SetupDebugLineMatrix()	const {
 Matrix4 GameTechRenderer::SetupDebugStringMatrix()	const {
 	return Matrix4::Orthographic(-1, 1.0f, 100, 0, 0, 100);
 }
+
+#endif

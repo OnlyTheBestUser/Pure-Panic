@@ -1,3 +1,4 @@
+#ifdef _WIN64
 #pragma once
 #include "../../Plugins/OpenGLRendering/OGLRenderer.h"
 #include "../../Plugins/OpenGLRendering/OGLShader.h"
@@ -7,8 +8,10 @@
 #include "../CSC8503Common/GameWorld.h"
 
 namespace NCL {
-	class Maths::Vector3;
-	class Maths::Vector4;
+	namespace Maths {
+		class Vector3;
+		class Vector4;
+	}
 	namespace CSC8503 {
 		class RenderObject;
 
@@ -55,3 +58,4 @@ namespace NCL {
 	}
 }
 
+#endif

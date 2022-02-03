@@ -76,19 +76,19 @@ namespace NCL {
 
 			GameObject* selectionObject = nullptr;
 
-			OGLMesh*	capsuleMesh = nullptr;
-			OGLMesh*	cubeMesh	= nullptr;
-			OGLMesh*	sphereMesh	= nullptr;
-			OGLTexture* basicTex	= nullptr;
-			OGLShader*	basicShader = nullptr;
+			//OGLMesh*	capsuleMesh = nullptr;
+			//OGLMesh*	cubeMesh	= nullptr;
+			//OGLMesh*	sphereMesh	= nullptr;
+			//OGLTexture* basicTex	= nullptr;
+			//OGLShader*	basicShader = nullptr;
 
-			OGLTexture* playerTex	= nullptr;
+			//OGLTexture* playerTex	= nullptr;
 
 			//Coursework Meshes
-			OGLMesh*	charMeshA	= nullptr;
-			OGLMesh*	charMeshB	= nullptr;
-			OGLMesh*	enemyMesh	= nullptr;
-			OGLMesh*	bonusMesh	= nullptr;
+			//OGLMesh*	charMeshA	= nullptr;
+			//OGLMesh*	charMeshB	= nullptr;
+			//OGLMesh*	enemyMesh	= nullptr;
+			//OGLMesh*	bonusMesh	= nullptr;
 
 			//Coursework Additional functionality	
 			GameObject* lockedObject	= nullptr;

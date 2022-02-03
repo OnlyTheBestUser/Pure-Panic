@@ -19,6 +19,7 @@ namespace SonyMath = sce::Vectormath::Scalar::Aos;
 
 using namespace NCL;
 using namespace NCL::PS4;
+using namespace NCL::Maths;
 
 sce::Gnmx::Toolkit::IAllocator	oAllocator;
 sce::Gnmx::Toolkit::IAllocator	gAllocator;
@@ -262,4 +263,11 @@ void	PS4RendererBase::ClearBuffer(bool colour, bool depth, bool stencil) {
 		SurfaceUtil::clearStencilTarget(*currentGFXContext, &currentPS4Buffer->depthTarget, defaultStencil);
 	}
 }
+
+void PS4RendererBase::DrawString(const std::string& text, const Maths::Vector2& pos, const Maths::Vector4& colour, float size) {
+
+}
+void PS4RendererBase::DrawLine(const Maths::Vector3& start, const Maths::Vector3& end, const Maths::Vector4& colour) {
+
+};
 #endif

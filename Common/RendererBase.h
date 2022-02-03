@@ -12,7 +12,8 @@ _-_-_-_-_-_-_-""  ""
 *//////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include "Window.h"
-
+#include "../Common/Vector3.h"
+#include "../Common/Vector4.h"
 namespace NCL {
 	namespace Rendering {
 		enum class VerticalSyncState {
@@ -23,24 +24,22 @@ namespace NCL {
 		class RendererBase {
 		public:
 			friend class NCL::Window;
-
 			RendererBase(Window& w);
 			virtual ~RendererBase();
-
-			virtual bool HasInitialised() const {return true;}
-
+			virtual bool HasInitialised() const { return true; }
 			virtual void Update(float dt) {}
-
 			void Render() {
 				BeginFrame();
 				RenderFrame();
 				EndFrame();
 				SwapBuffers();
 			}
-
 			virtual bool SetVerticalSync(VerticalSyncState s) {
 				return false;
 			}
+			virtual void DrawString(const std::string& text, const Vector2& pos, const Vector4& colour = Vector4(0.75f, 0.75f, 0.75f, 1), float size = 20.0f) = 0;
+			virtual void DrawLine(const Vector3& start, const Vector3& end, const Vector4& colour) = 0;
+
 
 		protected:
 			virtual void OnWindowResize(int w, int h) = 0;
