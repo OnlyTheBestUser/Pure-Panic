@@ -16,101 +16,84 @@ using namespace sce;
 using namespace Gnmx;
 using namespace Gnmx::Toolkit;
 
-namespace NCL {
-	namespace Maths {
-		class Matrix4;
-	}
-	namespace PS4 {
-		enum MemoryLocation {
-			GARLIC,
-			ONION,
-			MEMORYMAX
-		};
+namespace NCL::Maths {
+	class Matrix4;
+}
 
-		struct PS4ScreenBuffer {
-			sce::Gnm::RenderTarget		colourTarget;
-			sce::Gnm::DepthRenderTarget depthTarget;
-		};
+namespace NCL::PS4 {
+	enum MemoryLocation {
+		MEMORY_GARLIC,
+		MEMORY_ONION,
+		MEMORY_MAX
+	};
 
-		class PS4Window;
-		class PS4Shader;
-		class PS4Mesh;
+	struct PS4ScreenBuffer {
+		sce::Gnm::RenderTarget		colourTarget;
+		sce::Gnm::DepthRenderTarget depthTarget;
+	};
 
-		class RenderObject;
+	class PS4Window;
+	class PS4Shader;
+	class PS4Mesh;
 
-		class PS4RendererBase :
-			public RendererBase, public PS4MemoryAware
-		{
-		public:
-			PS4RendererBase(PS4Window* window);
-			~PS4RendererBase();
+	class RenderObject;
 
-		protected:
-			virtual void RenderActiveScene() = 0;
+	class PS4RendererBase :
+		public RendererBase, public PS4MemoryAware
+	{
+	public:
+		PS4RendererBase(PS4Window* window);
+		~PS4RendererBase();
 
-			void	OnWindowResize(int w, int h) override;
-			void	BeginFrame()    override;
-			void	RenderFrame()	override;
-			void	EndFrame()		override;
+	protected:
+		void	OnWindowResize(int w, int h) override;
+		void	BeginFrame()    override;
+		void	EndFrame()		override;
+		void	SwapBuffers()	override;
 
-			void	SwapScreenBuffer();
-			void	SwapCommandBuffer();
-			
-			void	DrawMesh(PS4Mesh& mesh);
+		void	SwapScreenBuffer();
+		void	SwapCommandBuffer();
+		void	SetRenderBuffer(PS4ScreenBuffer*buffer, bool clearColour, bool clearDepth, bool clearStencil);
+		void	ClearBuffer(bool colour, bool depth, bool stencil);
+		PS4ScreenBuffer* GenerateScreenBuffer(uint width, uint height, bool colour = true, bool depth = true, bool stencil = false);
 
-		private:
-			void	InitialiseMemoryAllocators();
-			void	InitialiseVideoSystem();
-			void	InitialiseGCMRendering();
+	private:
+		void	InitialiseMemoryAllocators();
+		void	InitialiseVideoSystem();
+		void	InitialiseGCMRendering();
 
-			void	DestroyMemoryAllocators();
-			void	DestroyVideoSystem();
-			void	DestroyGCMRendering();
+		void	DestroyMemoryAllocators();
+		void	DestroyVideoSystem();
+		void	DestroyGCMRendering();
 
-			void	SetRenderBuffer(PS4ScreenBuffer*buffer, bool clearColour, bool clearDepth, bool clearStencil);
-			void	ClearBuffer(bool colour, bool depth, bool stencil);
+	protected:
+		int currentGPUBuffer;
 
-			PS4ScreenBuffer* GenerateScreenBuffer(uint width, uint height, bool colour = true, bool depth = true, bool stencil = false);
+		const int _MaxCMDBufferCount;
 
-		protected:
-			int currentGPUBuffer;
+		//VIDEO SYSTEM VARIABLES
+		int videoHandle;		//Handle to video system
 
-			const int _MaxCMDBufferCount;
+	//SCREEN BUFFER VARIABLES
+		const int			_bufferCount;	//How many screen buffers should we have
+		int					currentScreenBuffer;
+		int					prevScreenBuffer;
+		PS4ScreenBuffer**	screenBuffers;	//Pointer to our screen buffers
+	//Memory Allocation
+		const int _GarlicMemory;
+		const int _OnionMemory;
 
-			//VIDEO SYSTEM VARIABLES
-			int videoHandle;		//Handle to video system
+		sce::Gnmx::Toolkit::StackAllocator	stackAllocators[MEMORY_MAX];
 
-		//SCREEN BUFFER VARIABLES
-			const int			_bufferCount;	//How many screen buffers should we have
-			int					currentScreenBuffer;
-			int					prevScreenBuffer;
-			PS4ScreenBuffer**	screenBuffers;	//Pointer to our screen buffers
-		//Memory Allocation
-			const int _GarlicMemory;
-			const int _OnionMemory;
+		//Individual Frames
+		PS4Frame*	frames;
 
-			sce::Gnmx::Toolkit::StackAllocator	stackAllocators[MEMORYMAX];
+		int framesSubmitted;
 
-			//default data
-			PS4Shader*	defaultShader;
-			PS4Mesh*	defaultMesh;
-			PS4Texture* defaultTexture;
-
-			RenderObject* defaultObject;
-
-			//Individual Frames
-			PS4Frame*	frames;
-
-			NCL::Maths::Matrix4*	viewProjMat;
-			Gnm::Buffer	cameraBuffer;
-
-			int framesSubmitted;
-
-			//Per frame pointers...
-			PS4ScreenBuffer*		currentPS4Buffer;  //Pointer to whichever buffer we're currently using...
-			Gnmx::GnmxGfxContext*	currentGFXContext;
-			PS4Frame*				currentFrame;
-		};
-	}
+		//Per frame pointers...
+		PS4ScreenBuffer*		currentPS4Buffer;  //Pointer to whichever buffer we're currently using...
+		Gnmx::GnmxGfxContext*	currentGFXContext;
+		PS4Frame*				currentFrame;
+	};
 }
 #endif

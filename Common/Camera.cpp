@@ -10,9 +10,6 @@ Should be done once per frame! Pass it the msec since
 last frame (default value is for simplicities sake...)
 */
 void Camera::UpdateCamera(float dt) {
-	if (lockCamera)
-		return;
-
 	//Update the mouse by how much
 	pitch	-= (Window::GetMouse()->GetRelativePosition().y);
 	yaw		-= (Window::GetMouse()->GetRelativePosition().x);
@@ -44,10 +41,10 @@ void Camera::UpdateCamera(float dt) {
 		position -= Matrix4::Rotation(yaw, Vector3(0, 1, 0)) * Vector3(-1, 0, 0) * frameSpeed;
 	}
 
-	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::SPACE)) {
+	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::SHIFT)) {
 		position.y += frameSpeed;
 	}
-	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::SHIFT)) {
+	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::SPACE)) {
 		position.y -= frameSpeed;
 	}
 }

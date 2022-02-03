@@ -1,0 +1,35 @@
+ConstantBuffer RenderObjectData
+{
+	column_major matrix modelMatrix;
+};
+
+ConstantBuffer CameraData
+{
+	column_major matrix camMatrix;
+};
+
+struct VS_INPUT
+{
+	float3 Position		: POSITION0;
+	float2 UV			: TEXCOORD0;
+	float3 Normal		: TEXCOORD1;
+	float3 Tangent		: TEXCOORD2;
+};
+
+struct VS_OUTPUT
+{
+	float4 Position		: S_POSITION;
+	float2 UV			: TEXCOORD0; 
+};
+
+VS_OUTPUT main(VS_INPUT Input)
+{
+	VS_OUTPUT Output; 
+
+	Output.Position = mul(mul(camMatrix,modelMatrix), float4(Input.Position.xyz, 1));
+
+	//Output.Color = Input.Color;
+	Output.UV = Input.UV;
+
+	return Output;
+}

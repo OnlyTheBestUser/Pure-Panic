@@ -178,7 +178,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="InputBase.cpp" />
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="Ps4AudioEmitter.cpp" />
     <ClCompile Include="PS4AudioSource.cpp" />
     <ClCompile Include="PS4ComputeShader.cpp" />

@@ -16,6 +16,7 @@ namespace NCL {
 			void UseGravity(bool state) {
 				applyGravity = state;
 			}
+			bool GetGravity() { return applyGravity; }
 
 			void SetGlobalDamping(float d) {
 				globalDamping = d;

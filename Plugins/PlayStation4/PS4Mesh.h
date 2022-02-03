@@ -11,55 +11,46 @@
 #include <gnm\dataformats.h>
 
 
-namespace NCL {
-	namespace PS4 {
-		using namespace sce;
-		class PS4Mesh :
-			public NCL::MeshGeometry, public PS4MemoryAware
+namespace NCL::PS4 {
+	using namespace sce;
+	class PS4Mesh :
+		public NCL::MeshGeometry, public PS4MemoryAware
+	{
+		friend class PS4RendererBase;
+	public:		
+		PS4Mesh();
+		~PS4Mesh();
+
+		static PS4Mesh* GenerateTriangle();
+		static PS4Mesh* GenerateQuad();
+		static PS4Mesh* GenerateSinglePoint();
+
+		void	UploadToGPU(Rendering::RendererBase* renderer) override;
+		void	SubmitDraw(Gnmx::GnmxGfxContext& cmdList, Gnm::ShaderStage stage);
+
+		void	InitAttributeBuffer(sce::Gnm::Buffer &buffer, Gnm::DataFormat format, void*offset);
+
+	protected:
+		//Gpu simply has a 4 byte alignment!
+		struct MeshVertex
 		{
-			friend class PS4RendererBase;
-		public:
-			static PS4Mesh* GenerateTriangle();
-			static PS4Mesh* GenerateQuad();
-			static PS4Mesh* GenerateSinglePoint();
-
-		protected:
-			void	SubmitPreDraw(Gnmx::GnmxGfxContext& cmdList, Gnm::ShaderStage stage);
-			void	SubmitDraw(Gnmx::GnmxGfxContext& cmdList, Gnm::ShaderStage stage);
-
-			void	InitAttributeBuffer(sce::Gnm::Buffer &buffer, Gnm::DataFormat format, void*offset);
-
-		protected:
-			PS4Mesh();
-			PS4Mesh(const std::string&filename);
-			~PS4Mesh();
-
-		protected:
-			void UploadToGPU() override;
-
-			//Gpu simply has a 4 byte alignment!
-			struct MeshVertex
-			{
-				float position[3];
-				float textureCoord[2];
-				float normal[3];
-				float tangent[3];
-			};
-
-			sce::Gnm::IndexSize		indexType;
-			sce::Gnm::PrimitiveType primitiveType;
-
-
-
-			int*		indexBuffer;
-			MeshVertex*	vertexBuffer;
-
-			int	vertexDataSize;
-			int indexDataSize;
-
-			sce::Gnm::Buffer*	attributeBuffers;
-			int					attributeCount;
+			float position[3];
+			float textureCoord[2];
+			float normal[3];
+			float tangent[3];
 		};
-	}
+
+		sce::Gnm::IndexSize		indexType;
+		sce::Gnm::PrimitiveType primitiveType;
+
+		int*		indexBuffer;
+		MeshVertex*	vertexBuffer;
+
+		int	vertexDataSize;
+		int indexDataSize;
+
+		sce::Gnm::Buffer*	attributeBuffers;
+		int					attributeCount;
+	};
 }
 #endif

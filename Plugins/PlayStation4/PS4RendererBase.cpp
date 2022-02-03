@@ -43,30 +43,12 @@ PS4RendererBase::PS4RendererBase(PS4Window*window)
 
 	InitialiseGCMRendering();
 	InitialiseVideoSystem();
-
-	defaultShader = PS4Shader::GenerateShader(
-		"/app0/Assets/Shaders/PS4/VertexShader.sb",
-		"/app0/Assets/Shaders/PS4/PixelShader.sb"
-	);
-
-	defaultMesh		= PS4Mesh::GenerateTriangle();
-	defaultTexture	= PS4Texture::LoadTextureFromFile("/app0/Assets/Textures/doge.gnf");
-
-	viewProjMat		= (Matrix4*)onionAllocator->allocate(sizeof(Matrix4), Gnm::kEmbeddedDataAlignment4);
-	*viewProjMat	= Matrix4();
-
-	cameraBuffer.initAsConstantBuffer(viewProjMat, sizeof(Matrix4));
-	cameraBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeRO); // it's a constant buffer, so read-only is OK
-
-	EndFrame(); //always swap at least once...
+	window->SetRenderer(this);
+	SwapScreenBuffer();
+	SwapCommandBuffer();//always swap at least once...
 }
 
 PS4RendererBase::~PS4RendererBase()	{
-	delete defaultObject;
-	delete defaultMesh;
-	delete defaultTexture;
-	delete defaultShader;
-
 	DestroyGCMRendering();
 	DestroyVideoSystem();
 	DestroyMemoryAllocators();
@@ -113,11 +95,11 @@ void	PS4RendererBase::InitialiseGCMRendering() {
 }
 
 void	PS4RendererBase::InitialiseMemoryAllocators() {
-	stackAllocators[GARLIC].init(SCE_KERNEL_WC_GARLIC, _GarlicMemory);
-	stackAllocators[ONION ].init(SCE_KERNEL_WB_ONION , _OnionMemory);
+	stackAllocators[MEMORY_GARLIC].init(SCE_KERNEL_WC_GARLIC, _GarlicMemory);
+	stackAllocators[MEMORY_ONION ].init(SCE_KERNEL_WB_ONION , _OnionMemory);
 
-	oAllocator = Gnmx::Toolkit::GetInterface(&stackAllocators[ONION]);
-	gAllocator = Gnmx::Toolkit::GetInterface(&stackAllocators[GARLIC]);
+	oAllocator = Gnmx::Toolkit::GetInterface(&stackAllocators[MEMORY_ONION]);
+	gAllocator = Gnmx::Toolkit::GetInterface(&stackAllocators[MEMORY_GARLIC]);
 
 	this->garlicAllocator   = &gAllocator;
 	this->onionAllocator	= &oAllocator;
@@ -125,8 +107,8 @@ void	PS4RendererBase::InitialiseMemoryAllocators() {
 }
 
 void PS4RendererBase::DestroyMemoryAllocators() {
-	stackAllocators[GARLIC].deinit();
-	stackAllocators[ONION ].deinit();
+	stackAllocators[MEMORY_GARLIC].deinit();
+	stackAllocators[MEMORY_ONION ].deinit();
 }
 
 PS4ScreenBuffer*	PS4RendererBase::GenerateScreenBuffer(uint width, uint height, bool colour, bool depth, bool stencil) {
@@ -151,7 +133,7 @@ PS4ScreenBuffer*	PS4RendererBase::GenerateScreenBuffer(uint width, uint height, 
 
 		const Gnm::SizeAlign colourAlign = buffer->colourTarget.getColorSizeAlign();
 
-		void *colourMemory = stackAllocators[GARLIC].allocate(colourAlign);
+		void *colourMemory = stackAllocators[MEMORY_GARLIC].allocate(colourAlign);
 
 		Gnm::registerResource(nullptr, ownerHandle, colourMemory, colourAlign.m_size,
 			"Colour", Gnm::kResourceTypeDepthRenderTargetBaseAddress, 0);
@@ -178,14 +160,13 @@ PS4ScreenBuffer*	PS4RendererBase::GenerateScreenBuffer(uint width, uint height, 
 			bool a = true;
 		}
 
-		void *depthMemory = stackAllocators[GARLIC].allocate(buffer->depthTarget.getZSizeAlign());
+		void *depthMemory = stackAllocators[MEMORY_GARLIC].allocate(buffer->depthTarget.getZSizeAlign());
 
 		Gnm::registerResource(nullptr, ownerHandle, depthMemory, buffer->depthTarget.getZSizeAlign().m_size,
 			"Depth", Gnm::kResourceTypeDepthRenderTargetBaseAddress, 0);
 
-
 		if (stencil) {
-			stencilMemory = stackAllocators[GARLIC].allocate(buffer->depthTarget.getStencilSizeAlign());
+			stencilMemory = stackAllocators[MEMORY_GARLIC].allocate(buffer->depthTarget.getStencilSizeAlign());
 
 			Gnm::registerResource(nullptr, ownerHandle, stencilMemory, buffer->depthTarget.getStencilSizeAlign().m_size,
 				"Stencil", Gnm::kResourceTypeDepthRenderTargetBaseAddress, 0);
@@ -210,48 +191,9 @@ void	PS4RendererBase::DestroyVideoSystem() {
 	sceVideoOutClose(videoHandle);
 }
 
-void PS4RendererBase::RenderFrame()			{
-	currentFrame->StartFrame();	
-
-	currentGFXContext->waitUntilSafeForRendering(videoHandle, currentGPUBuffer);
-
-	SetRenderBuffer(currentPS4Buffer, true, true, true);
-
-	defaultShader->SubmitShaderSwitch(*currentGFXContext);
-
-	//Primitive Setup State
-	Gnm::PrimitiveSetup primitiveSetup;
-	primitiveSetup.init();
-	primitiveSetup.setCullFace(Gnm::kPrimitiveSetupCullFaceNone);
-	primitiveSetup.setFrontFace(Gnm::kPrimitiveSetupFrontFaceCcw);
-	//primitiveSetup.setPolygonMode()
-	currentGFXContext->setPrimitiveSetup(primitiveSetup);
-
-	////Screen Access State
-	Gnm::DepthStencilControl dsc;
-	dsc.init();
-	dsc.setDepthControl(Gnm::kDepthControlZWriteEnable, Gnm::kCompareFuncLessEqual);
-	dsc.setDepthEnable(true);
-	currentGFXContext->setDepthStencilControl(dsc);
-
-	Gnm::Sampler trilinearSampler;
-	trilinearSampler.init();
-	trilinearSampler.setMipFilterMode(Gnm::kMipFilterModeLinear);
-
-	currentGFXContext->setTextures(Gnm::kShaderStagePs, 0, 1, &defaultTexture->GetAPITexture());
-	currentGFXContext->setSamplers(Gnm::kShaderStagePs, 0, 1, &trilinearSampler);
-
-	*viewProjMat = Matrix4();
-
-	RenderActiveScene();
-
-	currentFrame->EndFrame();
-
-	framesSubmitted++;
-}
-
 void	PS4RendererBase::OnWindowResize(int w, int h)  {
-
+	currentWidth	= w;
+	currentHeight	= h;
 }
 
 void	PS4RendererBase::BeginFrame()   {
@@ -259,6 +201,10 @@ void	PS4RendererBase::BeginFrame()   {
 }
 
 void PS4RendererBase::EndFrame()			{
+	framesSubmitted++;
+}
+
+void	PS4RendererBase::SwapBuffers() {
 	SwapScreenBuffer();
 	SwapCommandBuffer();
 }
@@ -303,8 +249,6 @@ void	PS4RendererBase::ClearBuffer(bool colour, bool depth, bool stencil) {
 	if (colour) {
 		//Vector4 defaultClearColour(rand() / (float)RAND_MAX, rand() / (float)RAND_MAX, rand() / (float)RAND_MAX, 1.0f);
 		SonyMath::Vector4 defaultClearColour(0.1f, 0.1f, 0.1f, 1.0f);
-
-
 		SurfaceUtil::clearRenderTarget(*currentGFXContext, &currentPS4Buffer->colourTarget, defaultClearColour);
 	}
 
@@ -317,10 +261,5 @@ void	PS4RendererBase::ClearBuffer(bool colour, bool depth, bool stencil) {
 		int defaultStencil = 0;
 		SurfaceUtil::clearStencilTarget(*currentGFXContext, &currentPS4Buffer->depthTarget, defaultStencil);
 	}
-}
-
-
-void PS4RendererBase::DrawMesh(PS4Mesh& mesh) {
-	defaultMesh->SubmitDraw(*currentGFXContext, Gnm::ShaderStage::kShaderStageVs);
 }
 #endif

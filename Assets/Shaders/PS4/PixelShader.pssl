@@ -1,0 +1,23 @@
+
+SamplerState samp0 : register(s0);
+
+Texture2D colorMap : register( t0 );
+
+
+struct VS_OUTPUT
+{
+	float4 Position		: S_POSITION;
+	float2 UV			: TEXCOORD0;
+};
+
+float4 main(VS_OUTPUT In) : S_TARGET_OUTPUT
+{
+	float4 test = colorMap.Sample(samp0, In.UV.xy);
+
+	float3x3 testmat = float3x3(1);
+	float3 testvec = float3(0);
+
+	float3 answer = mul(testmat, testvec);
+
+	return test + float4(answer,1);
+}  
