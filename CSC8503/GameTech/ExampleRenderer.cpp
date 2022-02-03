@@ -5,11 +5,12 @@
 #include "../../Plugins/PlayStation4/PS4Mesh.h"
 #include "../../Plugins/PlayStation4/PS4Shader.h"
 #include "../../Plugins/PlayStation4/PS4Texture.h"
+#include "../../Common/Window.h"
 
 using namespace NCL;
 using namespace NCL::PS4;
 
-ExampleRenderer::ExampleRenderer(PS4Window* window) : PS4RendererBase(window)
+ExampleRenderer::ExampleRenderer() : PS4RendererBase(*Window::GetWindow())
 {
 	rotation	= 0.0f;
 	translation = 0.0f;
@@ -24,8 +25,9 @@ ExampleRenderer::ExampleRenderer(PS4Window* window) : PS4RendererBase(window)
 	defaultTexture	= PS4Texture::LoadTextureFromFile("/app0/Assets/Textures/doge.gnf");
 
 	CSC8503::Transform* newTransform = new CSC8503::Transform();
+	CSC8503::Transform* newTransform2 = new CSC8503::Transform();
 	defaultObject[0] = new CSC8503::RenderObject(newTransform,(MeshGeometry*)defaultMesh, (TextureBase*)defaultTexture, (ShaderBase*)defaultShader);
-	defaultObject[1] = new CSC8503::RenderObject(newTransform, (MeshGeometry*)defaultMesh, (TextureBase*)defaultTexture, (ShaderBase*)defaultShader);
+	defaultObject[1] = new CSC8503::RenderObject(newTransform2, (MeshGeometry*)defaultMesh, (TextureBase*)defaultTexture, (ShaderBase*)defaultShader);
 
 	viewProjMat = (Matrix4*)onionAllocator->allocate(sizeof(Matrix4), Gnm::kEmbeddedDataAlignment4);
 	*viewProjMat = Matrix4();

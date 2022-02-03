@@ -5,13 +5,19 @@
 #include "../../Plugins/OpenGLRendering/OGLTexture.h"
 #include "../../Common/TextureLoader.h"
 #include "../../Common/Quaternion.h"
+
+//#include "ExampleRenderer.h"
 using namespace NCL;
 using namespace CSC8503;
+//using namespace NCL::PS4;
 
 TutorialGame::TutorialGame()	{
 	world		= new GameWorld();
 #ifdef _WIN64
 	renderer	= new GameTechRenderer(*world);
+#endif
+#ifdef _ORBIS
+	//renderer = new ExampleRenderer();
 #endif
 	physics		= new PhysicsSystem(*world);
 

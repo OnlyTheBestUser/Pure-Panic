@@ -24,8 +24,8 @@ using namespace NCL::Maths;
 sce::Gnmx::Toolkit::IAllocator	oAllocator;
 sce::Gnmx::Toolkit::IAllocator	gAllocator;
 
-PS4RendererBase::PS4RendererBase(PS4Window*window)
-	: RendererBase(*window),
+PS4RendererBase::PS4RendererBase(Window& window)
+	: RendererBase(window),
 	_MaxCMDBufferCount(3),
 	  _bufferCount(3),
 	  _GarlicMemory(1024 * 1024 * 512),
@@ -44,7 +44,7 @@ PS4RendererBase::PS4RendererBase(PS4Window*window)
 
 	InitialiseGCMRendering();
 	InitialiseVideoSystem();
-	window->SetRenderer(this);
+	window.SetRenderer(this);
 	SwapScreenBuffer();
 	SwapCommandBuffer();//always swap at least once...
 }

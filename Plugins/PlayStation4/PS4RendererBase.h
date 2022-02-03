@@ -11,10 +11,13 @@
 #include <..\samples\sample_code\graphics\api_gnm\toolkit\toolkit.h>
 #include "PS4Frame.h"
 #include "PS4Texture.h"
+#include "../../Common/Window.h"
 
 using namespace sce;
 using namespace Gnmx;
 using namespace Gnmx::Toolkit;
+
+
 
 namespace NCL::CSC8503 {
 	class RenderObject;
@@ -44,7 +47,7 @@ namespace NCL::PS4 {
 		public RendererBase, public PS4MemoryAware
 	{
 	public:
-		PS4RendererBase(PS4Window* window);
+		PS4RendererBase(Window& window);
 		~PS4RendererBase();
 
 	protected:
