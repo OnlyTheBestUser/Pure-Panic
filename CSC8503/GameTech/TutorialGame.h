@@ -1,5 +1,5 @@
 #pragma once
-#include "GameTechRenderer.h"
+#include "../../Common/RendererBase.h"
 #include "../CSC8503Common/PhysicsSystem.h"
 #include "../CSC8503Common/Player.h"
 
@@ -76,19 +76,19 @@ namespace NCL {
 
 			GameObject* selectionObject = nullptr;
 
-			//OGLMesh*	capsuleMesh = nullptr;
-			//OGLMesh*	cubeMesh	= nullptr;
-			//OGLMesh*	sphereMesh	= nullptr;
-			//OGLTexture* basicTex	= nullptr;
-			//OGLShader*	basicShader = nullptr;
+			MeshGeometry*	capsuleMesh = nullptr;
+			MeshGeometry*	cubeMesh	= nullptr;
+			MeshGeometry*	sphereMesh	= nullptr;
+			TextureBase* basicTex	= nullptr;
+			ShaderBase*	basicShader = nullptr;
 
-			//OGLTexture* playerTex	= nullptr;
+			TextureBase* playerTex	= nullptr;
 
 			//Coursework Meshes
-			//OGLMesh*	charMeshA	= nullptr;
-			//OGLMesh*	charMeshB	= nullptr;
-			//OGLMesh*	enemyMesh	= nullptr;
-			//OGLMesh*	bonusMesh	= nullptr;
+			MeshGeometry*	charMeshA	= nullptr;
+			MeshGeometry*	charMeshB	= nullptr;
+			MeshGeometry*	enemyMesh	= nullptr;
+			MeshGeometry*	bonusMesh	= nullptr;
 
 			//Coursework Additional functionality	
 			GameObject* lockedObject	= nullptr;

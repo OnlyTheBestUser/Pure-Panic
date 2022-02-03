@@ -1,6 +1,7 @@
 #ifdef _ORBIS
 #pragma once
 #include "../../Plugins/PlayStation4/PS4RendererBase.h"
+#include "../CSC8503Common/GameWorld.h"
 
 namespace NCL {
 
@@ -9,7 +10,7 @@ namespace NCL {
 			public PS4RendererBase
 		{
 		public:
-			ExampleRenderer();
+			ExampleRenderer(CSC8503::GameWorld& world);
 			~ExampleRenderer();
 
 			void Update(float dt)	 override;
@@ -17,7 +18,7 @@ namespace NCL {
 		protected:
 			void	RenderFrame()	override;
 
-			void DrawRenderObject(CSC8503::RenderObject* o);
+			void DrawRenderObject(const CSC8503::RenderObject* o);
 
 			float rotation;
 			float translation;
@@ -28,9 +29,16 @@ namespace NCL {
 			PS4Mesh*	defaultMesh;
 			PS4Texture* defaultTexture;
 
-			//		
 			NCL::Maths::Matrix4*	viewProjMat;
 			Gnm::Buffer	cameraBuffer;
+
+			CSC8503::GameWorld& gameWorld;
+			vector<const RenderObject*> activeObjects;
+
+			void BuildObjectList();
+			void SortObjectList();
+
+			void RenderCamera();
 		};
 	}
 }

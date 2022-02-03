@@ -15,6 +15,12 @@ PS4Mesh::PS4Mesh()	{
 	attributeCount	= 0;
 }
 
+PS4Mesh::PS4Mesh(const std::string& filename) :MeshGeometry(filename){
+	indexBuffer = 0;
+	vertexBuffer = 0;
+	attributeCount = 0;
+}
+
 PS4Mesh::~PS4Mesh()	{
 	delete[] attributeBuffers;
 }

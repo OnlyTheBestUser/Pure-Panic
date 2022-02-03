@@ -10,8 +10,7 @@
 using namespace NCL;
 using namespace NCL::PS4;
 
-ExampleRenderer::ExampleRenderer() : PS4RendererBase(*Window::GetWindow())
-{
+ExampleRenderer::ExampleRenderer(GameWorld& world) : PS4RendererBase(*Window::GetWindow()), gameWorld(world) {
 	rotation	= 0.0f;
 	translation = 0.0f;
 
@@ -20,7 +19,7 @@ ExampleRenderer::ExampleRenderer() : PS4RendererBase(*Window::GetWindow())
 		"/app0/Assets/Shaders/PS4/PixelShader.sb"
 	);
 
-	defaultMesh		= PS4Mesh::GenerateTriangle();
+	defaultMesh	= PS4Mesh::GenerateTriangle();
 	defaultMesh->UploadToGPU(this);
 	defaultTexture	= PS4Texture::LoadTextureFromFile("/app0/Assets/Textures/doge.gnf");
 
@@ -51,8 +50,7 @@ void ExampleRenderer::Update(float dt)	{
 	translation += dt;
 
 	(defaultObject[0])->GetTransform()
-		->SetPosition(Vector3(-0.4, 0, 0))
-		.SetOrientation(Quaternion(1, 1, 1, rotation));
+		->SetPosition(Vector3(-0.4, sin(translation), 0));
 
 
 	defaultObject[1]->GetTransform()
@@ -93,14 +91,14 @@ void ExampleRenderer::RenderFrame() {
 	*viewProjMat = Matrix4();
 	*viewProjMat = Matrix4::Perspective(1.0f, 1000.0f, (float)currentWidth / (float)currentHeight, 45.0f) * Matrix4::Translation(Vector3(0, 0, -2));
 
-	DrawRenderObject(defaultObject[0]);
-	DrawRenderObject(defaultObject[1]);
+	BuildObjectList();
+	RenderCamera();
 
 	currentFrame->EndFrame();
 }
 
 
-void ExampleRenderer::DrawRenderObject(CSC8503::RenderObject* o) {
+void ExampleRenderer::DrawRenderObject(const CSC8503::RenderObject* o) {
 	Matrix4* modelMat = (Matrix4*)currentGFXContext->allocateFromCommandBuffer(sizeof(Matrix4), Gnm::kEmbeddedDataAlignment4);
 	*modelMat = o->GetTransform()->GetMatrix();
 
@@ -108,7 +106,10 @@ void ExampleRenderer::DrawRenderObject(CSC8503::RenderObject* o) {
 	constantBuffer.initAsConstantBuffer(modelMat, sizeof(Matrix4));
 	constantBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeRO); // it's a constant buffer, so read-only is OK
 
-	PS4Shader*	realShader	= (PS4Shader*)o->GetShader();
+	//PS4Shader*	realShader = (PS4Shader*)o->GetShader() == NULL ? (PS4Shader*)o->GetShader() : (PS4Shader*)defaultShader;
+	//PS4Mesh*	realMesh	= (PS4Mesh*)o->GetMesh() == NULL ? (PS4Mesh*)o->GetMesh() : (PS4Mesh*)defaultMesh;
+
+	PS4Shader* realShader = defaultShader;
 	PS4Mesh*	realMesh	= (PS4Mesh*)o->GetMesh();
 
 	int objIndex = realShader->GetConstantBufferIndex("RenderObjectData");
@@ -119,5 +120,26 @@ void ExampleRenderer::DrawRenderObject(CSC8503::RenderObject* o) {
 
 	realShader->SubmitShaderSwitch(*currentGFXContext);
 	realMesh->SubmitDraw(*currentGFXContext, Gnm::ShaderStage::kShaderStageVs);
+}
+
+void ExampleRenderer::BuildObjectList() {
+	activeObjects.clear();
+
+	gameWorld.OperateOnContents(
+		[&](GameObject* o) {
+			if (o->IsActive()) {
+				const RenderObject* g = o->GetRenderObject();
+				if (g) {
+					activeObjects.emplace_back(g);
+				}
+			}
+		}
+	);
+}
+
+void ExampleRenderer::RenderCamera() {
+	for (const auto& i : activeObjects) {
+		DrawRenderObject((i));
+	}
 }
 #endif

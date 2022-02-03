@@ -19,6 +19,7 @@ namespace NCL::PS4 {
 		friend class PS4RendererBase;
 	public:		
 		PS4Mesh();
+		PS4Mesh(const std::string& filename);
 		~PS4Mesh();
 
 		static PS4Mesh* GenerateTriangle();

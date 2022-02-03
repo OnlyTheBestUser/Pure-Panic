@@ -1,5 +1,8 @@
 #ifdef _ORBIS
 #include "ExampleRenderer.h"
+#include "../../Plugins/PlayStation4/PS4Mesh.h"
+#include "../../Plugins/PlayStation4/PS4Shader.h"
+#include "../../Plugins/PlayStation4/PS4Texture.h"
 #endif
 #include "TutorialGame.h"
 
@@ -18,7 +21,7 @@ TutorialGame::TutorialGame()	{
 	renderer	= new GameTechRenderer(*world);
 #endif
 #ifdef _ORBIS
-	renderer = new PS4::ExampleRenderer();
+	renderer = new PS4::ExampleRenderer(*world);
 #endif
 	physics		= new PhysicsSystem(*world);
 
@@ -45,12 +48,16 @@ for this module, even in the coursework, but you can add it if you like!
 
 */
 void TutorialGame::InitialiseAssets() {
-	auto loadFunc = [](const string& name, OGLMesh** into) {
-		//*into = new OGLMesh(name);
-		//(*into)->SetPrimitiveType(GeometryPrimitive::Triangles);
-		//(*into)->UploadToGPU();
+	auto loadFunc = [](const string& name, MeshGeometry** into) {
+#ifdef _ORBIS
+		*into = new PS4::PS4Mesh(name);
+#else
+		*into = new OGLMesh(name);
+#endif
+		(*into)->SetPrimitiveType(GeometryPrimitive::Triangles);
+		(*into)->UploadToGPU();
 	};
-	/*
+	
 	loadFunc("cube.msh"		 , &cubeMesh);
 	loadFunc("sphere.msh"	 , &sphereMesh);
 	loadFunc("Male1.msh"	 , &charMeshA);
@@ -58,7 +65,7 @@ void TutorialGame::InitialiseAssets() {
 	loadFunc("security.msh"	 , &enemyMesh);
 	loadFunc("coin.msh"		 , &bonusMesh);
 	loadFunc("capsule.msh"	 , &capsuleMesh);
-
+	/*
 	basicTex	= (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
 	basicShader = new OGLShader("GameTechVert.glsl", "GameTechFrag.glsl");
 	playerTex = (OGLTexture*)TextureLoader::LoadAPITexture("me.png");*/
@@ -68,7 +75,7 @@ void TutorialGame::InitialiseAssets() {
 }
 
 TutorialGame::~TutorialGame()	{
-	/*delete cubeMesh;
+	delete cubeMesh;
 	delete sphereMesh;
 	delete charMeshA;
 	delete charMeshB;
@@ -76,7 +83,7 @@ TutorialGame::~TutorialGame()	{
 	delete bonusMesh;
 
 	delete basicTex;
-	delete basicShader;*/
+	delete basicShader;
 
 	delete physics;
 	delete renderer;
@@ -347,7 +354,7 @@ GameObject* TutorialGame::AddFloorToWorld(const Maths::Vector3& position) {
 		.SetPosition(position);
 		//.SetOrientation(Quaternion(0.25f, 0, 0, 1));
 
-	//floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
+	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
 	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume()));
 
 	floor->GetPhysicsObject()->SetInverseMass(0);
@@ -379,7 +386,7 @@ GameObject* TutorialGame::AddSphereToWorld(const Maths::Vector3& position, float
 		.SetScale(sphereSize)
 		.SetPosition(position);
 
-	//sphere->SetRenderObject(new RenderObject(&sphere->GetTransform(), sphereMesh, basicTex, basicShader));
+	sphere->SetRenderObject(new RenderObject(&sphere->GetTransform(), sphereMesh, basicTex, basicShader));
 	sphere->SetPhysicsObject(new PhysicsObject(&sphere->GetTransform(), sphere->GetBoundingVolume()));
 
 	sphere->GetPhysicsObject()->SetInverseMass(inverseMass);
@@ -408,7 +415,7 @@ GameObject* TutorialGame::AddCapsuleToWorld(const Maths::Vector3& position, floa
 		.SetScale(Vector3(radius* 2, halfHeight, radius * 2))
 		.SetPosition(position);
 
-	//capsule->SetRenderObject(new RenderObject(&capsule->GetTransform(), capsuleMesh, basicTex, basicShader));
+	capsule->SetRenderObject(new RenderObject(&capsule->GetTransform(), capsuleMesh, basicTex, basicShader));
 	capsule->SetPhysicsObject(new PhysicsObject(&capsule->GetTransform(), capsule->GetBoundingVolume()));
 
 	capsule->GetPhysicsObject()->SetInverseMass(inverseMass);
@@ -435,7 +442,7 @@ GameObject* TutorialGame::AddCubeToWorld(const Maths::Vector3& position, Maths::
 		.SetScale(dimensions * 2);
 
 
-	//cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, basicShader));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, basicShader));
 	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
 
 	cube->GetPhysicsObject()->SetInverseMass(inverseMass);
@@ -524,10 +531,10 @@ GameObject* TutorialGame::AddPlayerToWorld(const Maths::Vector3& position) {
 		.SetPosition(position);
 
 	if (rand() % 2) {
-		//character->SetRenderObject(new RenderObject(&character->GetTransform(), charMeshA, nullptr, basicShader));
+		character->SetRenderObject(new RenderObject(&character->GetTransform(), charMeshA, nullptr, basicShader));
 	}
 	else {
-		//character->SetRenderObject(new RenderObject(&character->GetTransform(), charMeshB, nullptr, basicShader));
+		character->SetRenderObject(new RenderObject(&character->GetTransform(), charMeshB, nullptr, basicShader));
 	}
 	character->SetPhysicsObject(new PhysicsObject(&character->GetTransform(), character->GetBoundingVolume()));
 
