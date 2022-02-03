@@ -7,10 +7,10 @@ namespace NCL {
 	class Debug
 	{
 	public:
-		static void Print(const std::string& text, const Vector2&pos, const Vector4& colour = Vector4(1, 1, 1, 1));
-		static void DrawLine(const Vector3& startpoint, const Vector3& endpoint, const Vector4& colour = Vector4(1, 1, 1, 1), float time = 0.0f);
+		static void Print(const std::string& text, const Maths::Vector2&pos, const Maths::Vector4& colour = Vector4(1, 1, 1, 1));
+		static void DrawLine(const Maths::Vector3& startpoint, const Maths::Vector3& endpoint, const Maths::Vector4& colour = Vector4(1, 1, 1, 1), float time = 0.0f);
 
-		static void DrawAxisLines(const Matrix4 &modelMatrix, float scaleBoost = 1.0f, float time = 0.0f);
+		static void DrawAxisLines(const Maths::Matrix4 &modelMatrix, float scaleBoost = 1.0f, float time = 0.0f);
 
 		static void SetRenderer(RendererBase* r) {
 			renderer = r;
@@ -19,29 +19,29 @@ namespace NCL {
 		static void FlushRenderables(float dt);
 
 
-		static const Vector4 RED;
-		static const Vector4 GREEN;
-		static const Vector4 BLUE;
+		static const Maths::Vector4 RED;
+		static const Maths::Vector4 GREEN;
+		static const Maths::Vector4 BLUE;
 
-		static const Vector4 BLACK;
-		static const Vector4 WHITE;
+		static const Maths::Vector4 BLACK;
+		static const Maths::Vector4 WHITE;
 
-		static const Vector4 YELLOW;
-		static const Vector4 MAGENTA;
-		static const Vector4 CYAN;
+		static const Maths::Vector4 YELLOW;
+		static const Maths::Vector4 MAGENTA;
+		static const Maths::Vector4 CYAN;
 
 	protected:
 		struct DebugStringEntry {
 			std::string	data;
-			Vector2 position;
-			Vector4 colour;
+			Maths::Vector2 position;
+			Maths::Vector4 colour;
 		};
 
 		struct DebugLineEntry {
-			Vector3 start;
-			Vector3 end;
+			Maths::Vector3 start;
+			Maths::Vector3 end;
 			float	time;
-			Vector4 colour;
+			Maths::Vector4 colour;
 		};
 
 		Debug() {}

@@ -62,8 +62,8 @@ namespace NCL::PS4 {
 		void	ClearBuffer(bool colour, bool depth, bool stencil);
 		PS4ScreenBuffer* GenerateScreenBuffer(uint width, uint height, bool colour = true, bool depth = true, bool stencil = false);
 
-		void DrawString(const std::string& text, const Vector2& pos, const Vector4& colour = Vector4(0.75f, 0.75f, 0.75f, 1), float size = 20.0f) override;
-		void DrawLine(const Vector3& start, const Vector3& end, const Vector4& colour) override;
+		void DrawString(const std::string& text, const Maths::Vector2& pos, const Maths::Vector4& colour = Maths::Vector4(0.75f, 0.75f, 0.75f, 1), float size = 20.0f) override;
+		void DrawLine(const Maths::Vector3& start, const Maths::Vector3& end, const Maths::Vector4& colour) override;
 
 	private:
 		void	InitialiseMemoryAllocators();

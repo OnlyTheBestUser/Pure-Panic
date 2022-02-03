@@ -151,7 +151,7 @@ bool CollisionDetection::RaySphereIntersection(const Ray&r, const Transform& wor
 	//Get the direction between the ray origin and the sphere origin
 	Vector3 dir = spherePos - r.GetPosition();
 
-	//Then project the sphere's origin onto our ray direction vector
+	//Then project the sphere's origin onto our ray direction Maths::Vector
 	float sphereProj = Vector3::Dot(dir, r.GetDirection());
 
 	if (sphereProj < 0.0f)
