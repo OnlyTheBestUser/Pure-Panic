@@ -70,12 +70,15 @@ TutorialGame::TutorialGame()	{
 	Command* l = new MoveLeftCommand(g);
 	Command* r = new MoveRightCommand(g);
 	Command* toggleGrav = new ToggleGravityCommand(physics);
+	Command* toggleDebug = new ToggleBoolCommand(&debugDraw);
 
 	inputHandler->BindButtonW(f);
 	inputHandler->BindButtonS(b);
 	inputHandler->BindButtonA(l);
 	inputHandler->BindButtonD(r);
 	inputHandler->BindButtonG(toggleGrav);
+	inputHandler->BindButtonJ(toggleDebug);
+
 #pragma endregion
 }
 
@@ -169,6 +172,16 @@ void TutorialGame::UpdateGameWorld(float dt)
 		Debug::Print("(G)ravity off", Vector2(5, 95));
 	}
 
+	if (debugDraw) {
+		GameObjectIterator first;
+		GameObjectIterator last;
+		world->GetObjectIterators(first, last);
+		for (auto i = first; i != last; i++) {
+			DebugDrawCollider((*i)->GetBoundingVolume(), &(*i)->GetTransform());
+			DebugDrawVelocity((*i)->GetPhysicsObject()->GetLinearVelocity(), &(*i)->GetTransform());
+		}
+	}
+
 	SelectObject();
 	MoveSelectedObject(dt);
 	physics->Update(dt);
@@ -192,6 +205,34 @@ void TutorialGame::UpdateGameWorld(float dt)
 	}
 
 	world->UpdateWorld(dt);
+}
+
+void TutorialGame::DebugDrawCollider(const CollisionVolume* c, Transform* worldTransform) {
+	Vector4 col = Vector4(1, 0, 0, 1);
+	switch (c->type) {
+	case VolumeType::AABB: Debug::DrawCube(worldTransform->GetPosition(), ((AABBVolume*)c)->GetHalfDimensions(), col); break;
+	case VolumeType::OBB: Debug::DrawCube(worldTransform->GetPosition(), ((AABBVolume*)c)->GetHalfDimensions(), Vector4(0, 1, 0, 1), 0, worldTransform->GetOrientation()); break;
+	case VolumeType::Sphere: Debug::DrawSphere(worldTransform->GetPosition(), ((SphereVolume*)c)->GetRadius(), col); break;
+	case VolumeType::Capsule: Debug::DrawCapsule(worldTransform->GetPosition(), ((CapsuleVolume*)c)->GetRadius(), ((CapsuleVolume*)c)->GetHalfHeight(), worldTransform->GetOrientation(), col); break;
+	default: break;
+	}
+}
+
+void TutorialGame::DebugDrawVelocity(const Vector3& velocity, Transform* worldTransform) {
+	Vector4 col = Vector4(1, 0, 1, 1);
+	Debug::DrawArrow(worldTransform->GetPosition(), worldTransform->GetPosition() + velocity, col);
+}
+
+void TutorialGame::DebugDrawObjectInfo(const GameObject* obj) {
+	Vector3 pos = selectionObject->GetTransform().GetPosition();
+	Vector3 rot = selectionObject->GetTransform().GetOrientation().ToEuler();
+	string name = obj->GetName();
+	string n = "Name: " + (name == "" ? "-" : name);
+	string p = "Pos: (" + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z) + ")";
+	string r = "Rot: (" + std::to_string(rot.x) + ", " + std::to_string(rot.y) + ", " + std::to_string(rot.z) + ")";
+	renderer->DrawString(n, Vector2(1, 3), Debug::WHITE, 15.0f);
+	renderer->DrawString(p, Vector2(1, 6), Debug::WHITE, 15.0f);
+	renderer->DrawString(r, Vector2(1, 9), Debug::WHITE, 15.0f);
 }
 
 void TutorialGame::UpdatePauseScreen(float dt)
@@ -359,7 +400,7 @@ void TutorialGame::InitWorld() {
 	cap1->SetDynamic(true);
 	cap2->SetDynamic(true);
 
-	GameObject* sphere1 = AddSphereToWorld(Vector3(10, 5, 20), 1.0f, 10.0f, false, false, true);
+	GameObject* sphere1 = AddSphereToWorld(Vector3(10, 15, 20), 10.0f, 10.0f, false, false, true);
 	GameObject* sphere2 = AddSphereToWorld(Vector3(15, 5, 20), 1.0f, 10.0f, false, false, true);
 
 	a->SetCollisionLayers(CollisionLayer::LAYER_ONE);
@@ -692,9 +733,7 @@ void TutorialGame::MoveSelectedObject(float dt) {
 		}
 	}
 
-	Vector3 pos = selectionObject->GetTransform().GetPosition();
-	string s = "Pos: " + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z) + ")";
-	renderer->DrawString(s, Vector2(5, 5));
+	DebugDrawObjectInfo(selectionObject);
 
 	if (Window::GetKeyboard()->KeyHeld(NCL::KeyboardKeys::F))
 		selectionObject->Interact(dt);

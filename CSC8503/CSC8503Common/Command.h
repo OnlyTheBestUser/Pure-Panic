@@ -76,6 +76,17 @@ namespace NCL {
 		protected:
 			PhysicsSystem* physics;
 		};
+
+		class ToggleBoolCommand : public Command {
+		public:
+			ToggleBoolCommand(bool* toggleVar) : toggleVar(toggleVar) {};
+			virtual ~ToggleBoolCommand() {};
+			void execute() {
+				*toggleVar = !(*toggleVar);
+			}
+		protected:
+			bool* toggleVar;
+		};
 #pragma endregion
 	}
 }
