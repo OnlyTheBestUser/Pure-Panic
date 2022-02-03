@@ -1,15 +1,16 @@
+#ifdef _ORBIS
+#include "ExampleRenderer.h"
+#endif
 #include "TutorialGame.h"
+
 #include "../CSC8503Common/GameWorld.h"
+#ifdef _WIN64
 #include "../../Plugins/OpenGLRendering/OGLMesh.h"
 #include "../../Plugins/OpenGLRendering/OGLShader.h"
 #include "../../Plugins/OpenGLRendering/OGLTexture.h"
+#endif
 #include "../../Common/TextureLoader.h"
 #include "../../Common/Quaternion.h"
-
-//#include "ExampleRenderer.h"
-using namespace NCL;
-using namespace CSC8503;
-//using namespace NCL::PS4;
 
 TutorialGame::TutorialGame()	{
 	world		= new GameWorld();
@@ -17,7 +18,7 @@ TutorialGame::TutorialGame()	{
 	renderer	= new GameTechRenderer(*world);
 #endif
 #ifdef _ORBIS
-	//renderer = new ExampleRenderer();
+	renderer = new PS4::ExampleRenderer();
 #endif
 	physics		= new PhysicsSystem(*world);
 
@@ -45,9 +46,9 @@ for this module, even in the coursework, but you can add it if you like!
 */
 void TutorialGame::InitialiseAssets() {
 	auto loadFunc = [](const string& name, OGLMesh** into) {
-		*into = new OGLMesh(name);
-		(*into)->SetPrimitiveType(GeometryPrimitive::Triangles);
-		(*into)->UploadToGPU();
+		//*into = new OGLMesh(name);
+		//(*into)->SetPrimitiveType(GeometryPrimitive::Triangles);
+		//(*into)->UploadToGPU();
 	};
 	/*
 	loadFunc("cube.msh"		 , &cubeMesh);
@@ -124,8 +125,8 @@ void TutorialGame::UpdateGameWorld(float dt)
 		Debug::Print("(G)ravity off", Vector2(5, 95));
 	}
 
-	SelectObject();
-	MoveSelectedObject(dt);
+	//SelectObject();
+	//MoveSelectedObject(dt);
 	physics->Update(dt);
 
 	if (lockedObject != nullptr) {
@@ -164,7 +165,7 @@ void TutorialGame::UpdateWinScreen(float dt)
 }
 
 void TutorialGame::UpdateKeys() {
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F1)) {
+	/*if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F1)) {
 		InitWorld(); //We can reset the simulation at any time with F1
 		selectionObject = nullptr;
 		lockedObject	= nullptr;
@@ -195,7 +196,7 @@ void TutorialGame::UpdateKeys() {
 	}
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F8)) {
 		world->ShuffleObjects(false);
-	}
+	}*/
 
 	if (lockedObject) {
 		LockedObjectMovement();
@@ -335,7 +336,7 @@ void TutorialGame::InitWorld() {
 A single function to add a large immoveable cube to the bottom of our world
 
 */
-GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
+GameObject* TutorialGame::AddFloorToWorld(const Maths::Vector3& position) {
 	GameObject* floor = new GameObject("Floor");
 
 	Vector3 floorSize	= Vector3(20, 2, 100);
@@ -364,7 +365,7 @@ rigid body representation. This and the cube function will let you build a lot o
 physics worlds. You'll probably need another function for the creation of OBB cubes too.
 
 */
-GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius, float inverseMass, bool rubber, bool hollow, bool dynamic) {
+GameObject* TutorialGame::AddSphereToWorld(const Maths::Vector3& position, float radius, float inverseMass, bool rubber, bool hollow, bool dynamic) {
 	GameObject* sphere = new GameObject("Sphere");
 	
 	// Raycasting Tutorial 1 - Further Work Part 1
@@ -397,7 +398,7 @@ GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius
 	return sphere;
 }
 
-GameObject* TutorialGame::AddCapsuleToWorld(const Vector3& position, float halfHeight, float radius, float inverseMass) {
+GameObject* TutorialGame::AddCapsuleToWorld(const Maths::Vector3& position, float halfHeight, float radius, float inverseMass) {
 	GameObject* capsule = new GameObject("Capsule");
 
 	CapsuleVolume* volume = new CapsuleVolume(halfHeight, radius);
@@ -418,7 +419,7 @@ GameObject* TutorialGame::AddCapsuleToWorld(const Vector3& position, float halfH
 	return capsule;
 }
 
-GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimensions, bool OBB, float inverseMass, int layer, bool isTrigger, bool dynamic) {
+GameObject* TutorialGame::AddCubeToWorld(const Maths::Vector3& position, Maths::Vector3 dimensions, bool OBB, float inverseMass, int layer, bool isTrigger, bool dynamic) {
 	GameObject* cube = new GameObject();
 	if (OBB) {
 		OBBVolume* volume = new OBBVolume(dimensions);
@@ -490,7 +491,7 @@ void TutorialGame::InitMixedGridWorld(int numRows, int numCols, float rowSpacing
 	}
 }
 
-void TutorialGame::InitCubeGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, const Vector3& cubeDims) {
+void TutorialGame::InitCubeGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, const Maths::Vector3& cubeDims) {
 	for (int x = 1; x < numCols+1; ++x) {
 		for (int z = 1; z < numRows+1; ++z) {
 			Vector3 position = Vector3(x * colSpacing, 10.0f, z * rowSpacing);
@@ -508,7 +509,7 @@ void TutorialGame::InitGameExamples() {
 	AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f, 1.0f);
 }
 
-GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position) {
+GameObject* TutorialGame::AddPlayerToWorld(const Maths::Vector3& position) {
 	float meshSize = 3.0f;
 	float inverseMass = 0.5f;
 

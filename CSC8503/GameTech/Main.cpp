@@ -219,14 +219,16 @@ using namespace NCL::PS4;
 int main(void) {
 #ifdef _ORBIS
 	Window* w = (PS4Window*)Window::CreateGameWindow("PS4 Example Code", 1920, 1080);
+	PS4Input		input = PS4Input();
+	Ps4AudioSystem* audioSystem = new Ps4AudioSystem(8);
 #endif
 #ifdef _WIN64
 	Window* w = Window::CreateGameWindow("CSC8503 Game technology!", 1600, 900);
 #endif
 
-	if (!w->HasInitialised()) {
-		return -1;
-	}
+	//if (!w->HasInitialised()) {
+		//return -1;
+	//}
 	srand(time(NULL));
 	w->ShowOSPointer(false);
 	w->LockMouseToWindow(true);
@@ -234,22 +236,12 @@ int main(void) {
 	TutorialGame* g = new TutorialGame();
 	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
 	while (w->UpdateWindow()) { //&& !w->GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
-		//DisplayPathfinding();
 		float dt = w->GetTimer()->GetTimeDeltaSeconds();
-		if (dt > 0.1f) {
-			std::cout << "Skipping large time delta" << std::endl;
-			continue; //must have hit a breakpoint or something to have a 1 second frame time!
-		}
-		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::PRIOR)) {
-			w->ShowConsole(true);
-		}
-		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NEXT)) {
-			w->ShowConsole(false);
-		}
 
-		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::T)) {
-			w->SetWindowPosition(0, 0);
-		}
+#ifdef _ORBIS
+		input.Poll();
+#endif
+		
 
 		w->SetTitle("Gametech frame time:" + std::to_string(1000.0f * dt));
 
