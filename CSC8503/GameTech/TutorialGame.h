@@ -1,18 +1,10 @@
 #pragma once
-#include "../../Common/Vector3.h"
-#include "../../Common/RendererBase.h"
+#include "GameTechRenderer.h"
+#include "../CSC8503Common/PhysicsSystem.h"
+#include "../CSC8503Common/Player.h"
 
 namespace NCL {
-	namespace Maths {
-		class Vector3;
-	}
-
 	namespace CSC8503 {
-		class Player;
-		class PhysicsSystem;
-		class GameObject;
-		class GameWorld;
-
 		enum GameState {
 			PLAY,
 			PAUSE,
@@ -49,7 +41,7 @@ namespace NCL {
 
 			void InitSphereGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, float radius);
 			void InitMixedGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing);
-			void InitCubeGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, const Maths::Vector3& cubeDims);
+			void InitCubeGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, const Vector3& cubeDims);
 			void InitDefaultFloor();
 	
 			bool SelectObject();
@@ -57,13 +49,13 @@ namespace NCL {
 			void DebugObjectMovement();
 			void LockedObjectMovement();
 
-			GameObject* AddFloorToWorld(const Maths::Vector3& position);
-			GameObject* AddSphereToWorld(const Maths::Vector3& position, float radius, float inverseMass = 10.0f, bool rubber = false, bool hollow = false, bool dynamic = false);
-			GameObject* AddCubeToWorld(const Maths::Vector3& position, Maths::Vector3 dimensions, bool OBB = false, float inverseMass = 10.0f, int layer = 1, bool isTrigger = false, bool dynamic = false);
+			GameObject* AddFloorToWorld(const Vector3& position);
+			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f, bool rubber = false, bool hollow = false, bool dynamic = false);
+			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, bool OBB = false, float inverseMass = 10.0f, int layer = 1, bool isTrigger = false, bool dynamic = false);
 			
-			GameObject* AddCapsuleToWorld(const Maths::Vector3& position, float halfHeight, float radius, float inverseMass = 10.0f);
+			GameObject* AddCapsuleToWorld(const Vector3& position, float halfHeight, float radius, float inverseMass = 10.0f);
 
-			GameObject* AddPlayerToWorld(const Maths::Vector3& position);
+			GameObject* AddPlayerToWorld(const Vector3& position);
 
 			StateGameObject* testStateObject;
 
@@ -100,7 +92,7 @@ namespace NCL {
 
 			//Coursework Additional functionality	
 			GameObject* lockedObject	= nullptr;
-			Maths::Vector3 lockedOffset	=Maths::Vector3(0, 14, 20);
+			Vector3 lockedOffset		= Vector3(0, 14, 20);
 			void LockCameraToObject(GameObject* o) {
 				lockedObject = o;
 			}

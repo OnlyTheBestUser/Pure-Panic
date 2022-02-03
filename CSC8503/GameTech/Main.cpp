@@ -231,7 +231,7 @@ int main(void) {
 	w->ShowOSPointer(false);
 	w->LockMouseToWindow(true);
 
-	CSC8503::TutorialGame* g = new CSC8503::TutorialGame();
+	TutorialGame* g = new TutorialGame();
 	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
 	while (w->UpdateWindow()) { //&& !w->GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
 		//DisplayPathfinding();

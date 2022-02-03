@@ -9,7 +9,7 @@
 #include <.\graphics\api_gnm\toolkit\allocators.h>
 #include <.\graphics\api_gnm\toolkit\stack_allocator.h>
 
-#include "../../Common/Vector4.h"
+#include "../../Common/Matrix4.h"
 
 using namespace sce::Vectormath::Scalar::Aos;
 
@@ -19,6 +19,7 @@ namespace SonyMath = sce::Vectormath::Scalar::Aos;
 
 using namespace NCL;
 using namespace NCL::PS4;
+using namespace NCL::Maths;
 
 sce::Gnmx::Toolkit::IAllocator	oAllocator;
 sce::Gnmx::Toolkit::IAllocator	gAllocator;
@@ -247,7 +248,7 @@ void	PS4RendererBase::SetRenderBuffer(PS4ScreenBuffer*buffer, bool clearColour, 
 
 void	PS4RendererBase::ClearBuffer(bool colour, bool depth, bool stencil) {
 	if (colour) {
-		//Maths::Vector4 defaultClearColour(rand() / (float)RAND_MAX, rand() / (float)RAND_MAX, rand() / (float)RAND_MAX, 1.0f);
+		//Vector4 defaultClearColour(rand() / (float)RAND_MAX, rand() / (float)RAND_MAX, rand() / (float)RAND_MAX, 1.0f);
 		SonyMath::Vector4 defaultClearColour(0.1f, 0.1f, 0.1f, 1.0f);
 		SurfaceUtil::clearRenderTarget(*currentGFXContext, &currentPS4Buffer->colourTarget, defaultClearColour);
 	}

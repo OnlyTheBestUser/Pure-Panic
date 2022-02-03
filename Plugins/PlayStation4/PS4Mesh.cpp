@@ -25,15 +25,15 @@ PS4Mesh* PS4Mesh::GenerateQuad() {
 	mesh->indexType		= sce::Gnm::IndexSize::kIndexSize32;
 	mesh->primitiveType = sce::Gnm::PrimitiveType::kPrimitiveTypeTriStrip;
 
-	mesh->SetVertexPositions({ Maths::Vector3(-1.0f, -1.0f, 0.0f), Maths::Vector3(-1.0f,  1.0f, 0.0f),Maths::Vector3(1.0f, -1.0f, 0.0f), Maths::Vector3(1.0f,  1.0f, 0.0f) });
+	mesh->SetVertexPositions({ Vector3(-1.0f, -1.0f, 0.0f), Vector3(-1.0f,  1.0f, 0.0f),Vector3(1.0f, -1.0f, 0.0f), Vector3(1.0f,  1.0f, 0.0f) });
 
-	std::vector<Maths::Vector3> normals;
-	std::vector<Maths::Vector4> tangents;
+	std::vector<Vector3> normals;
+	std::vector<Vector4> tangents;
 	std::vector<unsigned int> indices;
 
 	for (int i = 0; i < 4; ++i) {
-		normals.emplace_back(Maths::Vector3(0, 0, 1));
-		tangents.emplace_back(Maths::Vector4(1, 0, 0, 0));
+		normals.emplace_back(Vector3(0, 0, 1));
+		tangents.emplace_back(Vector4(1, 0, 0, 0));
 
 		indices.emplace_back(i);
 	}
@@ -51,9 +51,9 @@ PS4Mesh* PS4Mesh::GenerateSinglePoint() {
 	mesh->indexType		= sce::Gnm::IndexSize::kIndexSize32;
 	mesh->primitiveType = sce::Gnm::PrimitiveType::kPrimitiveTypePointList;
 
-	mesh->SetVertexPositions({ Maths::Vector3(0.0f, 0.0f, 0.0f) });
-	mesh->SetVertexNormals({ Maths::Vector3(0, 0, 1) });
-	mesh->SetVertexTangents({ Maths::Vector3(1, 0, 0) });
+	mesh->SetVertexPositions({ Vector3(0.0f, 0.0f, 0.0f) });
+	mesh->SetVertexNormals({ Vector3(0, 0, 1) });
+	mesh->SetVertexTangents({ Vector3(1, 0, 0) });
 	mesh->SetVertexIndices({ 0 });
 
 	return mesh;
@@ -65,10 +65,10 @@ PS4Mesh* PS4Mesh::GenerateTriangle() {
 	mesh->indexType		= sce::Gnm::IndexSize::kIndexSize32;
 	mesh->primitiveType = sce::Gnm::PrimitiveType::kPrimitiveTypeTriList;
 
-	mesh->SetVertexPositions({ Maths::Vector3(0.0f, 0.5f, 0.0f), Maths::Vector3(0.5f, -0.5f, 0.0f), Maths::Vector3(-0.5f, -0.5f, 0.0f) });
-	mesh->SetVertexTextureCoords({ Maths::Vector2(0.5f, 0.0f) , Maths::Vector2(1.0f, 1.0f), Maths::Vector2(0.0f, 1.0f) });
-	mesh->SetVertexNormals({ Maths::Vector3(0, 0, 1),Maths::Vector3(0, 0, 1), Maths::Vector3(0, 0, 1) });
-	mesh->SetVertexTangents({ Maths::Vector4(1, 0, 0, 0), Maths::Vector4(1, 0, 0,0), Maths::Vector4(1, 0, 0,0) });
+	mesh->SetVertexPositions({ Vector3(0.0f, 0.5f, 0.0f), Vector3(0.5f, -0.5f, 0.0f), Vector3(-0.5f, -0.5f, 0.0f) });
+	mesh->SetVertexTextureCoords({ Vector2(0.5f, 0.0f) , Vector2(1.0f, 1.0f), Vector2(0.0f, 1.0f) });
+	mesh->SetVertexNormals({ Vector3(0, 0, 1),Vector3(0, 0, 1), Vector3(0, 0, 1) });
+	mesh->SetVertexTangents({ Vector4(1, 0, 0, 0), Vector4(1, 0, 0,0), Vector4(1, 0, 0,0) });
 	mesh->SetVertexIndices({ 0, 1, 2 });
 
 	return mesh;

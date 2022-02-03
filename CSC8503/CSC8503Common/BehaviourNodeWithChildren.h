@@ -1,6 +1,6 @@
 #pragma once
 #include "BehaviourNode.h"
-#include <Maths::Vector>
+#include <vector>
 
 namespace NCL {
 	namespace CSC8503 {
