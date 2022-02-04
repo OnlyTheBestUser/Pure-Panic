@@ -456,7 +456,7 @@ void PhysicsSystem::CheckToSleep(PhysicsObject* object)
 	const int maxQueueSize = 6;
 	const float bounceTolerance = 0.5;
 
-	// for all objects in world, update their queue of previous velocities dot products
+	// for all objects in world, update their queue of previous velocities dot products and previous positions
 	// only ever want a queue of set length, so if gonna be longer remove the oldest and add latest
 	if (object->GetPrevVelocitiesSize() >= maxQueueSize)
 		object->RemoveFromPreviousVelocities();
@@ -510,7 +510,8 @@ void PhysicsSystem::CheckToSleep(PhysicsObject* object)
 		}
 		
 		// Velocity checks for OBB and Capsule
-		if ((object->GetVolumeType() == VolumeType::OBB || object->GetVolumeType() == VolumeType::Capsule) && ((velAverage / 5) > 0.001))
+		//if ((object->GetVolumeType() == VolumeType::OBB || object->GetVolumeType() == VolumeType::Capsule) && (abs((velAverage) / 5) > 0.1))
+		if ((object->GetVolumeType() == VolumeType::OBB || object->GetVolumeType() == VolumeType::Capsule) && ((velAverage / 5) > 0.1))
 			velShouldSleep = false;
 			
 		// if object should sleep remove all velocity and set to sleep

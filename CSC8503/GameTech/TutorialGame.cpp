@@ -320,7 +320,8 @@ void TutorialGame::InitWorld() {
 	//sphere1->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	//sphere2->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	//InitSphereGridWorld(5, 10, 6, 6, 2);
-	InitMixedGridWorld(5, 10, 6, 6);
+	InitCubeGridWorld(1, 1, 6, 6, Vector3(1,1,1));
+	//InitMixedGridWorld(5, 10, 6, 6);
 	//InitCapsuleGridWorld(5, 10, 7, 7);
 
 	physics->BuildStaticList();
@@ -508,7 +509,8 @@ void TutorialGame::InitCubeGridWorld(int numRows, int numCols, float rowSpacing,
 	for (int x = 1; x < numCols+1; ++x) {
 		for (int z = 1; z < numRows+1; ++z) {
 			Vector3 position = Vector3(x * colSpacing, 10.0f, z * rowSpacing);
-			AddCubeToWorld(position, cubeDims, 1.0f);
+			GameObject* obb = AddCubeToWorld(position, cubeDims, true, 10.0f, 1, false, true);
+			obb->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 		}
 	}
 }
