@@ -4,6 +4,9 @@
 #include "../CSC8503Common/Player.h"
 
 namespace NCL {
+	namespace PS4 {
+		class InputBase;
+	}
 	namespace CSC8503 {
 		enum GameState {
 			PLAY,
@@ -17,6 +20,7 @@ namespace NCL {
 		class TutorialGame		{
 		public:
 			TutorialGame();
+			TutorialGame(NCL::PS4::InputBase* input);
 			virtual ~TutorialGame();
 
 			virtual void UpdateGame(float dt);
@@ -30,6 +34,8 @@ namespace NCL {
 			}
 
 		protected:
+			NCL::PS4::InputBase* input = NULL;
+
 			void InitialiseAssets();
 
 			void InitCamera();

@@ -32,7 +32,7 @@ ExampleRenderer::ExampleRenderer(GameWorld& world) : PS4RendererBase(*Window::Ge
 	*viewProjMat = Matrix4();
 
 	cameraBuffer.initAsConstantBuffer(viewProjMat, sizeof(Matrix4));
-	cameraBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeRO); // it's a constant buffer, so read-only is OK
+	cameraBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeUC); // it's a constant buffer, so read-only is OK
 }
 
 ExampleRenderer::~ExampleRenderer()
@@ -88,8 +88,9 @@ void ExampleRenderer::RenderFrame() {
 	currentGFXContext->setTextures(Gnm::kShaderStagePs, 0, 1, &defaultTexture->GetAPITexture());
 	currentGFXContext->setSamplers(Gnm::kShaderStagePs, 0, 1, &trilinearSampler);
 
+	float screenAspect = (float)currentWidth / (float)currentHeight;
 	*viewProjMat = Matrix4();
-	*viewProjMat = Matrix4::Perspective(1.0f, 1000.0f, (float)currentWidth / (float)currentHeight, 45.0f) * Matrix4::Translation(Vector3(0, 0, -2));
+	*viewProjMat = gameWorld.GetMainCamera()->BuildViewMatrix() * gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);
 
 	BuildObjectList();
 	RenderCamera();

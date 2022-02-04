@@ -15,6 +15,7 @@
 #endif
 #include "../../Common/TextureLoader.h"
 #include "../../Common/Quaternion.h"
+#include "../../Plugins/PlayStation4/InputBase.h"
 
 TutorialGame::TutorialGame()	{
 	world		= new GameWorld();
@@ -25,6 +26,7 @@ TutorialGame::TutorialGame()	{
 	renderer = new PS4::ExampleRenderer(*world);
 #endif
 	physics		= new PhysicsSystem(*world);
+	input = NULL;
 
 	forceMagnitude	= 30.0f;
 	useGravity		= false;
@@ -41,6 +43,9 @@ TutorialGame::TutorialGame()	{
 	InitialiseAssets();
 }
 
+TutorialGame::TutorialGame(NCL::PS4::InputBase* input) : TutorialGame() {
+	this->input = input;
+}
 /*
 
 Each of the little demo scenarios used in the game uses the same 2 meshes, 
@@ -127,6 +132,21 @@ void TutorialGame::UpdateGameWorld(float dt)
 	}
 
 	UpdateKeys();
+
+	float frameSpeed = 1 * dt;
+	Camera* cam = world->GetMainCamera();
+	if (input->GetAxis(0).y > 0) {
+		cam->SetPosition(cam->GetPosition() + Matrix4::Rotation(cam->GetYaw(), Vector3(0, 1, 0)) * Vector3(0, 0, -1) * frameSpeed);
+	}
+	if (input->GetAxis(0).y < 0) {
+		cam->SetPosition(cam->GetPosition() - Matrix4::Rotation(cam->GetYaw(), Vector3(0, 1, 0)) * Vector3(0, 0, -1) * frameSpeed);
+	}
+	if (input->GetAxis(0).x > 0) {
+		cam->SetPosition(cam->GetPosition() + Matrix4::Rotation(cam->GetYaw(), Vector3(0, 1, 0)) * Vector3(-1, 0, 0) * frameSpeed);
+	}
+	if (input->GetAxis(0).x < 0) {
+		cam->SetPosition(cam->GetPosition() - Matrix4::Rotation(cam->GetYaw(), Vector3(0, 1, 0)) * Vector3(-1, 0, 0) * frameSpeed);
+	}
 
 	if (useGravity) {
 		Debug::Print("(G)ravity on", Vector2(5, 95));
