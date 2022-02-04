@@ -133,18 +133,29 @@ void TutorialGame::UpdateGameWorld(float dt)
 
 	UpdateKeys();
 
-	float frameSpeed = 1 * dt;
+	float frameSpeed = 10 * dt;
 	Camera* cam = world->GetMainCamera();
-	if (input->GetAxis(0).y > 0) {
+	float deadzone = 0.2f;
+	//pitch -= (Window::GetMouse()->GetRelativePosition().y);
+	//yaw -= (Window::GetMouse()->GetRelativePosition().x);
+	if (input->GetAxis(1).y < -deadzone || input->GetAxis(1).y > deadzone) {
+		cam->SetPitch(cam->GetPitch() - input->GetAxis(1).y);
+	}
+	if (input->GetAxis(1).x < -deadzone || input->GetAxis(1).x > deadzone) {
+		cam->SetYaw(cam->GetYaw() - input->GetAxis(1).x);
+	}
+
+	// Movement
+	if (input->GetAxis(0).y < -deadzone) {
 		cam->SetPosition(cam->GetPosition() + Matrix4::Rotation(cam->GetYaw(), Vector3(0, 1, 0)) * Vector3(0, 0, -1) * frameSpeed);
 	}
-	if (input->GetAxis(0).y < 0) {
+	if (input->GetAxis(0).y > deadzone) {
 		cam->SetPosition(cam->GetPosition() - Matrix4::Rotation(cam->GetYaw(), Vector3(0, 1, 0)) * Vector3(0, 0, -1) * frameSpeed);
 	}
-	if (input->GetAxis(0).x > 0) {
+	if (input->GetAxis(0).x < -deadzone) {
 		cam->SetPosition(cam->GetPosition() + Matrix4::Rotation(cam->GetYaw(), Vector3(0, 1, 0)) * Vector3(-1, 0, 0) * frameSpeed);
 	}
-	if (input->GetAxis(0).x < 0) {
+	if (input->GetAxis(0).x > deadzone) {
 		cam->SetPosition(cam->GetPosition() - Matrix4::Rotation(cam->GetYaw(), Vector3(0, 1, 0)) * Vector3(-1, 0, 0) * frameSpeed);
 	}
 

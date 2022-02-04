@@ -90,7 +90,7 @@ void ExampleRenderer::RenderFrame() {
 
 	float screenAspect = (float)currentWidth / (float)currentHeight;
 	*viewProjMat = Matrix4();
-	*viewProjMat = gameWorld.GetMainCamera()->BuildViewMatrix() * gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);
+	*viewProjMat = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect) * gameWorld.GetMainCamera()->BuildViewMatrix();
 
 	BuildObjectList();
 	RenderCamera();
