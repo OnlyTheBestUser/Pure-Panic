@@ -106,7 +106,7 @@ void ReadIndices(std::ifstream& file, vector<unsigned int>& elements, int numInd
 
 MeshGeometry::MeshGeometry(const std::string&filename) {
 	primType = GeometryPrimitive::Triangles;
-	std::ifstream file(Assets::MESHDIR + filename);
+	std::ifstream file(NCL::Assets::MESHDIR + filename);
 
 	std::string filetype;
 	int fileVersion;

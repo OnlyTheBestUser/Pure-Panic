@@ -18,7 +18,10 @@ PS4Mesh::PS4Mesh()	{
 PS4Mesh::PS4Mesh(const std::string& filename) :MeshGeometry(filename){
 	indexBuffer = 0;
 	vertexBuffer = 0;
+
 	attributeCount = 0;
+	indexType = sce::Gnm::IndexSize::kIndexSize32;
+	primitiveType = sce::Gnm::PrimitiveType::kPrimitiveTypeTriList;
 }
 
 PS4Mesh::~PS4Mesh()	{

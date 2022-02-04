@@ -4,13 +4,14 @@
 #include "../../Plugins/PlayStation4/PS4Shader.h"
 #include "../../Plugins/PlayStation4/PS4Texture.h"
 #endif
-#include "TutorialGame.h"
 
+#include "TutorialGame.h"
 #include "../CSC8503Common/GameWorld.h"
 #ifdef _WIN64
 #include "../../Plugins/OpenGLRendering/OGLMesh.h"
 #include "../../Plugins/OpenGLRendering/OGLShader.h"
 #include "../../Plugins/OpenGLRendering/OGLTexture.h"
+#include "GameTechRenderer.h"
 #endif
 #include "../../Common/TextureLoader.h"
 #include "../../Common/Quaternion.h"
@@ -65,10 +66,12 @@ void TutorialGame::InitialiseAssets() {
 	loadFunc("security.msh"	 , &enemyMesh);
 	loadFunc("coin.msh"		 , &bonusMesh);
 	loadFunc("capsule.msh"	 , &capsuleMesh);
-	/*
+	
+#ifdef _WIN64
 	basicTex	= (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
 	basicShader = new OGLShader("GameTechVert.glsl", "GameTechFrag.glsl");
-	playerTex = (OGLTexture*)TextureLoader::LoadAPITexture("me.png");*/
+	playerTex = (OGLTexture*)TextureLoader::LoadAPITexture("me.png");
+#endif
 
 	InitCamera();
 	InitWorld();
