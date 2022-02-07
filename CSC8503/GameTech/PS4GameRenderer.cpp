@@ -113,6 +113,19 @@ void PS4GameRenderer::RenderFrame() {
 
 	SetRenderBuffer(currentPS4Buffer, true, true, true);
 
+
+	Gnm::Sampler cubeSampler;
+	cubeSampler.init();
+	cubeSampler.setWrapMode(Gnm::kWrapModeWrap, Gnm::kWrapModeWrap, Gnm::kWrapModeWrap);
+
+
+	float screenAspect = (float)currentWidth / (float)currentHeight;
+	camMatrix->viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
+	camMatrix->projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);
+	camMatrix->viewProjMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect) * gameWorld.GetMainCamera()->BuildViewMatrix();
+
+	BuildObjectList();
+
 	//Primitive Setup State
 	Gnm::PrimitiveSetup primitiveSetup;
 	primitiveSetup.init();
@@ -125,26 +138,31 @@ void PS4GameRenderer::RenderFrame() {
 	Gnm::DepthStencilControl dsc;
 	dsc.init();
 	dsc.setDepthControl(Gnm::kDepthControlZWriteEnable, Gnm::kCompareFuncLessEqual);
+	dsc.setDepthEnable(false);
+	currentGFXContext->setDepthStencilControl(dsc);
+	
+	skyboxShader->SubmitShaderSwitch(*currentGFXContext);
+	currentGFXContext->setTextures(Gnm::kShaderStagePs, 0, 1, &skyboxTexture->GetAPITexture());
+	currentGFXContext->setSamplers(Gnm::kShaderStagePs, 0, 1, &cubeSampler);
+
+	RenderSkybox();
+
+	//Primitive Setup State
+	primitiveSetup.init();
+	primitiveSetup.setCullFace(Gnm::kPrimitiveSetupCullFaceNone);
+	primitiveSetup.setFrontFace(Gnm::kPrimitiveSetupFrontFaceCcw);
+	//primitiveSetup.setPolygonMode()
+	currentGFXContext->setPrimitiveSetup(primitiveSetup);
+
+	////Screen Access State
+	dsc.init();
+	dsc.setDepthControl(Gnm::kDepthControlZWriteEnable, Gnm::kCompareFuncLessEqual);
 	dsc.setDepthEnable(true);
 	currentGFXContext->setDepthStencilControl(dsc);
 
 	Gnm::Sampler trilinearSampler;
 	trilinearSampler.init();
 	trilinearSampler.setMipFilterMode(Gnm::kMipFilterModeLinear);
-
-
-	float screenAspect = (float)currentWidth / (float)currentHeight;
-	camMatrix->viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
-	camMatrix->projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);
-	camMatrix->viewProjMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect) * gameWorld.GetMainCamera()->BuildViewMatrix();
-
-	BuildObjectList();
-
-	/*skyboxShader->SubmitShaderSwitch(*currentGFXContext);
-	currentGFXContext->setTextures(Gnm::kShaderStagePs, 0, 1, &skyboxTexture->GetAPITexture());
-	currentGFXContext->setSamplers(Gnm::kShaderStagePs, 0, 1, &trilinearSampler);
-
-	RenderSkybox();*/
 
 	defaultShader->SubmitShaderSwitch(*currentGFXContext);
 	currentGFXContext->setTextures(Gnm::kShaderStagePs, 0, 1, &defaultTexture->GetAPITexture());

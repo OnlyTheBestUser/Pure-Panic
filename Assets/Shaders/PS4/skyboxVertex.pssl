@@ -2,6 +2,7 @@ ConstantBuffer CameraData
 {
 	column_major matrix projMatrix;
 	column_major matrix viewMatrix;
+	column_major matrix viewProjMatrix;
 };
 
 struct VS_INPUT
@@ -23,12 +24,11 @@ VS_OUTPUT main(VS_INPUT Input)
 	VS_OUTPUT Output;
 
 	float3 pos = Input.Position;
-	column_major matrix  invproj  = !(projMatrix);
+	float4x4  invproj  = !(projMatrix);
 	pos.xy	  *= float2(invproj[0][0],invproj[1][1]);
 	pos.z 	= -1.0f;
 
-	Output.View_Dir		= mul(normalize(pos),(transpose(column_major float3x3(viewMatrix))));
+	Output.View_Dir		= mul(transpose(float3x3(viewMatrix)),normalize(pos));
 	Output.Position		= float4(Input.Position, 1.0);
-
 	return Output;
 }
