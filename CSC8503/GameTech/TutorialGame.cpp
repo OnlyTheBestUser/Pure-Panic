@@ -364,9 +364,6 @@ physics worlds. You'll probably need another function for the creation of OBB cu
 GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius, float inverseMass, bool rubber, bool hollow, bool dynamic) {
 	GameObject* sphere = new GameObject("Sphere");
 	
-	// Raycasting Tutorial 1 - Further Work Part 1
-	//sphere->SetLayer(1);
-
 	Vector3 sphereSize = Vector3(radius, radius, radius);
 	SphereVolume* volume = new SphereVolume(radius);
 	sphere->SetBoundingVolume((CollisionVolume*)volume);

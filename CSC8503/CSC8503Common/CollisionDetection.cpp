@@ -715,7 +715,7 @@ bool NCL::CollisionDetection::AABBCapsuleIntersection(const AABBVolume& volumeB,
 
 	bool collided = AABBSphereIntersection(volumeB, worldTransformB, s, t, collisionInfo);
 	collisionInfo.point.localB += t.GetPosition() - worldTransformA.GetPosition();
-//	Debug::DrawLine(worldTransformA.GetPosition() + collisionInfo.point.localB, worldTransformA.GetPosition() + collisionInfo.point.localB + Vector3(0, 10, 0), Debug::MAGENTA);
+	//Debug::DrawLine(worldTransformA.GetPosition() + collisionInfo.point.localB, worldTransformA.GetPosition() + collisionInfo.point.localB + Vector3(0, 10, 0), Debug::MAGENTA);
 	return collided;
 }
 
