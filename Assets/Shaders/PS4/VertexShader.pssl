@@ -5,7 +5,9 @@ ConstantBuffer RenderObjectData
 
 ConstantBuffer CameraData
 {
-	column_major matrix camMatrix;
+	column_major matrix projMatrix;
+	column_major matrix viewMatrix;
+	column_major matrix viewProjMatrix;
 };
 
 struct VS_INPUT
@@ -26,7 +28,7 @@ VS_OUTPUT main(VS_INPUT Input)
 {
 	VS_OUTPUT Output; 
 
-	Output.Position = mul(mul(camMatrix,modelMatrix), float4(Input.Position.xyz, 1));
+	Output.Position = mul(mul(viewProjMatrix,modelMatrix), float4(Input.Position.xyz, 1));
 
 	//Output.Color = Input.Color;
 	Output.UV = Input.UV;

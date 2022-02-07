@@ -21,18 +21,34 @@ PS4GameRenderer::PS4GameRenderer(GameWorld& world) : PS4RendererBase(*Window::Ge
 
 	defaultMesh	= PS4Mesh::GenerateTriangle();
 	defaultMesh->UploadToGPU(this);
-	defaultTexture	= PS4Texture::LoadTextureFromFile("/app0/Assets/Textures/doge.gnf");
+	defaultTexture	= PS4Texture::LoadTextureFromFile("/app0/Assets/Textures/checkerboard.gnf");
 
 	CSC8503::Transform* newTransform = new CSC8503::Transform();
 	CSC8503::Transform* newTransform2 = new CSC8503::Transform();
 	defaultObject[0] = new CSC8503::RenderObject(newTransform,(MeshGeometry*)defaultMesh, (TextureBase*)defaultTexture, (ShaderBase*)defaultShader);
 	defaultObject[1] = new CSC8503::RenderObject(newTransform2, (MeshGeometry*)defaultMesh, (TextureBase*)defaultTexture, (ShaderBase*)defaultShader);
 
-	viewProjMat = (Matrix4*)onionAllocator->allocate(sizeof(Matrix4), Gnm::kEmbeddedDataAlignment4);
-	*viewProjMat = Matrix4();
+	camMatrix = (CameraMatrix*)onionAllocator->allocate(sizeof(CameraMatrix), Gnm::kEmbeddedDataAlignment4);
+	camMatrix->projMatrix = Matrix4();
+	camMatrix->viewMatrix = Matrix4();
+	camMatrix->viewProjMatrix = Matrix4();
 
-	cameraBuffer.initAsConstantBuffer(viewProjMat, sizeof(Matrix4));
-	cameraBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeUC); // it's a constant buffer, so read-only is OK
+	cameraBuffer.initAsConstantBuffer(camMatrix, sizeof(CameraMatrix));
+	cameraBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeSC); // it's a constant buffer, so read-only is OK
+
+
+	// Skybox
+	skyboxMesh = PS4Mesh::GenerateQuad();
+	skyboxMesh->UploadToGPU(this);
+
+	skyboxShader = PS4Shader::GenerateShader(
+		"/app0/Assets/Shaders/PS4/skyboxVertex.sb",
+		"/app0/Assets/Shaders/PS4/skyboxPixel.sb"
+	);
+
+	skyboxTexture = PS4Texture::LoadTextureFromFile("/app0/Assets/Textures/Cubemap/skyrender.gnf");
+	Gnm::Texture test = skyboxTexture->GetAPITexture();
+	test.setTextureType(Gnm::kTextureTypeCubemap);
 }
 
 PS4GameRenderer::~PS4GameRenderer()
@@ -41,8 +57,13 @@ PS4GameRenderer::~PS4GameRenderer()
 	delete defaultTexture;
 	delete defaultShader;
 
+
 	delete defaultObject[0];
 	delete defaultObject[1];
+
+	delete skyboxTexture;
+	delete skyboxShader;
+	delete skyboxMesh;
 }
 
 void PS4GameRenderer::Update(float dt)	{
@@ -57,14 +78,40 @@ void PS4GameRenderer::Update(float dt)	{
 		->SetPosition(Vector3(0.4, 0, sin(translation)));
 }
 
+void PS4GameRenderer::RenderSkybox() {
+	// Disable blend and depth
+	/*sce::Gnm::DepthStencilControl depth = sce::Gnm::DepthStencilControl();
+	depth.setDepthEnable(false);
+	depth.setStencilEnable(false);
+	currentGFXContext->setDepthStencilControl(depth);*/
+
+
+	// Send texture to shader
+
+	// Draw Mesh
+
+	//int camIndex = skyboxShader->GetConstantBufferIndex("CameraData");
+	//currentGFXContext->setConstantBuffers(Gnm::kShaderStageVs, camIndex, 1, &cameraBuffer);
+
+	int testCamIndex = skyboxShader->GetConstantBufferIndex("CameraData");
+	currentGFXContext->setConstantBuffers(Gnm::kShaderStageVs, testCamIndex, 1, &cameraBuffer);
+
+	skyboxShader->SubmitShaderSwitch(*currentGFXContext);
+	skyboxMesh->SubmitDraw(*currentGFXContext, Gnm::ShaderStage::kShaderStageVs);
+
+	// Enable blend and depth
+	/*depth.setDepthEnable(true);
+	depth.setStencilEnable(true);
+	currentGFXContext->setDepthStencilControl(depth);*/
+
+}
+
 void PS4GameRenderer::RenderFrame() {
 	currentFrame->StartFrame();
 
 	currentGFXContext->waitUntilSafeForRendering(videoHandle, currentGPUBuffer);
 
 	SetRenderBuffer(currentPS4Buffer, true, true, true);
-
-	defaultShader->SubmitShaderSwitch(*currentGFXContext);
 
 	//Primitive Setup State
 	Gnm::PrimitiveSetup primitiveSetup;
@@ -85,14 +132,23 @@ void PS4GameRenderer::RenderFrame() {
 	trilinearSampler.init();
 	trilinearSampler.setMipFilterMode(Gnm::kMipFilterModeLinear);
 
-	currentGFXContext->setTextures(Gnm::kShaderStagePs, 0, 1, &defaultTexture->GetAPITexture());
-	currentGFXContext->setSamplers(Gnm::kShaderStagePs, 0, 1, &trilinearSampler);
 
 	float screenAspect = (float)currentWidth / (float)currentHeight;
-	*viewProjMat = Matrix4();
-	*viewProjMat = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect) * gameWorld.GetMainCamera()->BuildViewMatrix();
+	camMatrix->viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
+	camMatrix->projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);
+	camMatrix->viewProjMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect) * gameWorld.GetMainCamera()->BuildViewMatrix();
 
 	BuildObjectList();
+
+	/*skyboxShader->SubmitShaderSwitch(*currentGFXContext);
+	currentGFXContext->setTextures(Gnm::kShaderStagePs, 0, 1, &skyboxTexture->GetAPITexture());
+	currentGFXContext->setSamplers(Gnm::kShaderStagePs, 0, 1, &trilinearSampler);
+
+	RenderSkybox();*/
+
+	defaultShader->SubmitShaderSwitch(*currentGFXContext);
+	currentGFXContext->setTextures(Gnm::kShaderStagePs, 0, 1, &defaultTexture->GetAPITexture());
+	currentGFXContext->setSamplers(Gnm::kShaderStagePs, 0, 1, &trilinearSampler);
 	RenderCamera();
 
 	currentFrame->EndFrame();

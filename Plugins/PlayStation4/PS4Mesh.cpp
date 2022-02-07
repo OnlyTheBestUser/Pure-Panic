@@ -35,7 +35,7 @@ PS4Mesh* PS4Mesh::GenerateQuad() {
 	mesh->primitiveType = sce::Gnm::PrimitiveType::kPrimitiveTypeTriStrip;
 
 	mesh->SetVertexPositions({ Vector3(-1.0f, -1.0f, 0.0f), Vector3(-1.0f,  1.0f, 0.0f),Vector3(1.0f, -1.0f, 0.0f), Vector3(1.0f,  1.0f, 0.0f) });
-
+	mesh->SetVertexTextureCoords({ Vector2(0.0f, 0.0f) , Vector2(1.0f, 0.0f), Vector2(1.0f, 1.0f), Vector2(0.0f, 1.0f) });
 	std::vector<Vector3> normals;
 	std::vector<Vector4> tangents;
 	std::vector<unsigned int> indices;

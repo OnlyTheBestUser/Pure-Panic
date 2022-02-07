@@ -6,6 +6,12 @@
 namespace NCL {
 
 	namespace PS4 {
+		struct CameraMatrix {
+			Matrix4 projMatrix;
+			Matrix4 viewMatrix;
+			Matrix4 viewProjMatrix;
+		};
+
 		class PS4GameRenderer :
 			public PS4RendererBase
 		{
@@ -29,9 +35,6 @@ namespace NCL {
 			PS4Mesh*	defaultMesh;
 			PS4Texture* defaultTexture;
 
-			NCL::Maths::Matrix4*	viewProjMat;
-			Gnm::Buffer	cameraBuffer;
-
 			CSC8503::GameWorld& gameWorld;
 			vector<const RenderObject*> activeObjects;
 
@@ -39,6 +42,14 @@ namespace NCL {
 			void SortObjectList();
 
 			void RenderCamera();
+			void RenderSkybox();
+
+			Gnm::Buffer	cameraBuffer;
+			CameraMatrix* camMatrix;
+
+			PS4Texture* skyboxTexture;
+			PS4Mesh* skyboxMesh;
+			PS4Shader* skyboxShader;
 		};
 	}
 }
