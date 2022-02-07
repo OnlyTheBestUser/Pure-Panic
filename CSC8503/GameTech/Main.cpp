@@ -167,6 +167,7 @@ int main() {
 	MainMenu* m = new MainMenu();
 	PushdownMachine p = new Menu(m, g, g, g);
 	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
+	float smallestFrameRate = 144.0f;
 	while (w->UpdateWindow()) { //&& !w->GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
 		//DisplayPathfinding();
 		float dt = w->GetTimer()->GetTimeDeltaSeconds();
@@ -185,7 +186,12 @@ int main() {
 			w->SetWindowPosition(0, 0);
 		}
 
-		w->SetTitle("Gametech frame time:" + std::to_string(1000.0f * dt));
+		float frameRate = (1.0f / dt);
+		if (frameRate < smallestFrameRate)
+			smallestFrameRate = frameRate;
+
+		//w->SetTitle("Gametech frame time:" + std::to_string(1000.0f * dt));
+		w->SetTitle("Gametech frame time:" + std::to_string(frameRate));
 
 		if (!p.Update(dt)) {
 			return 0;

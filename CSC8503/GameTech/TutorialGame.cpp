@@ -20,6 +20,8 @@ TutorialGame::TutorialGame()	{
 
 	forceMagnitude	= 30.0f;
 	useGravity		= true;
+	physics->UseGravity(useGravity);
+
 	inSelectionMode = false;
 	physics->UseGravity(true);
 
@@ -382,36 +384,40 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	GameObject* a = AddCubeToWorld(Vector3(15, 2, 15), Vector3(1, 1, 1), true, 10.0f, 1, false, true);
+	/*GameObject* a = AddCubeToWorld(Vector3(15, 2, 15), Vector3(1, 1, 1), true, 10.0f, 1, false, true);
 	GameObject* b = AddCubeToWorld(Vector3(10, 2, 15), Vector3(1, 1, 1), true, 10.0f, 1, false, true);
 	a->GetRenderObject()->SetColour(Debug::CYAN);
-	b->GetRenderObject()->SetColour(Debug::CYAN);
+	b->GetRenderObject()->SetColour(Debug::CYAN);*/
 
-	GameObject* c = AddCubeToWorld(Vector3(10, 2, 10), Vector3(1, 1, 1), false, 10.0f, 1, false, true);
+	/*GameObject* c = AddCubeToWorld(Vector3(10, 2, 10), Vector3(1, 1, 1), false, 10.0f, 1, false, true);
 	GameObject* d = AddCubeToWorld(Vector3(15, 2, 10), Vector3(1, 1, 1), false, 10.0f, 1, false, true);
 	c->GetPhysicsObject()->SetFriction(false);
-	d->GetPhysicsObject()->SetFriction(false);
+	d->GetPhysicsObject()->SetFriction(false);*/
 
 	// Floor
 	GameObject* e = AddCubeToWorld(Vector3(0, -2, 0), Vector3(250, 2, 250), false, 0, 0);
 
-	GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
+	/*GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
 	GameObject* cap2 = AddCapsuleToWorld(Vector3(10, 5, 0), 3.0f, 1.5f);
 	cap1->SetDynamic(true);
-	cap2->SetDynamic(true);
+	cap2->SetDynamic(true);*/
 
-	GameObject* sphere1 = AddSphereToWorld(Vector3(10, 15, 20), 10.0f, 10.0f, false, false, true);
-	GameObject* sphere2 = AddSphereToWorld(Vector3(15, 5, 20), 1.0f, 10.0f, false, false, true);
+	/*GameObject* sphere1 = AddSphereToWorld(Vector3(10, 5, 20), 1.0f, 10.0f, false, false, true);
+	GameObject* sphere2 = AddSphereToWorld(Vector3(15, 5, 20), 1.0f, 10.0f, false, false, true);*/
 
-	a->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	b->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	c->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	d->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	//a->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	//b->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	//c->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	//d->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	e->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
-	cap2->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
-	sphere1->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	sphere2->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	//cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
+	//cap2->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
+	//sphere1->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	//sphere2->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	//InitSphereGridWorld(5, 10, 6, 6, 2);
+	InitCubeGridWorld(1, 1, 6, 6, Vector3(1,1,1));
+	//InitMixedGridWorld(5, 10, 6, 6);
+	//InitCapsuleGridWorld(5, 10, 7, 7);
 
 	physics->BuildStaticList();
 }
@@ -453,9 +459,6 @@ physics worlds. You'll probably need another function for the creation of OBB cu
 GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius, float inverseMass, bool rubber, bool hollow, bool dynamic) {
 	GameObject* sphere = new GameObject("Sphere");
 	
-	// Raycasting Tutorial 1 - Further Work Part 1
-	//sphere->SetLayer(1);
-
 	Vector3 sphereSize = Vector3(radius, radius, radius);
 	SphereVolume* volume = new SphereVolume(radius);
 	sphere->SetBoundingVolume((CollisionVolume*)volume);
@@ -552,10 +555,21 @@ void TutorialGame::InitSphereGridWorld(int numRows, int numCols, float rowSpacin
 	for (int x = 0; x < numCols; ++x) {
 		for (int z = 0; z < numRows; ++z) {
 			Vector3 position = Vector3(x * colSpacing, 10.0f, z * rowSpacing);
-			AddSphereToWorld(position, radius, 1.0f);
+			GameObject* sphere = AddSphereToWorld(position, radius, 10.0f, false, false, true);
+			sphere->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 		}
 	}
-	AddFloorToWorld(Vector3(0, -2, 0));
+}
+
+void TutorialGame::InitCapsuleGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing) {
+	for (int x = 0; x < numCols; ++x) {
+		for (int z = 0; z < numRows; ++z) {
+			Vector3 position = Vector3(x * colSpacing, 10.0f, z * rowSpacing);
+			GameObject* capsule = AddCapsuleToWorld(position, 3.0f, 1.5f);
+			capsule->SetDynamic(true);
+			capsule->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+		}
+	}
 }
 
 void TutorialGame::InitMixedGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing) {
@@ -565,12 +579,19 @@ void TutorialGame::InitMixedGridWorld(int numRows, int numCols, float rowSpacing
 	for (int x = 0; x < numCols; ++x) {
 		for (int z = 0; z < numRows; ++z) {
 			Vector3 position = Vector3(x * colSpacing, 10.0f, z * rowSpacing);
-
-			if (rand() % 2) {
-				AddCubeToWorld(position, cubeDims, false, 10.0f, 1, false, true);
+			int choice = rand() % 3;
+			if (choice == 2) {
+				GameObject* obb = AddCubeToWorld(position, cubeDims, true, 10.0f, 1, false, true);
+				obb->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+			}
+			else if (choice == 1) {
+				GameObject* capsule = AddCapsuleToWorld(position, 3.0f, 1.5f);
+				capsule->SetDynamic(true);
+				capsule->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 			}
 			else {
-				AddSphereToWorld(position, sphereRadius, 10.0f, rand() % 2, false, true);
+				GameObject* sphere = AddSphereToWorld(position, sphereRadius, 10.0f, false, false, true);
+				sphere->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 			}
 		}
 	}
@@ -580,7 +601,8 @@ void TutorialGame::InitCubeGridWorld(int numRows, int numCols, float rowSpacing,
 	for (int x = 1; x < numCols+1; ++x) {
 		for (int z = 1; z < numRows+1; ++z) {
 			Vector3 position = Vector3(x * colSpacing, 10.0f, z * rowSpacing);
-			AddCubeToWorld(position, cubeDims, 1.0f);
+			GameObject* obb = AddCubeToWorld(position, cubeDims, true, 10.0f, 1, false, true);
+			obb->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 		}
 	}
 }
@@ -625,7 +647,6 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position) {
 
 	return character;
 }
-
 
 /*
 
