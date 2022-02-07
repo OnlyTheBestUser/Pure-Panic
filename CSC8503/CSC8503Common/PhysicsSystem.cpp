@@ -88,10 +88,6 @@ int realHZ		= idealHZ;
 float realDT	= idealDT;
 
 void PhysicsSystem::Update(float dt) {	
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::B)) {
-		useBroadPhase = !useBroadPhase;
-		std::cout << "Setting broadphase to " << useBroadPhase << std::endl;
-	}
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::I)) {
 		constraintIterationCount--;
 		std::cout << "Setting constraint iterations to " << constraintIterationCount << std::endl;
@@ -106,9 +102,9 @@ void PhysicsSystem::Update(float dt) {
 	GameTimer t;
 	t.GetTimeDeltaSeconds();
 
-	if (useBroadPhase) {
-		UpdateObjectAABBs();
-	}
+	//if (useBroadPhase) {
+	UpdateObjectAABBs();
+	//}
 
 	while(dTOffset >= realDT) {
 		std::vector<GameObject*>::const_iterator first;
@@ -120,17 +116,16 @@ void PhysicsSystem::Update(float dt) {
 				continue;
 			CheckToWake(object);
 			IntegrateAccel(realDT, object); //Update accelerations from external forces
+
+			/*if (!useBroadPhase) {
+				BasicCollisionDetection(i, first, last);
+			}*/
 		}
 
-		if (useBroadPhase) {
-			BroadPhase();
-			NarrowPhase();
-		}
-		else {
-			BasicCollisionDetection();
-		}
-
-		// --------------------------------------------------------------
+		//if (useBroadPhase) {
+		BroadPhase();
+		NarrowPhase();
+		//}
 
 		// TODO
 		//This is our simple iterative solver - 
@@ -150,12 +145,10 @@ void PhysicsSystem::Update(float dt) {
 			Transform& transform = (*i)->GetTransform();
 			IntegrateVelocity(realDT, object, transform); //update positions from new velocity changes
 		}
-
 		dTOffset -= realDT;
 	}
 
 	ClearForces();	//Once we've finished with the forces, reset them to zero
-
 	UpdateCollisionList(); //Remove any old collisions
 
 	t.Tick();
@@ -228,33 +221,26 @@ to the collision set for later processing. The set will guarantee that
 a particular pair will only be added once, so objects colliding for
 multiple frames won't flood the set with duplicates.
 */
-void PhysicsSystem::BasicCollisionDetection() {
-	std::vector<GameObject*>::const_iterator first;
-	std::vector<GameObject*>::const_iterator last;
-	gameWorld.GetObjectIterators(first, last);
-
-	for (auto i = first; i != last; i++) {
-		if ((*i)->GetPhysicsObject() == nullptr)
-			continue;
-
-		for (auto j = i + 1; j != last; ++j) {
-			if ((*j)->GetPhysicsObject() == nullptr)
-				continue;
-
-			CollisionDetection::CollisionInfo info;
-			if (CollisionDetection::ObjectIntersection(*i, *j, info)) {
-				if((*i)->GetPhysicsObject()->UseSpringRes() || (*j)->GetPhysicsObject()->UseSpringRes())
-					ResolveSpringCollision(*info.a, *info.b, info.point);
-				else
-				{
-					ImpulseResolveCollision(*info.a, *info.b, info.point);
-				}
-				info.framesLeft = numCollisionFrames;
-				allCollisions.insert(info);
-			}
-		}
-	}
-}
+//void PhysicsSystem::BasicCollisionDetection(std::vector<GameObject*>::const_iterator i, std::vector<GameObject*>::const_iterator first, std::vector<GameObject*>::const_iterator last) {
+//	gameWorld.GetObjectIterators(first, last);
+//
+//	for (auto j = i + 1; j != last; ++j) {
+//		if ((*j)->GetPhysicsObject() == nullptr)
+//			continue;
+//
+//		CollisionDetection::CollisionInfo info;
+//		if (CollisionDetection::ObjectIntersection(*i, *j, info)) {
+//			if((*i)->GetPhysicsObject()->UseSpringRes() || (*j)->GetPhysicsObject()->UseSpringRes())
+//				ResolveSpringCollision(*info.a, *info.b, info.point);
+//			else
+//			{
+//				ImpulseResolveCollision(*info.a, *info.b, info.point);
+//			}
+//			info.framesLeft = numCollisionFrames;
+//			allCollisions.insert(info);
+//		}
+//	}
+//}
 
 /*
 
@@ -510,8 +496,7 @@ void PhysicsSystem::CheckToSleep(PhysicsObject* object)
 		}
 		
 		// Velocity checks for OBB and Capsule
-		//if ((object->GetVolumeType() == VolumeType::OBB || object->GetVolumeType() == VolumeType::Capsule) && (abs((velAverage) / 5) > 0.1))
-		if ((object->GetVolumeType() == VolumeType::OBB || object->GetVolumeType() == VolumeType::Capsule) && ((velAverage / 5) > 0.1))
+		if ((object->GetVolumeType() == VolumeType::OBB || object->GetVolumeType() == VolumeType::Capsule) && (abs(velAverage / 5) > 0.1))
 			velShouldSleep = false;
 			
 		// if object should sleep remove all velocity and set to sleep

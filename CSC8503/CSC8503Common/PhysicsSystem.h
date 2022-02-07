@@ -30,7 +30,7 @@ namespace NCL {
 			void BuildStaticList();
 
 		protected:
-			void BasicCollisionDetection();
+//			void BasicCollisionDetection(std::vector<GameObject*>::const_iterator i, std::vector<GameObject*>::const_iterator first, std::vector<GameObject*>::const_iterator last);
 			void BroadPhase();
 			void NarrowPhase();
 
