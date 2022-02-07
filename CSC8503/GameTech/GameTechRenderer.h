@@ -29,9 +29,10 @@ namespace NCL {
 
 			void BuildObjectList();
 			void SortObjectList();
-			void RenderShadowMap();
-			void RenderCamera(); 
-			void RenderSkybox();
+			void RenderShadowMap(Camera* camera);
+			void RenderCamera(Camera* camera);
+			void RenderSkybox(Camera* camera);
+			void RenderPerspective(Camera* camera);
 
 			void LoadSkybox();
 

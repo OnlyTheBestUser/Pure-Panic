@@ -13,6 +13,7 @@ namespace NCL {
 		};
 
 		class StateGameObject;
+		class InputHandler;
 		class Checkpoint;
 		class TutorialGame		{
 		public:
@@ -30,6 +31,8 @@ namespace NCL {
 			}
 
 		protected:
+			InputHandler* inputHandler;
+
 			void InitialiseAssets();
 
 			void InitCamera();
@@ -48,6 +51,9 @@ namespace NCL {
 			bool SelectObject();
 			void MoveSelectedObject(float dt);
 			void DebugObjectMovement();
+			void DebugDrawCollider(const CollisionVolume* c, Transform* worldTransform);
+			void DebugDrawVelocity(const Vector3& vel, Transform* worldTransform);
+			void DebugDrawObjectInfo(const GameObject* obj);
 			void LockedObjectMovement();
 
 			GameObject* AddFloorToWorld(const Vector3& position);
@@ -60,7 +66,7 @@ namespace NCL {
 
 			StateGameObject* testStateObject;
 
-			GameTechRenderer*	renderer;
+			RendererBase*	renderer;
 			PhysicsSystem*		physics;
 			GameWorld*			world;
 
@@ -72,6 +78,7 @@ namespace NCL {
 
 			bool useGravity;
 			bool inSelectionMode;
+			bool debugDraw;
 
 			float		forceMagnitude;
 

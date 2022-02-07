@@ -5,6 +5,11 @@
 #include "../../Plugins/OpenGLRendering/OGLTexture.h"
 #include "../../Common/TextureLoader.h"
 #include "../../Common/Quaternion.h"
+
+#include "..//CSC8503Common/InputHandler.h"
+#include "..//CSC8503Common/GameActor.h"
+#include "..//CSC8503Common/Command.h"
+
 using namespace NCL;
 using namespace CSC8503;
 
@@ -16,7 +21,9 @@ TutorialGame::TutorialGame()	{
 	forceMagnitude	= 30.0f;
 	useGravity		= true;
 	physics->UseGravity(useGravity);
+
 	inSelectionMode = false;
+	physics->UseGravity(true);
 
 	testStateObject = nullptr;
 
@@ -27,6 +34,54 @@ TutorialGame::TutorialGame()	{
 	//physics->SetGravity(Vector3(0, 9.8f, 0));
 	//physics->SetLinearDamping(10.0f);
 	InitialiseAssets();
+
+#pragma region Commands
+
+	/*
+		Command Design Pattern Explanation
+
+		The command design pattern I've implemented comes down to three classes, all of which can be found in the Input Handling filter:
+		Command.h:
+			This contains all the commands you will use to affect the world (via input handling). There are a few examples
+			in the class itself of how to use them.
+
+		GameActor.h:
+			This is a gameobject child that you will control using inputs, I've given the class a set of default methods, which
+			can be overriden if you derive a Player class from GameActor for example. Use the commands class above to attach methods
+			to commands, which can in turn be assigned to keys in the input handler.
+
+		InputHandler.h:
+			This is where keys are assigned, each key you want to assign is made as a Command* pointer variable. The handleInputs method
+			is called every frame, it will loop through each of the keys, see if they are assigned to a command, if so it checks if the key is
+			pressed and executes accordingly. 
+
+		Basically, all this means is that the hard coding of key checking is done in a separate file, and commands are kept in their own file, 
+		so everything is organised and neat. 
+
+		To use this, as shown in the example below, you need to instantiate an input handler and some commands, and bind the commands to the buttons.
+		It makes it very easy and readable to change which keys do what. If there is a specific gameobject you wish to register inputs for, you need
+		to instantiate a GameActor and pass it into the Commands accordingly.
+			
+	*/
+
+	inputHandler = new InputHandler();
+	GameActor* g = new GameActor();
+
+	Command* f = new MoveForwardCommand(g);
+	Command* b = new MoveBackwardCommand(g);
+	Command* l = new MoveLeftCommand(g);
+	Command* r = new MoveRightCommand(g);
+	Command* toggleGrav = new ToggleGravityCommand(physics);
+	Command* toggleDebug = new ToggleBoolCommand(&debugDraw);
+
+	inputHandler->BindButtonW(f);
+	inputHandler->BindButtonS(b);
+	inputHandler->BindButtonA(l);
+	inputHandler->BindButtonD(r);
+	inputHandler->BindButtonG(toggleGrav);
+	inputHandler->BindButtonJ(toggleDebug);
+
+#pragma endregion
 }
 
 /*
@@ -89,6 +144,8 @@ void TutorialGame::UpdateGame(float dt) {
 	}
 	}
 
+	inputHandler->HandleInput();
+
 	//Debug::DrawLine(Vector3(), Vector3(0, 20, 0), Debug::RED);
 	//Debug::DrawLine(Vector3(), Vector3(360, 0, 0), Debug::RED);
 	//Debug::DrawLine(Vector3(360, 0, 0), Vector3(360, 0, 360), Debug::RED);
@@ -110,11 +167,21 @@ void TutorialGame::UpdateGameWorld(float dt)
 
 	UpdateKeys();
 
-	if (useGravity) {
+	if (physics->GetGravity()) {
 		Debug::Print("(G)ravity on", Vector2(5, 95));
 	}
 	else {
 		Debug::Print("(G)ravity off", Vector2(5, 95));
+	}
+
+	if (debugDraw) {
+		GameObjectIterator first;
+		GameObjectIterator last;
+		world->GetObjectIterators(first, last);
+		for (auto i = first; i != last; i++) {
+			DebugDrawCollider((*i)->GetBoundingVolume(), &(*i)->GetTransform());
+			DebugDrawVelocity((*i)->GetPhysicsObject()->GetLinearVelocity(), &(*i)->GetTransform());
+		}
 	}
 
 	SelectObject();
@@ -142,6 +209,34 @@ void TutorialGame::UpdateGameWorld(float dt)
 	world->UpdateWorld(dt);
 }
 
+void TutorialGame::DebugDrawCollider(const CollisionVolume* c, Transform* worldTransform) {
+	Vector4 col = Vector4(1, 0, 0, 1);
+	switch (c->type) {
+	case VolumeType::AABB: Debug::DrawCube(worldTransform->GetPosition(), ((AABBVolume*)c)->GetHalfDimensions(), col); break;
+	case VolumeType::OBB: Debug::DrawCube(worldTransform->GetPosition(), ((AABBVolume*)c)->GetHalfDimensions(), Vector4(0, 1, 0, 1), 0, worldTransform->GetOrientation()); break;
+	case VolumeType::Sphere: Debug::DrawSphere(worldTransform->GetPosition(), ((SphereVolume*)c)->GetRadius(), col); break;
+	case VolumeType::Capsule: Debug::DrawCapsule(worldTransform->GetPosition(), ((CapsuleVolume*)c)->GetRadius(), ((CapsuleVolume*)c)->GetHalfHeight(), worldTransform->GetOrientation(), col); break;
+	default: break;
+	}
+}
+
+void TutorialGame::DebugDrawVelocity(const Vector3& velocity, Transform* worldTransform) {
+	Vector4 col = Vector4(1, 0, 1, 1);
+	Debug::DrawArrow(worldTransform->GetPosition(), worldTransform->GetPosition() + velocity, col);
+}
+
+void TutorialGame::DebugDrawObjectInfo(const GameObject* obj) {
+	Vector3 pos = selectionObject->GetTransform().GetPosition();
+	Vector3 rot = selectionObject->GetTransform().GetOrientation().ToEuler();
+	string name = obj->GetName();
+	string n = "Name: " + (name == "" ? "-" : name);
+	string p = "Pos: (" + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z) + ")";
+	string r = "Rot: (" + std::to_string(rot.x) + ", " + std::to_string(rot.y) + ", " + std::to_string(rot.z) + ")";
+	renderer->DrawString(n, Vector2(1, 3), Debug::WHITE, 15.0f);
+	renderer->DrawString(p, Vector2(1, 6), Debug::WHITE, 15.0f);
+	renderer->DrawString(r, Vector2(1, 9), Debug::WHITE, 15.0f);
+}
+
 void TutorialGame::UpdatePauseScreen(float dt)
 {
 	renderer->DrawString("PAUSED", Vector2(5, 80), Debug::MAGENTA, 30.0f);
@@ -167,10 +262,10 @@ void TutorialGame::UpdateKeys() {
 		InitCamera(); //F2 will reset the camera to a specific default place
 	}
 
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::G)) {
-		useGravity = !useGravity; //Toggle gravity!
-		physics->UseGravity(useGravity);
-	}
+	//if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::G)) {
+	//	useGravity = !useGravity; //Toggle gravity!
+	//	physics->UseGravity(useGravity);
+	//}
 
 	//Running certain physics updates in a consistent order might cause some
 	//bias in the calculations - the same objects might keep 'winning' the constraint
@@ -585,7 +680,6 @@ bool TutorialGame::SelectObject() {
 			}
 
 			Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
-			ray.SetCollisionLayers(CollisionLayer::LAYER_ONE);
 
 			RayCollision closestCollision;
 			if (world->Raycast(ray, closestCollision, true)) {
@@ -660,9 +754,7 @@ void TutorialGame::MoveSelectedObject(float dt) {
 		}
 	}
 
-	Vector3 pos = selectionObject->GetTransform().GetPosition();
-	string s = "Pos: " + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z) + ")";
-	renderer->DrawString(s, Vector2(5, 5));
+	DebugDrawObjectInfo(selectionObject);
 
 	if (Window::GetKeyboard()->KeyHeld(NCL::KeyboardKeys::F))
 		selectionObject->Interact(dt);
