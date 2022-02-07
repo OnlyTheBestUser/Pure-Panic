@@ -7,6 +7,7 @@ using namespace NCL::Maths;
 
 namespace NCL {
 	class CollisionVolume;
+	enum class VolumeType;
 
 	namespace CSC8503 {
 		enum CollisionLayer {
@@ -94,25 +95,23 @@ namespace NCL {
 			void SetFriction(bool k) { useFriction = k; }
 			bool UsesFriction() const { return useFriction; }
 
-			void Wake() { sleeping = false; }
-			void Sleep() { sleeping = true; }
-			bool isSleeping() const { return sleeping; }
+			inline void Wake() { sleeping = false; }
+			inline void Sleep() { sleeping = true; }
+			inline bool isSleeping() const { return sleeping; }
 			
-			// ----------------------------------------------------------------------------------
-			std::string GetVolumeType() const;
-			// ----------------------------------------------------------------------------------
+			VolumeType GetVolumeType() const;
 
-			void AddToPreviousVelocities(float velocityDotProduct) { previousVelocityDotProducts.push(velocityDotProduct); }
-			void RemoveFromPreviousVelocities() { previousVelocityDotProducts.pop(); }
-			int GetPrevVelocitiesSize() const { return previousVelocityDotProducts.size(); }
+			inline void AddToPreviousVelocities(float velocityDotProduct) { previousVelocityDotProducts.push(velocityDotProduct); }
+			inline void RemoveFromPreviousVelocities() { previousVelocityDotProducts.pop(); }
+			inline int GetPrevVelocitiesSize() const { return previousVelocityDotProducts.size(); }
 			std::queue<float> GetPrevVelocities() const { return previousVelocityDotProducts; }
 			
-			void AddToPreviousPositions(float position) { previousPositions.push(position); }
-			void RemoveFromPreviousPositions() { previousPositions.pop(); }
-			int GetPreviousPositionsSize() const { return previousPositions.size(); }
+			inline void AddToPreviousPositions(float position) { previousPositions.push(position); }
+			inline void RemoveFromPreviousPositions() { previousPositions.pop(); }
+			inline int GetPreviousPositionsSize() const { return previousPositions.size(); }
 			std::queue<float> GetPreviousPositions() const { return previousPositions; }
 
-			Transform* GetTransform() const { return transform; }
+			inline Transform* GetTransform() const { return transform; }
       
 			void SetCollisionLayers(int layers) { collisionLayers = layers; }
 			int	GetCollisionLayers() const { return collisionLayers; }

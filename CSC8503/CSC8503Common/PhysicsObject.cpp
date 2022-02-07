@@ -17,20 +17,10 @@ PhysicsObject::~PhysicsObject()	{
 
 }
 
-// ----------------------------------------------------------------------------------
-std::string PhysicsObject::GetVolumeType() const
+VolumeType PhysicsObject::GetVolumeType() const
 {
-	if (volume->type == VolumeType::OBB)
-		return "OBB";
-	if (volume->type == VolumeType::AABB)
-		return "AABB";
-	if (volume->type == VolumeType::Capsule)
-		return "CAPSULE";
-	if (volume->type == VolumeType::Sphere)
-		return "SPHERE";
-	return "";
+	return volume->type;
 }
-// ----------------------------------------------------------------------------------
 
 void PhysicsObject::ApplyAngularImpulse(const Vector3& force) {
 	if (force.Length() > 0) {

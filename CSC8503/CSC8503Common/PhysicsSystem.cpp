@@ -36,7 +36,6 @@ void PhysicsSystem::SetGravity(const Vector3& g) {
 	gravity = g;
 }
 
-
 void PhysicsSystem::BuildStaticList()
 {
 	std::vector<GameObject*>::const_iterator first;
@@ -89,10 +88,6 @@ int realHZ		= idealHZ;
 float realDT	= idealDT;
 
 void PhysicsSystem::Update(float dt) {	
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::B)) {
-		useBroadPhase = !useBroadPhase;
-		std::cout << "Setting broadphase to " << useBroadPhase << std::endl;
-	}
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::I)) {
 		constraintIterationCount--;
 		std::cout << "Setting constraint iterations to " << constraintIterationCount << std::endl;
@@ -107,23 +102,30 @@ void PhysicsSystem::Update(float dt) {
 	GameTimer t;
 	t.GetTimeDeltaSeconds();
 
-	if (useBroadPhase) {
-		UpdateObjectAABBs();
-	}
+	//if (useBroadPhase) {
+	UpdateObjectAABBs();
+	//}
 
 	while(dTOffset >= realDT) {
-		CheckToWake();
-		IntegrateAccel(realDT); //Update accelerations from external forces
-		if (useBroadPhase) {
-			BroadPhase();
-			NarrowPhase();
-		}
-		else {
-			BasicCollisionDetection();
+		std::vector<GameObject*>::const_iterator first;
+		std::vector<GameObject*>::const_iterator last;
+		gameWorld.GetObjectIterators(first, last);
+		for (auto i = first; i != last; ++i) {
+			PhysicsObject* object = (*i)->GetPhysicsObject();
+			if (object == nullptr)
+				continue;
+			CheckToWake(object);
+			IntegrateAccel(realDT, object); //Update accelerations from external forces
+
+			/*if (!useBroadPhase) {
+				BasicCollisionDetection(i, first, last);
+			}*/
 		}
 
-		CheckToSleep();
-		// --------------------------------------------------------------
+		//if (useBroadPhase) {
+		BroadPhase();
+		NarrowPhase();
+		//}
 
 		// TODO
 		//This is our simple iterative solver - 
@@ -134,13 +136,19 @@ void PhysicsSystem::Update(float dt) {
 			UpdateConstraints(constraintDt);	
 		}
 
-		IntegrateVelocity(realDT); //update positions from new velocity changes
-
+		gameWorld.GetObjectIterators(first, last);
+		for (auto i = first; i != last; ++i) {
+			PhysicsObject* object = (*i)->GetPhysicsObject();
+			if (object == nullptr)
+				continue;
+			CheckToSleep(object);
+			Transform& transform = (*i)->GetTransform();
+			IntegrateVelocity(realDT, object, transform); //update positions from new velocity changes
+		}
 		dTOffset -= realDT;
 	}
 
 	ClearForces();	//Once we've finished with the forces, reset them to zero
-
 	UpdateCollisionList(); //Remove any old collisions
 
 	t.Tick();
@@ -150,7 +158,7 @@ void PhysicsSystem::Update(float dt) {
 	if (updateTime > realDT) {
 		realHZ /= 2;
 		realDT *= 2;
-		std::cout << "Dropping iteration count due to long physics time...(now " << realHZ << ")\n";
+		//std::cout << "Dropping iteration count due to long physics time...(now " << realHZ << ")\n";
 	}
 	else if(dt*2 < realDT) { //we have plenty of room to increase iteration count!
 		int temp = realHZ;
@@ -161,9 +169,9 @@ void PhysicsSystem::Update(float dt) {
 			realHZ = idealHZ;
 			realDT = idealDT;
 		}
-		if (temp != realHZ) {
+		/*if (temp != realHZ) {
 			std::cout << "Raising iteration count due to short physics time...(now " << realHZ << ")\n";
-		}
+		}*/
 	}
 }
 
@@ -213,33 +221,26 @@ to the collision set for later processing. The set will guarantee that
 a particular pair will only be added once, so objects colliding for
 multiple frames won't flood the set with duplicates.
 */
-void PhysicsSystem::BasicCollisionDetection() {
-	std::vector<GameObject*>::const_iterator first;
-	std::vector<GameObject*>::const_iterator last;
-	gameWorld.GetObjectIterators(first, last);
-
-	for (auto i = first; i != last; i++) {
-		if ((*i)->GetPhysicsObject() == nullptr)
-			continue;
-
-		for (auto j = i + 1; j != last; ++j) {
-			if ((*j)->GetPhysicsObject() == nullptr)
-				continue;
-
-			CollisionDetection::CollisionInfo info;
-			if (CollisionDetection::ObjectIntersection(*i, *j, info)) {
-				if((*i)->GetPhysicsObject()->UseSpringRes() || (*j)->GetPhysicsObject()->UseSpringRes())
-					ResolveSpringCollision(*info.a, *info.b, info.point);
-				else
-				{
-					ImpulseResolveCollision(*info.a, *info.b, info.point);
-				}
-				info.framesLeft = numCollisionFrames;
-				allCollisions.insert(info);
-			}
-		}
-	}
-}
+//void PhysicsSystem::BasicCollisionDetection(std::vector<GameObject*>::const_iterator i, std::vector<GameObject*>::const_iterator first, std::vector<GameObject*>::const_iterator last) {
+//	gameWorld.GetObjectIterators(first, last);
+//
+//	for (auto j = i + 1; j != last; ++j) {
+//		if ((*j)->GetPhysicsObject() == nullptr)
+//			continue;
+//
+//		CollisionDetection::CollisionInfo info;
+//		if (CollisionDetection::ObjectIntersection(*i, *j, info)) {
+//			if((*i)->GetPhysicsObject()->UseSpringRes() || (*j)->GetPhysicsObject()->UseSpringRes())
+//				ResolveSpringCollision(*info.a, *info.b, info.point);
+//			else
+//			{
+//				ImpulseResolveCollision(*info.a, *info.b, info.point);
+//			}
+//			info.framesLeft = numCollisionFrames;
+//			allCollisions.insert(info);
+//		}
+//	}
+//}
 
 /*
 
@@ -400,8 +401,6 @@ void PhysicsSystem::BroadPhase() {
 			}
 		}
 	});
-
-	//std::cout << broadphaseCollisions.size() << std::endl;
 }
 
 /*
@@ -429,105 +428,84 @@ void PhysicsSystem::NarrowPhase() {
 	}
 }
 
-void PhysicsSystem::CheckToWake()
+void PhysicsSystem::CheckToWake(PhysicsObject* object)
 {
-	const float threshold = 0.1;
+	const float threshold = 0.01;
 	// Wake objects if new forces have been applied above a threshold
-	std::vector<GameObject*>::const_iterator first;
-	std::vector<GameObject*>::const_iterator last;
-	gameWorld.GetObjectIterators(first, last);
-	for (auto i = first; i != last; ++i) {
-		PhysicsObject* object = (*i)->GetPhysicsObject();
-		if (object == nullptr)
-			continue;
-		if (object->GetLinearVelocity().Length() > threshold || object->GetForce().Length() > threshold
-			|| object->GetLinearVelocity().Length() < -threshold || object->GetForce().Length() < -threshold)
-			object->Wake();
-	}
+	if (object->GetLinearVelocity().Length() > threshold || object->GetForce().Length() > threshold
+		|| object->GetLinearVelocity().Length() < -threshold || object->GetForce().Length() < -threshold)
+		object->Wake();
 }
 
-void PhysicsSystem::CheckToSleep()
+void PhysicsSystem::CheckToSleep(PhysicsObject* object)
 {
 	const int maxQueueSize = 6;
 	const float bounceTolerance = 0.5;
 
-	// for all objects in world, update their queue of previous velocities dot products
-	std::vector<GameObject*>::const_iterator first;
-	std::vector<GameObject*>::const_iterator last;
-	gameWorld.GetObjectIterators(first, last);
-	for (auto i = first; i != last; ++i) {
-		PhysicsObject* object = (*i)->GetPhysicsObject();
-		if (object == nullptr)
-			continue;
+	// for all objects in world, update their queue of previous velocities dot products and previous positions
+	// only ever want a queue of set length, so if gonna be longer remove the oldest and add latest
+	if (object->GetPrevVelocitiesSize() >= maxQueueSize)
+		object->RemoveFromPreviousVelocities();
+	object->AddToPreviousVelocities(Vector3::Dot(object->GetLinearVelocity(), Vector3(1, 1, 1)));
 
-		// only ever want a queue of set length, so if gonna be longer remove the oldest and add latest
-		if (object->GetPrevVelocitiesSize() >= maxQueueSize)
-			object->RemoveFromPreviousVelocities();
-		object->AddToPreviousVelocities(Vector3::Dot(object->GetLinearVelocity(), Vector3(1, 1, 1)));
+	if (object->GetPreviousPositionsSize() >= maxQueueSize)
+		object->RemoveFromPreviousPositions();
+	object->AddToPreviousPositions(object->GetTransform()->GetPosition().Length());
 
-		if (object->GetPreviousPositionsSize() >= maxQueueSize)
-			object->RemoveFromPreviousPositions();
-		object->AddToPreviousPositions(object->GetTransform()->GetPosition().Length());
+	// Check if 2 consecutive values in the queue are of the same sign, if so continue, if not sleep object as its bouncing permanently on the floor
+	if (object->GetPrevVelocitiesSize() == maxQueueSize)
+	{
+		std::queue<float> velQueue = object->GetPrevVelocities();
+		bool velShouldSleep = true;
+		float velQueuePrev = velQueue.front();
+		float velAverage = velQueuePrev;
+		velQueue.pop();
 
-		// Check if 2 consecutive values in the queue are of the same sign, if so continue, if not sleep object as its bouncing permanently on the floor
-		if (object->GetPrevVelocitiesSize() == maxQueueSize)
+		std::queue<float> posQueue = object->GetPreviousPositions();
+		bool posShouldSleep = true;
+		float firstPos = posQueue.front();
+		float lastPos = 0.0;
+		float posQueuePrev = firstPos;
+		posQueue.pop();
+
+		// Queues are the same length
+		while (!velQueue.empty())
 		{
-			std::queue<float> velQueue = object->GetPrevVelocities();
-			std::queue<float> posQueue = object->GetPreviousPositions();
-			bool velShouldSleep = true;
-			bool posShouldSleep = true;
-			float velQueuePrev = velQueue.front();
-			float velAverage = velQueuePrev;
+			float velQueueNext = velQueue.front();
+			velAverage += velQueueNext;
 			velQueue.pop();
-			float firstPos = posQueue.front();
-			float lastPos = 0.0;
-			float posQueuePrev = firstPos;
+
+			float posQueueNext = posQueue.front();
+			lastPos = posQueueNext;
 			posQueue.pop();
 
-			while (!velQueue.empty())
-			{
-				float velQueueNext = velQueue.front();
-				velAverage += velQueueNext;
-				velQueue.pop();
-				float posQueueNext = posQueue.front();
-				lastPos = posQueueNext;
-				posQueue.pop();
+			// Check if values are same sign or it is gonna start moving from rest, set sleeping to false
+			// Velocity checks for AABB and Sphere
+			if ((object->GetVolumeType() == VolumeType::AABB || object->GetVolumeType() == VolumeType::Sphere) &&
+				((velQueuePrev / abs(velQueuePrev)) == (velQueueNext / abs(velQueueNext))
+				|| (velQueuePrev == 0.0) && ((velQueueNext / abs(velQueueNext)) != 0.0)
+				|| ((velQueuePrev / abs(velQueuePrev)) != 0.0) && (velQueueNext == 0.0)))
+				velShouldSleep = false;
 
-				// Check if values are same sign or it is gonna start moving from rest, set sleeping to false
-				// -------------------- ONLY WORKS FOR AABB & SPHERE -------------------
-				if (object->GetVolumeType() == "AABB" || object->GetVolumeType() == "SPHERE")
-				{
-					if ((velQueuePrev / abs(velQueuePrev)) == (velQueueNext / abs(velQueueNext))
-						|| (velQueuePrev == 0.0) && ((velQueueNext / abs(velQueueNext)) != 0.0)
-						|| ((velQueuePrev / abs(velQueuePrev)) != 0.0) && (velQueueNext == 0.0))
-					{
-						velShouldSleep = false;
-					}
-				}
+			// Position checks for all types, * 1000 to get rid of the e to power of as that messes up the checks
+			if (abs(posQueueNext - posQueuePrev) * 1000 > bounceTolerance)
+				posShouldSleep = false;
 
-				if (abs(posQueueNext - posQueuePrev) * 1000 > bounceTolerance)
-					posShouldSleep = false;
-
-				velQueuePrev = velQueueNext;
-				posQueuePrev = posQueueNext;
-			}
-			
-			if (object->GetVolumeType() == "OBB" || object->GetVolumeType() == "CAPSULE")
-			{
-				if ((velAverage / 5) > 0.001)
-				{
-					velShouldSleep = false;
-				}
-			}
-
-			// if object should sleep remove all velocity and set to sleep
-			if (abs(lastPos - firstPos) * 1000 < bounceTolerance && posShouldSleep && velShouldSleep)
-			{
-				object->SetLinearVelocity(Vector3(0, 0, 0));
-				object->Sleep();
-			}
+			velQueuePrev = velQueueNext;
+			posQueuePrev = posQueueNext;
 		}
-	}
+		
+		// Velocity checks for OBB and Capsule
+		if ((object->GetVolumeType() == VolumeType::OBB || object->GetVolumeType() == VolumeType::Capsule) && (abs(velAverage / 5) > 0.1))
+			velShouldSleep = false;
+			
+		// if object should sleep remove all velocity and set to sleep
+		if (abs(lastPos - firstPos) * 1000 < bounceTolerance && posShouldSleep && velShouldSleep)
+		{
+			object->SetLinearVelocity(Vector3(0, 0, 0));
+			object->Sleep();
+		}
+	}	
 }
 
 /*
@@ -539,41 +517,32 @@ This function will update both linear and angular acceleration,
 based on any forces that have been accumulated in the objects during
 the course of the previous game frame.
 */
-void PhysicsSystem::IntegrateAccel(float dt) {
-	std::vector<GameObject*>::const_iterator first;
-	std::vector<GameObject*>::const_iterator last;
-	gameWorld.GetObjectIterators(first, last);
+void PhysicsSystem::IntegrateAccel(float dt, PhysicsObject* object) {
+	if (object->isSleeping())
+		return;
 
-	for (auto i = first; i != last; i++) {
-		PhysicsObject* object = (*i)->GetPhysicsObject();
-		if (object == nullptr)
-			continue;
-		if (object->isSleeping())
-			continue;
+	float inverseMass = object->GetInverseMass();
 
-		float inverseMass = object->GetInverseMass();
+	Vector3 linearVel = object->GetLinearVelocity();
+	Vector3 force = object->GetForce();
+	Vector3 accel = force * inverseMass;
 
-		Vector3 linearVel = object->GetLinearVelocity();
-		Vector3 force = object->GetForce();
-		Vector3 accel = force * inverseMass;
-
-		if (applyGravity && inverseMass > 0 && object->UsesGravity()) {
-			accel += gravity;
-		}
-
-		linearVel += accel * dt;
-		object->SetLinearVelocity(linearVel);
-
-		// Angular Stuff
-		Vector3 torque = object->GetTorque();
-		Vector3 angVel = object->GetAngularVelocity();
-
-		object->UpdateInertiaTensor();
-
-		Vector3 angAccel = object->GetInertiaTensor() * torque;
-		angVel += angAccel * dt;
-		object->SetAngularVelocity(angVel);
+	if (applyGravity && inverseMass > 0 && object->UsesGravity()) {
+		accel += gravity;
 	}
+
+	linearVel += accel * dt;
+	object->SetLinearVelocity(linearVel);
+
+	// Angular Stuff
+	Vector3 torque = object->GetTorque();
+	Vector3 angVel = object->GetAngularVelocity();
+
+	object->UpdateInertiaTensor();
+
+	Vector3 angAccel = object->GetInertiaTensor() * torque;
+	angVel += angAccel * dt;
+	object->SetAngularVelocity(angVel);	
 }
 /*
 This function integrates linear and angular velocity into
@@ -581,43 +550,35 @@ position and orientation. It may be called multiple times
 throughout a physics update, to slowly move the objects through
 the world, looking for collisions.
 */
-void PhysicsSystem::IntegrateVelocity(float dt) {
-	std::vector<GameObject*>::const_iterator first;
-	std::vector<GameObject*>::const_iterator last;
-	gameWorld.GetObjectIterators(first, last);
+void PhysicsSystem::IntegrateVelocity(float dt, PhysicsObject* object, Transform& transform) {
+	
 	float frameLinearDamping = 1.0f - (linearDamping * dt);
 
-	for (auto i = first; i != last; ++i) {
-		PhysicsObject* object = (*i)->GetPhysicsObject();
-		if (object == nullptr)
-			continue;
-		if (object->isSleeping())
-			continue;
+	if (object->isSleeping())
+		return;
 
-		Transform& transform = (*i)->GetTransform();
-		// Position stuff
-		Vector3 position = transform.GetPosition();
-		Vector3 linearVel = object->GetLinearVelocity();
-		position += linearVel * dt;
-		transform.SetPosition(position);
-		// Linear Damping
-		linearVel = linearVel * frameLinearDamping;
-		object->SetLinearVelocity(linearVel);
+	// Position stuff
+	Vector3 position = transform.GetPosition();
+	Vector3 linearVel = object->GetLinearVelocity();
+	position += linearVel * dt;
+	transform.SetPosition(position);
+	// Linear Damping
+	linearVel = linearVel * frameLinearDamping;
+	object->SetLinearVelocity(linearVel);
 
-		// Orientation Stuff
-		Quaternion orientation = transform.GetOrientation();
-		Vector3 angVel = object->GetAngularVelocity();
+	// Orientation Stuff
+	Quaternion orientation = transform.GetOrientation();
+	Vector3 angVel = object->GetAngularVelocity();
 
-		orientation = orientation + (Quaternion(angVel * dt * 0.5f, 0.0f) * orientation);
-		orientation.Normalise();
+	orientation = orientation + (Quaternion(angVel * dt * 0.5f, 0.0f) * orientation);
+	orientation.Normalise();
 
-		transform.SetOrientation(orientation);
+	transform.SetOrientation(orientation);
 
-		// Damp the angular velocity too
-		float frameAngularDamping = 1.0f - (0.4f * dt);
-		angVel = angVel * frameAngularDamping;
-		object->SetAngularVelocity(angVel);
-	}
+	// Damp the angular velocity too
+	float frameAngularDamping = 1.0f - (0.4f * dt);
+	angVel = angVel * frameAngularDamping;
+	object->SetAngularVelocity(angVel);	
 }
 
 /*
@@ -632,7 +593,6 @@ void PhysicsSystem::ClearForces() {
 		}
 	);
 }
-
 
 /*
 

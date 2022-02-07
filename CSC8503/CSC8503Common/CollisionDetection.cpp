@@ -701,13 +701,12 @@ bool NCL::CollisionDetection::AABBCapsuleIntersection(const AABBVolume& volumeB,
 	Vector3 spherePos1 = pointB + (capsuleDir * dot1);
 	Vector3 spherePos2 = pointB + (capsuleDir * dot2);
 
-
 	if ((spherePos1 - cubePos1).Length() < (spherePos - cubePos).Length())
 		spherePos = spherePos1;
 	else if ((spherePos2 - cubePos2).Length() < (spherePos - cubePos).Length())
 		spherePos = spherePos2;
 
-	//Debug::DrawLine(spherePos, cubePos, Debug::CYAN);
+//	Debug::DrawLine(spherePos, cubePos, Debug::CYAN);
 
 	SphereVolume s(volumeA.GetRadius());
 	Transform t;
@@ -819,7 +818,7 @@ bool NCL::CollisionDetection::CapsuleIntersection(const CapsuleVolume& volumeA, 
 
 Vector3 CollisionDetection::ClosestPointOnLine(Vector3 A, Vector3 B, Vector3 p)
 {
-	Vector3 AB = B-A;
+	Vector3 AB = B - A;
 	float t = Vector3::Dot(p - A, AB) / Vector3::Dot(AB, AB);
 	return A + AB * NCL::Maths::Clamp(t, 0.0f, 1.0f);
 }
