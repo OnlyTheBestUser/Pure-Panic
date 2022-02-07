@@ -487,7 +487,7 @@ void PhysicsSystem::CheckToSleep(PhysicsObject* object)
 				|| ((velQueuePrev / abs(velQueuePrev)) != 0.0) && (velQueueNext == 0.0)))
 				velShouldSleep = false;
 
-			// Position checks for all types
+			// Position checks for all types, * 1000 to get rid of the e to power of as that messes up the checks
 			if (abs(posQueueNext - posQueuePrev) * 1000 > bounceTolerance)
 				posShouldSleep = false;
 
