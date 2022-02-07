@@ -28,7 +28,6 @@ namespace NCL {
 
 			float rotation;
 			float translation;
-			CSC8503::RenderObject* defaultObject[2];
 
 			//default data
 			PS4Shader*	defaultShader;

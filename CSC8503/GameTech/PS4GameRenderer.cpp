@@ -23,11 +23,6 @@ PS4GameRenderer::PS4GameRenderer(GameWorld& world) : PS4RendererBase(*Window::Ge
 	defaultMesh->UploadToGPU(this);
 	defaultTexture	= PS4Texture::LoadTextureFromFile("/app0/Assets/Textures/checkerboard.gnf");
 
-	CSC8503::Transform* newTransform = new CSC8503::Transform();
-	CSC8503::Transform* newTransform2 = new CSC8503::Transform();
-	defaultObject[0] = new CSC8503::RenderObject(newTransform,(MeshGeometry*)defaultMesh, (TextureBase*)defaultTexture, (ShaderBase*)defaultShader);
-	defaultObject[1] = new CSC8503::RenderObject(newTransform2, (MeshGeometry*)defaultMesh, (TextureBase*)defaultTexture, (ShaderBase*)defaultShader);
-
 	camMatrix = (CameraMatrix*)onionAllocator->allocate(sizeof(CameraMatrix), Gnm::kEmbeddedDataAlignment4);
 	camMatrix->projMatrix = Matrix4();
 	camMatrix->viewMatrix = Matrix4();
@@ -57,9 +52,7 @@ PS4GameRenderer::~PS4GameRenderer()
 	delete defaultTexture;
 	delete defaultShader;
 
-
-	delete defaultObject[0];
-	delete defaultObject[1];
+	delete camMatrix;
 
 	delete skyboxTexture;
 	delete skyboxShader;
@@ -69,13 +62,6 @@ PS4GameRenderer::~PS4GameRenderer()
 void PS4GameRenderer::Update(float dt)	{
 	rotation	+= 30.0f * dt;
 	translation += dt;
-
-	(defaultObject[0])->GetTransform()
-		->SetPosition(Vector3(-0.4, sin(translation), 0));
-
-
-	defaultObject[1]->GetTransform()
-		->SetPosition(Vector3(0.4, 0, sin(translation)));
 }
 
 void PS4GameRenderer::RenderSkybox() {
@@ -114,11 +100,6 @@ void PS4GameRenderer::RenderFrame() {
 	SetRenderBuffer(currentPS4Buffer, true, true, true);
 
 
-	Gnm::Sampler cubeSampler;
-	cubeSampler.init();
-	cubeSampler.setWrapMode(Gnm::kWrapModeWrap, Gnm::kWrapModeWrap, Gnm::kWrapModeWrap);
-
-
 	float screenAspect = (float)currentWidth / (float)currentHeight;
 	camMatrix->viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
 	camMatrix->projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);
@@ -140,6 +121,11 @@ void PS4GameRenderer::RenderFrame() {
 	dsc.setDepthControl(Gnm::kDepthControlZWriteEnable, Gnm::kCompareFuncLessEqual);
 	dsc.setDepthEnable(false);
 	currentGFXContext->setDepthStencilControl(dsc);
+
+	Gnm::Sampler cubeSampler;
+	cubeSampler.init();
+	cubeSampler.setWrapMode(Gnm::kWrapModeWrap, Gnm::kWrapModeWrap, Gnm::kWrapModeWrap);
+	cubeSampler.setMipFilterMode(Gnm::kMipFilterModePoint);
 	
 	skyboxShader->SubmitShaderSwitch(*currentGFXContext);
 	currentGFXContext->setTextures(Gnm::kShaderStagePs, 0, 1, &skyboxTexture->GetAPITexture());
@@ -148,14 +134,12 @@ void PS4GameRenderer::RenderFrame() {
 	RenderSkybox();
 
 	//Primitive Setup State
-	primitiveSetup.init();
 	primitiveSetup.setCullFace(Gnm::kPrimitiveSetupCullFaceNone);
 	primitiveSetup.setFrontFace(Gnm::kPrimitiveSetupFrontFaceCcw);
 	//primitiveSetup.setPolygonMode()
 	currentGFXContext->setPrimitiveSetup(primitiveSetup);
 
 	////Screen Access State
-	dsc.init();
 	dsc.setDepthControl(Gnm::kDepthControlZWriteEnable, Gnm::kCompareFuncLessEqual);
 	dsc.setDepthEnable(true);
 	currentGFXContext->setDepthStencilControl(dsc);
