@@ -1,5 +1,5 @@
 #ifdef _ORBIS
-#include "ExampleRenderer.h"
+#include "PS4GameRenderer.h"
 #include "../../Plugins/PlayStation4/PS4Mesh.h"
 #include "../../Plugins/PlayStation4/PS4Shader.h"
 #include "../../Plugins/PlayStation4/PS4Texture.h"
@@ -11,7 +11,7 @@
 #include "../../Plugins/OpenGLRendering/OGLMesh.h"
 #include "../../Plugins/OpenGLRendering/OGLShader.h"
 #include "../../Plugins/OpenGLRendering/OGLTexture.h"
-#include "GameTechRenderer.h"
+#include "OGLGameRenderer.h"
 #endif
 #include "../../Common/TextureLoader.h"
 #include "../../Common/Quaternion.h"
@@ -20,10 +20,10 @@
 TutorialGame::TutorialGame()	{
 	world		= new GameWorld();
 #ifdef _WIN64
-	renderer	= new GameTechRenderer(*world);
+	renderer	= new OGLGameRenderer(*world);
 #endif
 #ifdef _ORBIS
-	renderer = new PS4::ExampleRenderer(*world);
+	renderer = new PS4::PS4GameRenderer(*world);
 #endif
 	physics		= new PhysicsSystem(*world);
 	input = NULL;
@@ -133,11 +133,10 @@ void TutorialGame::UpdateGameWorld(float dt)
 
 	UpdateKeys();
 
+#ifdef _ORBIS
 	float frameSpeed = 10 * dt;
 	Camera* cam = world->GetMainCamera();
 	float deadzone = 0.2f;
-	//pitch -= (Window::GetMouse()->GetRelativePosition().y);
-	//yaw -= (Window::GetMouse()->GetRelativePosition().x);
 	if (input->GetAxis(1).y < -deadzone || input->GetAxis(1).y > deadzone) {
 		cam->SetPitch(cam->GetPitch() - input->GetAxis(1).y);
 	}
@@ -158,6 +157,7 @@ void TutorialGame::UpdateGameWorld(float dt)
 	if (input->GetAxis(0).x > deadzone) {
 		cam->SetPosition(cam->GetPosition() - Matrix4::Rotation(cam->GetYaw(), Vector3(0, 1, 0)) * Vector3(-1, 0, 0) * frameSpeed);
 	}
+#endif
 
 	if (useGravity) {
 		Debug::Print("(G)ravity on", Vector2(5, 95));

@@ -13,12 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Renderers">
+      <UniqueIdentifier>{10f01780-66e5-49ea-8709-aa84196e3a2f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GameTechRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TutorialGame.cpp">
@@ -27,22 +27,25 @@
     <ClCompile Include="MainMenu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ExampleRenderer.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="PS4GameRenderer.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="OGLGameRenderer.cpp">
+      <Filter>Renderers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GameTechRenderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TutorialGame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MainMenu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ExampleRenderer.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="PS4GameRenderer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="OGLGameRenderer.h">
+      <Filter>Renderers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

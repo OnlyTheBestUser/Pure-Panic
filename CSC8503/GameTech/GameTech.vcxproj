@@ -204,15 +204,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ExampleRenderer.cpp" />
-    <ClCompile Include="GameTechRenderer.cpp" />
+    <ClCompile Include="PS4GameRenderer.cpp" />
+    <ClCompile Include="OGLGameRenderer.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="TutorialGame.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ExampleRenderer.h" />
-    <ClInclude Include="GameTechRenderer.h" />
+    <ClInclude Include="PS4GameRenderer.h" />
+    <ClInclude Include="OGLGameRenderer.h" />
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="TutorialGame.h" />
   </ItemGroup>
