@@ -10,7 +10,7 @@ void Player::OnCollisionBegin(GameObject* other, Vector3 localA, Vector3 localB,
 
 void Player::Update(float dt)
 {
-
+	camera->SetPosition(GetTransform().GetPosition() + Vector3(0, 3, 0));
 }
 
 void Player::Reset() {

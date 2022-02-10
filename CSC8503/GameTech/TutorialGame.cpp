@@ -33,7 +33,6 @@ TutorialGame::TutorialGame()	{
 
 	//physics->SetGravity(Vector3(0, 9.8f, 0));
 	//physics->SetLinearDamping(10.0f);
-	InitialiseAssets();
 
 #pragma region Commands
 
@@ -65,23 +64,16 @@ TutorialGame::TutorialGame()	{
 	*/
 
 	inputHandler = new InputHandler();
-	GameActor* g = new GameActor();
 
-	Command* f = new MoveForwardCommand(g);
-	Command* b = new MoveBackwardCommand(g);
-	Command* l = new MoveLeftCommand(g);
-	Command* r = new MoveRightCommand(g);
 	Command* toggleGrav = new ToggleGravityCommand(physics);
 	Command* toggleDebug = new ToggleBoolCommand(&debugDraw);
-
-	inputHandler->BindButtonW(f);
-	inputHandler->BindButtonS(b);
-	inputHandler->BindButtonA(l);
-	inputHandler->BindButtonD(r);
+	
 	inputHandler->BindButtonG(toggleGrav);
 	inputHandler->BindButtonJ(toggleDebug);
 
 #pragma endregion
+
+	InitialiseAssets();
 }
 
 /*
@@ -160,7 +152,6 @@ void TutorialGame::UpdateGame(float dt) {
 
 void TutorialGame::UpdateGameWorld(float dt)
 {
-
 	if (!inSelectionMode) {
 		world->GetMainCamera()->UpdateCamera(dt);
 	}
@@ -384,40 +375,18 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	/*GameObject* a = AddCubeToWorld(Vector3(15, 2, 15), Vector3(1, 1, 1), true, 10.0f, 1, false, true);
-	GameObject* b = AddCubeToWorld(Vector3(10, 2, 15), Vector3(1, 1, 1), true, 10.0f, 1, false, true);
-	a->GetRenderObject()->SetColour(Debug::CYAN);
-	b->GetRenderObject()->SetColour(Debug::CYAN);*/
-
-	/*GameObject* c = AddCubeToWorld(Vector3(10, 2, 10), Vector3(1, 1, 1), false, 10.0f, 1, false, true);
-	GameObject* d = AddCubeToWorld(Vector3(15, 2, 10), Vector3(1, 1, 1), false, 10.0f, 1, false, true);
-	c->GetPhysicsObject()->SetFriction(false);
-	d->GetPhysicsObject()->SetFriction(false);*/
-
 	// Floor
-	GameObject* e = AddCubeToWorld(Vector3(0, -2, 0), Vector3(250, 2, 250), false, 0, 0);
+	GameObject* floor = AddCubeToWorld(Vector3(0, -2, 0), Vector3(250, 2, 250), false, 0, 0);
 
-	/*GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
-	GameObject* cap2 = AddCapsuleToWorld(Vector3(10, 5, 0), 3.0f, 1.5f);
+	GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
 	cap1->SetDynamic(true);
-	cap2->SetDynamic(true);*/
 
-	/*GameObject* sphere1 = AddSphereToWorld(Vector3(10, 5, 20), 1.0f, 10.0f, false, false, true);
-	GameObject* sphere2 = AddSphereToWorld(Vector3(15, 5, 20), 1.0f, 10.0f, false, false, true);*/
+	GameObject* player = AddPlayerToWorld(Vector3(0, 5, 0));
+	player->SetDynamic(true);
 
-	//a->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	//b->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	//c->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	//d->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	e->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	//cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
-	//cap2->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
-	//sphere1->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	//sphere2->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	//InitSphereGridWorld(5, 10, 6, 6, 2);
-	InitCubeGridWorld(1, 1, 6, 6, Vector3(1,1,1));
-	//InitMixedGridWorld(5, 10, 6, 6);
-	//InitCapsuleGridWorld(5, 10, 7, 7);
+	floor->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
+	player->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 
 	physics->BuildStaticList();
 }
@@ -620,7 +589,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position) {
 	float meshSize = 3.0f;
 	float inverseMass = 0.5f;
 
-	GameObject* character = new GameObject("Player");
+	GameActor* character = new Player(world->GetMainCamera(), "Player");
 
 	AABBVolume* volume = new AABBVolume(Vector3(0.3f, 0.85f, 0.3f) * meshSize);
 
@@ -639,11 +608,21 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position) {
 	character->SetPhysicsObject(new PhysicsObject(&character->GetTransform(), character->GetBoundingVolume()));
 
 	character->GetPhysicsObject()->SetInverseMass(inverseMass);
+	character->GetPhysicsObject()->SetFriction(0.0f);
 	character->GetPhysicsObject()->InitSphereInertia();
 
 	world->AddGameObject(character);
 
 	//lockedObject = character;
+
+	Command* f = new MoveForwardCommand(character);
+	Command* b = new MoveBackwardCommand(character);
+	Command* l = new MoveLeftCommand(character);
+	Command* r = new MoveRightCommand(character);
+	inputHandler->BindButtonW(f);
+	inputHandler->BindButtonS(b);
+	inputHandler->BindButtonA(l);
+	inputHandler->BindButtonD(r);
 
 	return character;
 }
