@@ -13,6 +13,12 @@ namespace NCL {
 			Matrix4 invProjMatrix;
 		};
 
+		struct LightInfo {
+			Vector3 lightPos;
+			float lightRadius;
+			Vector4 lightColour;
+		};
+
 		class PS4GameRenderer :
 			public PS4RendererBase
 		{
@@ -50,6 +56,9 @@ namespace NCL {
 			PS4Texture* skyboxTexture;
 			PS4Mesh* skyboxMesh;
 			PS4Shader* skyboxShader;
+
+			Gnm::Buffer lightBuffer;
+			LightInfo* globalLight;
 		};
 	}
 }

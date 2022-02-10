@@ -1,23 +1,46 @@
-
 SamplerState samp0 : register(s0);
 
 Texture2D colorMap : register( t0 );
 
+ConstantBuffer CameraData
+{
+	column_major matrix projMatrix;
+	column_major matrix viewMatrix;
+	column_major matrix viewProjMatrix;
+};
+
+ConstantBuffer LightData
+{
+	float3 LightPos;
+	float LightRadius;
+	float4 LightColour;
+};
 
 struct VS_OUTPUT
 {
 	float4 Position		: S_POSITION;
 	float2 UV			: TEXCOORD0;
+	float3 Normal : NORMAL;
+	float3 WorldPos : TANGENT;
 };
 
 float4 main(VS_OUTPUT In) : S_TARGET_OUTPUT
 {
-	float4 test = colorMap.Sample(samp0, In.UV.xy);
+	float3  incident = normalize ( LightPos - In.WorldPos );
+	float lambert  = max (0.0 , dot ( incident , In.Normal )) * 0.9; 
+	
+	float3 viewDir = mul(transpose(float3x3(viewMatrix)),normalize(In.Position.xyz));
+	float3 halfDir = normalize ( incident + viewDir );
 
-	float3x3 testmat = float3x3(1);
-	float3 testvec = float3(0);
+	float rFactor = max (0.0 , dot(halfDir , In.Normal ));
+	float sFactor = pow ( rFactor , 80.0 );
 
-	float3 answer = mul(testmat, testvec);
+	float4 albedo = colorMap.Sample(samp0, In.UV.xy);
+	float4 colour = albedo * 0.05f;
+	colour.a = 1;
+	colour.rgb += albedo.rgb * LightColour.rgb * lambert;
+	colour.rgb += LightColour.rgb * sFactor;
+	colour.rgb = pow(colour.rgb, float3(1.0 / 2.2f));
 
-	return test + float4(answer,1);
+	return colour;
 }  

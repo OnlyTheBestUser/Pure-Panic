@@ -32,6 +32,15 @@ PS4GameRenderer::PS4GameRenderer(GameWorld& world) : PS4RendererBase(*Window::Ge
 	cameraBuffer.initAsConstantBuffer(camMatrix, sizeof(CameraMatrix));
 	cameraBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeSC); // it's a constant buffer, so read-only is OK
 
+	globalLight = (LightInfo*)onionAllocator->allocate(sizeof(LightInfo), Gnm::kEmbeddedDataAlignment4);
+	globalLight->lightColour = Vector4(0.0f, 0.8f, 0.5f, 1.0f);
+	globalLight->lightRadius = 1000.0f;
+	globalLight->lightPos = Vector3(-200.0f, 60.0f, -200.0f);
+
+	lightBuffer.initAsConstantBuffer(globalLight, sizeof(LightInfo));
+	lightBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeSC); // it's a constant buffer, so read-only is OK
+
+
 	// Skybox
 	skyboxMesh = PS4Mesh::GenerateQuad();
 	skyboxMesh->UploadToGPU(this);
@@ -65,8 +74,8 @@ void PS4GameRenderer::Update(float dt)	{
 
 void PS4GameRenderer::RenderSkybox() {
 
-	int testCamIndex = skyboxShader->GetConstantBufferIndex("CameraData");
-	currentGFXContext->setConstantBuffers(Gnm::kShaderStageVs, testCamIndex, 1, &cameraBuffer);
+	int camIndex = skyboxShader->GetConstantBufferIndex("CameraData");
+	currentGFXContext->setConstantBuffers(Gnm::kShaderStageVs, camIndex, 1, &cameraBuffer);
 
 	skyboxShader->SubmitShaderSwitch(*currentGFXContext);
 	skyboxMesh->SubmitDraw(*currentGFXContext, Gnm::ShaderStage::kShaderStageVs);
@@ -79,7 +88,6 @@ void PS4GameRenderer::RenderFrame() {
 	currentGFXContext->waitUntilSafeForRendering(videoHandle, currentGPUBuffer);
 
 	SetRenderBuffer(currentPS4Buffer, true, true, true);
-
 
 	float screenAspect = (float)currentWidth / (float)currentHeight;
 	camMatrix->viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
@@ -104,13 +112,13 @@ void PS4GameRenderer::RenderFrame() {
 	dsc.setDepthEnable(false);
 	currentGFXContext->setDepthStencilControl(dsc);
 
-	Gnm::Sampler cubeSampler;
-	cubeSampler.init();
-	cubeSampler.setMipFilterMode(Gnm::kMipFilterModeLinear);
+	Gnm::Sampler trilinearSampler;
+	trilinearSampler.init();
+	trilinearSampler.setMipFilterMode(Gnm::kMipFilterModeLinear);
 	
 	skyboxShader->SubmitShaderSwitch(*currentGFXContext);
 	currentGFXContext->setTextures(Gnm::kShaderStagePs, 0, 1, &skyboxTexture->GetAPITexture());
-	currentGFXContext->setSamplers(Gnm::kShaderStagePs, 0, 1, &cubeSampler);
+	currentGFXContext->setSamplers(Gnm::kShaderStagePs, 0, 1, &trilinearSampler);
 
 	RenderSkybox();
 
@@ -125,13 +133,12 @@ void PS4GameRenderer::RenderFrame() {
 	dsc.setDepthEnable(true);
 	currentGFXContext->setDepthStencilControl(dsc);
 
-	Gnm::Sampler trilinearSampler;
-	trilinearSampler.init();
-	trilinearSampler.setMipFilterMode(Gnm::kMipFilterModeLinear);
+
 
 	defaultShader->SubmitShaderSwitch(*currentGFXContext);
 	currentGFXContext->setTextures(Gnm::kShaderStagePs, 0, 1, &defaultTexture->GetAPITexture());
 	currentGFXContext->setSamplers(Gnm::kShaderStagePs, 0, 1, &trilinearSampler);
+
 	RenderCamera();
 
 	currentFrame->EndFrame();
@@ -146,17 +153,17 @@ void PS4GameRenderer::DrawRenderObject(const CSC8503::RenderObject* o) {
 	constantBuffer.initAsConstantBuffer(modelMat, sizeof(Matrix4));
 	constantBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeRO); // it's a constant buffer, so read-only is OK
 
-	//PS4Shader*	realShader = (PS4Shader*)o->GetShader() == NULL ? (PS4Shader*)o->GetShader() : (PS4Shader*)defaultShader;
-	//PS4Mesh*	realMesh	= (PS4Mesh*)o->GetMesh() == NULL ? (PS4Mesh*)o->GetMesh() : (PS4Mesh*)defaultMesh;
-
 	PS4Shader* realShader = defaultShader;
 	PS4Mesh*	realMesh	= (PS4Mesh*)o->GetMesh();
 
 	int objIndex = realShader->GetConstantBufferIndex("RenderObjectData");
 	int camIndex = realShader->GetConstantBufferIndex("CameraData");
+	int lightIndex = realShader->GetConstantBufferIndex("LightData");
 
 	currentGFXContext->setConstantBuffers(Gnm::kShaderStageVs, objIndex, 1, &constantBuffer);
 	currentGFXContext->setConstantBuffers(Gnm::kShaderStageVs, camIndex, 1, &cameraBuffer);
+	currentGFXContext->setConstantBuffers(Gnm::kShaderStagePs, camIndex, 1, &cameraBuffer);
+	currentGFXContext->setConstantBuffers(Gnm::kShaderStagePs, 0, 1, &lightBuffer);
 
 	realShader->SubmitShaderSwitch(*currentGFXContext);
 	realMesh->SubmitDraw(*currentGFXContext, Gnm::ShaderStage::kShaderStageVs);

@@ -1,6 +1,6 @@
 ConstantBuffer RenderObjectData
 {
-	column_major matrix modelMatrix;
+	float4x4 modelMatrix;
 };
 
 ConstantBuffer CameraData
@@ -22,6 +22,8 @@ struct VS_OUTPUT
 {
 	float4 Position		: S_POSITION;
 	float2 UV			: TEXCOORD0; 
+	float3 Normal : NORMAL;
+	float3 WorldPos : TANGENT;
 };
 
 VS_OUTPUT main(VS_INPUT Input)
@@ -31,6 +33,9 @@ VS_OUTPUT main(VS_INPUT Input)
 	Output.Position = mul(mul(viewProjMatrix,modelMatrix), float4(Input.Position.xyz, 1));
 
 	//Output.Color = Input.Color;
+	Output.Normal = normalize(Input.Normal);
+
+	Output.WorldPos = mul(modelMatrix, float4(Input.Position,1)).xyz;
 	Output.UV = Input.UV;
 
 	return Output;
