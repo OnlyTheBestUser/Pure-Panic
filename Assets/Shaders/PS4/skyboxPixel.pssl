@@ -1,14 +1,14 @@
 SamplerState samp0 : register(s0);
 
-Texture2D colorMap : register( t0 );
+TextureCube colorMap : register( t0 );
 
 struct VS_OUTPUT
 {
-	float3 View_Dir		: TEXCOORD0;
+	float3 Normal		: NORMAL;
 };
 
 float4 main(VS_OUTPUT In) : S_TARGET_OUTPUT
 {
-	float4 test = colorMap.Sample(samp0, normalize(In.View_Dir));
-	return pow(test, float4(2.2f));
+	float4 test = colorMap.Sample(samp0, normalize(In.Normal));
+	return test;
 }  

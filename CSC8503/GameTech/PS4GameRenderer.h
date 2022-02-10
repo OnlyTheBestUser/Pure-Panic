@@ -10,6 +10,7 @@ namespace NCL {
 			Matrix4 projMatrix;
 			Matrix4 viewMatrix;
 			Matrix4 viewProjMatrix;
+			Matrix4 invProjMatrix;
 		};
 
 		class PS4GameRenderer :

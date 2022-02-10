@@ -77,7 +77,11 @@ void TutorialGame::InitialiseAssets() {
 	basicShader = new OGLShader("GameTechVert.glsl", "GameTechFrag.glsl");
 	playerTex = (OGLTexture*)TextureLoader::LoadAPITexture("me.png");
 #endif
-
+#ifdef _ORBIS
+	basicTex = (PS4::PS4Texture*)TextureLoader::LoadAPITexture("checkerboard.png");
+	basicShader = PS4::PS4Shader::GenerateShader("/app0/Assets/Shaders/PS4/VertexShader.sb","/app0/Assets/Shaders/PS4/PixelShader.sb");
+	playerTex = (PS4::PS4Texture*)TextureLoader::LoadAPITexture("me.png");
+#endif
 	InitCamera();
 	InitWorld();
 }
