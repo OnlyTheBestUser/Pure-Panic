@@ -38,11 +38,10 @@ namespace NCL {
 
             void SetSpawn(Vector3 l) { spawnPos = l; }
 
-//			void MoveForwards() override { std::cout << Vector3(0, 0, -1) * (-camera->GetYaw()) << std::endl; GetPhysicsObject()->ApplyLinearImpulse(Vector3(0, 0, -1) * (-camera->GetYaw())); }
 			void MoveForwards() override { GetPhysicsObject()->AddForce(Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(0, 0, -1) * 100.0f); }
 			void MoveBackwards() override { GetPhysicsObject()->AddForce(Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(0, 0, 1) * 100.0f); }
-			void MoveLeft() override { GetPhysicsObject()->ApplyLinearImpulse(Vector3(-1, 0, 0)); }
-			void MoveRight() override { GetPhysicsObject()->ApplyLinearImpulse(Vector3(1, 0, 0)); }
+			void MoveLeft() override { GetPhysicsObject()->AddForce(Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(-1, 0, 0) * 50.0f); }
+			void MoveRight() override { GetPhysicsObject()->AddForce(Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(1, 0, 0) * 50.0f); }
 
 			void ChangeCamLock() { camLocked = !camLocked; }
 

@@ -17,5 +17,7 @@ void Player::Update(float dt)
 	}
 }
 
-void Player::Reset() {
+void Player::Reset() 
+{
+
 }
