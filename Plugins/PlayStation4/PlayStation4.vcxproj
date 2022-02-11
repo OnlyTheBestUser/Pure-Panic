@@ -240,7 +240,7 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\Assets\Textures\Cubemap\skyrender0001.png">
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf.exe" -t cube -i C:\%(Directory)skyrender0001.png C:\%(Directory)skyrender0002.png  C:\%(Directory)skyrender0001.png C:\%(Directory)skyrender0004.png C:\%(Directory)skyrender0005.png C:\%(Directory)skyrender0005.png -o "%(RootDir)%(Directory)cubemap.gnf" -f auto</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf.exe" -t cube -i C:\%(Directory)skyrender0004.png C:\%(Directory)skyrender0001.png  C:\%(Directory)skyrender0003.png C:\%(Directory)skyrender0006.png C:\%(Directory)skyrender0002.png C:\%(Directory)skyrender0005.png -o "%(RootDir)%(Directory)cubemap.gnf" -f auto</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
     </CustomBuild>
   </ItemGroup>

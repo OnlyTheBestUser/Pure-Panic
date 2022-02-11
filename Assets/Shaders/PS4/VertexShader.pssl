@@ -35,9 +35,7 @@ VS_OUTPUT main(VS_INPUT Input)
 	Output.Position = mul(mul(viewProjMatrix,modelMatrix), float4(Input.Position.xyz, 1));
 	float3x3 normalMatrix = transpose(float3x3(invModelMatrix));
 
-	//Output.Color = Input.Color;
 	Output.Normal = normalize(mul(normalMatrix, normalize(Input.Normal)));
-
 	Output.WorldPos = mul(modelMatrix, float4(Input.Position,1)).xyz;
 	Output.UV = Input.UV;
 
