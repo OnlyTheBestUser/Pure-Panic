@@ -62,7 +62,7 @@ namespace NCL {
 			
 			GameObject* AddCapsuleToWorld(const Vector3& position, float halfHeight, float radius, float inverseMass = 10.0f);
 
-			GameObject* AddPlayerToWorld(const Vector3& position);
+			Player* AddPlayerToWorld(const Vector3& position);
 
 			StateGameObject* testStateObject;
 
@@ -106,6 +106,7 @@ namespace NCL {
 			}
 
 			bool won = false;
+			Player* player1 = nullptr;
 		};
 	}
 }

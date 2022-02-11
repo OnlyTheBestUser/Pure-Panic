@@ -381,12 +381,13 @@ void TutorialGame::InitWorld() {
 	GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
 	cap1->SetDynamic(true);
 
-	GameObject* player = AddPlayerToWorld(Vector3(0, 5, 0));
+	Player* player = AddPlayerToWorld(Vector3(0, 5, 0));
 	player->SetDynamic(true);
 
 	floor->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
 	player->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	player1 = player;
 
 	physics->BuildStaticList();
 }
@@ -585,11 +586,11 @@ void TutorialGame::InitGameExamples() {
 	AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f, 1.0f);
 }
 
-GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position) {
+Player* TutorialGame::AddPlayerToWorld(const Vector3& position) {
 	float meshSize = 3.0f;
 	float inverseMass = 0.5f;
 
-	GameActor* character = new Player(world->GetMainCamera(), "Player");
+	Player* character = new Player(world->GetMainCamera(), "Player");
 
 	AABBVolume* volume = new AABBVolume(Vector3(0.3f, 0.85f, 0.3f) * meshSize);
 
@@ -696,15 +697,15 @@ bool TutorialGame::SelectObject() {
 	}
 
 	if (Window::GetKeyboard()->KeyPressed(NCL::KeyboardKeys::L)) {
-		if (selectionObject) {
+		/*if (selectionObject) {
 			if (lockedObject == selectionObject) {
 				lockedObject = nullptr;
 			}
 			else {
 				lockedObject = selectionObject;
 			}
-		}
-
+		}*/
+		player1->ChangeCamLock();
 	}
 
 	return false;

@@ -13,6 +13,7 @@ namespace NCL {
         public:
 			Player(Camera* camera, string name = "", Vector3 ch = Vector3(0, 2, 0)) : GameActor(name), checkpoint(ch), spawnPos(ch) {
 				this->camera = camera;
+				camLocked = true;
 			};
             ~Player() {};
 
@@ -37,10 +38,13 @@ namespace NCL {
 
             void SetSpawn(Vector3 l) { spawnPos = l; }
 
-			void MoveForwards() override { GetPhysicsObject()->ApplyLinearImpulse(Vector3(0, 0, -1) * speed); }
-			void MoveBackwards() override { GetPhysicsObject()->ApplyLinearImpulse(Vector3(0, 0, 1) * speed); }
-			void MoveLeft() override { GetPhysicsObject()->ApplyLinearImpulse(Vector3(-1, 0, 0) * speed); }
-			void MoveRight() override { GetPhysicsObject()->ApplyLinearImpulse(Vector3(1, 0, 0) * speed); }
+//			void MoveForwards() override { std::cout << Vector3(0, 0, -1) * (-camera->GetYaw()) << std::endl; GetPhysicsObject()->ApplyLinearImpulse(Vector3(0, 0, -1) * (-camera->GetYaw())); }
+			void MoveForwards() override { GetPhysicsObject()->AddForce(Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(0, 0, -1) * 100.0f); }
+			void MoveBackwards() override { GetPhysicsObject()->AddForce(Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(0, 0, 1) * 100.0f); }
+			void MoveLeft() override { GetPhysicsObject()->ApplyLinearImpulse(Vector3(-1, 0, 0)); }
+			void MoveRight() override { GetPhysicsObject()->ApplyLinearImpulse(Vector3(1, 0, 0)); }
+
+			void ChangeCamLock() { camLocked = !camLocked; }
 
         protected:
             bool start = false;
@@ -55,6 +59,7 @@ namespace NCL {
 			float curSpeed = 50.0f;
 
 			Camera* camera;
+			bool camLocked;
         };
     }
 }
