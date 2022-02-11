@@ -24,6 +24,7 @@ bld/
 [Bb]in/
 [Oo]bj/
 [Ll]og/
+ORBIS_Debug/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
@@ -79,6 +80,10 @@ StyleCopReport.xml
 *.tmp_proj
 *_wpftmp.csproj
 *.log
+*.o
+*.tlog
+*.sb
+*.gnf
 *.vspscc
 *.vssscc
 .builds
