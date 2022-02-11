@@ -1,12 +1,9 @@
-SamplerState samp0 : register(s0);
-
-Texture2D colorMap : register( t0 );
-
 ConstantBuffer CameraData
 {
 	column_major matrix projMatrix;
 	column_major matrix viewMatrix;
 	column_major matrix viewProjMatrix;
+	float4x4 invProjMatrix;
 };
 
 ConstantBuffer LightData
@@ -16,12 +13,18 @@ ConstantBuffer LightData
 	float4 LightColour;
 };
 
+SamplerState samp0 : register(s0);
+
+Texture2D colorMap : register( t0 );
+
+
+
 struct VS_OUTPUT
 {
 	float4 Position		: S_POSITION;
 	float2 UV			: TEXCOORD0;
-	float3 Normal : NORMAL;
-	float3 WorldPos : TANGENT;
+	float3 Normal		: NORMAL;
+	float3 WorldPos		: TANGENT;
 };
 
 float4 main(VS_OUTPUT In) : S_TARGET_OUTPUT
@@ -36,6 +39,7 @@ float4 main(VS_OUTPUT In) : S_TARGET_OUTPUT
 	float sFactor = pow ( rFactor , 80.0 );
 
 	float4 albedo = colorMap.Sample(samp0, In.UV.xy);
+	albedo.rgb = pow(albedo.rgb, float3(2.2));
 	float4 colour = albedo * 0.05f;
 	colour.a = 1;
 	colour.rgb += albedo.rgb * LightColour.rgb * lambert;

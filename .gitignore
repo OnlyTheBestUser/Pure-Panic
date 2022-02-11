@@ -80,8 +80,11 @@ StyleCopReport.xml
 *.tmp_proj
 *_wpftmp.csproj
 *.log
+*.sdb
 *.o
 *.tlog
+*.sb
+*.gnf
 *.vspscc
 *.vssscc
 .builds

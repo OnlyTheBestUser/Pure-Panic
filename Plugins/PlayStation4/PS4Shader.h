@@ -25,7 +25,7 @@ namespace NCL::PS4 {
 
 		static PS4Shader* GenerateShader(const string& vertex, const string& pixel);
 
-		int		GetConstantBufferIndex(const string& name);
+		int		GetConstantBufferIndex(const Gnm::ShaderStage stage, const string& name);
 		void	SubmitShaderSwitch(Gnmx::GnmxGfxContext& cmdList);
 
 	protected:
