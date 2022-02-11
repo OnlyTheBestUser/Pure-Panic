@@ -1,16 +1,20 @@
 #pragma once
-#include "GameObject.h"
+#include "GameActor.h"
 #include "../../Common/Vector3.h"
+#include "../../Common/Camera.h"
 #include <chrono>
 
 namespace NCL {
     using namespace Maths;
     namespace CSC8503 {
 
-        class Player : public GameObject
+        class Player : public GameActor
         {
         public:
-            Player(string name = "", Vector3 ch = Vector3(0, 2, 0)) : GameObject(name), checkpoint(ch), spawnPos(ch) {};
+			Player(Camera* camera, string name = "", Vector3 ch = Vector3(0, 2, 0)) : GameActor(name), checkpoint(ch), spawnPos(ch) {
+				this->camera = camera;
+				camLocked = true;
+			};
             ~Player() {};
 
             void OnCollisionBegin(GameObject* other, Vector3 localA, Vector3 localB, Vector3 normal) override;
@@ -34,6 +38,13 @@ namespace NCL {
 
             void SetSpawn(Vector3 l) { spawnPos = l; }
 
+			void MoveForwards() override { force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(0, 0, -1) * 100.0f; }
+			void MoveBackwards() override { force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(0, 0, 1) * 100.0f; }
+			void MoveLeft() override { force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(-1, 0, 0) * 50.0f; }
+			void MoveRight() override { force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(1, 0, 0) * 50.0f; }
+
+			void ChangeCamLock() { camLocked = !camLocked; }
+
         protected:
             bool start = false;
             bool finish = false;
@@ -45,6 +56,10 @@ namespace NCL {
 			float powerupTime = 0.0f;
 			float speed = 50.0f;
 			float curSpeed = 50.0f;
+			Vector3 force = Vector3(0,0,0);
+
+			Camera* camera;
+			bool camLocked;
         };
     }
 }

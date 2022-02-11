@@ -54,7 +54,6 @@ namespace NCL {
 			void DebugDrawCollider(const CollisionVolume* c, Transform* worldTransform);
 			void DebugDrawVelocity(const Vector3& vel, Transform* worldTransform);
 			void DebugDrawObjectInfo(const GameObject* obj);
-			void LockedObjectMovement();
 
 			GameObject* AddFloorToWorld(const Vector3& position);
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f, bool rubber = false, bool hollow = false, bool dynamic = false);
@@ -62,7 +61,7 @@ namespace NCL {
 			
 			GameObject* AddCapsuleToWorld(const Vector3& position, float halfHeight, float radius, float inverseMass = 10.0f);
 
-			GameObject* AddPlayerToWorld(const Vector3& position);
+			Player* AddPlayerToWorld(const Vector3& position);
 
 			StateGameObject* testStateObject;
 
@@ -97,15 +96,9 @@ namespace NCL {
 			OGLMesh*	charMeshB	= nullptr;
 			OGLMesh*	enemyMesh	= nullptr;
 			OGLMesh*	bonusMesh	= nullptr;
-
-			//Coursework Additional functionality	
-			GameObject* lockedObject	= nullptr;
-			Vector3 lockedOffset		= Vector3(0, 14, 20);
-			void LockCameraToObject(GameObject* o) {
-				lockedObject = o;
-			}
-
+			
 			bool won = false;
+			Player* player1 = nullptr;
 		};
 	}
 }
