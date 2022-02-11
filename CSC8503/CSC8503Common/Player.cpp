@@ -15,6 +15,8 @@ void Player::Update(float dt)
 		camera->SetPosition(GetTransform().GetPosition() + Vector3(0, 3, 0));
 		GetTransform().SetOrientation(Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)));
 	}
+	GetPhysicsObject()->AddForce(force.Normalised() * speed);
+	force = Vector3(0, 0, 0);
 }
 
 void Player::Reset() 
