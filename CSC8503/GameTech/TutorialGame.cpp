@@ -179,24 +179,6 @@ void TutorialGame::UpdateGameWorld(float dt)
 	MoveSelectedObject(dt);
 	physics->Update(dt);
 
-	if (lockedObject != nullptr) {
-		Vector3 objPos = lockedObject->GetTransform().GetPosition();
-		Vector3 camPos = objPos + lockedOffset;
-
-		Matrix4 temp = Matrix4::BuildViewMatrix(camPos, objPos, Vector3(0, 1, 0));
-
-		Matrix4 modelMat = temp.Inverse();
-
-		Quaternion q(modelMat);
-		Vector3 angles = q.ToEuler(); //nearly there now!
-
-		world->GetMainCamera()->SetPosition(camPos);
-		world->GetMainCamera()->SetPitch(angles.x);
-		world->GetMainCamera()->SetYaw(angles.y);
-
-		//Debug::DrawAxisLines(lockedObject->GetTransform().GetMatrix(), 2.0f);
-	}
-
 	world->UpdateWorld(dt);
 }
 
@@ -246,7 +228,6 @@ void TutorialGame::UpdateKeys() {
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F1)) {
 		InitWorld(); //We can reset the simulation at any time with F1
 		selectionObject = nullptr;
-		lockedObject	= nullptr;
 	}
 
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F2)) {
@@ -276,51 +257,7 @@ void TutorialGame::UpdateKeys() {
 		world->ShuffleObjects(false);
 	}
 
-	if (lockedObject) {
-		LockedObjectMovement();
-	}
-	else {
-		DebugObjectMovement();
-	}
-}
-
-void TutorialGame::LockedObjectMovement() {
-	Matrix4 view		= world->GetMainCamera()->BuildViewMatrix();
-	Matrix4 camWorld	= view.Inverse();
-
-	Vector3 rightAxis = Vector3(camWorld.GetColumn(0)); //view is inverse of model!
-
-	//forward is more tricky -  camera forward is 'into' the screen...
-	//so we can take a guess, and use the cross of straight up, and
-	//the right axis, to hopefully get a vector that's good enough!
-
-	Vector3 fwdAxis = Vector3::Cross(Vector3(0, 1, 0), rightAxis);
-	fwdAxis.y = 0.0f;
-	fwdAxis.Normalise();
-
-	Vector3 charForward  = lockedObject->GetTransform().GetOrientation() * Vector3(0, 0, 1);
-	Vector3 charForward2 = lockedObject->GetTransform().GetOrientation() * Vector3(0, 0, 1);
-
-	float force = 100.0f;
-
-	//if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::UP)) {
-	//	selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 0, -1) * forceMagnitude * 0.1);
-	//}
-	//if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::DOWN)) {
-	//	selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 0, 1) * forceMagnitude * 0.1);
-	//}
-	//if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::LEFT)) {
-	//	selectionObject->GetPhysicsObject()->AddForce(Vector3(-1, 0, 0) * forceMagnitude * 0.1);
-	//}
-	//if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::RIGHT)) {
-	//	selectionObject->GetPhysicsObject()->AddForce(Vector3(1, 0, 0) * forceMagnitude * 0.1);
-	//}
-	//if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::SHIFT)) {
-	//	selectionObject->GetPhysicsObject()->AddForce(Vector3(0, -1, 0) * forceMagnitude * 0.1);
-	//}
-	//if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::SPACE)) {
-	//	selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 1, 0) * forceMagnitude * 0.1);
-	//}
+	DebugObjectMovement();
 }
 
 void TutorialGame::DebugObjectMovement() {
@@ -368,7 +305,6 @@ void TutorialGame::InitCamera() {
 	world->GetMainCamera()->SetPitch(-15.0f);
 	world->GetMainCamera()->SetYaw(315.0f);
 	world->GetMainCamera()->SetPosition(Vector3(-60, 40, 60));
-	lockedObject = nullptr;
 }
 
 void TutorialGame::InitWorld() {
@@ -656,7 +592,6 @@ bool TutorialGame::SelectObject() {
 				selectionObject->GetRenderObject()->SetColour(Vector4(1, 1, 1, 1));
 				//selectionObject->SetLayer(0);
 				selectionObject = nullptr;
-				lockedObject	= nullptr;
 			}
 
 			Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
@@ -688,23 +623,7 @@ bool TutorialGame::SelectObject() {
 		renderer->DrawString("Press Q to change to select mode!", Vector2(5, 85));
 	}
 
-	if (lockedObject) {
-		renderer->DrawString("Press L to unlock object!", Vector2(5, 80));
-	}
-
-	else if(selectionObject){
-		renderer->DrawString("Press L to lock selected object object!", Vector2(5, 80));
-	}
-
 	if (Window::GetKeyboard()->KeyPressed(NCL::KeyboardKeys::L)) {
-		/*if (selectionObject) {
-			if (lockedObject == selectionObject) {
-				lockedObject = nullptr;
-			}
-			else {
-				lockedObject = selectionObject;
-			}
-		}*/
 		player1->ChangeCamLock();
 	}
 
@@ -739,7 +658,7 @@ void TutorialGame::MoveSelectedObject(float dt) {
 	if (Window::GetKeyboard()->KeyHeld(NCL::KeyboardKeys::F))
 		selectionObject->Interact(dt);
 
-	if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::UP)) {
+	/*if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::UP)) {
 		if (selectionObject->GetName() == "player")
 			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 0, -1) * ((Player*)selectionObject)->GetSpeed() * 0.1);
 		else
@@ -774,5 +693,5 @@ void TutorialGame::MoveSelectedObject(float dt) {
 			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 1, 0) * ((Player*)selectionObject)->GetSpeed() * 0.1);
 		else
 			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 1, 0) * forceMagnitude * 0.1);
-	}
+	}*/
 }
