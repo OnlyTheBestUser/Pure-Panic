@@ -96,7 +96,21 @@ void TutorialGame::InitialiseAssets() {
 	loadFunc("courier.msh"	 , &charMeshB);
 	loadFunc("security.msh"	 , &enemyMesh);
 	loadFunc("coin.msh"		 , &bonusMesh);
-	loadFunc("capsule.msh"	 , &capsuleMesh);
+	loadFunc("capsule.msh"	 , &capsuleMesh); 
+	loadFunc("Corridor_Floor_Basic.msh"	 , &corridorFloor);
+	corridorFloorTex = (OGLTexture*)TextureLoader::LoadAPITexture("Corridor_Light_Colour.png");
+	loadFunc("Corridor_Wall_Alert.msh"	 , &corridorWallAlert);
+	corridorWallAlertTex = (OGLTexture*)TextureLoader::LoadAPITexture("corridor_wall_c.png");
+	loadFunc("Corridor_Wall_Corner_In_Both.msh"	 , &corridorWallCorner);
+	corridorWallCornerTex = (OGLTexture*)TextureLoader::LoadAPITexture("Corridor_Walls_Redux_Metal.png");
+	loadFunc("Corridor_Wall_Light.msh"	 , &corridorWallLight);
+	corridorWallLightTex = (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
+	loadFunc("Security_Camera.msh"	 , &securityCamera);
+	securityCameraTex = (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
+	loadFunc("corridor_wall_screen.msh"	 , &corridorWallScreen);
+	corridorWallScreenTex = (OGLTexture*)TextureLoader::LoadAPITexture("Animated_Screens_A_Colour.png");
+	loadFunc("corridor_Wall_Straight_Mid_end_L.msh"	 , &corridorWallStraight);
+	corridorWallStraightTex = (OGLTexture*)TextureLoader::LoadAPITexture("Corridor_Walls_Redux_Colour.png");
 
 	basicTex	= (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
 	basicShader = new OGLShader("GameTechVert.glsl", "GameTechFrag.glsl");
@@ -307,7 +321,14 @@ void TutorialGame::InitWorld() {
 	physics->Clear();
 
 	// Floor
-	GameObject* floor = AddCubeToWorld(Vector3(0, -2, 0), Vector3(250, 2, 250), false, 0, 0);
+	GameObject* floor = AddFloorToWorld(Vector3(0, 0, 0));
+	for (int i = 0; i < 100; i += 10)
+	{
+		if (rand() % 2)
+			AddWallToWorld(Vector3(i, 0, -50), Vector3(5, 5, 4), corridorWallStraight, corridorWallStraightTex);
+		else
+			AddWallToWorld(Vector3(i, 0, -50), Vector3(5, 5, 4), corridorWallStraight, corridorWallCornerTex);
+	}
 
 	GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
 	cap1->SetDynamic(true);
@@ -331,7 +352,7 @@ A single function to add a large immoveable cube to the bottom of our world
 GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
 	GameObject* floor = new GameObject("Floor");
 
-	Vector3 floorSize	= Vector3(20, 2, 100);
+	Vector3 floorSize	= Vector3(250, 2, 250);
 	AABBVolume* volume	= new AABBVolume(floorSize);
 	floor->SetBoundingVolume((CollisionVolume*)volume);
 	floor->GetTransform()
@@ -339,7 +360,7 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
 		.SetPosition(position);
 		//.SetOrientation(Quaternion(0.25f, 0, 0, 1));
 
-	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
+	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), corridorFloor, corridorFloorTex, basicShader));
 	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume()));
 
 	floor->GetPhysicsObject()->SetInverseMass(0);
@@ -449,6 +470,29 @@ GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimens
 	}
 	cube->SetTrigger(isTrigger);
 	cube->SetDynamic(dynamic);
+	return cube;
+}
+GameObject* TutorialGame::AddWallToWorld(const Vector3& position, Vector3 dimensions, OGLMesh* mesh, OGLTexture* texture) {
+	GameObject* cube = new GameObject();
+	
+	AABBVolume* volume = new AABBVolume(dimensions);
+	cube->SetBoundingVolume((CollisionVolume*)volume);
+
+	cube->GetTransform()
+		.SetPosition(position)
+		.SetScale(dimensions * 2);
+
+
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, basicShader));
+	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
+
+	cube->GetPhysicsObject()->SetInverseMass(0.0f);
+	cube->GetPhysicsObject()->InitCubeInertia();
+	cube->GetPhysicsObject()->SetElasticity(0.2f);
+
+	world->AddGameObject(cube);
+	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	cube->SetDynamic(false);
 	return cube;
 }
 
