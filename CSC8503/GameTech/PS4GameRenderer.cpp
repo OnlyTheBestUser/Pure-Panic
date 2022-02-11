@@ -33,7 +33,7 @@ PS4GameRenderer::PS4GameRenderer(GameWorld& world) : PS4RendererBase(*Window::Ge
 	cameraBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeSC); // it's a constant buffer, so read-only is OK
 
 	globalLight = (LightInfo*)onionAllocator->allocate(sizeof(LightInfo), Gnm::kEmbeddedDataAlignment4);
-	globalLight->lightColour = Vector4(0.0f, 0.8f, 0.5f, 1.0f);
+	globalLight->lightColour = Vector4(0.8f, 0.8f, 0.5f, 1.0f);
 	globalLight->lightRadius = 1000.0f;
 	globalLight->lightPos = Vector3(-200.0f, 60.0f, -200.0f);
 
@@ -74,7 +74,7 @@ void PS4GameRenderer::Update(float dt)	{
 
 void PS4GameRenderer::RenderSkybox() {
 
-	int camIndex = skyboxShader->GetConstantBufferIndex("CameraData");
+	int camIndex = skyboxShader->GetConstantBufferIndex(Gnm::kShaderStageVs, "CameraData");
 	currentGFXContext->setConstantBuffers(Gnm::kShaderStageVs, camIndex, 1, &cameraBuffer);
 
 	skyboxShader->SubmitShaderSwitch(*currentGFXContext);
@@ -146,24 +146,26 @@ void PS4GameRenderer::RenderFrame() {
 
 
 void PS4GameRenderer::DrawRenderObject(const CSC8503::RenderObject* o) {
-	Matrix4* modelMat = (Matrix4*)currentGFXContext->allocateFromCommandBuffer(sizeof(Matrix4), Gnm::kEmbeddedDataAlignment4);
-	*modelMat = o->GetTransform()->GetMatrix();
+	ModelInfo* modelData = (ModelInfo*)currentGFXContext->allocateFromCommandBuffer(sizeof(Matrix4), Gnm::kEmbeddedDataAlignment4);
+	modelData->modelMatrix = o->GetTransform()->GetMatrix();
+	modelData->invModelMatrix = modelData->modelMatrix.Inverse();
 
 	Gnm::Buffer constantBuffer;
-	constantBuffer.initAsConstantBuffer(modelMat, sizeof(Matrix4));
+	constantBuffer.initAsConstantBuffer(modelData, sizeof(ModelInfo));
 	constantBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeRO); // it's a constant buffer, so read-only is OK
 
 	PS4Shader* realShader = defaultShader;
 	PS4Mesh*	realMesh	= (PS4Mesh*)o->GetMesh();
 
-	int objIndex = realShader->GetConstantBufferIndex("RenderObjectData");
-	int camIndex = realShader->GetConstantBufferIndex("CameraData");
-	int lightIndex = realShader->GetConstantBufferIndex("LightData");
+	int objIndex = realShader->GetConstantBufferIndex(Gnm::kShaderStageVs, "RenderObjectData");
+	int camIndexVs = realShader->GetConstantBufferIndex(Gnm::kShaderStageVs, "CameraData");
+	int camIndexPs = realShader->GetConstantBufferIndex(Gnm::kShaderStagePs, "CameraData");
+	int lightIndex = realShader->GetConstantBufferIndex(Gnm::kShaderStagePs, "LightData");
 
 	currentGFXContext->setConstantBuffers(Gnm::kShaderStageVs, objIndex, 1, &constantBuffer);
-	currentGFXContext->setConstantBuffers(Gnm::kShaderStageVs, camIndex, 1, &cameraBuffer);
-	currentGFXContext->setConstantBuffers(Gnm::kShaderStagePs, camIndex, 1, &cameraBuffer);
-	currentGFXContext->setConstantBuffers(Gnm::kShaderStagePs, 0, 1, &lightBuffer);
+	currentGFXContext->setConstantBuffers(Gnm::kShaderStageVs, camIndexVs, 1, &cameraBuffer);
+	currentGFXContext->setConstantBuffers(Gnm::kShaderStagePs, camIndexPs, 1, &cameraBuffer);
+	currentGFXContext->setConstantBuffers(Gnm::kShaderStagePs, lightIndex, 1, &lightBuffer);
 
 	realShader->SubmitShaderSwitch(*currentGFXContext);
 	realMesh->SubmitDraw(*currentGFXContext, Gnm::ShaderStage::kShaderStageVs);

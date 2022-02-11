@@ -19,6 +19,11 @@ namespace NCL {
 			Vector4 lightColour;
 		};
 
+		struct ModelInfo {
+			Matrix4 modelMatrix;
+			Matrix4 invModelMatrix;
+		};
+
 		class PS4GameRenderer :
 			public PS4RendererBase
 		{
