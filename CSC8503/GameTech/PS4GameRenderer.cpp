@@ -6,6 +6,7 @@
 #include "../../Plugins/PlayStation4/PS4Shader.h"
 #include "../../Plugins/PlayStation4/PS4Texture.h"
 #include "../../Common/Window.h"
+#include "../../Common/Assets.h"
 
 using namespace NCL;
 using namespace NCL::PS4;
@@ -15,13 +16,13 @@ PS4GameRenderer::PS4GameRenderer(GameWorld& world) : PS4RendererBase(*Window::Ge
 	translation = 0.0f;
 
 	defaultShader = PS4Shader::GenerateShader(
-		"/app0/Assets/Shaders/PS4/VertexShader.sb",
-		"/app0/Assets/Shaders/PS4/PixelShader.sb"
+		NCL::Assets::SHADERDIR + "PS4/VertexShader.sb",
+		NCL::Assets::SHADERDIR + "PS4/PixelShader.sb"
 	);
 
 	defaultMesh	= PS4Mesh::GenerateTriangle();
 	defaultMesh->UploadToGPU(this);
-	defaultTexture	= PS4Texture::LoadTextureFromFile("/app0/Assets/Textures/checkerboard.gnf");
+	defaultTexture	= PS4Texture::LoadTextureFromFile(NCL::Assets::TEXTUREDIR + "checkerboard.gnf");
 
 	camMatrix = (CameraMatrix*)onionAllocator->allocate(sizeof(CameraMatrix), Gnm::kEmbeddedDataAlignment4);
 	camMatrix->projMatrix = Matrix4();
@@ -46,11 +47,11 @@ PS4GameRenderer::PS4GameRenderer(GameWorld& world) : PS4RendererBase(*Window::Ge
 	skyboxMesh->UploadToGPU(this);
 
 	skyboxShader = PS4Shader::GenerateShader(
-		"/app0/Assets/Shaders/PS4/skyboxVertex.sb",
-		"/app0/Assets/Shaders/PS4/skyboxPixel.sb"
+		NCL::Assets::SHADERDIR + "PS4/skyboxVertex.sb",
+		NCL::Assets::SHADERDIR + "PS4/skyboxPixel.sb"
 	);
 
-	skyboxTexture = PS4Texture::LoadSkyboxFromFile("/app0/Assets/Textures/Cubemap/cubemap.gnf");
+	skyboxTexture = PS4Texture::LoadSkyboxFromFile(NCL::Assets::TEXTUREDIR + "Cubemap/cubemap.gnf");
 
 }
 
