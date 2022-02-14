@@ -58,7 +58,9 @@ namespace NCL {
 			GameObject* AddFloorToWorld(const Vector3& position);
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f, bool rubber = false, bool hollow = false, bool dynamic = false);
 			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, bool OBB = false, float inverseMass = 10.0f, int layer = 1, bool isTrigger = false, bool dynamic = false);
-			GameObject* AddWallToWorld(const Vector3& position, Vector3 dimensions, OGLMesh* mesh, OGLTexture* texture);
+			GameObject* AddWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, OGLMesh* mesh, OGLTexture* texture);
+			GameObject* AddSecurityCameraToWorld(const Vector3& position, Vector3 dimensions, int rotation);
+			GameObject* AddWallHammerToWorld(const Vector3& position, Vector3 dimensions, int rotation);
 			
 			GameObject* AddCapsuleToWorld(const Vector3& position, float halfHeight, float radius, float inverseMass = 10.0f);
 
@@ -102,6 +104,8 @@ namespace NCL {
 			OGLTexture*	corridorWallScreenTex = nullptr;
 			OGLMesh*	corridorWallStraight = nullptr;
 			OGLTexture*	corridorWallStraightTex = nullptr;
+			OGLMesh*	corridorWallHammer = nullptr;
+			OGLTexture*	corridorWallHammerTex = nullptr;
 
 			OGLTexture* basicTex	= nullptr;
 			OGLShader*	basicShader = nullptr;
