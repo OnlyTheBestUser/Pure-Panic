@@ -23,9 +23,6 @@ namespace NCL {
 		protected:
 			void RenderFrame()	override;
 
-			Matrix4 SetupDebugLineMatrix()	const override;
-			Matrix4 SetupDebugStringMatrix()const override;
-
 			OGLShader*		defaultShader;
 
 			GameWorld&	gameWorld;

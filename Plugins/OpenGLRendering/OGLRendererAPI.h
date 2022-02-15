@@ -56,26 +56,17 @@ namespace NCL {
 
 			virtual bool SetVerticalSync(VerticalSyncState s);
 
-			void DrawString(const std::string& text, const Vector2&pos, const Vector4& colour = Vector4(0.75f, 0.75f, 0.75f,1), float size = 20.0f ) override;
-			void DrawLine(const Vector3& start, const Vector3& end, const Vector4& colour) override;
-
-			virtual Matrix4 SetupDebugLineMatrix()	const;
-			virtual Matrix4 SetupDebugStringMatrix()const;
-
-		protected:			
 			void BeginFrame()	override;
 			void RenderFrame()	override;
 			void EndFrame()		override;
 			void SwapBuffers()  override;
 
+		protected:			
+
 			void UpdateShaderMatrices(OGLShader* shader, Matrix4 proj, Matrix4 view);
 			void UpdateModelShaderMatrices(OGLShader* shader, Matrix4 model);
 			void UpdateModelShaderMatrices(OGLShader* shader, Matrix4 model, Matrix4 shadow);
 			void UpdateLightUniforms(OGLShader* shader, Vector3 lightPos, Vector4 lightColor, float lightRadius);
-
-			void DrawDebugData();
-			void DrawDebugStrings();
-			void DrawDebugLines();
 
 			void BindShader(ShaderBase*s);
 			void BindTextureToShader(const TextureBase*t, const std::string& uniform, int texUnit) const;
@@ -101,16 +92,8 @@ namespace NCL {
 				Maths::Vector4 colour;
 			};
 
-			OGLMesh* debugLinesMesh;
-			OGLMesh* debugTextMesh;
-
 			OGLMesh*	boundMesh;
 			OGLShader*	boundShader;
-
-			OGLShader*  debugShader;
-			SimpleFont* font;
-			std::vector<DebugString>	debugStrings;
-			std::vector<DebugLine>		debugLines;
 
 			bool initState;
 			bool forceValidDebugState;

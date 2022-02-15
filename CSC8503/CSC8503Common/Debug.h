@@ -3,6 +3,8 @@
 #include <vector>
 #include <string>
 
+
+// TODO: fix debug
 namespace NCL {
 	class Debug
 	{

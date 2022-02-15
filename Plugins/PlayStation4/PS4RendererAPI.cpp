@@ -263,11 +263,4 @@ void	PS4RendererAPI::ClearBuffer(bool colour, bool depth, bool stencil) {
 		SurfaceUtil::clearStencilTarget(*currentGFXContext, &currentPS4Buffer->depthTarget, defaultStencil);
 	}
 }
-
-void PS4RendererAPI::DrawString(const std::string& text, const Maths::Vector2& pos, const Maths::Vector4& colour, float size) {
-
-}
-void PS4RendererAPI::DrawLine(const Maths::Vector3& start, const Maths::Vector3& end, const Maths::Vector4& colour) {
-
-};
 #endif

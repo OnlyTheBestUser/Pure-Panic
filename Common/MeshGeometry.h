@@ -131,6 +131,7 @@ namespace NCL {
 		void SetDebugName(const std::string& debugName);
 
 		virtual void UploadToGPU(Rendering::RendererAPI* renderer = nullptr) = 0;
+		virtual void UpdateGPUBuffers(unsigned int startVertex, unsigned int vertexCount) = 0;
 
 		static MeshGeometry* GenerateTriangle(MeshGeometry* input);
 

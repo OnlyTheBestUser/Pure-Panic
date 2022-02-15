@@ -250,16 +250,5 @@ void OGLGameRenderer::RenderCamera(Camera* camera) {
 	}
 }
 
-Matrix4 OGLGameRenderer::SetupDebugLineMatrix()	const {
-	float screenAspect = (float)currentWidth / (float)currentHeight;
-	Matrix4 viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
-	Matrix4 projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);
-
-	return projMatrix * viewMatrix;
-}
-
-Matrix4 OGLGameRenderer::SetupDebugStringMatrix()	const {
-	return Matrix4::Orthographic(-1, 1.0f, 100, 0, 0, 100);
-}
 
 #endif
