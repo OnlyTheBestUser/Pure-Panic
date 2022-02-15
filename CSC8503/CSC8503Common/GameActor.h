@@ -6,12 +6,13 @@ namespace NCL {
 		class GameActor : public GameObject {
 		public:
 
+			GameActor(string name = "") : GameObject(name) {};
 			virtual ~GameActor() {};
 
-			void MoveForwards()		{ std::cout << "Move Forwards!" << std::endl; }
-			void MoveBackwards()	{ std::cout << "Move Backwards!" << std::endl; }
-			void MoveLeft()			{ std::cout << "Move Left!" << std::endl; }
-			void MoveRight()		{ std::cout << "Move Right!" << std::endl; }
+			virtual void MoveForwards()		{ std::cout << "Move Forwards!" << std::endl; }
+			virtual void MoveBackwards()	{ std::cout << "Move Backwards!" << std::endl; }
+			virtual void MoveLeft()			{ std::cout << "Move Left!" << std::endl; }
+			virtual void MoveRight()		{ std::cout << "Move Right!" << std::endl; }
 			void Jump()				{ std::cout << "Jump!" << std::endl; }
 			void Fire()				{ std::cout << "Fire!" << std::endl; }
 
@@ -21,7 +22,7 @@ namespace NCL {
 			*/
 
 		protected:
-			float speed = 100.0f;
+			float speed = 1.5f;
 			float jumpForce = 200.0f;
 
 			// Potentially put camera here?
