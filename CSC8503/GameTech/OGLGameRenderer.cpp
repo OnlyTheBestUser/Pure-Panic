@@ -13,7 +13,7 @@ using namespace CSC8503;
 
 Matrix4 biasMatrix = Matrix4::Translation(Vector3(0.5, 0.5, 0.5)) * Matrix4::Scale(Vector3(0.5, 0.5, 0.5));
 
-OGLGameRenderer::OGLGameRenderer(GameWorld& world) : OGLRenderer(*Window::GetWindow()), gameWorld(world)	{
+OGLGameRenderer::OGLGameRenderer() : OGLRenderer(*Window::GetWindow())	{
 	glEnable(GL_DEPTH_TEST);
 
 	shadowShader = new OGLShader("GameTechShadowVert.glsl", "GameTechShadowFrag.glsl");
@@ -101,36 +101,16 @@ void OGLGameRenderer::LoadSkybox() {
 void OGLGameRenderer::RenderFrame() {
 	glEnable(GL_CULL_FACE);
 	glClearColor(1, 1, 1, 1);
-	BuildObjectList();
-	SortObjectList();
-	RenderPerspective(gameWorld.GetMainCamera());
+	//RenderPerspective(gameWorld.GetMainCamera());
 	glDisable(GL_CULL_FACE); //Todo - text indices are going the wrong way...
 }
 
 void OGLGameRenderer::RenderPerspective(Camera* camera) {
-	RenderShadowMap(gameWorld.GetMainCamera());
-	RenderSkybox(gameWorld.GetMainCamera());
-	RenderCamera(gameWorld.GetMainCamera());
+	//RenderShadowMap(gameWorld.GetMainCamera());
+	//RenderSkybox(gameWorld.GetMainCamera());
+	//RenderCamera(gameWorld.GetMainCamera());
 }
 
-void OGLGameRenderer::BuildObjectList() {
-	activeObjects.clear();
-
-	gameWorld.OperateOnContents(
-		[&](GameObject* o) {
-			if (o->IsActive()) {
-				const RenderObject* g = o->GetRenderObject();
-				if (g) {
-					activeObjects.emplace_back(g);
-				}
-			}
-		}
-	);
-}
-
-void OGLGameRenderer::SortObjectList() {
-	//Who cares!
-}
 
 void OGLGameRenderer::RenderShadowMap(Camera* camera) {
 	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
@@ -149,7 +129,7 @@ void OGLGameRenderer::RenderShadowMap(Camera* camera) {
 	Matrix4 mvMatrix = shadowProjMatrix * shadowViewMatrix;
 
 	shadowMatrix = biasMatrix * mvMatrix; //we'll use this one later on
-
+	/*
 	for (const auto&i : activeObjects) {
 		Matrix4 modelMatrix = (*i).GetTransform()->GetMatrix();
 		Matrix4 mvpMatrix	= mvMatrix * modelMatrix;
@@ -159,7 +139,7 @@ void OGLGameRenderer::RenderShadowMap(Camera* camera) {
 		for (int i = 0; i < layerCount; ++i) {
 			DrawBoundMesh(i);
 		}
-	}
+	}*/
 
 	glViewport(0, 0, currentWidth, currentHeight);
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
@@ -195,71 +175,73 @@ void OGLGameRenderer::RenderSkybox(Camera* camera) {
 }
 
 void OGLGameRenderer::RenderCamera(Camera* camera) {
-	float screenAspect = (float)currentWidth / (float)currentHeight;
-	Matrix4 viewMatrix = camera->BuildViewMatrix();
-	Matrix4 projMatrix = camera->BuildProjectionMatrix(screenAspect);
 
+	/*
+	for (const auto&i : activeObjects) {
+		
+	}*/
+}
+
+Matrix4 OGLGameRenderer::SetupDebugLineMatrix()	const {
+	float screenAspect = (float)currentWidth / (float)currentHeight;
+	//Matrix4 viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
+	//Matrix4 projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);
+
+	//return projMatrix * viewMatrix;
+	return Matrix4();
+}
+
+Matrix4 OGLGameRenderer::SetupDebugStringMatrix()	const {
+	return Matrix4::Orthographic(-1, 1.0f, 100, 0, 0, 100);
+}
+
+void OGLGameRenderer::DrawRenderObject(RenderObject* o) {
 	OGLShader* activeShader = nullptr;
-	int colourLocation  = 0;
+	int colourLocation = 0;
 	int hasVColLocation = 0;
-	int hasTexLocation  = 0;
+	int hasTexLocation = 0;
 
 	int cameraLocation = 0;
 
 	glActiveTexture(GL_TEXTURE0 + 1);
 	glBindTexture(GL_TEXTURE_2D, shadowTex);
+	OGLShader* shader = (OGLShader*)(*o).GetShader();
+	BindShader(shader);
 
-	for (const auto&i : activeObjects) {
-		OGLShader* shader = (OGLShader*)(*i).GetShader();
-		BindShader(shader);
+	BindTextureToShader((OGLTexture*)(*o).GetDefaultTexture(), "mainTex", 0);
 
-		BindTextureToShader((OGLTexture*)(*i).GetDefaultTexture(), "mainTex", 0);
+	//if (activeShader != shader) {
+		//UpdateShaderMatrices(shader, projMatrix, viewMatrix);
+		colourLocation = glGetUniformLocation(shader->GetProgramID(), "objectColour");
+		hasVColLocation = glGetUniformLocation(shader->GetProgramID(), "hasVertexColours");
+		hasTexLocation = glGetUniformLocation(shader->GetProgramID(), "hasTexture");
 
-		if (activeShader != shader) {
-			UpdateShaderMatrices(shader, projMatrix, viewMatrix);
-			colourLocation  = glGetUniformLocation(shader->GetProgramID(), "objectColour");
-			hasVColLocation = glGetUniformLocation(shader->GetProgramID(), "hasVertexColours");
-			hasTexLocation  = glGetUniformLocation(shader->GetProgramID(), "hasTexture");
+		cameraLocation = glGetUniformLocation(shader->GetProgramID(), "cameraPos");
+		//glUniform3fv(cameraLocation, 1, (float*)&camera->GetPosition());
 
-			cameraLocation = glGetUniformLocation(shader->GetProgramID(), "cameraPos");
-			glUniform3fv(cameraLocation, 1, (float*)&camera->GetPosition());
+		UpdateLightUniforms(shader, lightPosition, lightColour, lightRadius);
 
-			UpdateLightUniforms(shader, lightPosition, lightColour, lightRadius);
+		int shadowTexLocation = glGetUniformLocation(shader->GetProgramID(), "shadowTex");
+		glUniform1i(shadowTexLocation, 1);
 
-			int shadowTexLocation = glGetUniformLocation(shader->GetProgramID(), "shadowTex");
-			glUniform1i(shadowTexLocation, 1);
+		activeShader = shader;
+	//}
 
-			activeShader = shader;
-		}
+	Matrix4 modelMatrix = (*o).GetTransform()->GetMatrix();
+	Matrix4 fullShadowMat = shadowMatrix * modelMatrix;
+	UpdateModelShaderMatrices(shader, modelMatrix, fullShadowMat);
 
-		Matrix4 modelMatrix = (*i).GetTransform()->GetMatrix();		
-		Matrix4 fullShadowMat = shadowMatrix * modelMatrix;
-		UpdateModelShaderMatrices(shader, modelMatrix, fullShadowMat);
+	glUniform4fv(colourLocation, 1, (float*)&o->GetColour());
 
-		glUniform4fv(colourLocation, 1, (float*)&i->GetColour());
+	glUniform1i(hasVColLocation, !(*o).GetMesh()->GetColourData().empty());
 
-		glUniform1i(hasVColLocation, !(*i).GetMesh()->GetColourData().empty());
+	glUniform1i(hasTexLocation, (OGLTexture*)(*o).GetDefaultTexture() ? 1 : 0);
 
-		glUniform1i(hasTexLocation, (OGLTexture*)(*i).GetDefaultTexture() ? 1:0);
-
-		BindMesh((*i).GetMesh());
-		int layerCount = (*i).GetMesh()->GetSubMeshCount();
-		for (int i = 0; i < layerCount; ++i) {
-			DrawBoundMesh(i);
-		}
+	BindMesh((*o).GetMesh());
+	int layerCount = (*o).GetMesh()->GetSubMeshCount();
+	for (int i = 0; i < layerCount; ++i) {
+		DrawBoundMesh(i);
 	}
-}
-
-Matrix4 OGLGameRenderer::SetupDebugLineMatrix()	const {
-	float screenAspect = (float)currentWidth / (float)currentHeight;
-	Matrix4 viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
-	Matrix4 projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);
-
-	return projMatrix * viewMatrix;
-}
-
-Matrix4 OGLGameRenderer::SetupDebugStringMatrix()	const {
-	return Matrix4::Orthographic(-1, 1.0f, 100, 0, 0, 100);
 }
 
 #endif

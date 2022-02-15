@@ -28,27 +28,25 @@ namespace NCL {
 			virtual ~RendererBase();
 			virtual bool HasInitialised() const { return true; }
 			virtual void Update(float dt) {}
-			void Render() {
-				BeginFrame();
-				RenderFrame();
-				EndFrame();
-				SwapBuffers();
-			}
 			virtual bool SetVerticalSync(VerticalSyncState s) {
 				return false;
 			}
 			virtual void DrawString(const std::string& text, const Vector2& pos, const Vector4& colour = Vector4(0.75f, 0.75f, 0.75f, 1), float size = 20.0f) = 0;
 			virtual void DrawLine(const Vector3& start, const Vector3& end, const Vector4& colour) = 0;
 
+			virtual void BeginFrame() = 0;
+			virtual void RenderFrame() = 0;
+			virtual void EndFrame() = 0;
+			virtual void SwapBuffers() = 0;
+
+			//Render commands
+			virtual void DrawMesh(MeshGeometry* mesh) = 0;
+			virtual void DrawRenderObject(RenderObject* o) = 0;
 
 		protected:
 			virtual void OnWindowResize(int w, int h) = 0;
 			virtual void OnWindowDetach() {}; //Most renderers won't care about this
 			
-			virtual void BeginFrame()	= 0;
-			virtual void RenderFrame()	= 0;
-			virtual void EndFrame()		= 0;
-			virtual void SwapBuffers()	= 0;
 			Window& hostWindow;
 
 			int currentWidth;
