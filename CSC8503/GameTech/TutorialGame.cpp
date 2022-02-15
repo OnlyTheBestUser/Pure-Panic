@@ -96,7 +96,23 @@ void TutorialGame::InitialiseAssets() {
 	loadFunc("courier.msh"	 , &charMeshB);
 	loadFunc("security.msh"	 , &enemyMesh);
 	loadFunc("coin.msh"		 , &bonusMesh);
-	loadFunc("capsule.msh"	 , &capsuleMesh);
+	loadFunc("capsule.msh"	 , &capsuleMesh); 
+	loadFunc("Corridor_Floor_Basic.msh"	 , &corridorFloor);
+	corridorFloorTex = (OGLTexture*)TextureLoader::LoadAPITexture("Corridor_Light_Colour.png");
+	loadFunc("Corridor_Wall_Alert.msh"	 , &corridorWallAlert);
+	corridorWallAlertTex = (OGLTexture*)TextureLoader::LoadAPITexture("corridor_wall_c.png");
+	loadFunc("Corridor_Wall_Corner_In_Both.msh"	 , &corridorWallCorner);
+	corridorWallCornerTex = (OGLTexture*)TextureLoader::LoadAPITexture("Corridor_Walls_Redux_Metal.png");
+	loadFunc("Corridor_Wall_Light.msh"	 , &corridorWallLight);
+	corridorWallLightTex = (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
+	loadFunc("Security_Camera.msh"	 , &securityCamera);
+	securityCameraTex = (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
+	loadFunc("corridor_wall_screen.msh"	 , &corridorWallScreen);
+	corridorWallScreenTex = (OGLTexture*)TextureLoader::LoadAPITexture("Animated_Screens_A_Colour.png");
+	loadFunc("corridor_Wall_Straight_Mid_end_L.msh"	 , &corridorWallStraight);
+	corridorWallStraightTex = (OGLTexture*)TextureLoader::LoadAPITexture("Corridor_Walls_Redux_Colour.png");
+	loadFunc("Corridor_Wall_Hammer.msh"	 , &corridorWallHammer);
+	corridorWallHammerTex = (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
 
 	basicTex	= (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
 	basicShader = new OGLShader("GameTechVert.glsl", "GameTechFrag.glsl");
@@ -306,8 +322,28 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	// Floor
-	GameObject* floor = AddCubeToWorld(Vector3(0, -2, 0), Vector3(250, 2, 250), false, 0, 0);
+	GameObject* floor = AddFloorToWorld(Vector3(0, 0, 0));
+
+	for (int i = -235; i < 240; i += 10)
+	{
+		AddWallToWorld(Vector3(255, 0, i), Vector3(5, 5, 4), 270, corridorWallStraight, corridorWallAlertTex);
+		AddWallToWorld(Vector3(-255, 0, i), Vector3(5, 5, 4), 90, corridorWallStraight, corridorWallAlertTex);
+		AddWallToWorld(Vector3(i, 0, 255), Vector3(5, 5, 4), 180, corridorWallStraight, corridorWallAlertTex);
+		AddWallToWorld(Vector3(i, 0, -255), Vector3(5, 5, 4), 0, corridorWallStraight, corridorWallAlertTex);
+	}
+
+	AddWallToWorld(Vector3(247.5, 0, -250), Vector3(8, 5, 4), 315, corridorWallCorner, corridorWallAlertTex);
+	AddWallToWorld(Vector3(247.5, 0, 250), Vector3(8, 5, 4), 225, corridorWallCorner, corridorWallAlertTex); 
+	AddWallToWorld(Vector3(-247.5, 0, -250), Vector3(8, 5, 4), 45, corridorWallCorner, corridorWallAlertTex);
+	AddWallToWorld(Vector3(-247.5, 0, 250), Vector3(8, 5, 4), 135, corridorWallCorner, corridorWallAlertTex);	
+
+	AddSecurityCameraToWorld(Vector3(237.5, 4, 237.5), Vector3(5, 5, 5), 225);
+	AddSecurityCameraToWorld(Vector3(25, 4, 240), Vector3(5, 5, 5), 180);
+	AddSecurityCameraToWorld(Vector3(-25, 4, 240), Vector3(5, 5, 5), 180);
+
+	AddWallHammerToWorld(Vector3(0, 2, 241), Vector3(10, 10, 6), 180);
+	AddWallHammerToWorld(Vector3(50, 2, 241), Vector3(10, 10, 6), 180);
+	AddWallHammerToWorld(Vector3(-50, 2, 241), Vector3(10, 10, 6), 180);
 
 	GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
 	cap1->SetDynamic(true);
@@ -315,7 +351,6 @@ void TutorialGame::InitWorld() {
 	Player* player = AddPlayerToWorld(Vector3(0, 5, 0));
 	player->SetDynamic(true);
 
-	floor->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
 	player->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	player1 = player;
@@ -331,13 +366,12 @@ A single function to add a large immoveable cube to the bottom of our world
 GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
 	GameObject* floor = new GameObject("Floor");
 
-	Vector3 floorSize	= Vector3(20, 2, 100);
+	Vector3 floorSize	= Vector3(250, 2, 250);
 	AABBVolume* volume	= new AABBVolume(floorSize);
 	floor->SetBoundingVolume((CollisionVolume*)volume);
 	floor->GetTransform()
 		.SetScale(floorSize * 2)
 		.SetPosition(position);
-		//.SetOrientation(Quaternion(0.25f, 0, 0, 1));
 
 	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
 	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume()));
@@ -345,8 +379,9 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
 	floor->GetPhysicsObject()->SetInverseMass(0);
 	floor->GetPhysicsObject()->InitCubeInertia();
 
-	world->AddGameObject(floor);
 	floor->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	floor->SetDynamic(false);
+	world->AddGameObject(floor);
 	return floor;
 }
 
@@ -449,6 +484,77 @@ GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimens
 	}
 	cube->SetTrigger(isTrigger);
 	cube->SetDynamic(dynamic);
+	return cube;
+}
+GameObject* TutorialGame::AddWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, OGLMesh* mesh, OGLTexture* texture) {
+	GameObject* cube = new GameObject();
+	
+	AABBVolume* volume = new AABBVolume(dimensions);
+	cube->SetBoundingVolume((CollisionVolume*)volume);
+
+	cube->GetTransform()
+		.SetPosition(position)
+		.SetScale(dimensions * 2)
+		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
+
+
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, basicShader));
+	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
+
+	cube->GetPhysicsObject()->SetInverseMass(0.0f);
+	cube->GetPhysicsObject()->InitCubeInertia();
+
+	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	cube->SetDynamic(false);
+	world->AddGameObject(cube);
+	return cube;
+}
+GameObject* TutorialGame::AddSecurityCameraToWorld(const Vector3& position, Vector3 dimensions, int rotation)
+{
+	GameObject* cube = new GameObject();
+
+	AABBVolume* volume = new AABBVolume(dimensions);
+	cube->SetBoundingVolume((CollisionVolume*)volume);
+
+	cube->GetTransform()
+		.SetPosition(position)
+		.SetScale(dimensions * 2)
+		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
+
+
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), securityCamera, securityCameraTex, basicShader));
+	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
+
+	cube->GetPhysicsObject()->SetInverseMass(0.0f);
+	cube->GetPhysicsObject()->InitCubeInertia();
+
+	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	cube->SetDynamic(false);
+	world->AddGameObject(cube);
+	return cube;
+}
+GameObject* TutorialGame::AddWallHammerToWorld(const Vector3& position, Vector3 dimensions, int rotation)
+{
+	GameObject* cube = new GameObject();
+
+	AABBVolume* volume = new AABBVolume(dimensions);
+	cube->SetBoundingVolume((CollisionVolume*)volume);
+
+	cube->GetTransform()
+		.SetPosition(position)
+		.SetScale(dimensions * 2)
+		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
+
+
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallHammer, corridorWallHammerTex, basicShader));
+	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
+
+	cube->GetPhysicsObject()->SetInverseMass(0.0f);
+	cube->GetPhysicsObject()->InitCubeInertia();
+
+	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	cube->SetDynamic(false);
+	world->AddGameObject(cube);
 	return cube;
 }
 

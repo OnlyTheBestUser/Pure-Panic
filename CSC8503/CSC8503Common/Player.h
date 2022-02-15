@@ -54,7 +54,7 @@ namespace NCL {
             Vector3 checkpoint;
 			bool key = false;
 			float powerupTime = 0.0f;
-			float speed = 50.0f;
+			float speed = 25.0f;
 			float curSpeed = 50.0f;
 			Vector3 force = Vector3(0,0,0);
 

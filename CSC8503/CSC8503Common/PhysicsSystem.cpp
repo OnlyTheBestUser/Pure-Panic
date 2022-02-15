@@ -158,7 +158,7 @@ void PhysicsSystem::Update(float dt) {
 	if (updateTime > realDT) {
 		realHZ /= 2;
 		realDT *= 2;
-		//std::cout << "Dropping iteration count due to long physics time...(now " << realHZ << ")\n";
+		std::cout << "Dropping iteration count due to long physics time...(now " << realHZ << ")\n";
 	}
 	else if(dt*2 < realDT) { //we have plenty of room to increase iteration count!
 		int temp = realHZ;
@@ -169,9 +169,9 @@ void PhysicsSystem::Update(float dt) {
 			realHZ = idealHZ;
 			realDT = idealDT;
 		}
-		/*if (temp != realHZ) {
+		if (temp != realHZ) {
 			std::cout << "Raising iteration count due to short physics time...(now " << realHZ << ")\n";
-		}*/
+		}
 	}
 }
 
@@ -404,7 +404,6 @@ void PhysicsSystem::BroadPhase() {
 }
 
 /*
-
 The broadphase will now only give us likely collisions, so we can now go through them,
 and work out if they are truly colliding, and if so, add them into the main collision list
 */
@@ -432,8 +431,8 @@ void PhysicsSystem::CheckToWake(PhysicsObject* object)
 {
 	const float threshold = 0.01;
 	// Wake objects if new forces have been applied above a threshold
-	if (object->GetLinearVelocity().Length() > threshold || object->GetForce().Length() > threshold
-		|| object->GetLinearVelocity().Length() < -threshold || object->GetForce().Length() < -threshold)
+	if ((object->GetLinearVelocity().Length() > threshold || object->GetForce().Length() > threshold
+		|| object->GetLinearVelocity().Length() < -threshold || object->GetForce().Length() < -threshold))
 		object->Wake();
 }
 
@@ -544,6 +543,7 @@ void PhysicsSystem::IntegrateAccel(float dt, PhysicsObject* object) {
 	angVel += angAccel * dt;
 	object->SetAngularVelocity(angVel);	
 }
+
 /*
 This function integrates linear and angular velocity into
 position and orientation. It may be called multiple times
