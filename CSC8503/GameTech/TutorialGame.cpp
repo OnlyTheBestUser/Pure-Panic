@@ -345,13 +345,13 @@ void TutorialGame::InitWorld() {
 	AddWallHammerToWorld(Vector3(50, 2, 241), Vector3(10, 10, 6), 180);
 	AddWallHammerToWorld(Vector3(-50, 2, 241), Vector3(10, 10, 6), 180);
 
-	//GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
-	//cap1->SetDynamic(true);
+	GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
+	cap1->SetDynamic(true);
 
 	Player* player = AddPlayerToWorld(Vector3(0, 5, 0));
 	player->SetDynamic(true);
 
-	/*cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);*/
+	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
 	player->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	player1 = player;
 
