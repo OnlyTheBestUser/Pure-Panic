@@ -6,7 +6,7 @@ Use as you see fit!
 Comments and queries to: richard-gordon.davison AT ncl.ac.uk
 https://research.ncl.ac.uk/game/
 */
-#include "OGLRenderer.h"
+#include "OGLRendererAPI.h"
 #include "OGLShader.h"
 #include "OGLMesh.h"
 #include "OGLTexture.h"
@@ -39,7 +39,7 @@ using namespace NCL::Rendering;
 static void APIENTRY DebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam);
 #endif;
 
-OGLRenderer::OGLRenderer(Window& w) : RendererBase(w)	{
+OGLRendererAPI::OGLRendererAPI(Window& w) : RendererAPI(w)	{
 	initState = false;
 #ifdef _WIN32
 	InitWithWin32(w);
@@ -87,7 +87,7 @@ OGLRenderer::OGLRenderer(Window& w) : RendererBase(w)	{
 	debugLinesMesh->SetPrimitiveType(GeometryPrimitive::Lines);
 }
 
-OGLRenderer::~OGLRenderer()	{
+OGLRendererAPI::~OGLRendererAPI()	{
 	delete font;
 	delete debugShader;
 
@@ -96,52 +96,52 @@ OGLRenderer::~OGLRenderer()	{
 #endif
 }
 
-void OGLRenderer::OnWindowResize(int w, int h)	 {
+void OGLRendererAPI::OnWindowResize(int w, int h)	 {
 	currentWidth	= w;
 	currentHeight	= h;
 	glViewport(0, 0, currentWidth, currentHeight);
 }
 
-void OGLRenderer::BeginFrame()		{
+void OGLRendererAPI::BeginFrame()		{
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	BindShader(nullptr);
 	BindMesh(nullptr);
 }
 
-void OGLRenderer::RenderFrame()		{
+void OGLRendererAPI::RenderFrame()		{
 
 }
 
-void OGLRenderer::EndFrame()		{
+void OGLRendererAPI::EndFrame()		{
 	DrawDebugData();
 }
 
-void OGLRenderer::SwapBuffers()   {
+void OGLRendererAPI::SwapBuffers()   {
 	::SwapBuffers(deviceContext);
 }
 
-void OGLRenderer::UpdateShaderMatrices(OGLShader* shader, Matrix4 projMatrix, Matrix4 viewMatrix) {
+void OGLRendererAPI::UpdateShaderMatrices(OGLShader* shader, Matrix4 projMatrix, Matrix4 viewMatrix) {
 	int projLocation = glGetUniformLocation(shader->GetProgramID(), "projMatrix");
 	int viewLocation = glGetUniformLocation(shader->GetProgramID(), "viewMatrix");
 	glUniformMatrix4fv(projLocation, 1, false, (float*)&projMatrix);
 	glUniformMatrix4fv(viewLocation, 1, false, (float*)&viewMatrix);
 }
 
-void OGLRenderer::UpdateModelShaderMatrices(OGLShader* shader, Matrix4 modelMatrix) {
+void OGLRendererAPI::UpdateModelShaderMatrices(OGLShader* shader, Matrix4 modelMatrix) {
 	int modelLocation = 0;
 	modelLocation = glGetUniformLocation(shader->GetProgramID(), "modelMatrix");
 	glUniformMatrix4fv(modelLocation, 1, false, (float*)&modelMatrix);
 }
 
-void OGLRenderer::UpdateModelShaderMatrices(OGLShader* shader, Matrix4 modelMatrix, Matrix4 shadowMatrix) {
+void OGLRendererAPI::UpdateModelShaderMatrices(OGLShader* shader, Matrix4 modelMatrix, Matrix4 shadowMatrix) {
 	UpdateModelShaderMatrices(shader, modelMatrix);
 	int shadowLocation = 0;
 	shadowLocation = glGetUniformLocation(shader->GetProgramID(), "shadowMatrix");
 	glUniformMatrix4fv(shadowLocation, 1, false, (float*)&shadowMatrix);
 }
 
-void OGLRenderer::UpdateLightUniforms(OGLShader* shader, Vector3 lightPos, Vector4 lightColor, float lightRadius) {
+void OGLRendererAPI::UpdateLightUniforms(OGLShader* shader, Vector3 lightPos, Vector4 lightColor, float lightRadius) {
 	int lightPosLocation = 0;
 	int lightColourLocation = 0;
 	int lightRadiusLocation = 0;
@@ -154,7 +154,7 @@ void OGLRenderer::UpdateLightUniforms(OGLShader* shader, Vector3 lightPos, Vecto
 }
 
 
-void OGLRenderer::BindShader(ShaderBase*s) {
+void OGLRendererAPI::BindShader(ShaderBase*s) {
 	if (!s) {
 		glUseProgram(0);
 		boundShader = nullptr;
@@ -169,7 +169,7 @@ void OGLRenderer::BindShader(ShaderBase*s) {
 	}
 }
 
-void OGLRenderer::BindMesh(MeshGeometry*m) {
+void OGLRendererAPI::BindMesh(MeshGeometry*m) {
 	if (!m) {
 		glBindVertexArray(0);
 		boundMesh = nullptr;
@@ -187,7 +187,7 @@ void OGLRenderer::BindMesh(MeshGeometry*m) {
 	}
 }
 
-void OGLRenderer::DrawBoundMesh(int subLayer, int numInstances) {
+void OGLRendererAPI::DrawBoundMesh(int subLayer, int numInstances) {
 	if (!boundMesh) {
 		std::cout << __FUNCTION__ << " has been called without a bound mesh!" << std::endl;
 		return;
@@ -231,7 +231,7 @@ void OGLRenderer::DrawBoundMesh(int subLayer, int numInstances) {
 	}
 }
 
-void OGLRenderer::BindTextureToShader(const TextureBase*t, const std::string& uniform, int texUnit) const{
+void OGLRendererAPI::BindTextureToShader(const TextureBase*t, const std::string& uniform, int texUnit) const{
 	GLint texID = 0;
 
 	if (!boundShader) {
@@ -255,7 +255,7 @@ void OGLRenderer::BindTextureToShader(const TextureBase*t, const std::string& un
 	glUniform1i(slot, texUnit);
 }
 
-void OGLRenderer::DrawString(const std::string& text, const Vector2&pos, const Vector4& colour, float size) {
+void OGLRendererAPI::DrawString(const std::string& text, const Vector2&pos, const Vector4& colour, float size) {
 	DebugString s;
 	s.colour	= colour;
 	s.pos		= pos;
@@ -264,7 +264,7 @@ void OGLRenderer::DrawString(const std::string& text, const Vector2&pos, const V
 	debugStrings.emplace_back(s);
 }
 
-void OGLRenderer::DrawLine(const Vector3& start, const Vector3& end, const Vector4& colour) {
+void OGLRendererAPI::DrawLine(const Vector3& start, const Vector3& end, const Vector4& colour) {
 	DebugLine l;
 	l.start		= start;
 	l.end		= end;
@@ -272,14 +272,14 @@ void OGLRenderer::DrawLine(const Vector3& start, const Vector3& end, const Vecto
 	debugLines.emplace_back(l);
 }
 
-Matrix4 OGLRenderer::SetupDebugLineMatrix() const {
+Matrix4 OGLRendererAPI::SetupDebugLineMatrix() const {
 	return Matrix4();
 }
-Matrix4 OGLRenderer::SetupDebugStringMatrix()const {
+Matrix4 OGLRendererAPI::SetupDebugStringMatrix()const {
 	return Matrix4();
 }
 
-void OGLRenderer::DrawDebugData() {
+void OGLRendererAPI::DrawDebugData() {
 	if (debugStrings.empty() && debugLines.empty()) {
 		return; //don't mess with OGL state if there's no point!
 	}
@@ -319,7 +319,7 @@ void OGLRenderer::DrawDebugData() {
 	}
 }
 
-void OGLRenderer::DrawDebugStrings() {
+void OGLRendererAPI::DrawDebugStrings() {
 	vector<Vector3> vertPos;
 	vector<Vector2> vertTex;
 	vector<Vector4> vertColours;
@@ -343,7 +343,7 @@ void OGLRenderer::DrawDebugStrings() {
 	debugStrings.clear();
 }
 
-void OGLRenderer::DrawDebugLines() {
+void OGLRendererAPI::DrawDebugLines() {
 	vector<Vector3> vertPos;
 	vector<Vector4> vertCol;
 
@@ -366,7 +366,7 @@ void OGLRenderer::DrawDebugLines() {
 }
 
 #ifdef _WIN32
-void OGLRenderer::InitWithWin32(Window& w) {
+void OGLRendererAPI::InitWithWin32(Window& w) {
 	Win32Code::Win32Window* realWindow = (Win32Code::Win32Window*)&w;
 
 	if (!(deviceContext = GetDC(realWindow->GetHandle()))) {
@@ -476,11 +476,11 @@ void OGLRenderer::InitWithWin32(Window& w) {
 	w.SetRenderer(this);
 }
 
-void OGLRenderer::DestroyWithWin32() {
+void OGLRendererAPI::DestroyWithWin32() {
 	wglDeleteContext(renderContext);
 }
 
-bool OGLRenderer::SetVerticalSync(VerticalSyncState s) {
+bool OGLRendererAPI::SetVerticalSync(VerticalSyncState s) {
 	if (!wglSwapIntervalEXT) {
 		return false;
 	}

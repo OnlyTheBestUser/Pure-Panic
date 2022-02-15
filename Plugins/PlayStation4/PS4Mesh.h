@@ -16,7 +16,7 @@ namespace NCL::PS4 {
 	class PS4Mesh :
 		public NCL::MeshGeometry, public PS4MemoryAware
 	{
-		friend class PS4RendererBase;
+		friend class PS4RendererAPI;
 	public:		
 		PS4Mesh();
 		PS4Mesh(const std::string& filename);
@@ -26,7 +26,7 @@ namespace NCL::PS4 {
 		static PS4Mesh* GenerateQuad();
 		static PS4Mesh* GenerateSinglePoint();
 
-		void	UploadToGPU(Rendering::RendererBase* renderer) override;
+		void	UploadToGPU(Rendering::RendererAPI* renderer) override;
 		void	SubmitDraw(Gnmx::GnmxGfxContext& cmdList, Gnm::ShaderStage stage);
 
 		void	InitAttributeBuffer(sce::Gnm::Buffer &buffer, Gnm::DataFormat format, void*offset);

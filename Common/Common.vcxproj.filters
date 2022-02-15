@@ -69,9 +69,6 @@
     <ClCompile Include="Win32Window.cpp">
       <Filter>Windowing and Input\Win32</Filter>
     </ClCompile>
-    <ClCompile Include="RendererBase.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="ShaderBase.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
@@ -110,6 +107,9 @@
     </ClCompile>
     <ClCompile Include="MeshMaterial.cpp">
       <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="RendererAPI.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -167,9 +167,6 @@
     <ClInclude Include="ShaderBase.h">
       <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="RendererBase.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="TextureBase.h">
       <Filter>Rendering</Filter>
     </ClInclude>
@@ -193,6 +190,9 @@
     </ClInclude>
     <ClInclude Include="MeshMaterial.h">
       <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="RendererAPI.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

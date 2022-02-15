@@ -7,7 +7,7 @@ Comments and queries to: richard-gordon.davison AT ncl.ac.uk
 https://research.ncl.ac.uk/game/
 */
 #pragma once
-#include "../../Common/RendererBase.h"
+#include "../../Common/RendererAPI.h"
 
 
 #ifdef _WIN32
@@ -38,12 +38,12 @@ namespace NCL {
 
 		class SimpleFont;
 		
-		class OGLRenderer : public RendererBase
+		class OGLRendererAPI : public RendererAPI
 		{
 		public:
-			friend class OGLRenderer;
-			OGLRenderer(Window& w);
-			~OGLRenderer();
+			friend class OGLRendererAPI;
+			OGLRendererAPI(Window& w);
+			~OGLRendererAPI();
 
 			void OnWindowResize(int w, int h)	override;
 			bool HasInitialised()				const override {

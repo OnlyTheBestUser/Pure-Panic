@@ -207,7 +207,7 @@
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Quaternion.cpp" />
-    <ClCompile Include="RendererBase.cpp" />
+    <ClCompile Include="RendererAPI.cpp" />
     <ClCompile Include="ShaderBase.cpp" />
     <ClCompile Include="SimpleFont.cpp" />
     <ClCompile Include="TextureBase.cpp" />
@@ -236,7 +236,7 @@
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="Quaternion.h" />
-    <ClInclude Include="RendererBase.h" />
+    <ClInclude Include="RendererAPI.h" />
     <ClInclude Include="ShaderBase.h" />
     <ClInclude Include="SimpleFont.h" />
     <ClInclude Include="TextureBase.h" />

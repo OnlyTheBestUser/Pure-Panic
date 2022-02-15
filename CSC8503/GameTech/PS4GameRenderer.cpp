@@ -11,7 +11,7 @@
 using namespace NCL;
 using namespace NCL::PS4;
 
-PS4GameRenderer::PS4GameRenderer(GameWorld& world) : PS4RendererBase(*Window::GetWindow()), gameWorld(world) {
+PS4GameRenderer::PS4GameRenderer(GameWorld& world) : PS4RendererAPI(*Window::GetWindow()), gameWorld(world) {
 	rotation	= 0.0f;
 	translation = 0.0f;
 

@@ -17,7 +17,7 @@ namespace NCL {
 		class OGLTexture : public TextureBase
 		{
 		public:
-			//friend class OGLRenderer;
+			//friend class OGLRendererAPI;
 			 OGLTexture();
 			 OGLTexture(GLuint texToOwn);
 			~OGLTexture();

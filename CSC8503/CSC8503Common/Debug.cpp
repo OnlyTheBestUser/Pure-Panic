@@ -2,7 +2,7 @@
 #include "../../Common/Matrix4.h"
 using namespace NCL;
 
-RendererBase* Debug::renderer = nullptr;
+RendererAPI* Debug::renderer = nullptr;
 
 std::vector<Debug::DebugStringEntry>	Debug::stringEntries;
 std::vector<Debug::DebugLineEntry>		Debug::lineEntries;

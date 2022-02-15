@@ -1,5 +1,5 @@
 #ifdef _ORBIS
-#include "PS4RendererBase.h"
+#include "PS4RendererAPI.h"
 #include "PS4Window.h"
 #include <video_out.h>	//Video System
 #include "PS4Shader.h"
@@ -24,8 +24,8 @@ using namespace NCL::Maths;
 sce::Gnmx::Toolkit::IAllocator	oAllocator;
 sce::Gnmx::Toolkit::IAllocator	gAllocator;
 
-PS4RendererBase::PS4RendererBase(Window& window)
-	: RendererBase(window),
+PS4RendererAPI::PS4RendererAPI(Window& window)
+	: RendererAPI(window),
 	_MaxCMDBufferCount(3),
 	  _bufferCount(3),
 	  _GarlicMemory(1024 * 1024 * 512),
@@ -49,13 +49,13 @@ PS4RendererBase::PS4RendererBase(Window& window)
 	SwapCommandBuffer();//always swap at least once...
 }
 
-PS4RendererBase::~PS4RendererBase()	{
+PS4RendererAPI::~PS4RendererAPI()	{
 	DestroyGCMRendering();
 	DestroyVideoSystem();
 	DestroyMemoryAllocators();
 }
 
-void	PS4RendererBase::InitialiseVideoSystem() {
+void	PS4RendererAPI::InitialiseVideoSystem() {
 	screenBuffers = new PS4ScreenBuffer*[_bufferCount];
 
 	for (int i = 0; i < _bufferCount; ++i) {
@@ -84,7 +84,7 @@ void	PS4RendererBase::InitialiseVideoSystem() {
 	sceVideoOutRegisterBuffers(videoHandle, 0, bufferAddresses, _bufferCount, &attribute);
 }
 
-void	PS4RendererBase::InitialiseGCMRendering() {
+void	PS4RendererAPI::InitialiseGCMRendering() {
 	frames = (PS4Frame*)onionAllocator->allocate(sizeof(PS4Frame) * _MaxCMDBufferCount, alignof(PS4Frame));
 
 	for (int i = 0; i < _MaxCMDBufferCount; ++i) {
@@ -95,7 +95,7 @@ void	PS4RendererBase::InitialiseGCMRendering() {
 	Gnmx::Toolkit::initializeWithAllocators(&allocators);
 }
 
-void	PS4RendererBase::InitialiseMemoryAllocators() {
+void	PS4RendererAPI::InitialiseMemoryAllocators() {
 	stackAllocators[MEMORY_GARLIC].init(SCE_KERNEL_WC_GARLIC, _GarlicMemory);
 	stackAllocators[MEMORY_ONION ].init(SCE_KERNEL_WB_ONION , _OnionMemory);
 
@@ -104,15 +104,15 @@ void	PS4RendererBase::InitialiseMemoryAllocators() {
 
 	this->garlicAllocator   = &gAllocator;
 	this->onionAllocator	= &oAllocator;
-	Gnm::registerOwner(&ownerHandle, "PS4RendererBase");
+	Gnm::registerOwner(&ownerHandle, "PS4RendererAPI");
 }
 
-void PS4RendererBase::DestroyMemoryAllocators() {
+void PS4RendererAPI::DestroyMemoryAllocators() {
 	stackAllocators[MEMORY_GARLIC].deinit();
 	stackAllocators[MEMORY_ONION ].deinit();
 }
 
-PS4ScreenBuffer*	PS4RendererBase::GenerateScreenBuffer(uint width, uint height, bool colour, bool depth, bool stencil) {
+PS4ScreenBuffer*	PS4RendererAPI::GenerateScreenBuffer(uint width, uint height, bool colour, bool depth, bool stencil) {
 	PS4ScreenBuffer* buffer = new PS4ScreenBuffer();
 
 	if (colour) {	
@@ -179,11 +179,11 @@ PS4ScreenBuffer*	PS4RendererBase::GenerateScreenBuffer(uint width, uint height, 
 	return buffer;
 }
 
-void	PS4RendererBase::DestroyGCMRendering() {
+void	PS4RendererAPI::DestroyGCMRendering() {
 	//onionAllocator->release(frames);
 }
 
-void	PS4RendererBase::DestroyVideoSystem() {
+void	PS4RendererAPI::DestroyVideoSystem() {
 	for (int i = 0; i < _bufferCount; ++i) {
 		delete screenBuffers[i];
 	}
@@ -192,25 +192,25 @@ void	PS4RendererBase::DestroyVideoSystem() {
 	sceVideoOutClose(videoHandle);
 }
 
-void	PS4RendererBase::OnWindowResize(int w, int h)  {
+void	PS4RendererAPI::OnWindowResize(int w, int h)  {
 	currentWidth	= w;
 	currentHeight	= h;
 }
 
-void	PS4RendererBase::BeginFrame()   {
+void	PS4RendererAPI::BeginFrame()   {
 
 }
 
-void PS4RendererBase::EndFrame()			{
+void PS4RendererAPI::EndFrame()			{
 	framesSubmitted++;
 }
 
-void	PS4RendererBase::SwapBuffers() {
+void	PS4RendererAPI::SwapBuffers() {
 	SwapScreenBuffer();
 	SwapCommandBuffer();
 }
 
-void	PS4RendererBase::SwapScreenBuffer() {
+void	PS4RendererAPI::SwapScreenBuffer() {
 	prevScreenBuffer	= currentScreenBuffer;
 	currentScreenBuffer = (currentScreenBuffer + 1) % _bufferCount;
 	sceVideoOutSubmitFlip(videoHandle, prevScreenBuffer, SCE_VIDEO_OUT_FLIP_MODE_VSYNC, 0);
@@ -218,7 +218,7 @@ void	PS4RendererBase::SwapScreenBuffer() {
 	currentPS4Buffer = screenBuffers[currentScreenBuffer];
 }
 
-void	PS4RendererBase::SwapCommandBuffer() {
+void	PS4RendererAPI::SwapCommandBuffer() {
 	if (currentGFXContext) {	
 		if (currentGFXContext->submit() != sce::Gnm::kSubmissionSuccess) {
 			std::cerr << "Graphics queue submission failed?" << std::endl;
@@ -232,7 +232,7 @@ void	PS4RendererBase::SwapCommandBuffer() {
 	currentGFXContext	= &currentFrame->GetCommandBuffer();
 }
  
-void	PS4RendererBase::SetRenderBuffer(PS4ScreenBuffer*buffer, bool clearColour, bool clearDepth, bool clearStencil) {
+void	PS4RendererAPI::SetRenderBuffer(PS4ScreenBuffer*buffer, bool clearColour, bool clearDepth, bool clearStencil) {
 	currentPS4Buffer = buffer;
 	currentGFXContext->setRenderTargetMask(0xF);
 	currentGFXContext->setRenderTarget(0, &currentPS4Buffer->colourTarget);
@@ -246,7 +246,7 @@ void	PS4RendererBase::SetRenderBuffer(PS4ScreenBuffer*buffer, bool clearColour, 
 	ClearBuffer(clearColour, clearDepth, clearStencil);
 }
 
-void	PS4RendererBase::ClearBuffer(bool colour, bool depth, bool stencil) {
+void	PS4RendererAPI::ClearBuffer(bool colour, bool depth, bool stencil) {
 	if (colour) {
 		//Vector4 defaultClearColour(rand() / (float)RAND_MAX, rand() / (float)RAND_MAX, rand() / (float)RAND_MAX, 1.0f);
 		SonyMath::Vector4 defaultClearColour(0.1f, 0.1f, 0.1f, 1.0f);
@@ -264,10 +264,10 @@ void	PS4RendererBase::ClearBuffer(bool colour, bool depth, bool stencil) {
 	}
 }
 
-void PS4RendererBase::DrawString(const std::string& text, const Maths::Vector2& pos, const Maths::Vector4& colour, float size) {
+void PS4RendererAPI::DrawString(const std::string& text, const Maths::Vector2& pos, const Maths::Vector4& colour, float size) {
 
 }
-void PS4RendererBase::DrawLine(const Maths::Vector3& start, const Maths::Vector3& end, const Maths::Vector4& colour) {
+void PS4RendererAPI::DrawLine(const Maths::Vector3& start, const Maths::Vector3& end, const Maths::Vector4& colour) {
 
 };
 #endif

@@ -10,7 +10,7 @@
 #include <iostream>
 using namespace NCL;
 
-NavMeshRenderer::NavMeshRenderer() : OGLRenderer(*Window::GetWindow())	{
+NavMeshRenderer::NavMeshRenderer() : OGLRendererAPI(*Window::GetWindow())	{
 	navMesh = new OGLMesh();
 
 	std::ifstream mapFile(Assets::DATADIR + "test.navmesh");

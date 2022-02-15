@@ -1,6 +1,6 @@
 #ifdef _ORBIS
 #pragma once
-#include "../../Plugins/PlayStation4/PS4RendererBase.h"
+#include "../../Plugins/PlayStation4/PS4RendererAPI.h"
 #include "../CSC8503Common/GameWorld.h"
 
 namespace NCL {
@@ -25,7 +25,7 @@ namespace NCL {
 		};
 
 		class PS4GameRenderer :
-			public PS4RendererBase
+			public PS4RendererAPI
 		{
 		public:
 			PS4GameRenderer(CSC8503::GameWorld& world);

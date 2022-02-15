@@ -1,5 +1,5 @@
 /******************************************************************************
-Class:RendererBase
+Class:RendererAPI
 Implements:
 Author:Rich Davison
 Description:TODO
@@ -21,11 +21,11 @@ namespace NCL {
 			VSync_OFF,
 			VSync_ADAPTIVE
 		};
-		class RendererBase {
+		class RendererAPI {
 		public:
 			friend class NCL::Window;
-			RendererBase(Window& w);
-			virtual ~RendererBase();
+			RendererAPI(Window& w);
+			virtual ~RendererAPI();
 			virtual bool HasInitialised() const { return true; }
 			virtual void Update(float dt) {}
 			void Render() {

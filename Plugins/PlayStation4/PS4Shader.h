@@ -19,7 +19,7 @@ namespace NCL::PS4 {
 	class PS4Shader :
 		public Rendering::ShaderBase, public PS4MemoryAware
 	{
-		friend class PS4RendererBase;
+		friend class PS4RendererAPI;
 	public:
 		~PS4Shader();
 

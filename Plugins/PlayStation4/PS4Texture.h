@@ -9,7 +9,7 @@ namespace NCL::PS4 {
 		public Rendering::TextureBase, public PS4MemoryAware
 	{
 	public:
-		friend class PS4RendererBase;
+		friend class PS4RendererAPI;
 
 		~PS4Texture();
 

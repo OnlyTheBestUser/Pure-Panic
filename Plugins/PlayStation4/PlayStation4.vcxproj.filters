@@ -45,7 +45,7 @@
     <ClCompile Include="PS4ComputeShader.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="PS4RendererBase.cpp">
+    <ClCompile Include="PS4RendererAPI.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="PS4Shader.cpp">
@@ -101,7 +101,7 @@
     <ClInclude Include="PS4Window.h">
       <Filter>Windowing and Input</Filter>
     </ClInclude>
-    <ClInclude Include="PS4RendererBase.h">
+    <ClInclude Include="PS4RendererAPI.h">
       <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="PS4Mesh.h">

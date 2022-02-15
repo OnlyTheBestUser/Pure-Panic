@@ -1,5 +1,5 @@
 #pragma once
-#include "../../Plugins/OpenGLRendering/OGLRenderer.h"
+#include "../../Plugins/OpenGLRendering/OGLRendererAPI.h"
 #include <vector>
 #include <string>
 
@@ -12,7 +12,7 @@ namespace NCL {
 
 		static void DrawAxisLines(const Matrix4 &modelMatrix, float scaleBoost = 1.0f, float time = 0.0f);
 
-		static void SetRenderer(RendererBase* r) {
+		static void SetRendererAPI(RendererAPI* r) {
 			renderer = r;
 		}
 
@@ -50,7 +50,7 @@ namespace NCL {
 		static std::vector<DebugStringEntry>	stringEntries;
 		static std::vector<DebugLineEntry>	lineEntries;
 
-		static RendererBase* renderer;
+		static RendererAPI* renderer;
 	};
 }
 

@@ -1,6 +1,6 @@
 #pragma once
 #ifdef _ORBIS
-#include "../../Common/RendererBase.h"
+#include "../../Common/RendererAPI.h"
 #include "PS4MemoryAware.h"
 
 #include <gnm.h>
@@ -43,12 +43,12 @@ namespace NCL::PS4 {
 	class PS4Shader;
 	class PS4Mesh;
 
-	class PS4RendererBase :
-		public RendererBase, public PS4MemoryAware
+	class PS4RendererAPI :
+		public RendererAPI, public PS4MemoryAware
 	{
 	public:
-		PS4RendererBase(Window& window);
-		~PS4RendererBase();
+		PS4RendererAPI(Window& window);
+		~PS4RendererAPI();
 
 	protected:
 		void	OnWindowResize(int w, int h) override;

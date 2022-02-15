@@ -1,6 +1,6 @@
 #ifdef _WIN64
 #pragma once
-#include "../../Plugins/OpenGLRendering/OGLRenderer.h"
+#include "../../Plugins/OpenGLRendering/OGLRendererAPI.h"
 #include "../../Plugins/OpenGLRendering/OGLShader.h"
 #include "../../Plugins/OpenGLRendering/OGLTexture.h"
 #include "../../Plugins/OpenGLRendering/OGLMesh.h"
@@ -15,7 +15,7 @@ namespace NCL {
 	namespace CSC8503 {
 		class RenderObject;
 
-		class OGLGameRenderer : public OGLRenderer	{
+		class OGLGameRenderer : public OGLRendererAPI	{
 		public:
 			OGLGameRenderer(GameWorld& world);
 			~OGLGameRenderer();

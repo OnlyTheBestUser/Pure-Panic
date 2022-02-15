@@ -17,14 +17,14 @@ namespace NCL {
 		class OGLMesh : public NCL::MeshGeometry
 		{
 		public:
-			friend class OGLRenderer;
+			friend class OGLRendererAPI;
 			OGLMesh();
 			OGLMesh(const std::string&filename);
 			~OGLMesh();
 
 			void RecalculateNormals();
 
-			void UploadToGPU(Rendering::RendererBase* renderer = nullptr) override;
+			void UploadToGPU(Rendering::RendererAPI* renderer = nullptr) override;
 			void UpdateGPUBuffers(unsigned int startVertex, unsigned int vertexCount);
 
 		protected:
