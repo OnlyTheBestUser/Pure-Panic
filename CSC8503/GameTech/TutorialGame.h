@@ -1,5 +1,5 @@
 #pragma once
-#include "WorldRenderer.h"
+#include "../../Common/RendererBase.h"
 #include "../CSC8503Common/PhysicsSystem.h"
 #include "../CSC8503Common/Player.h"
 
@@ -65,7 +65,7 @@ namespace NCL {
 
 			StateGameObject* testStateObject;
 
-			WorldRenderer*	worldRenderer;
+			RendererBase*	renderer;
 			PhysicsSystem*		physics;
 			GameWorld*			world;
 

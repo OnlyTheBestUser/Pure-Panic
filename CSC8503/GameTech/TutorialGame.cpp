@@ -19,7 +19,12 @@
 
 TutorialGame::TutorialGame()	{
 	world		= new GameWorld();
-	worldRenderer	= new WorldRenderer(*world);
+#ifdef _WIN64
+	renderer	= new OGLGameRenderer(*world);
+#endif
+#ifdef _ORBIS
+	renderer = new PS4::PS4GameRenderer(*world);
+#endif
 	physics		= new PhysicsSystem(*world);
 	input = NULL;
 
@@ -31,7 +36,7 @@ TutorialGame::TutorialGame()	{
 
 	state = PLAY;
 
-	Debug::SetRenderer(worldRenderer->GetRenderer());
+	Debug::SetRenderer(renderer);
 
 	//physics->SetGravity(Vector3(0, 9.8f, 0));
 	//physics->SetLinearDamping(10.0f);
@@ -93,12 +98,12 @@ TutorialGame::~TutorialGame()	{
 	delete basicShader;
 
 	delete physics;
-	delete worldRenderer;
+	delete renderer;
 	delete world;
 }
 
 void TutorialGame::UpdateGame(float dt) {
-	Debug::SetRenderer(worldRenderer->GetRenderer());
+	Debug::SetRenderer(renderer);
 	switch (state) {
 	case PLAY: UpdateGameWorld(dt); break;
 	case PAUSE: UpdatePauseScreen(dt); break;
@@ -117,10 +122,10 @@ void TutorialGame::UpdateGame(float dt) {
 	//Debug::DrawLine(Vector3(360, 0, 360), Vector3(0, 0, 360), Debug::RED);
 	//Debug::DrawLine(Vector3(0, 0, 360), Vector3(0, 0, 0), Debug::RED);
 
-	worldRenderer->Update(dt);
+	renderer->Update(dt);
 
 	Debug::FlushRenderables(dt);
-	worldRenderer->Render();
+	renderer->Render();
 }
 
 void TutorialGame::UpdateGameWorld(float dt)
@@ -192,16 +197,16 @@ void TutorialGame::UpdateGameWorld(float dt)
 
 void TutorialGame::UpdatePauseScreen(float dt)
 {
-	worldRenderer->GetRenderer()->DrawString("PAUSED", Vector2(5, 80), Debug::MAGENTA, 30.0f);
-	worldRenderer->GetRenderer()->DrawString("Press P to Unpause.", Vector2(5, 90), Debug::WHITE, 20.0f);
-	worldRenderer->GetRenderer()->DrawString("Press Esc to return to Main Menu.", Vector2(5, 95), Debug::WHITE, 20.0f);
+	renderer->DrawString("PAUSED", Vector2(5, 80), Debug::MAGENTA, 30.0f);
+	renderer->DrawString("Press P to Unpause.", Vector2(5, 90), Debug::WHITE, 20.0f);
+	renderer->DrawString("Press Esc to return to Main Menu.", Vector2(5, 95), Debug::WHITE, 20.0f);
 }
 
 void TutorialGame::UpdateWinScreen(float dt)
 {
-	worldRenderer->GetRenderer()->DrawString("YOU WIN", Vector2(5, 80), Debug::MAGENTA, 30.0f);
-	worldRenderer->GetRenderer()->DrawString("Press R to Restart.", Vector2(5, 90), Debug::WHITE, 20.0f);
-	worldRenderer->GetRenderer()->DrawString("Press Esc to return to Main Menu.", Vector2(5, 95), Debug::WHITE, 20.0f);
+	renderer->DrawString("YOU WIN", Vector2(5, 80), Debug::MAGENTA, 30.0f);
+	renderer->DrawString("Press R to Restart.", Vector2(5, 90), Debug::WHITE, 20.0f);
+	renderer->DrawString("Press Esc to return to Main Menu.", Vector2(5, 95), Debug::WHITE, 20.0f);
 }
 
 void TutorialGame::UpdateKeys() {
@@ -603,7 +608,7 @@ bool TutorialGame::SelectObject() {
 		}
 	}
 	if (inSelectionMode) {
-		worldRenderer->GetRenderer()->DrawString("Press Q to change to camera mode!", Vector2(5, 85));
+		renderer->DrawString("Press Q to change to camera mode!", Vector2(5, 85));
 
 		if (Window::GetMouse()->ButtonDown(NCL::MouseButtons::LEFT)) {
 			if (selectionObject) {	//set colour to deselected;
@@ -639,15 +644,15 @@ bool TutorialGame::SelectObject() {
 		}
 	}
 	else {
-		worldRenderer->GetRenderer()->DrawString("Press Q to change to select mode!", Vector2(5, 85));
+		renderer->DrawString("Press Q to change to select mode!", Vector2(5, 85));
 	}
 
 	if (lockedObject) {
-		worldRenderer->GetRenderer()->DrawString("Press L to unlock object!", Vector2(5, 80));
+		renderer->DrawString("Press L to unlock object!", Vector2(5, 80));
 	}
 
 	else if(selectionObject){
-		worldRenderer->GetRenderer()->DrawString("Press L to lock selected object object!", Vector2(5, 80));
+		renderer->DrawString("Press L to lock selected object object!", Vector2(5, 80));
 	}
 
 	if (Window::GetKeyboard()->KeyPressed(NCL::KeyboardKeys::L)) {
@@ -672,7 +677,7 @@ added linear motion into our physics system. After the second tutorial, objects 
 line - after the third, they'll be able to twist under torque aswell.
 */
 void TutorialGame::MoveSelectedObject(float dt) {
-	worldRenderer->GetRenderer()->DrawString("Click Force: " + std::to_string(forceMagnitude), Vector2(10, 20));
+	renderer->DrawString("Click Force: " + std::to_string(forceMagnitude), Vector2(10, 20));
 	forceMagnitude += Window::GetMouse()->GetWheelMovement() * 100.0f;
 
 	if (!selectionObject)
@@ -690,7 +695,7 @@ void TutorialGame::MoveSelectedObject(float dt) {
 
 	Vector3 pos = selectionObject->GetTransform().GetPosition();
 	string s = "Pos: " + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z) + ")";
-	worldRenderer->GetRenderer()->DrawString(s, Vector2(5, 5));
+	renderer->DrawString(s, Vector2(5, 5));
 
 	if (Window::GetKeyboard()->KeyHeld(NCL::KeyboardKeys::F))
 		selectionObject->Interact(dt);

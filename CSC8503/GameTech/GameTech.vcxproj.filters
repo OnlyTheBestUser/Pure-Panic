@@ -33,9 +33,6 @@
     <ClCompile Include="OGLGameRenderer.cpp">
       <Filter>Renderers</Filter>
     </ClCompile>
-    <ClCompile Include="WorldRenderer.cpp">
-      <Filter>Renderers</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TutorialGame.h">
@@ -48,9 +45,6 @@
       <Filter>Renderers</Filter>
     </ClInclude>
     <ClInclude Include="OGLGameRenderer.h">
-      <Filter>Renderers</Filter>
-    </ClInclude>
-    <ClInclude Include="WorldRenderer.h">
       <Filter>Renderers</Filter>
     </ClInclude>
   </ItemGroup>
