@@ -50,10 +50,6 @@ namespace NCL {
 				return initState;
 			}
 
-			void ForceValidDebugState(bool newState) {
-				forceValidDebugState = newState;
-			}
-
 			virtual bool SetVerticalSync(VerticalSyncState s);
 
 			void BeginFrame()	override;
@@ -85,6 +81,8 @@ namespace NCL {
 			void BindTexture(const TextureBase* tex, std::string uniform, int texSlot) override;
 			void UpdateUniformFloat(ShaderBase* shader, std::string uniform, float f) override;
 			void UpdateUniformMatrix4(ShaderBase* shader, std::string uniform, Maths::Matrix4 matrix) override;
+			void SetDepth(bool depth) override;
+			void SetBlend(bool blend) override;
 		private:
 			struct DebugString {
 				Maths::Vector4 colour;
@@ -103,7 +101,6 @@ namespace NCL {
 			OGLShader*	boundShader;
 
 			bool initState;
-			bool forceValidDebugState;
 		};
 	}
 }

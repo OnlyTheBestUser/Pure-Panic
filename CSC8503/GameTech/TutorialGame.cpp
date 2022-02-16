@@ -34,7 +34,7 @@ TutorialGame::TutorialGame()	{
 
 	state = PLAY;
 
-	Debug::SetRenderer(renderer->GetRendererAPI());
+	Debug::SetRenderer(renderer);
 
 	//physics->SetGravity(Vector3(0, 9.8f, 0));
 	//physics->SetLinearDamping(10.0f);
@@ -101,7 +101,7 @@ TutorialGame::~TutorialGame()	{
 }
 
 void TutorialGame::UpdateGame(float dt) {
-	Debug::SetRenderer(renderer->GetRendererAPI());
+	Debug::SetRenderer(renderer);
 	switch (state) {
 	case PLAY: UpdateGameWorld(dt); break;
 	case PAUSE: UpdatePauseScreen(dt); break;
@@ -189,7 +189,6 @@ void TutorialGame::UpdateGameWorld(float dt)
 
 		//Debug::DrawAxisLines(lockedObject->GetTransform().GetMatrix(), 2.0f);
 	}
-	renderer->DrawString("PAUSED", Vector2(5, 80), Debug::MAGENTA, 30.0f);
 	world->UpdateWorld(dt);
 }
 

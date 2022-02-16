@@ -2,7 +2,7 @@
 #include "../../Common/Matrix4.h"
 using namespace NCL;
 
-RendererAPI* Debug::renderer = nullptr;
+RendererBase* Debug::renderer = nullptr;
 
 std::vector<Debug::DebugStringEntry>	Debug::stringEntries;
 std::vector<Debug::DebugLineEntry>		Debug::lineEntries;
@@ -61,12 +61,12 @@ void Debug::FlushRenderables(float dt) {
 		return;
 	}
 	for (const auto& i : stringEntries) {
-		//renderer->DrawString(i.data, i.position);
+		renderer->DrawString(i.data, i.position);
 	}
 	int trim = 0;
 	for (int i = 0; i < lineEntries.size(); ) {
 		DebugLineEntry* e = &lineEntries[i]; 
-		//renderer->DrawLine(e->start, e->end, e->colour);
+		renderer->DrawLine(e->start, e->end, e->colour);
 		e->time -= dt;
 		if (e->time < 0) {			
 			trim++;				

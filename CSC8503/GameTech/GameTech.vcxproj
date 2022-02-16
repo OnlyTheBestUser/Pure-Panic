@@ -209,6 +209,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="RendererBase.cpp" />
     <ClCompile Include="TutorialGame.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -216,6 +217,7 @@
     <ClInclude Include="OGLGameRenderer.h" />
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="RendererBase.h" />
     <ClInclude Include="TutorialGame.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

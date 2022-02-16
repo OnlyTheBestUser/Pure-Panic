@@ -49,9 +49,12 @@ namespace NCL {
 			virtual void BindTexture(const TextureBase* tex, std::string uniform, int texSlot) = 0;
 			virtual void UpdateUniformFloat(ShaderBase* shader, std::string uniform, float f) = 0;
 			virtual void UpdateUniformMatrix4(ShaderBase* shader, std::string uniform, Maths::Matrix4 matrix) = 0;
+			virtual void SetDepth(bool depth) = 0;
+			virtual void SetBlend(bool blend) = 0;
 
 			int GetCurrentWidth() { return currentWidth; }
 			int GetCurrentHeight() { return currentHeight; }
+
 		protected:
 			virtual void OnWindowResize(int w, int h) = 0;
 			virtual void OnWindowDetach() {}; //Most renderers won't care about this

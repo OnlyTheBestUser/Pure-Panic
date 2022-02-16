@@ -373,8 +373,8 @@ void PhysicsSystem::BroadPhase() {
 			staticTree->GetContentsAtNode(i->object, i->pos, i->size, list);
 			for (auto j = list.begin(); j != list.end(); j++) {
 #ifdef _WIN64
-				info.a = min((*i).object, (*j).object);
-				info.b = max((*i).object, (*j).object);
+				info.a = std::min((*i).object, (*j).object);
+				info.b = std::max((*i).object, (*j).object);
 #else // _WIN64
 				info.a = std::min((*i).object, (*j).object);
 				info.b = std::max((*i).object, (*j).object);
@@ -394,8 +394,8 @@ void PhysicsSystem::BroadPhase() {
 				//is this pair of items already in the collision set - 
 				// if the same pair is in another Octree node together etc
 #ifdef _WIN64
-				info.a = min((*i).object, (*j).object);
-				info.b = max((*i).object, (*j).object);
+				info.a = std::min((*i).object, (*j).object);
+				info.b = std::max((*i).object, (*j).object);
 #else // _WIN64
 				info.a = std::min((*i).object, (*j).object);
 				info.b = std::max((*i).object, (*j).object);

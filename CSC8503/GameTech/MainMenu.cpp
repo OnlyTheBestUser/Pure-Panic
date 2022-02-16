@@ -13,7 +13,7 @@ void MainMenu::InitWorld()
 
 void MainMenu::UpdateGame(float dt)
 {
-	Debug::SetRenderer(renderer->GetRendererAPI());
+	Debug::SetRenderer(renderer);
 
 	renderer->DrawString("Screwball Scramble", Vector2(22, 30), Debug::MAGENTA, 30.0f);
 	renderer->DrawString("Press 1 - Screwball Scramble", Vector2(30, 50), Debug::WHITE, 20.0f);

@@ -68,8 +68,6 @@ OGLRendererAPI::OGLRendererAPI(Window& w) : RendererAPI(w)	{
 		debugShader = new OGLShader("debugVert.glsl", "debugFrag.glsl");
 	}*/
 
-	forceValidDebugState = false;
-
 	/*debugLinesMesh = new OGLMesh();
 	debugTextMesh		= new OGLMesh();
 
@@ -280,6 +278,15 @@ void OGLRendererAPI::UpdateUniformMatrix4(ShaderBase* shader, std::string unifor
 
 	int matLoc = glGetUniformLocation(oglShader->GetProgramID(), uniform.c_str());
 	glUniformMatrix4fv(matLoc, 1, false, (float*)&matrix);
+}
+
+void OGLRendererAPI::SetDepth(bool d) {
+	d ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST);
+}
+
+void OGLRendererAPI::SetBlend(bool b) {
+	b ? glEnable(GL_BLEND) : glDisable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 

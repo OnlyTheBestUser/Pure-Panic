@@ -1,7 +1,7 @@
 #pragma once
-#include "../../Plugins/OpenGLRendering/OGLRendererAPI.h"
 #include <vector>
 #include <string>
+#include "../GameTech/RendererBase.h"
 
 
 // TODO: fix debug
@@ -14,7 +14,7 @@ namespace NCL {
 
 		static void DrawAxisLines(const Matrix4 &modelMatrix, float scaleBoost = 1.0f, float time = 0.0f);
 
-		static void SetRenderer(RendererAPI* r) {
+		static void SetRenderer(RendererBase* r) {
 			renderer = r;
 		}
 
@@ -52,7 +52,7 @@ namespace NCL {
 		static std::vector<DebugStringEntry>	stringEntries;
 		static std::vector<DebugLineEntry>	lineEntries;
 
-		static RendererAPI* renderer;
+		static RendererBase* renderer;
 	};
 }
 

@@ -36,6 +36,9 @@
     <ClCompile Include="Renderer.cpp">
       <Filter>Renderers</Filter>
     </ClCompile>
+    <ClCompile Include="RendererBase.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TutorialGame.h">
@@ -51,6 +54,9 @@
       <Filter>Renderers</Filter>
     </ClInclude>
     <ClInclude Include="Renderer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="RendererBase.h">
       <Filter>Renderers</Filter>
     </ClInclude>
   </ItemGroup>

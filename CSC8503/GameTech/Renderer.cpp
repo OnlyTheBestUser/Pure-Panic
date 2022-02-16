@@ -11,10 +11,10 @@ using namespace NCL;
 using namespace Rendering;
 using namespace CSC8503;
 
-Renderer::Renderer(GameWorld& world) {
+Renderer::Renderer(GameWorld& world) : RendererBase() {
 	gameWorld = world;
 #ifdef _WIN64
-	rendererAPI = new OGLGameRenderer(world);
+	rendererAPI = new OGLRendererAPI(*Window::GetWindow());
 	debugLinesMesh = new OGLMesh();
 	debugTextMesh = new OGLMesh();
 
@@ -63,108 +63,6 @@ void Renderer::Render() {
 	rendererAPI->EndFrame();
 	DrawDebugData();
 	rendererAPI->SwapBuffers();
-}
-
-void Renderer::DrawString(const std::string& text, const Maths::Vector2& pos, const Maths::Vector4& colour, float size) {
-	DebugString s;
-	s.colour = colour;
-	s.pos = pos;
-	s.size = size;
-	s.text = text;
-	debugStrings.emplace_back(s);
-}
-
-void Renderer::DrawLine(const Maths::Vector3& start, const Maths::Vector3& end, const Maths::Vector4& colour) {
-	DebugLine l;
-	l.start = start;
-	l.end = end;
-	l.colour = colour;
-	debugLines.emplace_back(l);
-}
-
-void Renderer::DrawDebugData() {
-	if (debugStrings.empty() && debugLines.empty()) {
-		return; //don't mess with OGL state if there's no point!
-	}
-	rendererAPI->BindShader(debugShader);
-
-	//if (forceValidDebugState) {
-		glEnable(GL_BLEND);
-		glDisable(GL_DEPTH_TEST);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//}
-
-	Matrix4 pMat;
-
-	rendererAPI->BindTexture(font->GetTexture(), "mainTex", 0);
-
-	if (debugLines.size() > 0) {
-		pMat = SetupDebugLineMatrix();
-		rendererAPI->UpdateUniformMatrix4(debugShader, "viewProjMatrix", pMat);
-		rendererAPI->UpdateUniformFloat(debugShader, "useTexture", 0);
-		DrawDebugLines();
-	}
-
-	if (debugStrings.size() > 0) {
-		pMat = SetupDebugStringMatrix();
-		rendererAPI->UpdateUniformMatrix4(debugShader, "viewProjMatrix", pMat);
-		rendererAPI->UpdateUniformFloat(debugShader, "useTexture", 1);
-		DrawDebugStrings();
-	}
-
-	//if (forceValidDebugState) {
-		glDisable(GL_BLEND);
-		glEnable(GL_DEPTH_TEST);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//}
-}
-
-void Renderer::DrawDebugStrings() {
-	vector<Vector3> vertPos;
-	vector<Vector2> vertTex;
-	vector<Vector4> vertColours;
-
-	if (debugStrings.size() > 100) {
-		bool a = true;
-	}
-
-	for (DebugString& s : debugStrings) {
-		font->BuildVerticesForString(s.text, s.pos, s.colour, s.size, vertPos, vertTex, vertColours);
-	}
-
-	debugTextMesh->SetVertexPositions(vertPos);
-	debugTextMesh->SetVertexTextureCoords(vertTex);
-	debugTextMesh->SetVertexColours(vertColours);
-	debugTextMesh->UpdateGPUBuffers(0, vertPos.size());
-
-
-	//BindMesh(debugTextMesh);
-	//DrawBoundMesh();
-	rendererAPI->DrawMesh(debugTextMesh);
-
-	debugStrings.clear();
-}
-
-void Renderer::DrawDebugLines() {
-	vector<Vector3> vertPos;
-	vector<Vector4> vertCol;
-
-	for (DebugLine& s : debugLines) {
-		vertPos.emplace_back(s.start);
-		vertPos.emplace_back(s.end);
-
-		vertCol.emplace_back(s.colour);
-		vertCol.emplace_back(s.colour);
-	}
-
-	debugLinesMesh->SetVertexPositions(vertPos);
-	debugLinesMesh->SetVertexColours(vertCol);
-	debugLinesMesh->UpdateGPUBuffers(0, vertPos.size());
-
-	//BindMesh(debugLinesMesh);
-	//DrawBoundMesh();
-
-	debugLines.clear();
 }
 
 
