@@ -14,7 +14,7 @@ namespace NCL {
 
 		static void DrawAxisLines(const Matrix4 &modelMatrix, float scaleBoost = 1.0f, float time = 0.0f);
 
-		static void SetRendererAPI(RendererAPI* r) {
+		static void SetRenderer(RendererAPI* r) {
 			renderer = r;
 		}
 

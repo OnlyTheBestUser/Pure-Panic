@@ -14,8 +14,14 @@ _-_-_-_-_-_-_-""  ""
 #include "Window.h"
 #include "../Common/Vector3.h"
 #include "../Common/Vector4.h"
+#include "../Common/Matrix4.h"
 namespace NCL {
+	class MeshGeometry;
+
 	namespace Rendering {
+		class ShaderBase;
+		class TextureBase;
+
 		enum class VerticalSyncState {
 			VSync_ON,
 			VSync_OFF,
@@ -36,6 +42,13 @@ namespace NCL {
 			virtual void RenderFrame() = 0;
 			virtual void EndFrame() = 0;
 			virtual void SwapBuffers() = 0;
+
+			// Renderer commands
+			virtual void DrawMesh(MeshGeometry* mesh) = 0;
+			virtual void BindShader(ShaderBase* shader) = 0;
+			virtual void BindTexture(const TextureBase* tex, std::string uniform, int texSlot) = 0;
+			virtual void UpdateUniformFloat(ShaderBase* shader, std::string uniform, float f) = 0;
+			virtual void UpdateUniformMatrix4(ShaderBase* shader, std::string uniform, Maths::Matrix4 matrix) = 0;
 
 			int GetCurrentWidth() { return currentWidth; }
 			int GetCurrentHeight() { return currentHeight; }

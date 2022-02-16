@@ -1,4 +1,7 @@
 #include "MainMenu.h"
+using namespace NCL;
+using namespace CSC8503;
+
 
 void MainMenu::InitWorld()
 {
@@ -10,7 +13,7 @@ void MainMenu::InitWorld()
 
 void MainMenu::UpdateGame(float dt)
 {
-	Debug::SetRendererAPI(renderer->GetRendererAPI());
+	Debug::SetRenderer(renderer->GetRendererAPI());
 
 	renderer->DrawString("Screwball Scramble", Vector2(22, 30), Debug::MAGENTA, 30.0f);
 	renderer->DrawString("Press 1 - Screwball Scramble", Vector2(30, 50), Debug::WHITE, 20.0f);

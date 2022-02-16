@@ -68,7 +68,7 @@ namespace NCL {
 			void UpdateModelShaderMatrices(OGLShader* shader, Matrix4 model, Matrix4 shadow);
 			void UpdateLightUniforms(OGLShader* shader, Vector3 lightPos, Vector4 lightColor, float lightRadius);
 
-			void BindShader(ShaderBase*s);
+
 			void BindTextureToShader(const TextureBase*t, const std::string& uniform, int texUnit) const;
 			void BindMesh(MeshGeometry*m);
 			void DrawBoundMesh(int subLayer = 0, int numInstances = 1);
@@ -78,6 +78,13 @@ namespace NCL {
 			HDC		deviceContext;		//...Device context?
 			HGLRC	renderContext;		//Permanent Rendering Context		
 #endif
+
+
+			void DrawMesh(MeshGeometry* mesh) override;
+			void BindShader(ShaderBase* shader) override;
+			void BindTexture(const TextureBase* tex, std::string uniform, int texSlot) override;
+			void UpdateUniformFloat(ShaderBase* shader, std::string uniform, float f) override;
+			void UpdateUniformMatrix4(ShaderBase* shader, std::string uniform, Maths::Matrix4 matrix) override;
 		private:
 			struct DebugString {
 				Maths::Vector4 colour;

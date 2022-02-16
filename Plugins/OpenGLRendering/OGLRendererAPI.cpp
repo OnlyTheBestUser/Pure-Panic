@@ -112,7 +112,7 @@ void OGLRendererAPI::RenderFrame()		{
 }
 
 void OGLRendererAPI::EndFrame()		{
-	//DrawDebugData();
+	
 }
 
 void OGLRendererAPI::SwapBuffers()   {
@@ -251,6 +251,35 @@ void OGLRendererAPI::BindTextureToShader(const TextureBase*t, const std::string&
 	glBindTexture(GL_TEXTURE_2D, texID);
 
 	glUniform1i(slot, texUnit);
+}
+
+void OGLRendererAPI::DrawMesh(MeshGeometry* mesh) {
+	BindMesh(mesh);
+	DrawBoundMesh();
+}
+
+void OGLRendererAPI::BindTexture(const TextureBase* tex, std::string uniform, int texSlot) {
+	BindTextureToShader(tex, uniform, 0);
+}
+
+void OGLRendererAPI::UpdateUniformFloat(ShaderBase* shader, std::string uniform, float f) {
+	OGLShader* oglShader = dynamic_cast<OGLShader*>(shader);
+	if (!oglShader) {
+		return;
+	}
+
+	int fLoc = glGetUniformLocation(oglShader->GetProgramID(), uniform.c_str());
+	glUniform1i(fLoc, f);
+}
+
+void OGLRendererAPI::UpdateUniformMatrix4(ShaderBase* shader, std::string uniform, Maths::Matrix4 matrix) {
+	OGLShader* oglShader = dynamic_cast<OGLShader*>(shader);
+	if (!oglShader) {
+		return;
+	}
+
+	int matLoc = glGetUniformLocation(oglShader->GetProgramID(), uniform.c_str());
+	glUniformMatrix4fv(matLoc, 1, false, (float*)&matrix);
 }
 
 

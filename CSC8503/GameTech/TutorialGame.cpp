@@ -3,6 +3,7 @@
 #include "../../Plugins/PlayStation4/PS4Mesh.h"
 #include "../../Plugins/PlayStation4/PS4Shader.h"
 #include "../../Plugins/PlayStation4/PS4Texture.h"
+#include "../../Plugins/PlayStation4/InputBase.h"
 #endif
 
 #include "TutorialGame.h"
@@ -15,7 +16,9 @@
 #endif
 #include "../../Common/TextureLoader.h"
 #include "../../Common/Quaternion.h"
-#include "../../Plugins/PlayStation4/InputBase.h"
+
+using namespace NCL;
+using namespace CSC8503;
 
 TutorialGame::TutorialGame()	{
 	world		= new GameWorld();
@@ -31,7 +34,7 @@ TutorialGame::TutorialGame()	{
 
 	state = PLAY;
 
-	Debug::SetRendererAPI(renderer->GetRendererAPI());
+	Debug::SetRenderer(renderer->GetRendererAPI());
 
 	//physics->SetGravity(Vector3(0, 9.8f, 0));
 	//physics->SetLinearDamping(10.0f);
@@ -98,7 +101,7 @@ TutorialGame::~TutorialGame()	{
 }
 
 void TutorialGame::UpdateGame(float dt) {
-	Debug::SetRendererAPI(renderer->GetRendererAPI());
+	Debug::SetRenderer(renderer->GetRendererAPI());
 	switch (state) {
 	case PLAY: UpdateGameWorld(dt); break;
 	case PAUSE: UpdatePauseScreen(dt); break;
@@ -186,7 +189,7 @@ void TutorialGame::UpdateGameWorld(float dt)
 
 		//Debug::DrawAxisLines(lockedObject->GetTransform().GetMatrix(), 2.0f);
 	}
-
+	renderer->DrawString("PAUSED", Vector2(5, 80), Debug::MAGENTA, 30.0f);
 	world->UpdateWorld(dt);
 }
 

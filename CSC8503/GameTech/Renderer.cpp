@@ -9,6 +9,7 @@
 #include "../../Plugins/PlayStation4/PS4Mesh.h"
 using namespace NCL;
 using namespace Rendering;
+using namespace CSC8503;
 
 Renderer::Renderer(GameWorld& world) {
 	gameWorld = world;
@@ -85,40 +86,37 @@ void Renderer::DrawDebugData() {
 	if (debugStrings.empty() && debugLines.empty()) {
 		return; //don't mess with OGL state if there's no point!
 	}
-	//BindShader(debugShader);
+	rendererAPI->BindShader(debugShader);
 
-	/*if (forceValidDebugState) {
+	//if (forceValidDebugState) {
 		glEnable(GL_BLEND);
 		glDisable(GL_DEPTH_TEST);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	}*/
+	//}
 
-	//int matLocation = glGetUniformLocation(debugShader->GetProgramID(), "viewProjMatrix");
 	Matrix4 pMat;
 
-	//BindTextureToShader(font->GetTexture(), "mainTex", 0);
-
-	//GLuint texSlot = glGetUniformLocation(boundShader->programID, "useTexture");
+	rendererAPI->BindTexture(font->GetTexture(), "mainTex", 0);
 
 	if (debugLines.size() > 0) {
-		//pMat = SetupDebugLineMatrix();
-		//glUniformMatrix4fv(matLocation, 1, false, pMat.array);
-		//glUniform1i(texSlot, 0);
+		pMat = SetupDebugLineMatrix();
+		rendererAPI->UpdateUniformMatrix4(debugShader, "viewProjMatrix", pMat);
+		rendererAPI->UpdateUniformFloat(debugShader, "useTexture", 0);
 		DrawDebugLines();
 	}
 
 	if (debugStrings.size() > 0) {
-		//pMat = SetupDebugStringMatrix();
-		//glUniformMatrix4fv(matLocation, 1, false, pMat.array);
-		//glUniform1i(texSlot, 1);
+		pMat = SetupDebugStringMatrix();
+		rendererAPI->UpdateUniformMatrix4(debugShader, "viewProjMatrix", pMat);
+		rendererAPI->UpdateUniformFloat(debugShader, "useTexture", 1);
 		DrawDebugStrings();
 	}
 
-	/*if (forceValidDebugState) {
+	//if (forceValidDebugState) {
 		glDisable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	}*/
+	//}
 }
 
 void Renderer::DrawDebugStrings() {
@@ -142,6 +140,7 @@ void Renderer::DrawDebugStrings() {
 
 	//BindMesh(debugTextMesh);
 	//DrawBoundMesh();
+	rendererAPI->DrawMesh(debugTextMesh);
 
 	debugStrings.clear();
 }

@@ -3,12 +3,13 @@
 
 #include "../../CSC8503/CSC8503Common/GameWorld.h"
 namespace NCL {
-	class SimpleFont;
 	namespace Rendering {
+		class SimpleFont;
+
 		class Renderer
 		{
 		public:
-			Renderer(GameWorld& world);
+			Renderer(CSC8503::GameWorld& world);
 			~Renderer();
 
 			void Update(float dt);
@@ -29,7 +30,7 @@ namespace NCL {
 			void DrawDebugStrings();
 		protected:
 			RendererAPI* rendererAPI;
-			GameWorld gameWorld;
+			CSC8503::GameWorld gameWorld;
 
 		private:
 			struct DebugString {
@@ -45,7 +46,7 @@ namespace NCL {
 				Maths::Vector4 colour;
 			};
 
-			SimpleFont* font;
+			NCL::Rendering::SimpleFont* font;
 			std::vector<DebugString>	debugStrings;
 			std::vector<DebugLine>		debugLines;
 
