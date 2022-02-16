@@ -263,4 +263,47 @@ void	PS4RendererAPI::ClearBuffer(bool colour, bool depth, bool stencil) {
 		SurfaceUtil::clearStencilTarget(*currentGFXContext, &currentPS4Buffer->depthTarget, defaultStencil);
 	}
 }
+
+void PS4RendererAPI::DrawMesh(MeshGeometry* mesh) {
+	//BindMesh(mesh);
+	//DrawBoundMesh();
+}
+
+void PS4RendererAPI::BindShader(ShaderBase* shader) {
+
+}
+
+void PS4RendererAPI::BindTexture(const TextureBase* tex, std::string uniform, int texSlot) {
+	//BindTextureToShader(tex, uniform, 0);
+}
+
+void PS4RendererAPI::UpdateUniformFloat(ShaderBase* shader, std::string uniform, float f) {
+	//PS4Shader* ps4Shader = dynamic_cast<PS4Shader*>(shader);
+	//if (!ps4Shader) {
+	//	return;
+	//}
+
+	//int fLoc = glGetUniformLocation(oglShader->GetProgramID(), uniform.c_str());
+	//glUniform1i(fLoc, f);
+}
+
+void PS4RendererAPI::UpdateUniformMatrix4(ShaderBase* shader, std::string uniform, Maths::Matrix4 matrix) {
+	//PS4Shader* ps4Shader = dynamic_cast<PS4Shader*>(shader);
+	//if (!ps4Shader) {
+	//	return;
+	//}
+
+	//int matLoc = glGetUniformLocation(oglShader->GetProgramID(), uniform.c_str());
+	//glUniformMatrix4fv(matLoc, 1, false, (float*)&matrix);
+}
+
+void PS4RendererAPI::SetDepth(bool d) {
+	//d ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST);
+}
+
+void PS4RendererAPI::SetBlend(bool b) {
+	//b ? glEnable(GL_BLEND) : glDisable(GL_BLEND);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
 #endif

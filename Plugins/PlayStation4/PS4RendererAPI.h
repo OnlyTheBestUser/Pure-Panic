@@ -62,6 +62,15 @@ namespace NCL::PS4 {
 		void	ClearBuffer(bool colour, bool depth, bool stencil);
 		PS4ScreenBuffer* GenerateScreenBuffer(uint width, uint height, bool colour = true, bool depth = true, bool stencil = false);
 
+		//Render commands
+		void DrawMesh(MeshGeometry* mesh) override;
+		void BindShader(ShaderBase* shader) override;
+		void BindTexture(const TextureBase* tex, std::string uniform, int texSlot) override;
+		void UpdateUniformFloat(ShaderBase* shader, std::string uniform, float f) override;
+		void UpdateUniformMatrix4(ShaderBase* shader, std::string uniform, Maths::Matrix4 matrix) override;
+		void SetDepth(bool depth) override;
+		void SetBlend(bool blend) override;
+
 	private:
 		void	InitialiseMemoryAllocators();
 		void	InitialiseVideoSystem();
