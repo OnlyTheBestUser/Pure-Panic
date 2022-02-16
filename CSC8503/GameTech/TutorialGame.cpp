@@ -187,6 +187,8 @@ void TutorialGame::UpdateGameWorld(float dt)
 		world->GetObjectIterators(first, last);
 		for (auto i = first; i != last; i++) {
 			DebugDrawCollider((*i)->GetBoundingVolume(), &(*i)->GetTransform());
+			if ((*i)->GetPhysicsObject() == nullptr)
+				continue;
 			DebugDrawVelocity((*i)->GetPhysicsObject()->GetLinearVelocity(), &(*i)->GetTransform());
 		}
 	}
@@ -200,6 +202,8 @@ void TutorialGame::UpdateGameWorld(float dt)
 
 void TutorialGame::DebugDrawCollider(const CollisionVolume* c, Transform* worldTransform) {
 	Vector4 col = Vector4(1, 0, 0, 1);
+	if (c == nullptr)
+		return;
 	switch (c->type) {
 	case VolumeType::AABB: Debug::DrawCube(worldTransform->GetPosition(), ((AABBVolume*)c)->GetHalfDimensions(), col); break;
 	case VolumeType::OBB: Debug::DrawCube(worldTransform->GetPosition(), ((AABBVolume*)c)->GetHalfDimensions(), Vector4(0, 1, 0, 1), 0, worldTransform->GetOrientation()); break;
@@ -323,16 +327,12 @@ void TutorialGame::InitWorld() {
 	physics->Clear();
 
 	GameObject* floor = AddFloorToWorld(Vector3(0, 0, 0));
+	AddLongWallToWorld(Vector3(255,0,5), Vector3(2, 20, 250), 270, corridorWallStraight, corridorWallAlertTex);
+	AddLongWallToWorld(Vector3(-255,0,5), Vector3(2, 20, 250), 90, corridorWallStraight, corridorWallAlertTex);
+	AddLongWallToWorld(Vector3(5,0,255), Vector3(250, 20, 2), 180, corridorWallStraight, corridorWallAlertTex);
+	AddLongWallToWorld(Vector3(5,0,-255), Vector3(250, 20, 2), 0, corridorWallStraight, corridorWallAlertTex);
 
-	for (int i = -235; i < 240; i += 10)
-	{
-		AddWallToWorld(Vector3(255, 0, i), Vector3(5, 5, 4), 270, corridorWallStraight, corridorWallAlertTex);
-		AddWallToWorld(Vector3(-255, 0, i), Vector3(5, 5, 4), 90, corridorWallStraight, corridorWallAlertTex);
-		AddWallToWorld(Vector3(i, 0, 255), Vector3(5, 5, 4), 180, corridorWallStraight, corridorWallAlertTex);
-		AddWallToWorld(Vector3(i, 0, -255), Vector3(5, 5, 4), 0, corridorWallStraight, corridorWallAlertTex);
-	}
-
-	AddWallToWorld(Vector3(247.5, 0, -250), Vector3(8, 5, 4), 315, corridorWallCorner, corridorWallAlertTex);
+	/*AddWallToWorld(Vector3(247.5, 0, -250), Vector3(8, 5, 4), 315, corridorWallCorner, corridorWallAlertTex);
 	AddWallToWorld(Vector3(247.5, 0, 250), Vector3(8, 5, 4), 225, corridorWallCorner, corridorWallAlertTex); 
 	AddWallToWorld(Vector3(-247.5, 0, -250), Vector3(8, 5, 4), 45, corridorWallCorner, corridorWallAlertTex);
 	AddWallToWorld(Vector3(-247.5, 0, 250), Vector3(8, 5, 4), 135, corridorWallCorner, corridorWallAlertTex);	
@@ -343,13 +343,15 @@ void TutorialGame::InitWorld() {
 
 	AddWallHammerToWorld(Vector3(0, 2, 241), Vector3(10, 10, 6), 180);
 	AddWallHammerToWorld(Vector3(50, 2, 241), Vector3(10, 10, 6), 180);
-	AddWallHammerToWorld(Vector3(-50, 2, 241), Vector3(10, 10, 6), 180);
+	AddWallHammerToWorld(Vector3(-50, 2, 241), Vector3(10, 10, 6), 180);*/
 
-	GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
-	cap1->SetDynamic(true);
+	//InitSphereGridWorld(10, 10, 25, 25, 2);
 
 	Player* player = AddPlayerToWorld(Vector3(0, 5, 0));
 	player->SetDynamic(true);
+
+	GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
+	cap1->SetDynamic(true);
 
 	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
 	player->SetCollisionLayers(CollisionLayer::LAYER_ONE);
@@ -486,6 +488,78 @@ GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimens
 	cube->SetDynamic(dynamic);
 	return cube;
 }
+
+void TutorialGame::AddLongWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, OGLMesh* mesh, OGLTexture* texture) {
+	Vector3 location = position + Vector3(0, 10, 0);
+
+	if (position.x < 0)
+		location += Vector3(5, 0, -5);
+	if (position.x > 0)
+		location += Vector3(-7, 0, -4);
+
+	if (position.z < 0)
+		location += Vector3(1, 0, 10);
+	if (position.z > 0)
+		location += Vector3(1, 0, -2);
+
+	GameObject* mainWall = AddInvisibleWallPartToWorld(location, dimensions, rotation);
+	if (rotation == 90 || rotation == 270)
+	{
+		for (int i = -dimensions.z; i < dimensions.z; i += 10)
+		{
+			AddWallPartToWorld(Vector3(position.x, position.y, position.z + i), Vector3(5, 5, 4), rotation);
+		}
+		return;
+	}
+	if (rotation == 180 || rotation == 0)
+	{
+		for (int i = -dimensions.x; i < dimensions.x; i += 10)
+		{
+			AddWallPartToWorld(Vector3(position.x + i, position.y, position.z), Vector3(5, 5, 4), rotation);
+		}
+		return;
+	}
+	return;
+}
+
+GameObject* TutorialGame::AddInvisibleWallPartToWorld(const Vector3& position, Vector3 dimensions, int rotation) {
+	GameObject* cube = new GameObject();
+	AABBVolume* volume = new AABBVolume(dimensions);
+	cube->SetBoundingVolume((CollisionVolume*)volume);
+
+	cube->GetTransform()
+		.SetPosition(position)
+		.SetScale(dimensions * 2)
+		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
+
+	cube->SetRenderObject(nullptr);
+	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
+
+	cube->GetPhysicsObject()->SetInverseMass(0.0f);
+	cube->GetPhysicsObject()->InitCubeInertia();
+
+	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	cube->SetDynamic(false);
+	world->AddGameObject(cube);
+	return cube;
+}
+
+GameObject* TutorialGame::AddWallPartToWorld(const Vector3& position, Vector3 dimensions, int rotation) {
+	GameObject* cube = new GameObject();
+	cube->SetBoundingVolume(nullptr);
+	
+	cube->GetTransform()
+		.SetPosition(position)
+		.SetScale(dimensions * 2)
+		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
+
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, basicShader));
+	cube->SetPhysicsObject(nullptr);
+
+	cube->SetDynamic(false);
+	world->AddGameObject(cube);
+	return cube;
+}
 GameObject* TutorialGame::AddWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, OGLMesh* mesh, OGLTexture* texture) {
 	GameObject* cube = new GameObject();
 	
@@ -496,7 +570,6 @@ GameObject* TutorialGame::AddWallToWorld(const Vector3& position, Vector3 dimens
 		.SetPosition(position)
 		.SetScale(dimensions * 2)
 		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
-
 
 	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, basicShader));
 	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
@@ -562,7 +635,7 @@ void TutorialGame::InitSphereGridWorld(int numRows, int numCols, float rowSpacin
 	for (int x = 0; x < numCols; ++x) {
 		for (int z = 0; z < numRows; ++z) {
 			Vector3 position = Vector3(x * colSpacing, 10.0f, z * rowSpacing);
-			GameObject* sphere = AddSphereToWorld(position, radius, 10.0f, false, false, true);
+			GameObject* sphere = AddSphereToWorld(position, radius, 10.0f, false, false, false);
 			sphere->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 		}
 	}
