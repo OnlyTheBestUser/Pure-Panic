@@ -293,6 +293,15 @@ void PS4RendererAPI::UpdateUniformMatrix4(ShaderBase* shader, std::string unifor
 	//	return;
 	//}
 
+	Matrix4* modelData = (Matrix4*)currentGFXContext->allocateFromCommandBuffer(sizeof(Matrix4), Gnm::kEmbeddedDataAlignment4);
+	*modelData = matrix;
+
+	Gnm::Buffer constantBuffer;
+	constantBuffer.initAsConstantBuffer(modelData, sizeof(Matrix4));
+	constantBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
+
+	UpdateAllUniform(shader, uniform, buffer);
+
 	//int matLoc = glGetUniformLocation(oglShader->GetProgramID(), uniform.c_str());
 	//glUniformMatrix4fv(matLoc, 1, false, (float*)&matrix);
 }
@@ -304,6 +313,17 @@ void PS4RendererAPI::SetDepth(bool d) {
 void PS4RendererAPI::SetBlend(bool b) {
 	//b ? glEnable(GL_BLEND) : glDisable(GL_BLEND);
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
+void PS4RendererAPI::UpdateAllUniform(PS4Shader* shader, std::string uniform, Gnm::buffer buffer) {
+	int vsIndex = realShader->GetConstantBufferIndex(Gnm::kShaderStageVs, uniform.c_str());
+	if (vsIndex != -1) {
+		currentGFXContext->setConstantBuffers(Gnm::kShaderStageVs, objIndex, 1, &buffer);
+	}
+	int psIndex = realShader->GetConstantBufferIndex(Gnm::kShaderStageVs, uniform.c_str());
+	if (psIndex != -1) {
+		currentGFXContext->setConstantBuffers(Gnm::kShaderStagePs, objIndex, 1, &buffer);
+	}
 }
 
 #endif

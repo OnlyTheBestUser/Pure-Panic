@@ -145,6 +145,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="OGLComputeShader.h" />
+    <ClInclude Include="OGLFrameBuffer.h" />
     <ClInclude Include="OGLMesh.h" />
     <ClInclude Include="OGLRendererAPI.h" />
     <ClInclude Include="OGLShader.h" />
@@ -153,6 +154,7 @@
   <ItemGroup>
     <ClCompile Include="glad.c" />
     <ClCompile Include="OGLComputeShader.cpp" />
+    <ClCompile Include="OGLFrameBuffer.cpp" />
     <ClCompile Include="OGLMesh.cpp" />
     <ClCompile Include="OGLRendererAPI.cpp" />
     <ClCompile Include="OGLShader.cpp" />

@@ -14,15 +14,24 @@ namespace NCL {
 			void Update(float dt) override;
 			void Render() override;
 
-			RendererAPI* GetRendererAPI() { return rendererAPI;}
-
-
+			void BuildObjectList();
+			void SortObjectList();
+			void RenderScene();
 
 			// Debug
 			Maths::Matrix4 SetupDebugLineMatrix() const override;
 			Maths::Matrix4 SetupDebugStringMatrix() const override;
 		protected:
-			CSC8503::GameWorld gameWorld;
+			CSC8503::GameWorld& gameWorld;
+			vector<const RenderObject*> activeObjects;
+
+			ShaderBase* defaultShader;
+			ShaderBase* shadowShader;
+
+			Vector4 lightColour;
+			float lightRadius;
+			Vector3 lightPos;
+			Matrix4 shadowMatrix;
 
 		};
 	}

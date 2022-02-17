@@ -195,6 +195,7 @@
   <ItemGroup>
     <ClCompile Include="Assets.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="FrameBufferBase.cpp" />
     <ClCompile Include="GameTimer.cpp" />
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Maths.cpp" />
@@ -224,6 +225,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Assets.h" />
+    <ClInclude Include="FrameBufferBase.h" />
     <ClInclude Include="GameTimer.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Maths.h" />

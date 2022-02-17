@@ -15,6 +15,7 @@ _-_-_-_-_-_-_-""  ""
 #include "../Common/Vector3.h"
 #include "../Common/Vector4.h"
 #include "../Common/Matrix4.h"
+#include "../Common/FrameBufferBase.h"
 namespace NCL {
 	class MeshGeometry;
 
@@ -47,8 +48,13 @@ namespace NCL {
 			virtual void DrawMesh(MeshGeometry* mesh) = 0;
 			virtual void BindShader(ShaderBase* shader) = 0;
 			virtual void BindTexture(const TextureBase* tex, std::string uniform, int texSlot) = 0;
+			virtual void BindFrameBuffer() = 0;
+			virtual void BindFrameBuffer(const FrameBufferBase* fbo) = 0;
+
 			virtual void UpdateUniformFloat(ShaderBase* shader, std::string uniform, float f) = 0;
+			virtual void UpdateUniformVector3(ShaderBase* shader, std::string uniform, const Maths::Vector3 vec) = 0;
 			virtual void UpdateUniformMatrix4(ShaderBase* shader, std::string uniform, Maths::Matrix4 matrix) = 0;
+
 			virtual void SetDepth(bool depth) = 0;
 			virtual void SetBlend(bool blend) = 0;
 

@@ -10,6 +10,7 @@ https://research.ncl.ac.uk/game/
 #include "OGLShader.h"
 #include "OGLMesh.h"
 #include "OGLTexture.h"
+#include "OGLFrameBuffer.h"
 
 #include "../../Common/SimpleFont.h"
 #include "../../Common/TextureLoader.h"
@@ -257,7 +258,19 @@ void OGLRendererAPI::DrawMesh(MeshGeometry* mesh) {
 }
 
 void OGLRendererAPI::BindTexture(const TextureBase* tex, std::string uniform, int texSlot) {
-	BindTextureToShader(tex, uniform, 0);
+	BindTextureToShader(tex, uniform, texSlot);
+}
+
+void OGLRendererAPI::BindFrameBuffer() {
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void OGLRendererAPI::BindFrameBuffer(const FrameBufferBase* fbo) {
+	const OGLFrameBuffer* oglFbo = dynamic_cast<const OGLFrameBuffer*>(fbo);
+	if (!oglFbo) {
+		return;
+	}
+	glBindFramebuffer(GL_FRAMEBUFFER, oglFbo->GetBufferObject());
 }
 
 void OGLRendererAPI::UpdateUniformFloat(ShaderBase* shader, std::string uniform, float f) {
@@ -268,6 +281,16 @@ void OGLRendererAPI::UpdateUniformFloat(ShaderBase* shader, std::string uniform,
 
 	int fLoc = glGetUniformLocation(oglShader->GetProgramID(), uniform.c_str());
 	glUniform1i(fLoc, f);
+}
+
+void OGLRendererAPI::UpdateUniformVector3(ShaderBase* shader, std::string uniform, const Maths::Vector3 vec) {
+	OGLShader* oglShader = dynamic_cast<OGLShader*>(shader);
+	if (!oglShader) {
+		return;
+	}
+
+	int vecLoc = glGetUniformLocation(oglShader->GetProgramID(), uniform.c_str());
+	glUniform3fv(vecLoc, 1, (float*)&vec);
 }
 
 void OGLRendererAPI::UpdateUniformMatrix4(ShaderBase* shader, std::string uniform, Maths::Matrix4 matrix) {

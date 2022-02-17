@@ -22,7 +22,7 @@ using namespace CSC8503;
 
 TutorialGame::TutorialGame()	{
 	world		= new GameWorld();
-	renderer = new Renderer(*world);
+	renderer	= new Renderer(*world);
 	physics		= new PhysicsSystem(*world);
 	input = NULL;
 

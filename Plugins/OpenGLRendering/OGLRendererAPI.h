@@ -79,7 +79,10 @@ namespace NCL {
 			void DrawMesh(MeshGeometry* mesh) override;
 			void BindShader(ShaderBase* shader) override;
 			void BindTexture(const TextureBase* tex, std::string uniform, int texSlot) override;
+			void BindFrameBuffer() override;
+			void BindFrameBuffer(const FrameBufferBase* fbo) override;
 			void UpdateUniformFloat(ShaderBase* shader, std::string uniform, float f) override;
+			void UpdateUniformVector3(ShaderBase* shader, std::string uniform, const Maths::Vector3 vec) override;
 			void UpdateUniformMatrix4(ShaderBase* shader, std::string uniform, Maths::Matrix4 matrix) override;
 			void SetDepth(bool depth) override;
 			void SetBlend(bool blend) override;

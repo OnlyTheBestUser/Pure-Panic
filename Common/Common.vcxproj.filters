@@ -111,6 +111,9 @@
     <ClCompile Include="RendererAPI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FrameBufferBase.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -193,6 +196,9 @@
     </ClInclude>
     <ClInclude Include="RendererAPI.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameBufferBase.h">
+      <Filter>Rendering</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
