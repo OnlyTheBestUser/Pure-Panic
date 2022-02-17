@@ -30,9 +30,6 @@
     <ClCompile Include="PS4GameRenderer.cpp">
       <Filter>Renderers</Filter>
     </ClCompile>
-    <ClCompile Include="OGLGameRenderer.cpp">
-      <Filter>Renderers</Filter>
-    </ClCompile>
     <ClCompile Include="Renderer.cpp">
       <Filter>Renderers</Filter>
     </ClCompile>
@@ -48,9 +45,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PS4GameRenderer.h">
-      <Filter>Renderers</Filter>
-    </ClInclude>
-    <ClInclude Include="OGLGameRenderer.h">
       <Filter>Renderers</Filter>
     </ClInclude>
     <ClInclude Include="Renderer.h">

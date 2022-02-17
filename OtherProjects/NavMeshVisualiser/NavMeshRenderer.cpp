@@ -168,7 +168,7 @@ void NavMeshRenderer::RenderFrame() {
 
 	BindMesh(navMesh);
 
-	BindTextureToShader(testTex, "testTex", 0);
+	BindTextureToShader(OGLRendererAPI::TextureType::TEXTURE2D, testTex, "testTex", 0);
 
 	DrawBoundMesh();
 

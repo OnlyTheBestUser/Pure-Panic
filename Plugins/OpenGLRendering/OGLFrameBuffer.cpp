@@ -8,6 +8,7 @@ OGLFrameBuffer::OGLFrameBuffer() : FrameBufferBase() {
 }
 
 OGLFrameBuffer::~OGLFrameBuffer() {
+	glDeleteFramebuffers(1, &frameBuffer);
 	delete texObj;
 }
 

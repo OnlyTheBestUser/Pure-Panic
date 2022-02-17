@@ -57,6 +57,11 @@ namespace NCL {
 			void EndFrame()		override;
 			void SwapBuffers()  override;
 
+			enum TextureType {
+				TEXTURE2D,
+				CUBEMAP,
+			};
+
 		protected:			
 
 			void UpdateShaderMatrices(OGLShader* shader, Matrix4 proj, Matrix4 view);
@@ -64,8 +69,7 @@ namespace NCL {
 			void UpdateModelShaderMatrices(OGLShader* shader, Matrix4 model, Matrix4 shadow);
 			void UpdateLightUniforms(OGLShader* shader, Vector3 lightPos, Vector4 lightColor, float lightRadius);
 
-
-			void BindTextureToShader(const TextureBase*t, const std::string& uniform, int texUnit) const;
+			void BindTextureToShader(TextureType type,const TextureBase*t, const std::string& uniform, int texUnit) const;
 			void BindMesh(MeshGeometry*m);
 			void DrawBoundMesh(int subLayer = 0, int numInstances = 1);
 #ifdef _WIN32
@@ -79,12 +83,17 @@ namespace NCL {
 			void DrawMesh(MeshGeometry* mesh) override;
 			void BindShader(ShaderBase* shader) override;
 			void BindTexture(const TextureBase* tex, std::string uniform, int texSlot) override;
+			void BindCubemap(const TextureBase* tex, std::string uniform, int texSlot) override;
 			void BindFrameBuffer() override;
 			void BindFrameBuffer(const FrameBufferBase* fbo) override;
-			void UpdateUniformFloat(ShaderBase* shader, std::string uniform, float f) override;
+
+			void UpdateUniformInt(ShaderBase* shader, std::string uniform, const int f) override;
+			void UpdateUniformFloat(ShaderBase* shader, std::string uniform, const float f) override;
 			void UpdateUniformVector3(ShaderBase* shader, std::string uniform, const Maths::Vector3 vec) override;
-			void UpdateUniformMatrix4(ShaderBase* shader, std::string uniform, Maths::Matrix4 matrix) override;
+			void UpdateUniformVector4(ShaderBase* shader, std::string uniform, const Maths::Vector4 vec) override;
+			void UpdateUniformMatrix4(ShaderBase* shader, std::string uniform, const Maths::Matrix4 matrix) override;
 			void SetDepth(bool depth) override;
+
 			void SetBlend(bool blend) override;
 		private:
 			struct DebugString {

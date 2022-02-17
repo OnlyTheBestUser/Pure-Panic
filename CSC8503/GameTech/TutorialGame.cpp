@@ -12,7 +12,6 @@
 #include "../../Plugins/OpenGLRendering/OGLMesh.h"
 #include "../../Plugins/OpenGLRendering/OGLShader.h"
 #include "../../Plugins/OpenGLRendering/OGLTexture.h"
-#include "OGLGameRenderer.h"
 #endif
 #include "../../Common/TextureLoader.h"
 #include "../../Common/Quaternion.h"

@@ -18,6 +18,8 @@ namespace NCL {
 			void SortObjectList();
 			void RenderScene();
 
+			void LoadSkybox();
+
 			// Debug
 			Maths::Matrix4 SetupDebugLineMatrix() const override;
 			Maths::Matrix4 SetupDebugStringMatrix() const override;
@@ -26,7 +28,13 @@ namespace NCL {
 			vector<const RenderObject*> activeObjects;
 
 			ShaderBase* defaultShader;
+
+			FrameBufferBase* shadowFBO;
 			ShaderBase* shadowShader;
+
+			ShaderBase* skyboxShader;
+			MeshGeometry* skyboxMesh;
+			TextureBase* skyboxTex;
 
 			Vector4 lightColour;
 			float lightRadius;

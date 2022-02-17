@@ -1,5 +1,4 @@
 #pragma once
-#include "OGLGameRenderer.h"
 #include "TutorialGame.h"
 
 namespace NCL {

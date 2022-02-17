@@ -1,6 +1,6 @@
 #include "PS4GameRenderer.h"
 #include "RendererBase.h"
-#include "OGLGameRenderer.h"
+#include "../../Plugins/OpenGLRendering/OGLRendererAPI.h"
 
 #include "../../Common/SimpleFont.h"
 #include "../../Common/TextureLoader.h"
@@ -9,10 +9,9 @@
 #include "../../Plugins/PlayStation4/PS4Mesh.h"
 using namespace NCL;
 using namespace Rendering;
-using namespace CSC8503;
 
 RendererBase::RendererBase() {
-	forceValidDebugState = false;
+	forceValidDebugState = true;
 }
 
 RendererBase::~RendererBase() {

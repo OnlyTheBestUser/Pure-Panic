@@ -228,7 +228,7 @@ void OGLRendererAPI::DrawBoundMesh(int subLayer, int numInstances) {
 	}
 }
 
-void OGLRendererAPI::BindTextureToShader(const TextureBase*t, const std::string& uniform, int texUnit) const{
+void OGLRendererAPI::BindTextureToShader(TextureType type, const TextureBase*t, const std::string& uniform, int texUnit) const{
 	GLint texID = 0;
 
 	if (!boundShader) {
@@ -247,7 +247,17 @@ void OGLRendererAPI::BindTextureToShader(const TextureBase*t, const std::string&
 	}
 
 	glActiveTexture(GL_TEXTURE0 + texUnit);
-	glBindTexture(GL_TEXTURE_2D, texID);
+	switch (type)
+	{
+	default:
+		break;
+	case TextureType::TEXTURE2D:
+		glBindTexture(GL_TEXTURE_2D, texID);
+		break;
+	case TextureType::CUBEMAP:
+		glBindTexture(GL_TEXTURE_CUBE_MAP, texID);
+		break;
+	}
 
 	glUniform1i(slot, texUnit);
 }
@@ -258,7 +268,11 @@ void OGLRendererAPI::DrawMesh(MeshGeometry* mesh) {
 }
 
 void OGLRendererAPI::BindTexture(const TextureBase* tex, std::string uniform, int texSlot) {
-	BindTextureToShader(tex, uniform, texSlot);
+	BindTextureToShader(TextureType::TEXTURE2D, tex, uniform, texSlot);
+}
+
+void OGLRendererAPI::BindCubemap(const TextureBase* tex, std::string uniform, int texSlot) {
+	BindTextureToShader(TextureType::CUBEMAP, tex, uniform, texSlot);
 }
 
 void OGLRendererAPI::BindFrameBuffer() {
@@ -273,7 +287,17 @@ void OGLRendererAPI::BindFrameBuffer(const FrameBufferBase* fbo) {
 	glBindFramebuffer(GL_FRAMEBUFFER, oglFbo->GetBufferObject());
 }
 
-void OGLRendererAPI::UpdateUniformFloat(ShaderBase* shader, std::string uniform, float f) {
+void OGLRendererAPI::UpdateUniformInt(ShaderBase* shader, std::string uniform, const int i) {
+	OGLShader* oglShader = dynamic_cast<OGLShader*>(shader);
+	if (!oglShader) {
+		return;
+	}
+
+	int fLoc = glGetUniformLocation(oglShader->GetProgramID(), uniform.c_str());
+	glUniform1i(fLoc, i);
+}
+
+void OGLRendererAPI::UpdateUniformFloat(ShaderBase* shader, std::string uniform, const float f) {
 	OGLShader* oglShader = dynamic_cast<OGLShader*>(shader);
 	if (!oglShader) {
 		return;
@@ -293,7 +317,17 @@ void OGLRendererAPI::UpdateUniformVector3(ShaderBase* shader, std::string unifor
 	glUniform3fv(vecLoc, 1, (float*)&vec);
 }
 
-void OGLRendererAPI::UpdateUniformMatrix4(ShaderBase* shader, std::string uniform, Maths::Matrix4 matrix) {
+void OGLRendererAPI::UpdateUniformVector4(ShaderBase* shader, std::string uniform, const Maths::Vector4 vec) {
+	OGLShader* oglShader = dynamic_cast<OGLShader*>(shader);
+	if (!oglShader) {
+		return;
+	}
+
+	int vecLoc = glGetUniformLocation(oglShader->GetProgramID(), uniform.c_str());
+	glUniform4fv(vecLoc, 1, (float*)&vec);
+}
+
+void OGLRendererAPI::UpdateUniformMatrix4(ShaderBase* shader, std::string uniform, const Maths::Matrix4 matrix) {
 	OGLShader* oglShader = dynamic_cast<OGLShader*>(shader);
 	if (!oglShader) {
 		return;

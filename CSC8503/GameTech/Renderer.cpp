@@ -1,7 +1,10 @@
 #include "PS4GameRenderer.h"
 #include "Renderer.h"
-#include "OGLGameRenderer.h"
+#include "../../Plugins/OpenGLRendering/OGLRendererAPI.h"
 #include "../../Plugins/OpenGLRendering/OGLFrameBuffer.h"
+#include "../../Plugins/OpenGLRendering/OGLShader.h"
+#include "../../Plugins/OpenGLRendering/OGLMesh.h"
+#include "../../Plugins/OpenGLRendering/OGLTexture.h"
 
 #include "../../Common/SimpleFont.h"
 #include "../../Common/TextureLoader.h"
@@ -33,6 +36,18 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 
 	shadowShader = new OGLShader("GameTechShadowVert.glsl", "GameTechShadowFrag.glsl");
 
+	//Skybox!
+	skyboxShader = new OGLShader("skyboxVertex.glsl", "skyboxFragment.glsl");
+	skyboxMesh = new OGLMesh();
+	skyboxMesh->SetVertexPositions({ Vector3(-1, 1,-1), Vector3(-1,-1,-1) , Vector3(1,-1,-1) , Vector3(1,1,-1) });
+	skyboxMesh->SetVertexIndices({ 0,1,2,2,3,0 });
+	skyboxMesh->UploadToGPU();
+
+	LoadSkybox();
+
+	shadowFBO = new OGLFrameBuffer();
+	shadowFBO->AddTexture();
+
 	TextureLoader::RegisterAPILoadFunction(OGLTexture::RGBATextureFromFilename);
 #endif
 #ifdef _ORBIS
@@ -57,6 +72,58 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 Renderer::~Renderer() {
 	delete rendererAPI;
 	delete font;
+
+	delete defaultShader;
+
+	delete shadowFBO;
+	delete shadowShader;
+
+	delete skyboxShader;
+	delete skyboxMesh;
+	delete skyboxTex;
+}
+
+void Renderer::LoadSkybox() {
+	GLuint tex;
+	string filenames[6] = {
+		"/Cubemap/skyrender0004.png",
+		"/Cubemap/skyrender0001.png",
+		"/Cubemap/skyrender0003.png",
+		"/Cubemap/skyrender0006.png",
+		"/Cubemap/skyrender0002.png",
+		"/Cubemap/skyrender0005.png"
+	};
+
+	int width[6] = { 0 };
+	int height[6] = { 0 };
+	int channels[6] = { 0 };
+	int flags[6] = { 0 };
+
+	vector<char*> texData(6, nullptr);
+
+	for (int i = 0; i < 6; ++i) {
+		TextureLoader::LoadTexture(filenames[i], texData[i], width[i], height[i], channels[i], flags[i]);
+		if (i > 0 && (width[i] != width[0] || height[0] != height[0])) {
+			std::cout << __FUNCTION__ << " cubemap input textures don't match in size?\n";
+			return;
+		}
+	}
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
+
+	GLenum type = channels[0] == 4 ? GL_RGBA : GL_RGB;
+
+	for (int i = 0; i < 6; ++i) {
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width[i], height[i], 0, type, GL_UNSIGNED_BYTE, texData[i]);
+	}
+
+	glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	delete skyboxTex;
+	skyboxTex = new OGLTexture(tex);
 }
 
 void Renderer::Update(float dt) {
@@ -65,11 +132,13 @@ void Renderer::Update(float dt) {
 
 void Renderer::Render() {
 	rendererAPI->BeginFrame();
-
+	glEnable(GL_CULL_FACE);
+	glClearColor(1, 1, 1, 1);
 	BuildObjectList();
 	SortObjectList();
 	RenderScene();
 	rendererAPI->RenderFrame();
+	glDisable(GL_CULL_FACE);
 
 	rendererAPI->EndFrame();
 	DrawDebugData();
@@ -97,12 +166,8 @@ void Renderer::SortObjectList() {
 
 void Renderer::RenderScene() {
 // Render Shadow Map
-#ifdef _WIN64
-	OGLFrameBuffer shadowFBO;
-	shadowFBO.AddTexture();
-#endif
 
-	rendererAPI->BindFrameBuffer(&shadowFBO);
+	rendererAPI->BindFrameBuffer(shadowFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 	glViewport(0, 0, 4096, 4096);
@@ -128,11 +193,33 @@ void Renderer::RenderScene() {
 	rendererAPI->BindFrameBuffer();
 	glCullFace(GL_BACK);
 
-// Render Scene
+// Render skybox
+ 	glDisable(GL_CULL_FACE);
+	glDisable(GL_BLEND);
+	glDisable(GL_DEPTH_TEST);
 
 	float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
 	Matrix4 viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
 	Matrix4 projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);
+
+	rendererAPI->BindShader(skyboxShader);
+
+	rendererAPI->UpdateUniformMatrix4(skyboxShader, "projMatrix", projMatrix);
+	rendererAPI->UpdateUniformMatrix4(skyboxShader, "viewMatrix", viewMatrix);
+
+	rendererAPI->BindCubemap(skyboxTex, "cubeTex", 0);
+
+	rendererAPI->DrawMesh(skyboxMesh);
+
+
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
+// Render Scene
+
+	/*float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
+	Matrix4 viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
+	Matrix4 projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);*/
 
 	for (const auto& i : activeObjects) {
 		ShaderBase* shader = (*i).GetShader();
@@ -144,12 +231,22 @@ void Renderer::RenderScene() {
 		rendererAPI->UpdateUniformMatrix4(shader, "viewMatrix", viewMatrix);
 		rendererAPI->UpdateUniformVector3(shader, "cameraPos", gameWorld.GetMainCamera()->GetPosition());
 
-		rendererAPI->BindTexture(shadowFBO.GetTexture(), "shadowTex", 1);
+		rendererAPI->UpdateUniformVector4(shader, "lightColour", lightColour);
+		rendererAPI->UpdateUniformVector3(shader, "lightPos", lightPos);
+		rendererAPI->UpdateUniformFloat(shader, "lightRadius", lightRadius);
+
+		rendererAPI->BindTexture(shadowFBO->GetTexture(), "shadowTex", 1);
 
 		Matrix4 modelMatrix = (*i).GetTransform()->GetMatrix();
 		Matrix4 fullShadowMat = shadowMatrix * modelMatrix;
 		rendererAPI->UpdateUniformMatrix4(shader, "modelMatrix", modelMatrix);
 		rendererAPI->UpdateUniformMatrix4(shader, "shadowMatrix", fullShadowMat);
+
+		rendererAPI->UpdateUniformVector4(shader, "objectColour", i->GetColour());
+		rendererAPI->UpdateUniformInt(shader, "hasVertexColours", !(*i).GetMesh()->GetColourData().empty());
+		rendererAPI->UpdateUniformInt(shader, "hasTexture", (OGLTexture*)(*i).GetDefaultTexture() ? 1 : 0);
+
+
 
 
 		rendererAPI->DrawMesh((*i).GetMesh());
