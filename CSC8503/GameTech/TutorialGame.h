@@ -60,8 +60,10 @@ namespace NCL {
 			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, bool OBB = false, float inverseMass = 10.0f, int layer = 1, bool isTrigger = false, bool dynamic = false);
 			void AddLongWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, OGLMesh* mesh, OGLTexture* texture);
 			GameObject* AddInvisibleWallPartToWorld(const Vector3& position, Vector3 dimensions, int rotation);
-			GameObject* AddWallPartToWorld(const Vector3& position, Vector3 dimensions, int rotation);
-			GameObject* AddWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, OGLMesh* mesh, OGLTexture* texture);
+			GameObject* AddWallPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, OGLMesh* mesh, OGLTexture* texture);
+			GameObject* AddWallToWorld(const Vector3& position, Vector3 dimensions, int rotation);
+			GameObject* AddOBBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation);
+			void AddCornerWallToWorld(const Vector3& position, Vector3 dimensions, int rotation);
 			GameObject* AddSecurityCameraToWorld(const Vector3& position, Vector3 dimensions, int rotation);
 			GameObject* AddWallHammerToWorld(const Vector3& position, Vector3 dimensions, int rotation);
 			
