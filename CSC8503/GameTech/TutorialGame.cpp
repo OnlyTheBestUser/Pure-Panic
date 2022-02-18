@@ -63,6 +63,8 @@ TutorialGame::TutorialGame()	{
 			
 	*/
 
+	// Character movement Go to Line 354
+
 	inputHandler = new InputHandler();
 
 	Command* toggleGrav = new ToggleGravityCommand(physics);
@@ -348,6 +350,16 @@ void TutorialGame::InitWorld() {
 
 	Player* player = AddPlayerToWorld(Vector3(0, 5, 0));
 	player->SetDynamic(true);
+
+	Command* f = new MoveForwardCommand(player);
+	Command* b = new MoveBackwardCommand(player);
+	Command* l = new MoveLeftCommand(player);
+	Command* r = new MoveRightCommand(player);
+	inputHandler->BindButtonW(f);
+	inputHandler->BindButtonS(b);
+	inputHandler->BindButtonA(l);
+	inputHandler->BindButtonD(r);
+
 
 	GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
 	cap1->SetDynamic(true);
@@ -759,15 +771,6 @@ Player* TutorialGame::AddPlayerToWorld(const Vector3& position) {
 	character->GetPhysicsObject()->InitSphereInertia();
 
 	world->AddGameObject(character);
-
-	Command* f = new MoveForwardCommand(character);
-	Command* b = new MoveBackwardCommand(character);
-	Command* l = new MoveLeftCommand(character);
-	Command* r = new MoveRightCommand(character);
-	inputHandler->BindButtonW(f);
-	inputHandler->BindButtonS(b);
-	inputHandler->BindButtonA(l);
-	inputHandler->BindButtonD(r);
 
 	return character;
 }
