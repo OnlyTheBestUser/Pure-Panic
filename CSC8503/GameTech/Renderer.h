@@ -25,8 +25,6 @@ namespace NCL {
 			CSC8503::GameWorld& gameWorld;
 			vector<const RenderObject*> activeObjects;
 
-			ShaderBase* defaultShader;
-
 			FrameBufferBase* shadowFBO;
 			ShaderBase* shadowShader;
 

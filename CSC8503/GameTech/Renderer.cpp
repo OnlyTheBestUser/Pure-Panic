@@ -16,8 +16,31 @@ using namespace Rendering;
 using namespace CSC8503;
 
 Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
+
 #ifdef _WIN64
 	rendererAPI = new OGLRendererAPI(*Window::GetWindow());
+
+	font = new SimpleFont("PressStart2P.fnt", "PressStart2P.png");
+
+	if (rendererAPI->GetInitState()) {
+		TextureLoader::RegisterAPILoadFunction(OGLTexture::RGBATextureFromFilename);
+
+		font = new SimpleFont("PressStart2P.fnt", "PressStart2P.png");
+
+		OGLTexture* t = (OGLTexture*)font->GetTexture();
+
+		if (t) {
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, t->GetObjectID());
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+		debugShader = new OGLShader("debugVert.glsl", "debugFrag.glsl");
+	}
+	ForceValidDebugState(false);
+
 	debugLinesMesh = new OGLMesh();
 	debugTextMesh = new OGLMesh();
 
@@ -32,9 +55,15 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 	debugLinesMesh->UploadToGPU();
 
 	debugLinesMesh->SetPrimitiveType(GeometryPrimitive::Lines);
-	debugShader = new OGLShader("debugVert.glsl", "debugFrag.glsl");
+
 
 	shadowShader = new OGLShader("GameTechShadowVert.glsl", "GameTechShadowFrag.glsl");
+
+	shadowFBO = new OGLFrameBuffer();
+	shadowFBO->AddTexture();
+
+	rendererAPI->SetDepth(true);
+	rendererAPI->SetClearColour(1, 1, 1, 1);
 
 	//Skybox!
 	skyboxShader = new OGLShader("skyboxVertex.glsl", "skyboxFragment.glsl");
@@ -42,6 +71,7 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 	skyboxMesh->SetVertexPositions({ Vector3(-1, 1,-1), Vector3(-1,-1,-1) , Vector3(1,-1,-1) , Vector3(1,1,-1) });
 	skyboxMesh->SetVertexIndices({ 0,1,2,2,3,0 });
 	skyboxMesh->UploadToGPU();
+
 
 	skyboxTex = OGLTexture::RGBATextureCubemapFromFilename(
 		"/Cubemap/skyrender0004.png",
@@ -51,11 +81,6 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 		"/Cubemap/skyrender0002.png",
 		"/Cubemap/skyrender0005.png"
 	);
-
-	shadowFBO = new OGLFrameBuffer();
-	shadowFBO->AddTexture();
-
-	TextureLoader::RegisterAPILoadFunction(OGLTexture::RGBATextureFromFilename);
 #endif
 #ifdef _ORBIS
 	rendererAPI = new PS4::PS4GameRenderer(world);
@@ -69,7 +94,6 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 	debugLinesMesh->SetPrimitiveType(GeometryPrimitive::Lines);
 #endif
 
-	font = new SimpleFont("PressStart2P.fnt", "PressStart2P.png");
 	//Set up the light properties
 	lightColour = Vector4(0.8f, 0.8f, 0.5f, 1.0f);
 	lightRadius = 1000.0f;
@@ -79,8 +103,6 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 Renderer::~Renderer() {
 	delete rendererAPI;
 	delete font;
-
-	delete defaultShader;
 
 	delete shadowFBO;
 	delete shadowShader;
@@ -96,16 +118,16 @@ void Renderer::Update(float dt) {
 
 void Renderer::Render() {
 	rendererAPI->BeginFrame();
+
 	rendererAPI->SetCullFace(true);
 	rendererAPI->SetClearColour(1, 1, 1, 1);
 	BuildObjectList();
 	SortObjectList();
 	RenderScene();
-	rendererAPI->RenderFrame();
 	rendererAPI->SetCullFace(false);
 
 	rendererAPI->EndFrame();
-	DrawDebugData();
+	//DrawDebugData();
 	rendererAPI->SwapBuffers();
 }
 
@@ -150,7 +172,8 @@ void Renderer::RenderScene() {
 		Matrix4 modelMatrix = (*i).GetTransform()->GetMatrix();
 		Matrix4 mvpMatrix = mvMatrix * modelMatrix;
 		rendererAPI->UpdateUniformMatrix4(shadowShader, "mvpMatrix", mvpMatrix);
-		rendererAPI->DrawMesh((*i).GetMesh());
+
+		rendererAPI->DrawMeshAndSubMesh((*i).GetMesh());
 	}
 	rendererAPI->SetViewportSize(rendererAPI->GetCurrentWidth(), rendererAPI->GetCurrentHeight());
 	rendererAPI->SetColourMask(true, true, true, true);
@@ -175,7 +198,6 @@ void Renderer::RenderScene() {
 
 	rendererAPI->DrawMesh(skyboxMesh);
 
-
 	rendererAPI->SetCullFace(true);
 	rendererAPI->SetBlend(true);
 	rendererAPI->SetDepth(true);
@@ -187,10 +209,12 @@ void Renderer::RenderScene() {
 	Matrix4 projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);*/
 
 	for (const auto& i : activeObjects) {
+
 		ShaderBase* shader = (*i).GetShader();
 		rendererAPI->BindShader(shader);
+		
 
-		rendererAPI->BindTexture((OGLTexture*)(*i).GetDefaultTexture(), "mainTex", 0);
+		rendererAPI->BindTexture((*i).GetDefaultTexture(), "mainTex", 0);
 
 		rendererAPI->UpdateUniformMatrix4(shader, "projMatrix", projMatrix);
 		rendererAPI->UpdateUniformMatrix4(shader, "viewMatrix", viewMatrix);
@@ -201,7 +225,7 @@ void Renderer::RenderScene() {
 		rendererAPI->UpdateUniformFloat(shader, "lightRadius", lightRadius);
 
 		rendererAPI->BindTexture(shadowFBO->GetTexture(), "shadowTex", 1);
-
+		
 		Matrix4 modelMatrix = (*i).GetTransform()->GetMatrix();
 		Matrix4 fullShadowMat = shadowMatrix * modelMatrix;
 		rendererAPI->UpdateUniformMatrix4(shader, "modelMatrix", modelMatrix);
@@ -211,7 +235,7 @@ void Renderer::RenderScene() {
 		rendererAPI->UpdateUniformInt(shader, "hasVertexColours", !(*i).GetMesh()->GetColourData().empty());
 		rendererAPI->UpdateUniformInt(shader, "hasTexture", (OGLTexture*)(*i).GetDefaultTexture() ? 1 : 0);
 
-		rendererAPI->DrawMesh((*i).GetMesh());
+		rendererAPI->DrawMeshAndSubMesh((*i).GetMesh());
 	}
 
 

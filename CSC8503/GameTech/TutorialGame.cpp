@@ -370,8 +370,8 @@ void TutorialGame::InitWorld() {
 	physics->Clear();
 
 	GameObject* floor = AddFloorToWorld(Vector3(0, 0, 0));
-	AddLongWallToWorld(Vector3(255,0,5), Vector3(2, 20, 250), 270, corridorWallStraight, corridorWallAlertTex);
-	AddLongWallToWorld(Vector3(-255,0,5), Vector3(2, 20, 250), 90, corridorWallStraight, corridorWallAlertTex);
+	/*AddLongWallToWorld(Vector3(255, 0, 5), Vector3(2, 20, 250), 270, corridorWallStraight, corridorWallAlertTex);
+	AddLongWallToWorld(Vector3(-255, 0, 5), Vector3(2, 20, 250), 90, corridorWallStraight, corridorWallAlertTex);
 	AddLongWallToWorld(Vector3(5,0,255), Vector3(250, 20, 2), 180, corridorWallStraight, corridorWallAlertTex);
 	AddLongWallToWorld(Vector3(5,0,-255), Vector3(250, 20, 2), 0, corridorWallStraight, corridorWallAlertTex);
 
@@ -385,16 +385,16 @@ void TutorialGame::InitWorld() {
 
 	/*AddWallHammerToWorld(Vector3(0, 2, 241), Vector3(10, 10, 6), 180);
 	AddWallHammerToWorld(Vector3(50, 2, 241), Vector3(10, 10, 6), 180);
-	AddWallHammerToWorld(Vector3(-50, 2, 241), Vector3(10, 10, 6), 180);*/
+	AddWallHammerToWorld(Vector3(-50, 2, 241), Vector3(10, 10, 6), 180);
 
 	//InitSphereGridWorld(10, 10, 25, 25, 2);
-
+	*/
 	Player* player = AddPlayerToWorld(Vector3(0, 5, 0));
 	player->SetDynamic(true);
 
 	GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
 	cap1->SetDynamic(true);
-
+	
 	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
 	player->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	player1 = player;

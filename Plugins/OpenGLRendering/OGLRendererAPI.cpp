@@ -246,6 +246,7 @@ void OGLRendererAPI::BindTextureToShader(TextureType type, const TextureBase*t, 
 		texID = oglTexture->GetObjectID();
 	}
 
+	glUniform1i(slot, texUnit);
 	glActiveTexture(GL_TEXTURE0 + texUnit);
 	switch (type)
 	{
@@ -259,12 +260,19 @@ void OGLRendererAPI::BindTextureToShader(TextureType type, const TextureBase*t, 
 		break;
 	}
 
-	glUniform1i(slot, texUnit);
 }
 
 void OGLRendererAPI::DrawMesh(MeshGeometry* mesh) {
 	BindMesh(mesh);
 	DrawBoundMesh();
+}
+
+void OGLRendererAPI::DrawMeshAndSubMesh(MeshGeometry* mesh) {
+	BindMesh(mesh);
+	int layerCount = mesh->GetSubMeshCount();
+	for (int i = 0; i < layerCount; ++i) {
+		DrawBoundMesh(i);
+	}
 }
 
 void OGLRendererAPI::BindTexture(const TextureBase* tex, std::string uniform, int texSlot) {
@@ -343,7 +351,6 @@ void OGLRendererAPI::SetDepth(bool d) {
 
 void OGLRendererAPI::SetBlend(bool b) {
 	b ? glEnable(GL_BLEND) : glDisable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void OGLRendererAPI::SetCullFace(bool b) {

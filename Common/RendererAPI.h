@@ -46,6 +46,7 @@ namespace NCL {
 
 			// Renderer commands
 			virtual void DrawMesh(MeshGeometry* mesh) = 0;
+			virtual void DrawMeshAndSubMesh(MeshGeometry* mesh) = 0;
 
 			virtual void BindShader(ShaderBase* shader) = 0;
 			virtual void BindTexture(const TextureBase* tex, std::string uniform, int texSlot) = 0;
@@ -79,6 +80,8 @@ namespace NCL {
 			int GetCurrentWidth() { return currentWidth; }
 			int GetCurrentHeight() { return currentHeight; }
 
+			bool GetInitState() { return initState; }
+
 		protected:
 			virtual void OnWindowResize(int w, int h) = 0;
 			virtual void OnWindowDetach() {}; //Most renderers won't care about this
@@ -87,6 +90,8 @@ namespace NCL {
 
 			int currentWidth;
 			int currentHeight;
+
+			bool initState;
 		};
 	}
 }

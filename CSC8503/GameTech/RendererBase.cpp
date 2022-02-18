@@ -11,7 +11,7 @@ using namespace NCL;
 using namespace Rendering;
 
 RendererBase::RendererBase() {
-	forceValidDebugState = true;
+	
 }
 
 RendererBase::~RendererBase() {

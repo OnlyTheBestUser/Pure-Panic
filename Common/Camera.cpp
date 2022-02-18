@@ -25,7 +25,8 @@ void Camera::UpdateCamera(float dt) {
 		yaw -= 360.0f;
 	}
 	float frameSpeed = 100 * dt;
-	/*
+	
+	// TODO Remove Input Code
 	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::UP)) {
 		position += Matrix4::Rotation(yaw, Vector3(0, 1, 0)) * Vector3(0, 0, -1) * frameSpeed;
 	}
@@ -44,7 +45,7 @@ void Camera::UpdateCamera(float dt) {
 	}
 	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::SHIFT)) {
 		position.y -= frameSpeed;
-	}*/
+	}
 }
 /*
 Generates a view matrix for the camera's viewpoint. This matrix can be sent

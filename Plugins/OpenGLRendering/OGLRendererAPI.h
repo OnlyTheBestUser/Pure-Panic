@@ -81,6 +81,8 @@ namespace NCL {
 
 
 			void DrawMesh(MeshGeometry* mesh) override;
+			void DrawMeshAndSubMesh(MeshGeometry* mesh) override;
+
 			void BindShader(ShaderBase* shader) override;
 			void BindTexture(const TextureBase* tex, std::string uniform, int texSlot) override;
 			void BindCubemap(const TextureBase* tex, std::string uniform, int texSlot) override;
@@ -120,8 +122,6 @@ namespace NCL {
 
 			OGLMesh*	boundMesh;
 			OGLShader*	boundShader;
-
-			bool initState;
 		};
 	}
 }
