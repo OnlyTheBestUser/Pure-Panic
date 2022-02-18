@@ -337,11 +337,10 @@ void TutorialGame::InitWorld() {
 	AddCornerWallToWorld(Vector3(247.5, 0, 250), Vector3(8, 5, 4), 225);
 	AddCornerWallToWorld(Vector3(247.5, 0, -250), Vector3(8, 5, 4), 315);
 
-	/*AddSecurityCameraToWorld(Vector3(237.5, 4, 237.5), Vector3(5, 5, 5), 225);
-	AddSecurityCameraToWorld(Vector3(25, 4, 240), Vector3(5, 5, 5), 180);
-	AddSecurityCameraToWorld(Vector3(-25, 4, 240), Vector3(5, 5, 5), 180);
+	AddSecurityCameraToWorld(Vector3(25, 4, 240), 180);
+	AddSecurityCameraToWorld(Vector3(-25, 4, 240), 180);
 
-	AddWallHammerToWorld(Vector3(0, 2, 241), Vector3(10, 10, 6), 180);
+	/*AddWallHammerToWorld(Vector3(0, 2, 241), Vector3(10, 10, 6), 180);
 	AddWallHammerToWorld(Vector3(50, 2, 241), Vector3(10, 10, 6), 180);
 	AddWallHammerToWorld(Vector3(-50, 2, 241), Vector3(10, 10, 6), 180);*/
 
@@ -502,12 +501,12 @@ void TutorialGame::AddLongWallToWorld(const Vector3& position, Vector3 dimension
 	if (position.z > 0)
 		location += Vector3(1, 0, -2);
 
-	GameObject* mainWall = AddInvisibleWallPartToWorld(location, dimensions, rotation);
+	GameObject* mainWall = AddAABBWallToWorld(location, dimensions, rotation);
 	if (rotation == 90 || rotation == 270)
 	{
 		for (int i = -dimensions.z; i < dimensions.z; i += 10)
 		{
-			AddWallPartToWorld(Vector3(position.x, position.y, position.z + i), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallAlertTex);
+			AddRenderPartToWorld(Vector3(position.x, position.y, position.z + i), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallAlertTex);
 		}
 		return;
 	}
@@ -515,13 +514,13 @@ void TutorialGame::AddLongWallToWorld(const Vector3& position, Vector3 dimension
 	{
 		for (int i = -dimensions.x; i < dimensions.x; i += 10)
 		{
-			AddWallPartToWorld(Vector3(position.x + i, position.y, position.z), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallAlertTex);
+			AddRenderPartToWorld(Vector3(position.x + i, position.y, position.z), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallAlertTex);
 		}
 		return;
 	}
 	return;
 }
-GameObject* TutorialGame::AddInvisibleWallPartToWorld(const Vector3& position, Vector3 dimensions, int rotation) {
+GameObject* TutorialGame::AddAABBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation) {
 	GameObject* cube = new GameObject();
 	AABBVolume* volume = new AABBVolume(dimensions);
 	cube->SetBoundingVolume((CollisionVolume*)volume);
@@ -542,7 +541,7 @@ GameObject* TutorialGame::AddInvisibleWallPartToWorld(const Vector3& position, V
 	world->AddGameObject(cube);
 	return cube;
 }
-GameObject* TutorialGame::AddWallPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, OGLMesh* mesh, OGLTexture* texture) {
+GameObject* TutorialGame::AddRenderPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, OGLMesh* mesh, OGLTexture* texture) {
 	GameObject* cube = new GameObject();
 	cube->SetBoundingVolume(nullptr);
 	
@@ -616,34 +615,39 @@ void TutorialGame::AddCornerWallToWorld(const Vector3& position, Vector3 dimensi
 		location += Vector3(-3, 0, 3);
 
 	GameObject* mainWall = AddOBBWallToWorld(location, dimensions, rotation);
-	AddWallPartToWorld(position, dimensions, rotation, corridorWallCorner, corridorWallAlertTex);
+	AddRenderPartToWorld(position, dimensions, rotation, corridorWallCorner, corridorWallAlertTex);
 	return;
 }
-GameObject* TutorialGame::AddSecurityCameraToWorld(const Vector3& position, Vector3 dimensions, int rotation)
+void TutorialGame::AddSecurityCameraToWorld(const Vector3& position, int rotation)
 {
-	GameObject* cube = new GameObject();
+	Vector3 location = position + Vector3(0, 24, 0);
+	Vector3 dimensions = Vector3(2, 3, 4);
+	if (rotation == 0)
+	{
+		dimensions = Vector3(2, 2, 4);
+		location += Vector3(0, 0, -4);
+	}
+	if (rotation == 90)
+	{
+		dimensions = Vector3(4, 2, 2);
+		location += Vector3(-4, 0, 0);
+	}
+	if (rotation == 180)
+	{
+		dimensions = Vector3(2, 2, 4);
+		location += Vector3(0, 0, 4);
+	}
+	if (rotation == 270)
+	{
+		dimensions = Vector3(4, 2, 2);
+		location += Vector3(4, 0, 0);
+	}
 
-	AABBVolume* volume = new AABBVolume(dimensions);
-	cube->SetBoundingVolume((CollisionVolume*)volume);
-
-	cube->GetTransform()
-		.SetPosition(position)
-		.SetScale(dimensions * 2)
-		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
-
-
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), securityCamera, securityCameraTex, basicShader));
-	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
-
-	cube->GetPhysicsObject()->SetInverseMass(0.0f);
-	cube->GetPhysicsObject()->InitCubeInertia();
-
-	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	cube->SetDynamic(false);
-	world->AddGameObject(cube);
-	return cube;
+	GameObject* mainWall = AddAABBWallToWorld(location, dimensions, rotation);
+	AddRenderPartToWorld(position, Vector3(5, 5, 5), rotation, securityCamera, securityCameraTex);
+	return;
 }
-GameObject* TutorialGame::AddWallHammerToWorld(const Vector3& position, Vector3 dimensions, int rotation)
+void TutorialGame::AddWallHammerToWorld(const Vector3& position, Vector3 dimensions, int rotation)
 {
 	GameObject* cube = new GameObject();
 
@@ -665,7 +669,7 @@ GameObject* TutorialGame::AddWallHammerToWorld(const Vector3& position, Vector3 
 	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	cube->SetDynamic(false);
 	world->AddGameObject(cube);
-	return cube;
+	return;
 }
 
 void TutorialGame::InitSphereGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, float radius) {
