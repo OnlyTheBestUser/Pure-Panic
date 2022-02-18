@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include "../GameTech/RendererBase.h"
+#include "../../Common/Quaternion.h"
 
 
 // TODO: fix debug

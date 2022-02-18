@@ -16,9 +16,9 @@
 #include "../../Common/TextureLoader.h"
 #include "../../Common/Quaternion.h"
 
-#include "..//CSC8503Common/InputHandler.h"
-#include "..//CSC8503Common/GameActor.h"
-#include "..//CSC8503Common/Command.h"
+#include "../CSC8503Common/InputHandler.h"
+#include "../CSC8503Common/GameActor.h"
+#include "../CSC8503Common/Command.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -27,7 +27,6 @@ TutorialGame::TutorialGame()	{
 	world		= new GameWorld();
 	renderer	= new Renderer(*world);
 	physics		= new PhysicsSystem(*world);
-	input = NULL;
 
 	forceMagnitude	= 30.0f;
 	useGravity		= true;
@@ -86,10 +85,6 @@ TutorialGame::TutorialGame()	{
 
 	InitialiseAssets();
 }
-
-TutorialGame::TutorialGame(NCL::PS4::InputBase* input) : TutorialGame() {
-	this->input = input;
-}
 /*
 
 Each of the little demo scenarios used in the game uses the same 2 meshes, 
@@ -107,7 +102,7 @@ void TutorialGame::InitialiseAssets() {
 		(*into)->SetPrimitiveType(GeometryPrimitive::Triangles);
 		(*into)->UploadToGPU();
 	};
-	
+	loadFunc("courier.msh", &cubeMesh);
 	loadFunc("cube.msh"		 , &cubeMesh);
 	loadFunc("sphere.msh"	 , &sphereMesh);
 	loadFunc("Male1.msh"	 , &charMeshA);
@@ -135,7 +130,6 @@ void TutorialGame::InitialiseAssets() {
 	basicTex	= (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
 	basicShader = new OGLShader("GameTechVert.glsl", "GameTechFrag.glsl");
 	playerTex = (OGLTexture*)TextureLoader::LoadAPITexture("me.png");
-#endif
 #ifdef _ORBIS
 	basicTex = (PS4::PS4Texture*)TextureLoader::LoadAPITexture("checkerboard.png");
 	basicShader = PS4::PS4Shader::GenerateShader("/app0/Assets/Shaders/PS4/VertexShader.sb","/app0/Assets/Shaders/PS4/PixelShader.sb");
@@ -294,7 +288,7 @@ void TutorialGame::UpdateWinScreen(float dt)
 }
 
 void TutorialGame::UpdateKeys() {
-	/*if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F1)) {
+	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F1)) {
 		InitWorld(); //We can reset the simulation at any time with F1
 		selectionObject = nullptr;
 	}
@@ -319,7 +313,7 @@ void TutorialGame::UpdateKeys() {
 	}
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F8)) {
 		world->ShuffleObjects(false);
-	}*/
+	}
 
 	DebugObjectMovement();
 }
@@ -537,7 +531,7 @@ GameObject* TutorialGame::AddCubeToWorld(const Maths::Vector3& position, Maths::
 	return cube;
 }
 
-void TutorialGame::AddLongWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, OGLMesh* mesh, OGLTexture* texture) {
+void TutorialGame::AddLongWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture) {
 	Vector3 location = position + Vector3(0, 10, 0);
 
 	if (position.x < 0)
@@ -590,7 +584,7 @@ GameObject* TutorialGame::AddAABBWallToWorld(const Vector3& position, Vector3 di
 	world->AddGameObject(cube);
 	return cube;
 }
-GameObject* TutorialGame::AddRenderPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, OGLMesh* mesh, OGLTexture* texture) {
+GameObject* TutorialGame::AddRenderPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture) {
 	GameObject* cube = new GameObject();
 	cube->SetBoundingVolume(nullptr);
 	
