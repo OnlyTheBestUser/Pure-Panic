@@ -22,25 +22,6 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 
 	font = new SimpleFont("PressStart2P.fnt", "PressStart2P.png");
 
-	if (rendererAPI->GetInitState()) {
-		TextureLoader::RegisterAPILoadFunction(OGLTexture::RGBATextureFromFilename);
-
-		font = new SimpleFont("PressStart2P.fnt", "PressStart2P.png");
-
-		OGLTexture* t = (OGLTexture*)font->GetTexture();
-
-		if (t) {
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, t->GetObjectID());
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glBindTexture(GL_TEXTURE_2D, 0);
-		}
-		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-		debugShader = new OGLShader("debugVert.glsl", "debugFrag.glsl");
-	}
-	ForceValidDebugState(false);
-
 	debugLinesMesh = new OGLMesh();
 	debugTextMesh = new OGLMesh();
 
@@ -55,7 +36,6 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 	debugLinesMesh->UploadToGPU();
 
 	debugLinesMesh->SetPrimitiveType(GeometryPrimitive::Lines);
-
 
 	shadowShader = new OGLShader("GameTechShadowVert.glsl", "GameTechShadowFrag.glsl");
 
@@ -72,6 +52,19 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 	skyboxMesh->SetVertexIndices({ 0,1,2,2,3,0 });
 	skyboxMesh->UploadToGPU();
 
+	TextureLoader::RegisterAPILoadFunction(OGLTexture::RGBATextureFromFilename);
+
+	//OGLTexture* t = (OGLTexture*)font->GetTexture();
+
+	/*glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, t->GetObjectID());
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);*/
+	debugShader = new OGLShader("debugVert.glsl", "debugFrag.glsl");
+
+	//ForceValidDebugState(false);
 
 	skyboxTex = OGLTexture::RGBATextureCubemapFromFilename(
 		"/Cubemap/skyrender0004.png",
@@ -81,6 +74,8 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 		"/Cubemap/skyrender0002.png",
 		"/Cubemap/skyrender0005.png"
 	);
+
+
 #endif
 #ifdef _ORBIS
 	rendererAPI = new PS4::PS4GameRenderer(world);
@@ -93,6 +88,8 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 
 	debugLinesMesh->SetPrimitiveType(GeometryPrimitive::Lines);
 #endif
+
+	font = new SimpleFont("PressStart2P.fnt", "PressStart2P.png");
 
 	//Set up the light properties
 	lightColour = Vector4(0.8f, 0.8f, 0.5f, 1.0f);
