@@ -16,6 +16,10 @@
 #include "../../Common/TextureLoader.h"
 #include "../../Common/Quaternion.h"
 
+#include "..//CSC8503Common/InputHandler.h"
+#include "..//CSC8503Common/GameActor.h"
+#include "..//CSC8503Common/Command.h"
+
 using namespace NCL;
 using namespace CSC8503;
 
@@ -26,8 +30,11 @@ TutorialGame::TutorialGame()	{
 	input = NULL;
 
 	forceMagnitude	= 30.0f;
-	useGravity		= false;
+	useGravity		= true;
+	physics->UseGravity(useGravity);
+
 	inSelectionMode = false;
+	physics->UseGravity(true);
 
 	testStateObject = nullptr;
 
@@ -37,6 +44,46 @@ TutorialGame::TutorialGame()	{
 
 	//physics->SetGravity(Vector3(0, 9.8f, 0));
 	//physics->SetLinearDamping(10.0f);
+
+#pragma region Commands
+
+	/*
+		Command Design Pattern Explanation
+
+		The command design pattern I've implemented comes down to three classes, all of which can be found in the Input Handling filter:
+		Command.h:
+			This contains all the commands you will use to affect the world (via input handling). There are a few examples
+			in the class itself of how to use them.
+
+		GameActor.h:
+			This is a gameobject child that you will control using inputs, I've given the class a set of default methods, which
+			can be overriden if you derive a Player class from GameActor for example. Use the commands class above to attach methods
+			to commands, which can in turn be assigned to keys in the input handler.
+
+		InputHandler.h:
+			This is where keys are assigned, each key you want to assign is made as a Command* pointer variable. The handleInputs method
+			is called every frame, it will loop through each of the keys, see if they are assigned to a command, if so it checks if the key is
+			pressed and executes accordingly. 
+
+		Basically, all this means is that the hard coding of key checking is done in a separate file, and commands are kept in their own file, 
+		so everything is organised and neat. 
+
+		To use this, as shown in the example below, you need to instantiate an input handler and some commands, and bind the commands to the buttons.
+		It makes it very easy and readable to change which keys do what. If there is a specific gameobject you wish to register inputs for, you need
+		to instantiate a GameActor and pass it into the Commands accordingly.
+			
+	*/
+
+	inputHandler = new InputHandler();
+
+	Command* toggleGrav = new ToggleGravityCommand(physics);
+	Command* toggleDebug = new ToggleBoolCommand(&debugDraw);
+	
+	inputHandler->BindButtonG(toggleGrav);
+	inputHandler->BindButtonJ(toggleDebug);
+
+#pragma endregion
+
 	InitialiseAssets();
 }
 
@@ -67,9 +114,24 @@ void TutorialGame::InitialiseAssets() {
 	loadFunc("courier.msh"	 , &charMeshB);
 	loadFunc("security.msh"	 , &enemyMesh);
 	loadFunc("coin.msh"		 , &bonusMesh);
-	loadFunc("capsule.msh"	 , &capsuleMesh);
-	
-#ifdef _WIN64
+	loadFunc("capsule.msh"	 , &capsuleMesh); 
+	loadFunc("Corridor_Floor_Basic.msh"	 , &corridorFloor);
+	corridorFloorTex = (OGLTexture*)TextureLoader::LoadAPITexture("Corridor_Light_Colour.png");
+	loadFunc("Corridor_Wall_Alert.msh"	 , &corridorWallAlert);
+	corridorWallAlertTex = (OGLTexture*)TextureLoader::LoadAPITexture("corridor_wall_c.png");
+	loadFunc("Corridor_Wall_Corner_In_Both.msh"	 , &corridorWallCorner);
+	corridorWallCornerTex = (OGLTexture*)TextureLoader::LoadAPITexture("Corridor_Walls_Redux_Metal.png");
+	loadFunc("Corridor_Wall_Light.msh"	 , &corridorWallLight);
+	corridorWallLightTex = (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
+	loadFunc("Security_Camera.msh"	 , &securityCamera);
+	securityCameraTex = (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
+	loadFunc("corridor_wall_screen.msh"	 , &corridorWallScreen);
+	corridorWallScreenTex = (OGLTexture*)TextureLoader::LoadAPITexture("Animated_Screens_A_Colour.png");
+	loadFunc("corridor_Wall_Straight_Mid_end_L.msh"	 , &corridorWallStraight);
+	corridorWallStraightTex = (OGLTexture*)TextureLoader::LoadAPITexture("Corridor_Walls_Redux_Colour.png");
+	loadFunc("Corridor_Wall_Hammer.msh"	 , &corridorWallHammer);
+	corridorWallHammerTex = (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
+
 	basicTex	= (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
 	basicShader = new OGLShader("GameTechVert.glsl", "GameTechFrag.glsl");
 	playerTex = (OGLTexture*)TextureLoader::LoadAPITexture("me.png");
@@ -113,6 +175,8 @@ void TutorialGame::UpdateGame(float dt) {
 	}
 	}
 
+	inputHandler->HandleInput();
+
 	//Debug::DrawLine(Vector3(), Vector3(0, 20, 0), Debug::RED);
 	//Debug::DrawLine(Vector3(), Vector3(360, 0, 0), Debug::RED);
 	//Debug::DrawLine(Vector3(360, 0, 0), Vector3(360, 0, 360), Debug::RED);
@@ -127,7 +191,6 @@ void TutorialGame::UpdateGame(float dt) {
 
 void TutorialGame::UpdateGameWorld(float dt)
 {
-
 	if (!inSelectionMode) {
 		world->GetMainCamera()->UpdateCamera(dt);
 	}
@@ -160,35 +223,60 @@ void TutorialGame::UpdateGameWorld(float dt)
 	}
 #endif
 
-	if (useGravity) {
+	if (physics->GetGravity()) {
 		Debug::Print("(G)ravity on", Vector2(5, 95));
 	}
 	else {
 		Debug::Print("(G)ravity off", Vector2(5, 95));
 	}
 
-	//SelectObject();
-	//MoveSelectedObject(dt);
+	if (debugDraw) {
+		GameObjectIterator first;
+		GameObjectIterator last;
+		world->GetObjectIterators(first, last);
+		for (auto i = first; i != last; i++) {
+			DebugDrawCollider((*i)->GetBoundingVolume(), &(*i)->GetTransform());
+			if ((*i)->GetPhysicsObject() == nullptr)
+				continue;
+			DebugDrawVelocity((*i)->GetPhysicsObject()->GetLinearVelocity(), &(*i)->GetTransform());
+		}
+	}
+
+	SelectObject();
+	MoveSelectedObject(dt);
 	physics->Update(dt);
 
-	if (lockedObject != nullptr) {
-		Vector3 objPos = lockedObject->GetTransform().GetPosition();
-		Vector3 camPos = objPos + lockedOffset;
-
-		Matrix4 temp = Matrix4::BuildViewMatrix(camPos, objPos, Vector3(0, 1, 0));
-
-		Matrix4 modelMat = temp.Inverse();
-
-		Quaternion q(modelMat);
-		Vector3 angles = q.ToEuler(); //nearly there now!
-
-		world->GetMainCamera()->SetPosition(camPos);
-		world->GetMainCamera()->SetPitch(angles.x);
-		world->GetMainCamera()->SetYaw(angles.y);
-
-		//Debug::DrawAxisLines(lockedObject->GetTransform().GetMatrix(), 2.0f);
-	}
 	world->UpdateWorld(dt);
+}
+
+void TutorialGame::DebugDrawCollider(const CollisionVolume* c, Transform* worldTransform) {
+	Vector4 col = Vector4(1, 0, 0, 1);
+	if (c == nullptr)
+		return;
+	switch (c->type) {
+	case VolumeType::AABB: Debug::DrawCube(worldTransform->GetPosition(), ((AABBVolume*)c)->GetHalfDimensions(), col); break;
+	case VolumeType::OBB: Debug::DrawCube(worldTransform->GetPosition(), ((AABBVolume*)c)->GetHalfDimensions(), Vector4(0, 1, 0, 1), 0, worldTransform->GetOrientation()); break;
+	case VolumeType::Sphere: Debug::DrawSphere(worldTransform->GetPosition(), ((SphereVolume*)c)->GetRadius(), col); break;
+	case VolumeType::Capsule: Debug::DrawCapsule(worldTransform->GetPosition(), ((CapsuleVolume*)c)->GetRadius(), ((CapsuleVolume*)c)->GetHalfHeight(), worldTransform->GetOrientation(), col); break;
+	default: break;
+	}
+}
+
+void TutorialGame::DebugDrawVelocity(const Vector3& velocity, Transform* worldTransform) {
+	Vector4 col = Vector4(1, 0, 1, 1);
+	Debug::DrawArrow(worldTransform->GetPosition(), worldTransform->GetPosition() + velocity, col);
+}
+
+void TutorialGame::DebugDrawObjectInfo(const GameObject* obj) {
+	Vector3 pos = selectionObject->GetTransform().GetPosition();
+	Vector3 rot = selectionObject->GetTransform().GetOrientation().ToEuler();
+	string name = obj->GetName();
+	string n = "Name: " + (name == "" ? "-" : name);
+	string p = "Pos: (" + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z) + ")";
+	string r = "Rot: (" + std::to_string(rot.x) + ", " + std::to_string(rot.y) + ", " + std::to_string(rot.z) + ")";
+	renderer->DrawString(n, Vector2(1, 3), Debug::WHITE, 15.0f);
+	renderer->DrawString(p, Vector2(1, 6), Debug::WHITE, 15.0f);
+	renderer->DrawString(r, Vector2(1, 9), Debug::WHITE, 15.0f);
 }
 
 void TutorialGame::UpdatePauseScreen(float dt)
@@ -209,18 +297,12 @@ void TutorialGame::UpdateKeys() {
 	/*if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F1)) {
 		InitWorld(); //We can reset the simulation at any time with F1
 		selectionObject = nullptr;
-		lockedObject	= nullptr;
 	}
 
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F2)) {
 		InitCamera(); //F2 will reset the camera to a specific default place
 	}
-
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::G)) {
-		useGravity = !useGravity; //Toggle gravity!
-		physics->UseGravity(useGravity);
-	}
-
+	
 	//Running certain physics updates in a consistent order might cause some
 	//bias in the calculations - the same objects might keep 'winning' the constraint
 	//allowing the other one to stretch too much etc. Shuffling the order so that it
@@ -239,51 +321,7 @@ void TutorialGame::UpdateKeys() {
 		world->ShuffleObjects(false);
 	}*/
 
-	if (lockedObject) {
-		LockedObjectMovement();
-	}
-	else {
-		DebugObjectMovement();
-	}
-}
-
-void TutorialGame::LockedObjectMovement() {
-	Matrix4 view		= world->GetMainCamera()->BuildViewMatrix();
-	Matrix4 camWorld	= view.Inverse();
-
-	Vector3 rightAxis = Vector3(camWorld.GetColumn(0)); //view is inverse of model!
-
-	//forward is more tricky -  camera forward is 'into' the screen...
-	//so we can take a guess, and use the cross of straight up, and
-	//the right axis, to hopefully get a vector that's good enough!
-
-	Vector3 fwdAxis = Vector3::Cross(Vector3(0, 1, 0), rightAxis);
-	fwdAxis.y = 0.0f;
-	fwdAxis.Normalise();
-
-	Vector3 charForward  = lockedObject->GetTransform().GetOrientation() * Vector3(0, 0, 1);
-	Vector3 charForward2 = lockedObject->GetTransform().GetOrientation() * Vector3(0, 0, 1);
-
-	float force = 100.0f;
-
-	//if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::UP)) {
-	//	selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 0, -1) * forceMagnitude * 0.1);
-	//}
-	//if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::DOWN)) {
-	//	selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 0, 1) * forceMagnitude * 0.1);
-	//}
-	//if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::LEFT)) {
-	//	selectionObject->GetPhysicsObject()->AddForce(Vector3(-1, 0, 0) * forceMagnitude * 0.1);
-	//}
-	//if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::RIGHT)) {
-	//	selectionObject->GetPhysicsObject()->AddForce(Vector3(1, 0, 0) * forceMagnitude * 0.1);
-	//}
-	//if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::SHIFT)) {
-	//	selectionObject->GetPhysicsObject()->AddForce(Vector3(0, -1, 0) * forceMagnitude * 0.1);
-	//}
-	//if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::SPACE)) {
-	//	selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 1, 0) * forceMagnitude * 0.1);
-	//}
+	DebugObjectMovement();
 }
 
 void TutorialGame::DebugObjectMovement() {
@@ -331,43 +369,41 @@ void TutorialGame::InitCamera() {
 	world->GetMainCamera()->SetPitch(-15.0f);
 	world->GetMainCamera()->SetYaw(315.0f);
 	world->GetMainCamera()->SetPosition(Vector3(-60, 40, 60));
-	lockedObject = nullptr;
 }
 
 void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	GameObject* a = AddCubeToWorld(Vector3(15, 2, 15), Vector3(1, 1, 1), true, 10.0f, 1, false, true);
-	GameObject* b = AddCubeToWorld(Vector3(10, 2, 15), Vector3(1, 1, 1), true, 10.0f, 1, false, true);
-	//a->GetRenderObject()->SetColour(Debug::CYAN);
-	//b->GetRenderObject()->SetColour(Debug::CYAN);
+	GameObject* floor = AddFloorToWorld(Vector3(0, 0, 0));
+	AddLongWallToWorld(Vector3(255,0,5), Vector3(2, 20, 250), 270, corridorWallStraight, corridorWallAlertTex);
+	AddLongWallToWorld(Vector3(-255,0,5), Vector3(2, 20, 250), 90, corridorWallStraight, corridorWallAlertTex);
+	AddLongWallToWorld(Vector3(5,0,255), Vector3(250, 20, 2), 180, corridorWallStraight, corridorWallAlertTex);
+	AddLongWallToWorld(Vector3(5,0,-255), Vector3(250, 20, 2), 0, corridorWallStraight, corridorWallAlertTex);
 
-	GameObject* c = AddCubeToWorld(Vector3(10, 2, 10), Vector3(1, 1, 1), false, 10.0f, 1, false, true);
-	GameObject* d = AddCubeToWorld(Vector3(15, 2, 10), Vector3(1, 1, 1), false, 10.0f, 1, false, true);
-	c->GetPhysicsObject()->SetFriction(false);
-	d->GetPhysicsObject()->SetFriction(false);
+	AddCornerWallToWorld(Vector3(-247.5, 0, -250), Vector3(8, 5, 4), 45);
+	AddCornerWallToWorld(Vector3(-247.5, 0, 250), Vector3(8, 5, 4), 135);
+	AddCornerWallToWorld(Vector3(247.5, 0, 250), Vector3(8, 5, 4), 225);
+	AddCornerWallToWorld(Vector3(247.5, 0, -250), Vector3(8, 5, 4), 315);
 
-	// Floor
-	GameObject* e = AddCubeToWorld(Vector3(0, -2, 0), Vector3(250, 2, 250), false, 0, 0);
+	AddSecurityCameraToWorld(Vector3(25, 4, 240), 180);
+	AddSecurityCameraToWorld(Vector3(-25, 4, 240), 180);
+
+	/*AddWallHammerToWorld(Vector3(0, 2, 241), Vector3(10, 10, 6), 180);
+	AddWallHammerToWorld(Vector3(50, 2, 241), Vector3(10, 10, 6), 180);
+	AddWallHammerToWorld(Vector3(-50, 2, 241), Vector3(10, 10, 6), 180);*/
+
+	//InitSphereGridWorld(10, 10, 25, 25, 2);
+
+	Player* player = AddPlayerToWorld(Vector3(0, 5, 0));
+	player->SetDynamic(true);
 
 	GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
-	GameObject* cap2 = AddCapsuleToWorld(Vector3(10, 5, 0), 3.0f, 1.5f);
 	cap1->SetDynamic(true);
-	cap2->SetDynamic(true);
 
-	GameObject* sphere1 = AddSphereToWorld(Vector3(10, 5, 20), 1.0f, 10.0f, false, false, true);
-	GameObject* sphere2 = AddSphereToWorld(Vector3(15, 5, 20), 1.0f, 10.0f, false, false, true);
-
-	a->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	b->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	c->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	d->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	e->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
-	cap2->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
-	sphere1->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	sphere2->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	player->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	player1 = player;
 
 	physics->BuildStaticList();
 }
@@ -380,13 +416,12 @@ A single function to add a large immoveable cube to the bottom of our world
 GameObject* TutorialGame::AddFloorToWorld(const Maths::Vector3& position) {
 	GameObject* floor = new GameObject("Floor");
 
-	Vector3 floorSize	= Vector3(20, 2, 100);
+	Vector3 floorSize	= Vector3(250, 2, 250);
 	AABBVolume* volume	= new AABBVolume(floorSize);
 	floor->SetBoundingVolume((CollisionVolume*)volume);
 	floor->GetTransform()
 		.SetScale(floorSize * 2)
 		.SetPosition(position);
-		//.SetOrientation(Quaternion(0.25f, 0, 0, 1));
 
 	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
 	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume()));
@@ -394,8 +429,9 @@ GameObject* TutorialGame::AddFloorToWorld(const Maths::Vector3& position) {
 	floor->GetPhysicsObject()->SetInverseMass(0);
 	floor->GetPhysicsObject()->InitCubeInertia();
 
-	world->AddGameObject(floor);
 	floor->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	floor->SetDynamic(false);
+	world->AddGameObject(floor);
 	return floor;
 }
 
@@ -409,9 +445,6 @@ physics worlds. You'll probably need another function for the creation of OBB cu
 GameObject* TutorialGame::AddSphereToWorld(const Maths::Vector3& position, float radius, float inverseMass, bool rubber, bool hollow, bool dynamic) {
 	GameObject* sphere = new GameObject("Sphere");
 	
-	// Raycasting Tutorial 1 - Further Work Part 1
-	//sphere->SetLayer(1);
-
 	Vector3 sphereSize = Vector3(radius, radius, radius);
 	SphereVolume* volume = new SphereVolume(radius);
 	sphere->SetBoundingVolume((CollisionVolume*)volume);
@@ -504,14 +537,209 @@ GameObject* TutorialGame::AddCubeToWorld(const Maths::Vector3& position, Maths::
 	return cube;
 }
 
+void TutorialGame::AddLongWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, OGLMesh* mesh, OGLTexture* texture) {
+	Vector3 location = position + Vector3(0, 10, 0);
+
+	if (position.x < 0)
+		location += Vector3(5, 0, -5);
+	if (position.x > 0)
+		location += Vector3(-7, 0, -4);
+
+	if (position.z < 0)
+		location += Vector3(1, 0, 10);
+	if (position.z > 0)
+		location += Vector3(1, 0, -2);
+
+	GameObject* mainWall = AddAABBWallToWorld(location, dimensions, rotation);
+	if (rotation == 90 || rotation == 270)
+	{
+		for (int i = -dimensions.z; i < dimensions.z; i += 10)
+		{
+			AddRenderPartToWorld(Vector3(position.x, position.y, position.z + i), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallAlertTex);
+		}
+		return;
+	}
+	if (rotation == 180 || rotation == 0)
+	{
+		for (int i = -dimensions.x; i < dimensions.x; i += 10)
+		{
+			AddRenderPartToWorld(Vector3(position.x + i, position.y, position.z), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallAlertTex);
+		}
+		return;
+	}
+	return;
+}
+GameObject* TutorialGame::AddAABBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation) {
+	GameObject* cube = new GameObject();
+	AABBVolume* volume = new AABBVolume(dimensions);
+	cube->SetBoundingVolume((CollisionVolume*)volume);
+
+	cube->GetTransform()
+		.SetPosition(position)
+		.SetScale(dimensions * 2)
+		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
+
+	cube->SetRenderObject(nullptr);
+	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
+
+	cube->GetPhysicsObject()->SetInverseMass(0.0f);
+	cube->GetPhysicsObject()->InitCubeInertia();
+
+	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	cube->SetDynamic(false);
+	world->AddGameObject(cube);
+	return cube;
+}
+GameObject* TutorialGame::AddRenderPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, OGLMesh* mesh, OGLTexture* texture) {
+	GameObject* cube = new GameObject();
+	cube->SetBoundingVolume(nullptr);
+	
+	cube->GetTransform()
+		.SetPosition(position)
+		.SetScale(dimensions * 2)
+		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
+
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, basicShader));
+	cube->SetPhysicsObject(nullptr);
+
+	cube->SetDynamic(false);
+	world->AddGameObject(cube);
+	return cube;
+}
+
+GameObject* TutorialGame::AddWallToWorld(const Vector3& position, Vector3 dimensions, int rotation) {
+	GameObject* cube = new GameObject();
+	
+	AABBVolume* volume = new AABBVolume(dimensions);
+	cube->SetBoundingVolume((CollisionVolume*)volume);
+
+	cube->GetTransform()
+		.SetPosition(position)
+		.SetScale(dimensions * 2)
+		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
+
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, basicShader));
+	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
+
+	cube->GetPhysicsObject()->SetInverseMass(0.0f);
+	cube->GetPhysicsObject()->InitCubeInertia();
+
+	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	cube->SetDynamic(false);
+	world->AddGameObject(cube);
+	return cube;
+}
+GameObject* TutorialGame::AddOBBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation) {
+	GameObject* cube = new GameObject();
+	
+	OBBVolume* volume = new OBBVolume(dimensions + Vector3(2,10,0));
+	cube->SetBoundingVolume((CollisionVolume*)volume);
+
+	cube->GetTransform()
+		.SetPosition(position)
+		.SetScale(dimensions * 2)
+		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
+
+	cube->SetRenderObject(nullptr);
+	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
+
+	cube->GetPhysicsObject()->SetInverseMass(0.0f);
+	cube->GetPhysicsObject()->InitCubeInertia();
+
+	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	cube->SetDynamic(false);
+	world->AddGameObject(cube);
+	return cube;
+}
+void TutorialGame::AddCornerWallToWorld(const Vector3& position, Vector3 dimensions, int rotation) {
+	Vector3 location = position + Vector3(0, 15, 0);
+
+	if (rotation == 45)
+		location += Vector3(3, 0, 3);
+	if (rotation == 135)
+		location += Vector3(3, 0, -3);
+	if (rotation == 225)
+		location += Vector3(-3, 0, -3);
+	if (rotation == 315)
+		location += Vector3(-3, 0, 3);
+
+	GameObject* mainWall = AddOBBWallToWorld(location, dimensions, rotation);
+	AddRenderPartToWorld(position, dimensions, rotation, corridorWallCorner, corridorWallAlertTex);
+	return;
+}
+void TutorialGame::AddSecurityCameraToWorld(const Vector3& position, int rotation)
+{
+	Vector3 location = position + Vector3(0, 24, 0);
+	Vector3 dimensions = Vector3(2, 3, 4);
+	if (rotation == 0)
+	{
+		dimensions = Vector3(2, 2, 4);
+		location += Vector3(0, 0, -4);
+	}
+	if (rotation == 90)
+	{
+		dimensions = Vector3(4, 2, 2);
+		location += Vector3(-4, 0, 0);
+	}
+	if (rotation == 180)
+	{
+		dimensions = Vector3(2, 2, 4);
+		location += Vector3(0, 0, 4);
+	}
+	if (rotation == 270)
+	{
+		dimensions = Vector3(4, 2, 2);
+		location += Vector3(4, 0, 0);
+	}
+
+	GameObject* mainWall = AddAABBWallToWorld(location, dimensions, rotation);
+	AddRenderPartToWorld(position, Vector3(5, 5, 5), rotation, securityCamera, securityCameraTex);
+	return;
+}
+void TutorialGame::AddWallHammerToWorld(const Vector3& position, Vector3 dimensions, int rotation)
+{
+	GameObject* cube = new GameObject();
+
+	AABBVolume* volume = new AABBVolume(dimensions);
+	cube->SetBoundingVolume((CollisionVolume*)volume);
+
+	cube->GetTransform()
+		.SetPosition(position)
+		.SetScale(dimensions * 2)
+		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
+
+
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallHammer, corridorWallHammerTex, basicShader));
+	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
+
+	cube->GetPhysicsObject()->SetInverseMass(0.0f);
+	cube->GetPhysicsObject()->InitCubeInertia();
+
+	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	cube->SetDynamic(false);
+	world->AddGameObject(cube);
+	return;
+}
+
 void TutorialGame::InitSphereGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, float radius) {
 	for (int x = 0; x < numCols; ++x) {
 		for (int z = 0; z < numRows; ++z) {
 			Vector3 position = Vector3(x * colSpacing, 10.0f, z * rowSpacing);
-			AddSphereToWorld(position, radius, 1.0f);
+			GameObject* sphere = AddSphereToWorld(position, radius, 10.0f, false, false, false);
+			sphere->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 		}
 	}
-	AddFloorToWorld(Vector3(0, -2, 0));
+}
+
+void TutorialGame::InitCapsuleGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing) {
+	for (int x = 0; x < numCols; ++x) {
+		for (int z = 0; z < numRows; ++z) {
+			Vector3 position = Vector3(x * colSpacing, 10.0f, z * rowSpacing);
+			GameObject* capsule = AddCapsuleToWorld(position, 3.0f, 1.5f);
+			capsule->SetDynamic(true);
+			capsule->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+		}
+	}
 }
 
 void TutorialGame::InitMixedGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing) {
@@ -521,12 +749,19 @@ void TutorialGame::InitMixedGridWorld(int numRows, int numCols, float rowSpacing
 	for (int x = 0; x < numCols; ++x) {
 		for (int z = 0; z < numRows; ++z) {
 			Vector3 position = Vector3(x * colSpacing, 10.0f, z * rowSpacing);
-
-			if (rand() % 2) {
-				AddCubeToWorld(position, cubeDims, false, 10.0f, 1, false, true);
+			int choice = rand() % 3;
+			if (choice == 2) {
+				GameObject* obb = AddCubeToWorld(position, cubeDims, true, 10.0f, 1, false, true);
+				obb->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+			}
+			else if (choice == 1) {
+				GameObject* capsule = AddCapsuleToWorld(position, 3.0f, 1.5f);
+				capsule->SetDynamic(true);
+				capsule->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 			}
 			else {
-				AddSphereToWorld(position, sphereRadius, 10.0f, rand() % 2, false, true);
+				GameObject* sphere = AddSphereToWorld(position, sphereRadius, 10.0f, false, false, true);
+				sphere->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 			}
 		}
 	}
@@ -536,7 +771,8 @@ void TutorialGame::InitCubeGridWorld(int numRows, int numCols, float rowSpacing,
 	for (int x = 1; x < numCols+1; ++x) {
 		for (int z = 1; z < numRows+1; ++z) {
 			Vector3 position = Vector3(x * colSpacing, 10.0f, z * rowSpacing);
-			AddCubeToWorld(position, cubeDims, 1.0f);
+			GameObject* obb = AddCubeToWorld(position, cubeDims, true, 10.0f, 1, false, true);
+			obb->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 		}
 	}
 }
@@ -550,11 +786,11 @@ void TutorialGame::InitGameExamples() {
 	AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f, 1.0f);
 }
 
-GameObject* TutorialGame::AddPlayerToWorld(const Maths::Vector3& position) {
+Player* TutorialGame::AddPlayerToWorld(const Vector3& position) {
 	float meshSize = 3.0f;
 	float inverseMass = 0.5f;
 
-	GameObject* character = new GameObject("Player");
+	Player* character = new Player(world->GetMainCamera(), "Player");
 
 	AABBVolume* volume = new AABBVolume(Vector3(0.3f, 0.85f, 0.3f) * meshSize);
 
@@ -564,24 +800,26 @@ GameObject* TutorialGame::AddPlayerToWorld(const Maths::Vector3& position) {
 		.SetScale(Vector3(meshSize, meshSize, meshSize))
 		.SetPosition(position);
 
-	if (rand() % 2) {
-		character->SetRenderObject(new RenderObject(&character->GetTransform(), charMeshA, nullptr, basicShader));
-	}
-	else {
-		character->SetRenderObject(new RenderObject(&character->GetTransform(), charMeshB, nullptr, basicShader));
-	}
+	character->SetRenderObject(new RenderObject(&character->GetTransform(), charMeshA, nullptr, basicShader));
 	character->SetPhysicsObject(new PhysicsObject(&character->GetTransform(), character->GetBoundingVolume()));
 
 	character->GetPhysicsObject()->SetInverseMass(inverseMass);
+	character->GetPhysicsObject()->SetFriction(0.0f);
 	character->GetPhysicsObject()->InitSphereInertia();
 
 	world->AddGameObject(character);
 
-	//lockedObject = character;
+	Command* f = new MoveForwardCommand(character);
+	Command* b = new MoveBackwardCommand(character);
+	Command* l = new MoveLeftCommand(character);
+	Command* r = new MoveRightCommand(character);
+	inputHandler->BindButtonW(f);
+	inputHandler->BindButtonS(b);
+	inputHandler->BindButtonA(l);
+	inputHandler->BindButtonD(r);
 
 	return character;
 }
-
 
 /*
 
@@ -611,7 +849,6 @@ bool TutorialGame::SelectObject() {
 				selectionObject->GetRenderObject()->SetColour(Vector4(1, 1, 1, 1));
 				//selectionObject->SetLayer(0);
 				selectionObject = nullptr;
-				lockedObject	= nullptr;
 			}
 
 			Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
@@ -643,24 +880,8 @@ bool TutorialGame::SelectObject() {
 		renderer->DrawString("Press Q to change to select mode!", Vector2(5, 85));
 	}
 
-	if (lockedObject) {
-		renderer->DrawString("Press L to unlock object!", Vector2(5, 80));
-	}
-
-	else if(selectionObject){
-		renderer->DrawString("Press L to lock selected object object!", Vector2(5, 80));
-	}
-
 	if (Window::GetKeyboard()->KeyPressed(NCL::KeyboardKeys::L)) {
-		if (selectionObject) {
-			if (lockedObject == selectionObject) {
-				lockedObject = nullptr;
-			}
-			else {
-				lockedObject = selectionObject;
-			}
-		}
-
+		player1->ChangeCamLock();
 	}
 
 	return false;
@@ -689,14 +910,12 @@ void TutorialGame::MoveSelectedObject(float dt) {
 		}
 	}
 
-	Vector3 pos = selectionObject->GetTransform().GetPosition();
-	string s = "Pos: " + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z) + ")";
-	renderer->DrawString(s, Vector2(5, 5));
+	DebugDrawObjectInfo(selectionObject);
 
 	if (Window::GetKeyboard()->KeyHeld(NCL::KeyboardKeys::F))
 		selectionObject->Interact(dt);
 
-	if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::UP)) {
+	/*if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::UP)) {
 		if (selectionObject->GetName() == "player")
 			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 0, -1) * ((Player*)selectionObject)->GetSpeed() * 0.1);
 		else
@@ -731,5 +950,5 @@ void TutorialGame::MoveSelectedObject(float dt) {
 			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 1, 0) * ((Player*)selectionObject)->GetSpeed() * 0.1);
 		else
 			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 1, 0) * forceMagnitude * 0.1);
-	}
+	}*/
 }

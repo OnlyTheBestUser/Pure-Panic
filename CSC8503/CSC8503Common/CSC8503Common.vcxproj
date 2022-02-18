@@ -197,6 +197,10 @@
     <ClInclude Include="BehaviourSelector.h" />
     <ClInclude Include="BehaviourSequence.h" />
     <ClInclude Include="CapsuleVolume.h" />
+    <ClInclude Include="Command.h" />
+    <ClInclude Include="GameActor.h" />
+    <ClInclude Include="InputHandler.h" />
+    <ClInclude Include="MoveForwardCommand.h" />
     <ClInclude Include="NavigationGrid.h" />
     <ClInclude Include="NavigationMap.h" />
     <ClInclude Include="NavigationMesh.h" />
@@ -228,6 +232,8 @@
     <ClCompile Include="Debug.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameWorld.cpp" />
+    <ClCompile Include="InputHandler.cpp" />
+    <ClCompile Include="MoveForwardCommand.cpp" />
     <ClCompile Include="NavigationGrid.cpp" />
     <ClCompile Include="NavigationMesh.cpp" />
     <ClCompile Include="PhysicsObject.cpp" />

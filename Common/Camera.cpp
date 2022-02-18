@@ -25,16 +25,18 @@ void Camera::UpdateCamera(float dt) {
 		yaw -= 360.0f;
 	}
 	float frameSpeed = 100 * dt;
-	/*if (Window::GetKeyboard()->KeyDown(KeyboardKeys::W)) {
+	/*
+	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::UP)) {
 		position += Matrix4::Rotation(yaw, Vector3(0, 1, 0)) * Vector3(0, 0, -1) * frameSpeed;
 	}
-	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::S)) {
+	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::DOWN)) {
 		position -= Matrix4::Rotation(yaw, Vector3(0, 1, 0)) * Vector3(0, 0, -1) * frameSpeed;
 	}
-	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::A)) {
+
+	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::LEFT)) {
 		position += Matrix4::Rotation(yaw, Vector3(0, 1, 0)) * Vector3(-1, 0, 0) * frameSpeed;
 	}
-	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::D)) {
+	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::RIGHT)) {
 		position -= Matrix4::Rotation(yaw, Vector3(0, 1, 0)) * Vector3(-1, 0, 0) * frameSpeed;
 	}
 	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::SPACE)) {
@@ -60,9 +62,7 @@ Matrix4 Camera::BuildProjectionMatrix(float currentAspect) const {
 	if (camType == CameraType::Orthographic) {
 		return Matrix4::Orthographic(nearPlane, farPlane, right, left, top, bottom);
 	}
-	//else if (camType == CameraType::Perspective) {
-		return Matrix4::Perspective(nearPlane, farPlane, currentAspect, fov);
-	//}
+	return Matrix4::Perspective(nearPlane, farPlane, currentAspect, fov);
 }
 
 Camera Camera::BuildPerspectiveCamera(const Vector3& pos, float pitch, float yaw, float fov, float nearPlane, float farPlane) {

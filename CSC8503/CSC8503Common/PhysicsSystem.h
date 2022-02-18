@@ -31,14 +31,16 @@ namespace NCL {
 			void BuildStaticList();
 
 		protected:
-			void BasicCollisionDetection();
 			void BroadPhase();
 			void NarrowPhase();
 
 			void ClearForces();
 
-			void IntegrateAccel(float dt);
-			void IntegrateVelocity(float dt);
+			void CheckToWake(PhysicsObject* object);
+			void CheckToSleep(PhysicsObject* object);
+
+			void IntegrateAccel(float dt, GameObject* object);
+			void IntegrateVelocity(float dt, PhysicsObject* object, Transform& transform);
 
 			void UpdateConstraints(float dt);
 
@@ -64,4 +66,3 @@ namespace NCL {
 		};
 	}
 }
-

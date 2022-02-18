@@ -1,13 +1,24 @@
 #pragma once
 #include "../../Common/Vector3.h"
 #include "../../Common/Matrix3.h"
+#include <queue>
 
 using namespace NCL::Maths;
 
 namespace NCL {
 	class CollisionVolume;
-	
+	enum class VolumeType;
+
 	namespace CSC8503 {
+		enum CollisionLayer {
+			LAYER_ONE = (1 << 0),
+			LAYER_TWO = (1 << 1),
+			LAYER_THREE = (1 << 2),
+			LAYER_FOUR = (1 << 3),
+			LAYER_FIVE = (1 << 4),
+			LAYER_SIX = (1 << 5)
+		};
+
 		class Transform;
 
 		class PhysicsObject	{
@@ -84,6 +95,27 @@ namespace NCL {
 			void SetFriction(bool k) { useFriction = k; }
 			bool UsesFriction() const { return useFriction; }
 
+			inline void Wake() { sleeping = false; }
+			inline void Sleep() { sleeping = true; }
+			inline bool isSleeping() const { return sleeping; }
+			
+			VolumeType GetVolumeType() const;
+
+			inline void AddToPreviousVelocities(float velocityDotProduct) { previousVelocityDotProducts.push(velocityDotProduct); }
+			inline void RemoveFromPreviousVelocities() { previousVelocityDotProducts.pop(); }
+			inline int GetPrevVelocitiesSize() const { return previousVelocityDotProducts.size(); }
+			std::queue<float> GetPrevVelocities() const { return previousVelocityDotProducts; }
+			
+			inline void AddToPreviousPositions(float position) { previousPositions.push(position); }
+			inline void RemoveFromPreviousPositions() { previousPositions.pop(); }
+			inline int GetPreviousPositionsSize() const { return previousPositions.size(); }
+			std::queue<float> GetPreviousPositions() const { return previousPositions; }
+
+			inline Transform* GetTransform() const { return transform; }
+      
+			void SetCollisionLayers(int layers) { collisionLayers = layers; }
+			int	GetCollisionLayers() const { return collisionLayers; }
+
 		protected:
 			const CollisionVolume* volume;
 			Transform*		transform;
@@ -91,6 +123,10 @@ namespace NCL {
 			float inverseMass;
 			float elasticity;
 			float friction;
+
+			bool sleeping = false;
+			std::queue<float> previousVelocityDotProducts;
+			std::queue<float> previousPositions;
 
 			bool useGravity = true;
 			bool useFriction = true;
@@ -106,6 +142,8 @@ namespace NCL {
 			Vector3 torque;
 			Vector3 inverseInertia;
 			Matrix3 inverseInteriaTensor;
+
+			int collisionLayers = 0;
 		};
 	}
 }

@@ -78,11 +78,7 @@ namespace NCL {
 			const CapsuleVolume& volumeA, const Transform& worldTransformA,
 			const CapsuleVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo);
 
-		static Vector3 ClosestPointOnLine(Vector3 A, Vector3 B, Vector3 p) {
-			Vector3 AB = B - A;
-			float t = Vector3::Dot(p - A, AB) / Vector3::Dot(AB, AB);
-			return A + (AB * t);
-		}
+		static Vector3 ClosestPointOnLine(Vector3 A, Vector3 B, Vector3 p);
 
 		static Vector3 OBBSupport(const Transform& worldTransform, Vector3 worldDir) {
 			Vector3 localDir = worldTransform.GetOrientation().Conjugate() * worldDir;

@@ -152,9 +152,7 @@ hide or show the
 
 int main() {
 	Window*w = Window::CreateGameWindow("CSC8503 Game technology!", 1600, 900);
-
-	//TestPushdownAutomata(w);
-
+		
 	if (!w->HasInitialised()) {
 		return -1;
 	}	
@@ -162,12 +160,16 @@ int main() {
 	w->ShowOSPointer(false);
 	w->LockMouseToWindow(true);
 
-	//TestBehaviourTree();
+	float avgTimeWait = 3.0f;
+	float curTimeWait = 3.0f;
+	float totalTime = 0.0f;
+	int totalFrames = 0;
 
 	TutorialGame* g = new TutorialGame();
 	MainMenu* m = new MainMenu();
 	PushdownMachine p = new Menu(m, g, g, g);
 	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
+	float smallestFrameRate = 144.0f;
 	while (w->UpdateWindow()) { //&& !w->GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
 		//DisplayPathfinding();
 		float dt = w->GetTimer()->GetTimeDeltaSeconds();
@@ -186,13 +188,23 @@ int main() {
 			w->SetWindowPosition(0, 0);
 		}
 
-		w->SetTitle("Gametech frame time:" + std::to_string(1000.0f * dt));
+		float frameRate = (1.0f / dt);
+		if (frameRate < smallestFrameRate)
+			smallestFrameRate = frameRate;
+
+		w->SetTitle("Gametech frame time:" + std::to_string(1000.0f * dt) + " | Gametech frame rate:" + std::to_string(frameRate));
+
+		curTimeWait -= dt;
+		totalTime += dt;
+		totalFrames++;
+		if (curTimeWait < 0.0f) {
+			std::cout << "Average Frame Time: " << 1000.0f * (totalTime / totalFrames) << "\n";
+			curTimeWait = avgTimeWait;
+		}
 
 		if (!p.Update(dt)) {
 			return 0;
 		}
-		//f->UpdateGame(dt);
-		//g->UpdateGame(dt);
 	}
 	Window::DestroyGameWindow();
 }
