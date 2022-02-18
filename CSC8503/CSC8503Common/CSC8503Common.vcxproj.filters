@@ -28,6 +28,9 @@
     <Filter Include="Input Handling">
       <UniqueIdentifier>{f1226dc9-d3d1-4557-b16d-d16067ca991a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Networking">
+      <UniqueIdentifier>{2e1fc26c-11f4-4a07-b069-18d536e6299e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameWorld.h">
@@ -138,6 +141,21 @@
     <ClInclude Include="MoveForwardCommand.h">
       <Filter>Input Handling</Filter>
     </ClInclude>
+    <ClInclude Include="GameClient.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkBase.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="GameServer.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkObject.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkState.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameWorld.cpp">
@@ -193,6 +211,21 @@
     </ClCompile>
     <ClCompile Include="MoveForwardCommand.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameClient.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="GameServer.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkBase.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkObject.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkState.cpp">
+      <Filter>Networking</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

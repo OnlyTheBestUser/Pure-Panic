@@ -144,11 +144,15 @@
     <ClCompile Include="GameTechRenderer.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainMenu.cpp" />
+    <ClCompile Include="NetworkedGame.cpp" />
+    <ClCompile Include="NetworkedPlayer.cpp" />
     <ClCompile Include="TutorialGame.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameTechRenderer.h" />
     <ClInclude Include="MainMenu.h" />
+    <ClInclude Include="NetworkedGame.h" />
+    <ClInclude Include="NetworkedPlayer.h" />
     <ClInclude Include="TutorialGame.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
