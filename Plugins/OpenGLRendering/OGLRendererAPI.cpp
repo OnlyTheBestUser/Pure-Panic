@@ -346,6 +346,58 @@ void OGLRendererAPI::SetBlend(bool b) {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
+void OGLRendererAPI::SetCullFace(bool b) {
+	switch (b)
+	{
+	default:
+		break;
+	case true:
+		glEnable(GL_CULL_FACE);
+		break;
+	case false:
+		glDisable(GL_CULL_FACE);
+		break;
+	}
+}
+
+void OGLRendererAPI::SetCullType(CULL_TYPE type) {
+	switch (type)
+	{
+	case NCL::Rendering::RendererAPI::FRONT:
+		glCullFace(GL_FRONT);
+		break;
+	case NCL::Rendering::RendererAPI::BACK:
+		glCullFace(GL_BACK);
+		break;
+	default:
+		break;
+	}
+}
+
+void OGLRendererAPI::ClearBuffer(bool color, bool depth, bool stencil) {
+	if (color) {
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
+	if (depth) {
+		glClear(GL_DEPTH_BUFFER_BIT);
+	}
+	if (stencil) {
+		glClear(GL_STENCIL_BUFFER_BIT);
+	}
+}
+
+void OGLRendererAPI::SetClearColour(float r, float g, float b, float a) {
+	glClearColor(r, g, b, a);
+}
+
+void OGLRendererAPI::SetColourMask(bool r, bool g, bool b, bool a) {
+	glColorMask(r, g, b, a);
+}
+
+void OGLRendererAPI::SetViewportSize(int x, int y) {
+	glViewport(0, 0, x, y);
+}
+
 
 #ifdef _WIN32
 void OGLRendererAPI::InitWithWin32(Window& w) {

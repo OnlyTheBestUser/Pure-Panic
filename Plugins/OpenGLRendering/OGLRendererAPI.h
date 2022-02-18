@@ -92,9 +92,18 @@ namespace NCL {
 			void UpdateUniformVector3(ShaderBase* shader, std::string uniform, const Maths::Vector3 vec) override;
 			void UpdateUniformVector4(ShaderBase* shader, std::string uniform, const Maths::Vector4 vec) override;
 			void UpdateUniformMatrix4(ShaderBase* shader, std::string uniform, const Maths::Matrix4 matrix) override;
-			void SetDepth(bool depth) override;
 
+			void SetDepth(bool depth) override;
 			void SetBlend(bool blend) override;
+
+			void SetCullFace(bool cull) override;
+			void SetCullType(CULL_TYPE type) override;
+
+			void SetViewportSize(int x, int y) override;
+
+			void ClearBuffer(bool color, bool depth, bool stencil) override;
+			void SetClearColour(float r, float g, float b, float a) override;
+			void SetColourMask(bool r, bool g, bool b, bool a) override;
 		private:
 			struct DebugString {
 				Maths::Vector4 colour;

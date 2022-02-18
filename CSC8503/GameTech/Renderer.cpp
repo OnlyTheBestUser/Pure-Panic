@@ -43,7 +43,14 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 	skyboxMesh->SetVertexIndices({ 0,1,2,2,3,0 });
 	skyboxMesh->UploadToGPU();
 
-	LoadSkybox();
+	skyboxTex = OGLTexture::RGBATextureCubemapFromFilename(
+		"/Cubemap/skyrender0004.png",
+		"/Cubemap/skyrender0001.png",
+		"/Cubemap/skyrender0003.png",
+		"/Cubemap/skyrender0006.png",
+		"/Cubemap/skyrender0002.png",
+		"/Cubemap/skyrender0005.png"
+	);
 
 	shadowFBO = new OGLFrameBuffer();
 	shadowFBO->AddTexture();
@@ -83,62 +90,19 @@ Renderer::~Renderer() {
 	delete skyboxTex;
 }
 
-void Renderer::LoadSkybox() {
-	GLuint tex;
-	string filenames[6] = {
-		"/Cubemap/skyrender0004.png",
-		"/Cubemap/skyrender0001.png",
-		"/Cubemap/skyrender0003.png",
-		"/Cubemap/skyrender0006.png",
-		"/Cubemap/skyrender0002.png",
-		"/Cubemap/skyrender0005.png"
-	};
-
-	int width[6] = { 0 };
-	int height[6] = { 0 };
-	int channels[6] = { 0 };
-	int flags[6] = { 0 };
-
-	vector<char*> texData(6, nullptr);
-
-	for (int i = 0; i < 6; ++i) {
-		TextureLoader::LoadTexture(filenames[i], texData[i], width[i], height[i], channels[i], flags[i]);
-		if (i > 0 && (width[i] != width[0] || height[0] != height[0])) {
-			std::cout << __FUNCTION__ << " cubemap input textures don't match in size?\n";
-			return;
-		}
-	}
-	glGenTextures(1, &tex);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
-
-	GLenum type = channels[0] == 4 ? GL_RGBA : GL_RGB;
-
-	for (int i = 0; i < 6; ++i) {
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width[i], height[i], 0, type, GL_UNSIGNED_BYTE, texData[i]);
-	}
-
-	glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-	delete skyboxTex;
-	skyboxTex = new OGLTexture(tex);
-}
-
 void Renderer::Update(float dt) {
 
 }
 
 void Renderer::Render() {
 	rendererAPI->BeginFrame();
-	glEnable(GL_CULL_FACE);
-	glClearColor(1, 1, 1, 1);
+	rendererAPI->SetCullFace(true);
+	rendererAPI->SetClearColour(1, 1, 1, 1);
 	BuildObjectList();
 	SortObjectList();
 	RenderScene();
 	rendererAPI->RenderFrame();
-	glDisable(GL_CULL_FACE);
+	rendererAPI->SetCullFace(false);
 
 	rendererAPI->EndFrame();
 	DrawDebugData();
@@ -168,10 +132,10 @@ void Renderer::RenderScene() {
 // Render Shadow Map
 
 	rendererAPI->BindFrameBuffer(shadowFBO);
-	glClear(GL_DEPTH_BUFFER_BIT);
-	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-	glViewport(0, 0, 4096, 4096);
-	glCullFace(GL_FRONT);
+	rendererAPI->ClearBuffer(false, true, false);
+	rendererAPI->SetColourMask(false, false, false, false);
+	rendererAPI->SetViewportSize(4096, 4096);
+	rendererAPI->SetCullType(NCL::Rendering::RendererAPI::CULL_TYPE::FRONT);
 
 	rendererAPI->BindShader(shadowShader);
 
@@ -188,15 +152,15 @@ void Renderer::RenderScene() {
 		rendererAPI->UpdateUniformMatrix4(shadowShader, "mvpMatrix", mvpMatrix);
 		rendererAPI->DrawMesh((*i).GetMesh());
 	}
-	glViewport(0, 0, rendererAPI->GetCurrentWidth(), rendererAPI->GetCurrentHeight());
-	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+	rendererAPI->SetViewportSize(rendererAPI->GetCurrentWidth(), rendererAPI->GetCurrentHeight());
+	rendererAPI->SetColourMask(true, true, true, true);
 	rendererAPI->BindFrameBuffer();
-	glCullFace(GL_BACK);
+	rendererAPI->SetCullType(NCL::Rendering::RendererAPI::CULL_TYPE::BACK);
 
 // Render skybox
- 	glDisable(GL_CULL_FACE);
-	glDisable(GL_BLEND);
-	glDisable(GL_DEPTH_TEST);
+	rendererAPI->SetCullFace(false);
+	rendererAPI->SetBlend(false);
+	rendererAPI->SetDepth(false);
 
 	float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
 	Matrix4 viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
@@ -212,9 +176,10 @@ void Renderer::RenderScene() {
 	rendererAPI->DrawMesh(skyboxMesh);
 
 
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_BLEND);
-	glEnable(GL_DEPTH_TEST);
+	rendererAPI->SetCullFace(true);
+	rendererAPI->SetBlend(true);
+	rendererAPI->SetDepth(true);
+
 // Render Scene
 
 	/*float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
@@ -245,9 +210,6 @@ void Renderer::RenderScene() {
 		rendererAPI->UpdateUniformVector4(shader, "objectColour", i->GetColour());
 		rendererAPI->UpdateUniformInt(shader, "hasVertexColours", !(*i).GetMesh()->GetColourData().empty());
 		rendererAPI->UpdateUniformInt(shader, "hasTexture", (OGLTexture*)(*i).GetDefaultTexture() ? 1 : 0);
-
-
-
 
 		rendererAPI->DrawMesh((*i).GetMesh());
 	}

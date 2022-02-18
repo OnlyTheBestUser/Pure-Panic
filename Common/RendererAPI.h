@@ -62,6 +62,20 @@ namespace NCL {
 			virtual void SetDepth(bool depth) = 0;
 			virtual void SetBlend(bool blend) = 0;
 
+			enum CULL_TYPE {
+				FRONT,
+				BACK,
+			};
+
+			virtual void SetCullFace(bool cull) = 0;
+			virtual void SetCullType(CULL_TYPE type) = 0;
+
+			virtual void SetViewportSize(int x, int y) = 0;
+
+			virtual void ClearBuffer(bool color, bool depth, bool stencil) = 0;
+			virtual void SetClearColour(float r, float g, float b, float a) = 0;
+			virtual void SetColourMask(bool r, bool g, bool b, bool a) = 0;
+
 			int GetCurrentWidth() { return currentWidth; }
 			int GetCurrentHeight() { return currentHeight; }
 

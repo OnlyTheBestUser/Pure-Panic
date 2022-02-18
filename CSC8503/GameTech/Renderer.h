@@ -18,8 +18,6 @@ namespace NCL {
 			void SortObjectList();
 			void RenderScene();
 
-			void LoadSkybox();
-
 			// Debug
 			Maths::Matrix4 SetupDebugLineMatrix() const override;
 			Maths::Matrix4 SetupDebugStringMatrix() const override;
