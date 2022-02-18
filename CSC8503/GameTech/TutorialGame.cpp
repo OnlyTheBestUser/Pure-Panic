@@ -797,7 +797,8 @@ bool TutorialGame::SelectObject() {
 
 		if (Window::GetMouse()->ButtonDown(NCL::MouseButtons::LEFT)) {
 			if (selectionObject) {	//set colour to deselected;
-				selectionObject->GetRenderObject()->SetColour(Vector4(1, 1, 1, 1));
+				if(selectionObject->GetRenderObject())
+					selectionObject->GetRenderObject()->SetColour(Vector4(1, 1, 1, 1));
 				//selectionObject->SetLayer(0);
 				selectionObject = nullptr;
 			}
@@ -807,7 +808,8 @@ bool TutorialGame::SelectObject() {
 			RayCollision closestCollision;
 			if (world->Raycast(ray, closestCollision, true)) {
 				selectionObject = (GameObject*)closestCollision.node;
-				selectionObject->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
+				if(selectionObject->GetRenderObject())
+					selectionObject->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
 				//selectionObject->SetLayer(1);
 				//Ray r(selectionObject->GetTransform().GetPosition(), Vector3(0,0,-1));
 				//RayCollision col;
