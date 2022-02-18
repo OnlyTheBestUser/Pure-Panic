@@ -271,6 +271,9 @@ void TutorialGame::UpdateKeys() {
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F8)) {
 		world->ShuffleObjects(false);
 	}
+	if (Window::GetKeyboard()->KeyPressed(NCL::KeyboardKeys::L)) {
+		player1->ChangeCamLock();
+	}
 
 	DebugObjectMovement();
 }
@@ -501,7 +504,8 @@ void TutorialGame::AddLongWallToWorld(const Vector3& position, Vector3 dimension
 	if (position.z > 0)
 		location += Vector3(1, 0, -2);
 
-	GameObject* mainWall = AddAABBWallToWorld(location, dimensions, rotation);
+	GameObject* physicalObject = AddAABBWallToWorld(location, dimensions, rotation, "Long wall");
+	physicalObject->GetPhysicsObject()->Sleep();
 	if (rotation == 90 || rotation == 270)
 	{
 		for (int i = -dimensions.z; i < dimensions.z; i += 10)
@@ -520,8 +524,8 @@ void TutorialGame::AddLongWallToWorld(const Vector3& position, Vector3 dimension
 	}
 	return;
 }
-GameObject* TutorialGame::AddAABBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation) {
-	GameObject* cube = new GameObject();
+GameObject* TutorialGame::AddAABBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name) {
+	GameObject* cube = new GameObject(name);
 	AABBVolume* volume = new AABBVolume(dimensions);
 	cube->SetBoundingVolume((CollisionVolume*)volume);
 
@@ -580,9 +584,8 @@ GameObject* TutorialGame::AddWallToWorld(const Vector3& position, Vector3 dimens
 	world->AddGameObject(cube);
 	return cube;
 }
-GameObject* TutorialGame::AddOBBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation) {
-	GameObject* cube = new GameObject();
-	
+GameObject* TutorialGame::AddOBBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name) {
+	GameObject* cube = new GameObject(name);
 	OBBVolume* volume = new OBBVolume(dimensions + Vector3(2,10,0));
 	cube->SetBoundingVolume((CollisionVolume*)volume);
 
@@ -602,9 +605,9 @@ GameObject* TutorialGame::AddOBBWallToWorld(const Vector3& position, Vector3 dim
 	world->AddGameObject(cube);
 	return cube;
 }
-void TutorialGame::AddCornerWallToWorld(const Vector3& position, Vector3 dimensions, int rotation) {
+void TutorialGame::AddCornerWallToWorld(const Vector3& position, Vector3 dimensions, int rotation) 
+{
 	Vector3 location = position + Vector3(0, 15, 0);
-
 	if (rotation == 45)
 		location += Vector3(3, 0, 3);
 	if (rotation == 135)
@@ -614,7 +617,8 @@ void TutorialGame::AddCornerWallToWorld(const Vector3& position, Vector3 dimensi
 	if (rotation == 315)
 		location += Vector3(-3, 0, 3);
 
-	GameObject* mainWall = AddOBBWallToWorld(location, dimensions, rotation);
+	GameObject* physicalObject = AddOBBWallToWorld(location, dimensions, rotation, "Corner wall");
+	physicalObject->GetPhysicsObject()->Sleep();
 	AddRenderPartToWorld(position, dimensions, rotation, corridorWallCorner, corridorWallAlertTex);
 	return;
 }
@@ -643,7 +647,8 @@ void TutorialGame::AddSecurityCameraToWorld(const Vector3& position, int rotatio
 		location += Vector3(4, 0, 0);
 	}
 
-	GameObject* mainWall = AddAABBWallToWorld(location, dimensions, rotation);
+	GameObject* physicalObject = AddAABBWallToWorld(location, dimensions, rotation, "Security Camera");
+	physicalObject->GetPhysicsObject()->Sleep();
 	AddRenderPartToWorld(position, Vector3(5, 5, 5), rotation, securityCamera, securityCameraTex);
 	return;
 }
@@ -797,7 +802,8 @@ bool TutorialGame::SelectObject() {
 
 		if (Window::GetMouse()->ButtonDown(NCL::MouseButtons::LEFT)) {
 			if (selectionObject) {	//set colour to deselected;
-				selectionObject->GetRenderObject()->SetColour(Vector4(1, 1, 1, 1));
+				if (selectionObject->GetRenderObject())
+					selectionObject->GetRenderObject()->SetColour(Vector4(1, 1, 1, 1));
 				//selectionObject->SetLayer(0);
 				selectionObject = nullptr;
 			}
@@ -807,7 +813,8 @@ bool TutorialGame::SelectObject() {
 			RayCollision closestCollision;
 			if (world->Raycast(ray, closestCollision, true)) {
 				selectionObject = (GameObject*)closestCollision.node;
-				selectionObject->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
+				if (selectionObject->GetRenderObject())
+					selectionObject->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
 				//selectionObject->SetLayer(1);
 				//Ray r(selectionObject->GetTransform().GetPosition(), Vector3(0,0,-1));
 				//RayCollision col;
@@ -829,10 +836,6 @@ bool TutorialGame::SelectObject() {
 	}
 	else {
 		renderer->DrawString("Press Q to change to select mode!", Vector2(5, 85));
-	}
-
-	if (Window::GetKeyboard()->KeyPressed(NCL::KeyboardKeys::L)) {
-		player1->ChangeCamLock();
 	}
 
 	return false;
