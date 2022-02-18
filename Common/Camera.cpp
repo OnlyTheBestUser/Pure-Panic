@@ -13,8 +13,8 @@ void Camera::UpdateCamera(float dt) {
 	if (lockCamera)
 		return;
 	//Update the mouse by how much
-	//pitch -= (Window::GetMouse()->GetRelativePosition().y);
-	//yaw -= (Window::GetMouse()->GetRelativePosition().x);
+	pitch -= (Window::GetMouse()->GetRelativePosition().y);
+	yaw -= (Window::GetMouse()->GetRelativePosition().x);
 	//Bounds check the pitch, to be between straight up and straight down ;)
 	pitch = std::min(pitch, 90.0f);
 	pitch = std::max(pitch, -90.0f);
