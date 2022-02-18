@@ -15,6 +15,8 @@
 #include "../CSC8503Common/PushdownState.h"
 #include "../CSC8503Common/PushdownMachine.h"
 
+#include "NetworkedGame.h"
+
 using namespace NCL;
 using namespace CSC8503;
 
@@ -102,13 +104,13 @@ protected:
 
 class Menu : public PushdownState {
 public:
-	Menu(MainMenu* m, TutorialGame* g, TutorialGame* f, TutorialGame* h) : m(m), g(g), f(f), h(h) {};
+	Menu(MainMenu* m, TutorialGame* g, TutorialGame* h, TutorialGame* i) : m(m), g(g), h(h), i(i) {};
 
 	PushdownResult OnUpdate(float dt, PushdownState** newState) override {
 		m->UpdateGame(dt);
 
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM1)) {
-			*newState = new Game(f);
+			*newState = new Game(g);
 			return PushdownResult::Push;
 		}
 
@@ -118,7 +120,7 @@ public:
 		}
 
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM3)) {
-			*newState = new Game(g);
+			*newState = new Game(i);
 			return PushdownResult::Push;
 		}
 
@@ -131,8 +133,8 @@ public:
 
 protected:
 	TutorialGame* g;
-	TutorialGame* f;
 	TutorialGame* h;
+	TutorialGame* i;
 	MainMenu* m;
 };
 
@@ -150,7 +152,7 @@ hide or show the
 */
 
 int main() {
-	Window*w = Window::CreateGameWindow("CSC8503 Game technology!", 1600, 900);
+	Window*w = Window::CreateGameWindow("CSC8503 Game technology!", 960, 540);
 		
 	if (!w->HasInitialised()) {
 		return -1;
@@ -165,8 +167,9 @@ int main() {
 	int totalFrames = 0;
 
 	TutorialGame* g = new TutorialGame();
+	NetworkedGame* h = new NetworkedGame();
 	MainMenu* m = new MainMenu();
-	PushdownMachine p = new Menu(m, g, g, g);
+	PushdownMachine p = new Menu(m, g, h, g);
 	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
 	float smallestFrameRate = 144.0f;
 	while (w->UpdateWindow()) { //&& !w->GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {

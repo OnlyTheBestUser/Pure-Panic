@@ -1,5 +1,26 @@
 #pragma once
-class NetworkedPlayer
-{
-};
+#include "../CSC8503Common/GameObject.h"
+#include "../CSC8503Common/GameClient.h"
+
+namespace NCL {
+	namespace CSC8503 {
+		class NetworkedGame;
+
+		class NetworkPlayer : public GameObject {
+		public:
+			NetworkPlayer(NetworkedGame* game, int num);
+			~NetworkPlayer();
+
+			virtual void OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vector3 localB, Vector3 normal) override;
+
+			int GetPlayerNum() const {
+				return playerNum;
+			}
+
+		protected:
+			NetworkedGame* game;
+			int playerNum;
+		};
+	}
+}
 

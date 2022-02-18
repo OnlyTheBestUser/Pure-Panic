@@ -12,8 +12,13 @@ _-_-_-_-_-_-_-""  ""
 *//////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include "Window.h"
+#include "../Common/Vector3.h"
+#include "../Common/Vector4.h"
+/*
 #include "../../Common/Vector3.h"
 #include "../../Common/Vector4.h"
+*/
+
 
 namespace NCL {
 	namespace Rendering {
