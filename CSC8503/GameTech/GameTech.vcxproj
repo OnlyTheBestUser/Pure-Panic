@@ -79,12 +79,12 @@
     <IncludePath>$(SolutionDir)\Plugins\OpenGLRendering;$(SolutionDir)\Plugins\Networking-ENet\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>$(SolutionDir)$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(SolutionDir)\Plugins\OpenGLRendering;$(SolutionDir)\Plugins\Networking-ENet\include;$(IncludePath)</IncludePath>
+    <LibraryPath>;$(SolutionDir)\Plugins\OpenGLRendering;$(SolutionDir)\Plugins\Networking-ENet\include;;$(SolutionDir)\Plugins\OpenGLRendering;$(SolutionDir)\Plugins\FMod\api\core\lib;$(SolutionDir)$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\Plugins\OpenGLRendering;$(SolutionDir)\Plugins\Networking-ENet\include;;$(SolutionDir)\Plugins\OpenGLRendering;$(SolutionDir)\Plugins\FMod\api\core\inc;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LibraryPath>$(SolutionDir)$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(SolutionDir)\Plugins\OpenGLRendering;$(SolutionDir)\Plugins\Networking-ENet\include;$(IncludePath)</IncludePath>
+    <LibraryPath>;$(SolutionDir)\Plugins\OpenGLRendering;$(SolutionDir)\Plugins\Networking-ENet\include;;$(SolutionDir)\Plugins\OpenGLRendering;$(SolutionDir)\Plugins\FMod\api\core\lib;$(SolutionDir)$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\Plugins\OpenGLRendering;$(SolutionDir)\Plugins\Networking-ENet\include;;$(SolutionDir)\Plugins\OpenGLRendering;$(SolutionDir)\Plugins\FMod\api\core\inc;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

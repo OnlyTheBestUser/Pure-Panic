@@ -2,6 +2,7 @@
 #include "GameTechRenderer.h"
 #include "../CSC8503Common/PhysicsSystem.h"
 #include "../CSC8503Common/Player.h"
+#include "../CSC8503Common/AudioManager.h"
 
 namespace NCL {
 	namespace CSC8503 {
@@ -71,6 +72,7 @@ namespace NCL {
 			RendererBase*	renderer;
 			PhysicsSystem*		physics;
 			GameWorld*			world;
+			AudioManager*		audio;
 
 			GameState state;
 

@@ -75,17 +75,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>$(SolutionDir)\Plugins\Networking-ENet\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\Plugins\FMod\api\core\inc;$(SolutionDir)\Plugins\Networking-ENet\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>$(SolutionDir)\Plugins\Networking-ENet\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\Plugins\FMod\api\core\inc;$(SolutionDir)\Plugins\Networking-ENet\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)\Plugins\Networking-ENet\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\Plugins\FMod\api\core\inc;$(SolutionDir)\Plugins\Networking-ENet\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64;$(SolutionDir)\Plugins\FMod\api\studio\lib;</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)\Plugins\Networking-ENet\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\Plugins\FMod\api\core\inc;$(SolutionDir)\Plugins\Networking-ENet\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64;$(SolutionDir)\Plugins\FMod\api\studio\lib;</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -133,6 +135,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AABBVolume.h" />
+    <ClInclude Include="AudioManager.h" />
     <ClInclude Include="BehaviourAction.h" />
     <ClInclude Include="BehaviourNode.h" />
     <ClInclude Include="BehaviourNodeWithChildren.h" />
@@ -170,6 +173,7 @@
     <ClInclude Include="Transform.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AudioManager.cpp" />
     <ClCompile Include="CollisionDetection.cpp" />
     <ClCompile Include="Debug.cpp" />
     <ClCompile Include="GameObject.cpp" />

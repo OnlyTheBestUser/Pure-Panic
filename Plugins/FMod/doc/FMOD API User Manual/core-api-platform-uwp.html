@@ -1,0 +1,218 @@
+<html>
+<head>
+<title>Core API Reference | UWP Specific</title>
+<link rel="stylesheet" href="style/docs.css">
+<link rel="stylesheet" href="style/code_highlight.css">
+<script type="text/javascript" src="scripts/language-selector.js"></script></head>
+<body>
+<div class="docs-body">
+<div class="manual-toc">
+<p>FMOD API User Manual 2.00</p>
+<ul>
+<li><a href="welcome.html">Welcome to FMOD API</a></li>
+<li><a href="studio-guide.html">Studio API Guide</a></li>
+<li><a href="core-guide.html">Core API Guide</a></li>
+<li><a href="platforms.html">Platform Details</a></li>
+<li><a href="white-papers.html">White Papers</a></li>
+<li><a href="studio-api.html">Studio API Reference</a></li>
+<li class="manual-current-chapter manual-inactive-chapter"><a href="core-api.html">Core API Reference</a><ul class="subchapters"><li><a href="core-api-common.html">Common</a></li><li><a href="core-api-common-dsp-effects.html">Effect Parameters</a></li><li><a href="core-api-system.html">System</a></li><li><a href="core-api-sound.html">Sound</a></li><li><a href="core-api-channelcontrol.html">ChannelControl</a></li><li><a href="core-api-channel.html">Channel</a></li><li><a href="core-api-channelgroup.html">ChannelGroup</a></li><li><a href="core-api-soundgroup.html">SoundGroup</a></li><li><a href="core-api-dsp.html">DSP</a></li><li><a href="core-api-dspconnection.html">DSPConnection</a></li><li><a href="core-api-geometry.html">Geometry</a></li><li><a href="core-api-reverb3d.html">Reverb3D</a></li><li><a href="core-api-platform-android.html">Android Specific</a></li><li><a href="core-api-platform-ios.html">iOS Specific</a></li><li class="manual-current-chapter manual-active-chapter"><a href="core-api-platform-uwp.html">UWP Specific</a></li><li><a href="core-api-platform-ps4.html">PS4 Specific</a></li></ul></li>
+<li><a href="fsbank-api.html">FSBank API Reference</a></li>
+<li><a href="plugin-api.html">Plugin API Reference</a></li>
+<li><a href="effects-reference.html">Effects Reference</a></li>
+<li><a href="glossary.html">Glossary</a></li>
+</ul>
+</div>
+<div class="manual-content api">
+<h1>7. Core API Reference | UWP Specific</h1>
+<p>APIs and types for UWP platform, see fmod_uwp.h</p>
+<ul>
+<li><a class="apilink" href="core-api-platform-uwp.html#fmod_uwp_setthreadaffinity" title="Control which core particular threads are created on.">FMOD_UWP_SetThreadAffinity</a> Control which core particular threads are created on.</li>
+<li><a class="apilink" href="core-api-platform-uwp.html#fmod_uwp_threadaffinity" title="Mapping of cores to threads.">FMOD_UWP_THREADAFFINITY</a> Mapping of cores to threads.</li>
+<li><a class="apilink" href="core-api-platform-android.html#fmod_thread" title="Cores available for mapping threads onto.">FMOD_THREAD</a> Cores available for mapping threads onto.</li>
+</ul>
+<h2 api="define" id="fmod_thread"><a href="#fmod_thread">FMOD_THREAD</a></h2>
+<p>Cores available for mapping threads onto.</p>
+<p>
+<div class="language-selector">
+<div class="language-tab" data-language="language-c">C</div>
+<div class="language-tab" data-language="language-cpp">C++</div>
+<div class="language-tab" data-language="language-csharp">C#</div>
+</div>
+</p>
+<div class="highlight language-c-cpp"><pre><span></span><span class="cp">#define FMOD_THREAD_DEFAULT       0</span>
+<span class="cp">#define FMOD_THREAD_CORE0         (1 &lt;&lt; 0)</span>
+<span class="cp">#define FMOD_THREAD_CORE1         (1 &lt;&lt; 1)</span>
+<span class="cp">#define FMOD_THREAD_CORE2         (1 &lt;&lt; 2)</span>
+<span class="cp">#define FMOD_THREAD_CORE3         (1 &lt;&lt; 3)</span>
+<span class="cp">#define FMOD_THREAD_CORE4         (1 &lt;&lt; 4)</span>
+<span class="cp">#define FMOD_THREAD_CORE5         (1 &lt;&lt; 5)</span>
+<span class="cp">#define FMOD_THREAD_CORE6         (1 &lt;&lt; 6)</span>
+<span class="cp">#define FMOD_THREAD_CORE7         (1 &lt;&lt; 7)</span>
+<span class="cp">#define FMOD_THREAD_CORE8         (1 &lt;&lt; 8)</span>
+<span class="cp">#define FMOD_THREAD_CORE9         (1 &lt;&lt; 9)</span>
+<span class="cp">#define FMOD_THREAD_CORE10        (1 &lt;&lt; 10)</span>
+<span class="cp">#define FMOD_THREAD_CORE11        (1 &lt;&lt; 11)</span>
+<span class="cp">#define FMOD_THREAD_CORE12        (1 &lt;&lt; 12)</span>
+<span class="cp">#define FMOD_THREAD_CORE13        (1 &lt;&lt; 13)</span>
+<span class="cp">#define FMOD_THREAD_CORE14        (1 &lt;&lt; 14)</span>
+<span class="cp">#define FMOD_THREAD_CORE15        (1 &lt;&lt; 15)</span>
+</pre></div>
+
+
+<div class="highlight language-csharp"><pre><span></span><span class="k">enum</span> <span class="n">THREAD</span> <span class="p">:</span> <span class="kt">uint</span>
+<span class="p">{</span>
+  <span class="n">DEFAULT</span> <span class="p">=</span> <span class="m">0</span><span class="p">,</span>
+  <span class="n">CORE0</span>   <span class="p">=</span> <span class="m">1</span> <span class="p">&lt;&lt;</span> <span class="m">0</span><span class="p">,</span>
+  <span class="n">CORE1</span>   <span class="p">=</span> <span class="m">1</span> <span class="p">&lt;&lt;</span> <span class="m">1</span><span class="p">,</span>
+  <span class="n">CORE2</span>   <span class="p">=</span> <span class="m">1</span> <span class="p">&lt;&lt;</span> <span class="m">2</span><span class="p">,</span>
+  <span class="n">CORE3</span>   <span class="p">=</span> <span class="m">1</span> <span class="p">&lt;&lt;</span> <span class="m">3</span><span class="p">,</span>
+  <span class="n">CORE4</span>   <span class="p">=</span> <span class="m">1</span> <span class="p">&lt;&lt;</span> <span class="m">4</span><span class="p">,</span>
+  <span class="n">CORE5</span>   <span class="p">=</span> <span class="m">1</span> <span class="p">&lt;&lt;</span> <span class="m">5</span><span class="p">,</span>
+  <span class="n">CORE6</span>   <span class="p">=</span> <span class="m">1</span> <span class="p">&lt;&lt;</span> <span class="m">6</span><span class="p">,</span>
+  <span class="n">CORE7</span>   <span class="p">=</span> <span class="m">1</span> <span class="p">&lt;&lt;</span> <span class="m">7</span><span class="p">,</span>
+  <span class="n">CORE8</span>   <span class="p">=</span> <span class="m">1</span> <span class="p">&lt;&lt;</span> <span class="m">8</span><span class="p">,</span>
+  <span class="n">CORE9</span>   <span class="p">=</span> <span class="m">1</span> <span class="p">&lt;&lt;</span> <span class="m">9</span><span class="p">,</span>
+  <span class="n">CORE10</span>  <span class="p">=</span> <span class="m">1</span> <span class="p">&lt;&lt;</span> <span class="m">10</span><span class="p">,</span>
+  <span class="n">CORE11</span>  <span class="p">=</span> <span class="m">1</span> <span class="p">&lt;&lt;</span> <span class="m">11</span><span class="p">,</span>
+  <span class="n">CORE12</span>  <span class="p">=</span> <span class="m">1</span> <span class="p">&lt;&lt;</span> <span class="m">12</span><span class="p">,</span>
+  <span class="n">CORE13</span>  <span class="p">=</span> <span class="m">1</span> <span class="p">&lt;&lt;</span> <span class="m">13</span><span class="p">,</span>
+  <span class="n">CORE14</span>  <span class="p">=</span> <span class="m">1</span> <span class="p">&lt;&lt;</span> <span class="m">14</span><span class="p">,</span>
+  <span class="n">CORE15</span>  <span class="p">=</span> <span class="m">1</span> <span class="p">&lt;&lt;</span> <span class="m">15</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<div class="admonition language-javascript">
+<p>Not supported for JavaScript.</p>
+</div>
+<dl>
+<dt id="fmod_thread_default">FMOD_THREAD_DEFAULT</dt>
+<dd>Use all available cores.</dd>
+<dt id="fmod_thread_core0">FMOD_THREAD_CORE0</dt>
+<dd>Logical core 0.</dd>
+<dt id="fmod_thread_core1">FMOD_THREAD_CORE1</dt>
+<dd>Logical core 1.</dd>
+<dt id="fmod_thread_core2">FMOD_THREAD_CORE2</dt>
+<dd>Logical core 2.</dd>
+<dt id="fmod_thread_core3">FMOD_THREAD_CORE3</dt>
+<dd>Logical core 3.</dd>
+<dt id="fmod_thread_core4">FMOD_THREAD_CORE4</dt>
+<dd>Logical core 4.</dd>
+<dt id="fmod_thread_core5">FMOD_THREAD_CORE5</dt>
+<dd>Logical core 5.</dd>
+<dt id="fmod_thread_core6">FMOD_THREAD_CORE6</dt>
+<dd>Logical core 6.</dd>
+<dt id="fmod_thread_core7">FMOD_THREAD_CORE7</dt>
+<dd>Logical core 7.</dd>
+<dt id="fmod_thread_core8">FMOD_THREAD_CORE8</dt>
+<dd>Logical core 8.</dd>
+<dt id="fmod_thread_core9">FMOD_THREAD_CORE9</dt>
+<dd>Logical core 9.</dd>
+<dt id="fmod_thread_core10">FMOD_THREAD_CORE10</dt>
+<dd>Logical core 10.</dd>
+<dt id="fmod_thread_core11">FMOD_THREAD_CORE11</dt>
+<dd>Logical core 11.</dd>
+<dt id="fmod_thread_core12">FMOD_THREAD_CORE12</dt>
+<dd>Logical core 12.</dd>
+<dt id="fmod_thread_core13">FMOD_THREAD_CORE13</dt>
+<dd>Logical core 13.</dd>
+<dt id="fmod_thread_core14">FMOD_THREAD_CORE14</dt>
+<dd>Logical core 14.</dd>
+<dt id="fmod_thread_core15">FMOD_THREAD_CORE15</dt>
+<dd>Logical core 15.</dd>
+</dl>
+<p><strong>See Also:</strong> <a class="apilink" href="core-api-platform-uwp.html#fmod_uwp_threadaffinity" title="Mapping of cores to threads.">FMOD_UWP_THREADAFFINITY</a></p>
+<h2 api="function" id="fmod_uwp_setthreadaffinity"><a href="#fmod_uwp_setthreadaffinity">FMOD_UWP_SetThreadAffinity</a></h2>
+<p>Control which core particular threads are created on.</p>
+<p>
+<div class="language-selector">
+<div class="language-tab" data-language="language-c">C</div>
+<div class="language-tab" data-language="language-cpp">C++</div>
+<div class="language-tab" data-language="language-csharp">C#</div>
+</div>
+</p>
+<div class="highlight language-c-cpp"><pre><span></span><span class="n">FMOD_RESULT</span> <span class="nf">FMOD_UWP_SetThreadAffinity</span><span class="p">(</span>
+  <span class="n">FMOD_UWP_THREADAFFINITY</span> <span class="o">*</span><span class="n">affinity</span>
+<span class="p">);</span>
+</pre></div>
+
+
+<div class="admonition language-csharp">
+<p>Not supported for C#.</p>
+</div>
+<div class="admonition language-javascript">
+<p>Not supported for JavaScript.</p>
+</div>
+<dl>
+<dt>affinity</dt>
+<dd>Affinity for each thread. (<a class="apilink" href="core-api-platform-uwp.html#fmod_uwp_threadaffinity" title="Mapping of cores to threads.">FMOD_UWP_THREADAFFINITY</a>)</dd>
+</dl>
+<p>Call before <a class="apilink" href="core-api-system.html#system_init" title="Initialize the system object and prepare FMOD for playback.">System::init</a> or affinity values will not apply.</p>
+<h2 api="struct" id="fmod_uwp_threadaffinity"><a href="#fmod_uwp_threadaffinity">FMOD_UWP_THREADAFFINITY</a></h2>
+<p>Mapping of cores to threads.</p>
+<p>
+<div class="language-selector">
+<div class="language-tab" data-language="language-c">C</div>
+<div class="language-tab" data-language="language-cpp">C++</div>
+<div class="language-tab" data-language="language-csharp">C#</div>
+</div>
+</p>
+<div class="highlight language-c-cpp"><pre><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">FMOD_UWP_THREADAFFINITY</span> <span class="p">{</span>
+  <span class="n">FMOD_THREAD</span> <span class="n">mixer</span><span class="p">;</span>
+  <span class="n">FMOD_THREAD</span> <span class="n">stream</span><span class="p">;</span>
+  <span class="n">FMOD_THREAD</span> <span class="n">nonblocking</span><span class="p">;</span>
+  <span class="n">FMOD_THREAD</span> <span class="n">file</span><span class="p">;</span>
+  <span class="n">FMOD_THREAD</span> <span class="n">geometry</span><span class="p">;</span>
+  <span class="n">FMOD_THREAD</span> <span class="n">profiler</span><span class="p">;</span>
+  <span class="n">FMOD_THREAD</span> <span class="n">studioUpdate</span><span class="p">;</span>
+  <span class="n">FMOD_THREAD</span> <span class="n">studioLoadBank</span><span class="p">;</span>
+  <span class="n">FMOD_THREAD</span> <span class="n">studioLoadSample</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">FMOD_UWP_THREADAFFINITY</span><span class="p">;</span>
+</pre></div>
+
+
+<div class="highlight language-csharp"><pre><span></span><span class="k">struct</span> <span class="nc">THREADAFFINITY</span>
+<span class="p">{</span>
+  <span class="n">THREAD</span> <span class="n">mixer</span><span class="p">;</span>
+  <span class="n">THREAD</span> <span class="n">stream</span><span class="p">;</span>
+  <span class="n">THREAD</span> <span class="n">nonblocking</span><span class="p">;</span>
+  <span class="n">THREAD</span> <span class="n">file</span><span class="p">;</span>
+  <span class="n">THREAD</span> <span class="n">geometry</span><span class="p">;</span>
+  <span class="n">THREAD</span> <span class="n">profiler</span><span class="p">;</span>
+  <span class="n">THREAD</span> <span class="n">studioUpdate</span><span class="p">;</span>
+  <span class="n">THREAD</span> <span class="n">studioLoadBank</span><span class="p">;</span>
+  <span class="n">THREAD</span> <span class="n">studioLoadSample</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<div class="admonition language-javascript">
+<p>Not supported for JavaScript.</p>
+</div>
+<dl>
+<dt id="fmod_uwp_threadaffinity_mixer">mixer <span><a class="token" href="glossary.html#documentation-conventions" title="Optional">Opt</a></span></dt>
+<dd>Software mixer thread. (<a class="apilink" href="core-api-platform-android.html#fmod_thread" title="Cores available for mapping threads onto.">FMOD_THREAD</a>)</dd>
+<dt id="fmod_uwp_threadaffinity_stream">stream <span><a class="token" href="glossary.html#documentation-conventions" title="Optional">Opt</a></span></dt>
+<dd>Stream thread. (<a class="apilink" href="core-api-platform-android.html#fmod_thread" title="Cores available for mapping threads onto.">FMOD_THREAD</a>)</dd>
+<dt id="fmod_uwp_threadaffinity_nonblocking">nonblocking <span><a class="token" href="glossary.html#documentation-conventions" title="Optional">Opt</a></span></dt>
+<dd>Asynchronous sound loading thread. (<a class="apilink" href="core-api-platform-android.html#fmod_thread" title="Cores available for mapping threads onto.">FMOD_THREAD</a>)</dd>
+<dt id="fmod_uwp_threadaffinity_file">file <span><a class="token" href="glossary.html#documentation-conventions" title="Optional">Opt</a></span></dt>
+<dd>File thread. (<a class="apilink" href="core-api-platform-android.html#fmod_thread" title="Cores available for mapping threads onto.">FMOD_THREAD</a>)</dd>
+<dt id="fmod_uwp_threadaffinity_geometry">geometry <span><a class="token" href="glossary.html#documentation-conventions" title="Optional">Opt</a></span></dt>
+<dd>Geometry processing thread. (<a class="apilink" href="core-api-platform-android.html#fmod_thread" title="Cores available for mapping threads onto.">FMOD_THREAD</a>)</dd>
+<dt id="fmod_uwp_threadaffinity_profiler">profiler <span><a class="token" href="glossary.html#documentation-conventions" title="Optional">Opt</a></span></dt>
+<dd>Profiler threads. (<a class="apilink" href="core-api-platform-android.html#fmod_thread" title="Cores available for mapping threads onto.">FMOD_THREAD</a>)</dd>
+<dt id="fmod_uwp_threadaffinity_studioupdate">studioUpdate <span><a class="token" href="glossary.html#documentation-conventions" title="Optional">Opt</a></span></dt>
+<dd>Studio update thread. (<a class="apilink" href="core-api-platform-android.html#fmod_thread" title="Cores available for mapping threads onto.">FMOD_THREAD</a>)</dd>
+<dt id="fmod_uwp_threadaffinity_studioloadbank">studioLoadBank <span><a class="token" href="glossary.html#documentation-conventions" title="Optional">Opt</a></span></dt>
+<dd>Studio bank loading thread. (<a class="apilink" href="core-api-platform-android.html#fmod_thread" title="Cores available for mapping threads onto.">FMOD_THREAD</a>)</dd>
+<dt id="fmod_uwp_threadaffinity_studioloadsample">studioLoadSample <span><a class="token" href="glossary.html#documentation-conventions" title="Optional">Opt</a></span></dt>
+<dd>Studio sample loading thread. (<a class="apilink" href="core-api-platform-android.html#fmod_thread" title="Cores available for mapping threads onto.">FMOD_THREAD</a>)</dd>
+</dl>
+<p><strong>See Also:</strong> <a class="apilink" href="core-api-platform-uwp.html#fmod_uwp_setthreadaffinity" title="Control which core particular threads are created on.">FMOD_UWP_SetThreadAffinity</a></p></div>
+
+<p class="manual-footer">FMOD API User Manual 2.00.20 (2021-09-08). &copy; 2021 Firelight Technologies Pty Ltd.</p>
+</body>
+</html>
+
+</div>

@@ -1,0 +1,173 @@
+<html>
+<head>
+<title>Platform Details | PlayStation 4</title>
+<link rel="stylesheet" href="style/docs.css">
+<link rel="stylesheet" href="style/code_highlight.css">
+<script type="text/javascript" src="scripts/language-selector.js"></script></head>
+<body>
+<div class="docs-body">
+<div class="manual-toc">
+<p>FMOD API User Manual 2.00</p>
+<ul>
+<li><a href="welcome.html">Welcome to FMOD API</a></li>
+<li><a href="studio-guide.html">Studio API Guide</a></li>
+<li><a href="core-guide.html">Core API Guide</a></li>
+<li class="manual-current-chapter manual-inactive-chapter"><a href="platforms.html">Platform Details</a><ul class="subchapters"><li><a href="platforms-win.html">Windows</a></li><li><a href="platforms-mac.html">Mac</a></li><li><a href="platforms-linux.html">Linux</a></li><li><a href="platforms-ios.html">iOS</a></li><li><a href="platforms-android.html">Android</a></li><li><a href="platforms-uwp.html">Universal Windows Platform</a></li><li><a href="platforms-html5.html">HTML5</a></li><li class="manual-current-chapter manual-active-chapter"><a href="platforms-ps4.html">PlayStation 4</a></li></ul></li>
+<li><a href="white-papers.html">White Papers</a></li>
+<li><a href="studio-api.html">Studio API Reference</a></li>
+<li><a href="core-api.html">Core API Reference</a></li>
+<li><a href="fsbank-api.html">FSBank API Reference</a></li>
+<li><a href="plugin-api.html">Plugin API Reference</a></li>
+<li><a href="effects-reference.html">Effects Reference</a></li>
+<li><a href="glossary.html">Glossary</a></li>
+</ul>
+</div>
+<div class="manual-content api">
+<h1>4. Platform Details | PlayStation 4</h1>
+<div class="toc">
+<ul>
+<li><a href="#ps4-specific-starter-guide">PS4 Specific Starter Guide</a><ul>
+<li><a href="#sdk-version">SDK Version</a></li>
+<li><a href="#libraries">Libraries</a></li>
+<li><a href="#playstation-vr">PlayStation VR</a></li>
+<li><a href="#master-submission">Master Submission</a></li>
+<li><a href="#background-music">Background Music</a></li>
+<li><a href="#user-specific-audio-output">User Specific Audio Output</a></li>
+<li><a href="#thread-affinity">Thread Affinity</a></li>
+<li><a href="#memory">Memory</a></li>
+<li><a href="#exporting-at9-banks-in-fmod-studio-and-fsbank">Exporting AT9 Banks in FMOD Studio and FSBank</a></li>
+<li><a href="#recording">Recording</a></li>
+</ul>
+</li>
+<li><a href="#performance-reference">Performance Reference</a><ul>
+<li><a href="#format-choice">Format Choice</a></li>
+<li><a href="#voice-count">Voice Count</a><ul>
+<li><a href="#settings">Settings</a></li>
+<li><a href="#test-device">Test Device</a></li>
+<li><a href="#results">Results</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#technical-requirements-checklist">Technical Requirements Checklist</a><ul>
+<li><a href="#r4068-2ch-linear-pcm-output-is-supported-and-it-has-been-confirmed-that-audio-is-output-in-all-of-the-supported-audio-formats">R4068 - 2ch linear PCM output is supported, and it has been confirmed that audio is output in all of the supported audio formats.</a></li>
+<li><a href="#r4162-confirm-that-the-application-audio-is-being-output-even-if-the-system-software-audio-output-format-is-changed">R4162 - Confirm that the application audio is being output even if the system software audio output format is changed.</a></li>
+<li><a href="#r4069-the-application-performs-loudness-measurement-for-each-scene-and-the-measurements-are-within-the-sie-recommended-value-range">R4069 - The application performs loudness measurement for each scene and the measurements are within the SIE recommended value range.</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<h2 id="ps4-specific-starter-guide"><a href="#ps4-specific-starter-guide">PS4 Specific Starter Guide</a></h2>
+<h3 id="sdk-version"><a href="#sdk-version">SDK Version</a></h3>
+<p>FMOD is compiled using the following tools.</p>
+<ul>
+<li><strong>Visual Studio</strong> - version 2017 targeting SDK 8.508.001.</li>
+</ul>
+<h3 id="libraries"><a href="#libraries">Libraries</a></h3>
+<p><em>FMOD is distributed as a dynamic library. The PRX files must be copied into your package and loaded at runtime. See sceKernelLoadStartModule for details on runtime loading of PRX modules.</em></p>
+<p>FMOD Core Engine library</p>
+<ul>
+<li><strong>/api/core/lib/libfmod_stub_weak.a</strong> - Release dynamic binary for production code (requires libfmod.prx at runtime).</li>
+<li><strong>/api/core/lib/libfmodL_stub_weak.a</strong> - Release dynamic binary with logging enabled for development (requires libfmodL.prx at runtime).</li>
+</ul>
+<p>FMOD Studio Engine library (used in conjunction with core library)</p>
+<ul>
+<li><strong>/api/studio/lib/libfmodstudio_stub_weak.a</strong> - Release dynamic binary for production code (requires libfmodstudio.prx at runtime).</li>
+<li><strong>/api/studio/lib/libfmodstudioL_stub_weak.a</strong> - Release dynamic binary with logging enabled for development (requires libfmodstudioL.prx at runtime).</li>
+</ul>
+<h3 id="playstation-vr"><a href="#playstation-vr">PlayStation VR</a></h3>
+<p>To take full advantage of 3D audio on the Platstation VR platform you can use the FMOD object panner coupled with the Audio3D output mode.<br />
+Switch to the Audio3D output mode by calling <a class="apilink" href="core-api-system.html#system_setoutput" title="Sets the type of output interface used to run the mixer.">System::setOutput</a> with <a class="apilink" href="core-api-system.html#fmod_outputtype_audio3d" title="">FMOD_OUTPUTTYPE_AUDIO3D</a> before initializing the System.</p>
+<p>In FMOD Studio, switch any FMOD 3D Panner on the deck to the FMOD 3D Object Panner. Now audio will be sent directly to the PlayStation VR decoder for true 3D spatialization including height.</p>
+<p>For auditioning PlayStation VR in FMOD Studio, copy fmod_output_audio3d.dll from the API bin directory (bin\x64 for 64bit version of FMOD Studio) and paste it to the plugins directory of either your project or the tool itself. In FMOD Studio, from Edit -&gt; Preferences -&gt; Audio, select the "FMOD Audio3D Output" device. To complete the emulation process you should now start the 3D Audio Renderer Application found in the Sony SDK, this application will receive audio from FMOD and decode it in the same manner that the PlayStation VR does.</p>
+<h3 id="master-submission"><a href="#master-submission">Master Submission</a></h3>
+<p>When completing the MDT form you will be required to specify which audio modes the game supports.</p>
+<p>FMOD will always output 8 channels of PCM audio, the console will handle any downmixing or encoding required.<br />
+Therefore you should tick 2ch (required by Sony), 7.1ch (supported by FMOD) and consider ticking 5.1ch (supported via system downmix). Make sure to test all ticked configurations for quality.</p>
+<h3 id="background-music"><a href="#background-music">Background Music</a></h3>
+<p>To allow the console to automatically mute game music in response to the user playing their music you can use the FMOD port API. This allows you to register a special background music channel group which you can play audio on.</p>
+<div class="highlight language-cpp"><pre><span></span><span class="n">FMOD</span><span class="o">::</span><span class="n">ChannelGroup</span><span class="o">*</span> <span class="n">bgm</span><span class="p">;</span>
+<span class="n">system</span><span class="o">-&gt;</span><span class="n">createChannelGroup</span><span class="p">(</span><span class="s">&quot;BGM&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">bgm</span><span class="p">);</span>
+<span class="n">system</span><span class="o">-&gt;</span><span class="n">attachChannelGroupToPort</span><span class="p">(</span><span class="n">FMOD_PS4_PORT_TYPE_MUSIC</span><span class="p">,</span> <span class="n">FMOD_PORT_INDEX_NONE</span><span class="p">,</span> <span class="n">bgm</span><span class="p">);</span>
+<span class="n">FMOD</span><span class="o">::</span><span class="n">Channel</span><span class="o">*</span> <span class="n">channel</span><span class="p">;</span>
+<span class="n">system</span><span class="o">-&gt;</span><span class="n">playSound</span><span class="p">(</span><span class="n">music</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">true</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">channel</span><span class="p">);</span>
+<span class="n">channel</span><span class="o">-&gt;</span><span class="n">setChannelGroup</span><span class="p">(</span><span class="n">bgm</span><span class="p">);</span>
+<span class="n">channel</span><span class="o">-&gt;</span><span class="n">setPaused</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span>
+</pre></div>
+
+
+<p>If the background music contains copyright works that cannot be broadcast use the port <a class="apilink" href="core-api-platform-ps4.html#fmod_ps4_port_type_copyright_music" title="">FMOD_PS4_PORT_TYPE_COPYRIGHT_MUSIC</a>.</p>
+<h3 id="user-specific-audio-output"><a href="#user-specific-audio-output">User Specific Audio Output</a></h3>
+<p>If you wish to route audio to a user specific audio device connected to the system you can use the FMOD port API. Audio devices include the controller, headsets, or other personal devices. You need to use the SceUserServiceUserId of the user associated with the device as the port index.</p>
+<div class="highlight language-cpp"><pre><span></span><span class="n">FMOD</span><span class="o">::</span><span class="n">ChannelGroup</span><span class="o">*</span> <span class="n">pad0</span><span class="p">;</span>
+<span class="n">system</span><span class="o">-&gt;</span><span class="n">createChannelGroup</span><span class="p">(</span><span class="s">&quot;PAD0&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pad0</span><span class="p">);</span>
+<span class="n">SceUserServiceUserId</span> <span class="n">user0</span><span class="p">;</span>
+<span class="n">sceUserServiceGetInitialUser</span><span class="p">(</span><span class="o">&amp;</span><span class="n">user0</span><span class="p">);</span>
+<span class="n">system</span><span class="o">-&gt;</span><span class="n">attachChannelGroupToPort</span><span class="p">(</span><span class="n">FMOD_PS4_PORT_TYPE_CONTROLLER</span><span class="p">,</span> <span class="p">(</span><span class="n">FMOD_PORT_INDEX</span><span class="p">)</span><span class="n">user0</span><span class="p">,</span> <span class="n">pad0</span><span class="p">);</span>
+<span class="n">FMOD</span><span class="o">::</span><span class="n">Channel</span><span class="o">*</span> <span class="n">padchannel</span><span class="p">;</span>
+<span class="n">system</span><span class="o">-&gt;</span><span class="n">playSound</span><span class="p">(</span><span class="n">padsfx</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">true</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">padchannel</span><span class="p">);</span>
+<span class="n">padchannel</span><span class="o">-&gt;</span><span class="n">setChannelGroup</span><span class="p">(</span><span class="n">pad0</span><span class="p">);</span>
+<span class="n">padchannel</span><span class="o">-&gt;</span><span class="n">setPaused</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span>
+</pre></div>
+
+
+<p>You can use the platform specific utility function <a class="apilink" href="core-api-platform-ps4.html#fmod_ps4_getpadvolume" title="Retrieves the output volume of the pad speaker as set by the user in the system software.">FMOD_PS4_GetPadVolume</a> in fmod_ps4.h to query the volume set on a controller speaker in the system software.</p>
+<h3 id="thread-affinity"><a href="#thread-affinity">Thread Affinity</a></h3>
+<p>By default, all FMOD threads will run on a single core.  To customize the thread affinity, use the <a class="apilink" href="core-api-platform-ps4.html#fmod_ps4_setthreadaffinity" title="Control which core particular threads are created on.">FMOD_PS4_SetThreadAffinity</a> function.</p>
+<h3 id="memory"><a href="#memory">Memory</a></h3>
+<p>FMOD by default will use standard library malloc for memory allocation which may impose restrictions on the amount of memory available. See the <a href="https://ps4.scedev.net/resources/documents/SDK/1.750/C_and_Cpp_standard_libraries/stdlib.html#malloc">Sony SDK documentation</a> for details and how to change the total amount of memory available. </p>
+<p>If you use override FMOD's memory you can use either flexible or direct memory.</p>
+<h3 id="exporting-at9-banks-in-fmod-studio-and-fsbank"><a href="#exporting-at9-banks-in-fmod-studio-and-fsbank">Exporting AT9 Banks in FMOD Studio and FSBank</a></h3>
+<p>FMOD Studio and FSBank require the Sony provided libatrac9.dll to be copied into the same directory as the executable. 64bit versions of the DLL can be found in the latest platform SDK. 32bit version of the FMOD tools no longer support building AT9 banks in line with Sony's removal of 32bit libraries.</p>
+<p>Note that to install the required libatrac9.dll using the SDK Manager you must select the "ATRAC9 Windows Library" package from "SDK #.### -&gt; SDK / Development Tools -&gt; Tools For Development (Other) -&gt; External Tools".</p>
+<h3 id="recording"><a href="#recording">Recording</a></h3>
+<p>Each logged in user has three associated endpoints that FMOD can record audio from: Voice Chat, General, and Voice Recognition. If you wish to find the device for a SceUserServiceUserId, iterate the devices with <a class="apilink" href="core-api-system.html#system_getrecorddriverinfo" title="Retrieves identification information about a sound device specified by its index, and specific to the output mode.">System::getRecordDriverInfo</a> and match the value against FMOD_GUID.Data1. FMOD_GUID.Data2 contains the endpoint type. The device index will not change, even if users log in and out.</p>
+<h2 id="performance-reference"><a href="#performance-reference">Performance Reference</a></h2>
+<p>This section is a companion for the <a href="white-papers-cpu-performance.html">CPU Performance</a> white paper and serves as a quick reference of facts targeting this platform.</p>
+<h3 id="format-choice"><a href="#format-choice">Format Choice</a></h3>
+<p>Each compression format provided in FMOD has a reason for being included, the below list will detail our recommendations for this platform. Formats listed as primary are considering the best choice, secondary formats should only be considered if the primary doesn't satisfy your requirements.</p>
+<ul>
+<li><strong>AT9</strong>: Primary format for all sounds, hardware assisted.</li>
+<li><strong>Vorbis</strong>: Not recommended.</li>
+<li><strong>FADPCM</strong>: Not recommended.</li>
+<li><strong>PCM</strong>: Not recommended.</li>
+<li><strong>XMA</strong>: Unavailable.</li>
+</ul>
+<h3 id="voice-count"><a href="#voice-count">Voice Count</a></h3>
+<p>To give developers an idea about the costs of a particular format we provide synthetic benchmark results. These results are based on simple usage of the FMOD Studio API using recommended configuration settings.</p>
+<h4 id="settings"><a href="#settings">Settings</a></h4>
+<ul>
+<li><strong>Voice count:</strong> 128</li>
+<li><strong>Sample rate:</strong> 48KHz</li>
+<li><strong>Speaker mode:</strong> 7.1</li>
+<li><strong>DSP block size:</strong> 256 samples</li>
+</ul>
+<h4 id="test-device"><a href="#test-device">Test Device</a></h4>
+<ul>
+<li><strong>CPU:</strong> PS4 Testkit (DUH-T7xxx series)</li>
+<li><strong>OS:</strong> 8.008.041</li>
+</ul>
+<h4 id="results"><a href="#results">Results</a></h4>
+<ul>
+<li><strong>DSP with AT9:</strong> 7.62% (+/- 7.96%)</li>
+<li><strong>DSP with Vorbis:</strong> 57.55% (+/- 5.26%)</li>
+<li><strong>DSP with FADPCM:</strong> 9.88% (+/- 0.22%)</li>
+<li><strong>DSP with PCM:</strong> 4.36% (+/- 0.19%)</li>
+<li><strong>Update at 60 FPS:</strong> 0.25% (+/- 0.11%)</li>
+</ul>
+<h2 id="technical-requirements-checklist"><a href="#technical-requirements-checklist">Technical Requirements Checklist</a></h2>
+<p>This section discusses the Technical Requirements Checklist (TRC) items required for PS4 submission that relate to audio. This section is intended as a guide only. It is not designed to be comprehensive and omits mention of all TRCs not contained within the audio section of the PS4 TRC documentation. Please refer to the official PlayStation 4 SDK documentation for all TRC requirements.</p>
+<h3 id="r4068-2ch-linear-pcm-output-is-supported-and-it-has-been-confirmed-that-audio-is-output-in-all-of-the-supported-audio-formats"><a href="#r4068-2ch-linear-pcm-output-is-supported-and-it-has-been-confirmed-that-audio-is-output-in-all-of-the-supported-audio-formats">R4068 - 2ch linear PCM output is supported, and it has been confirmed that audio is output in all of the supported audio formats.</a></h3>
+<p>Each output format that your game supports should be tested to ensure that it sounds correct. See <a href="platforms-ps4.html#master-submission">Master Submission</a> section for more details.</p>
+<p>FMOD uses speakermode <a class="apilink" href="core-api-common.html#fmod_speakermode_7point1" title="">FMOD_SPEAKERMODE_7POINT1</a> on PS4. This does not need to be changed to meet this requirement - FMOD should still use <a class="apilink" href="core-api-common.html#fmod_speakermode_7point1" title="">FMOD_SPEAKERMODE_7POINT1</a> even when the system output setting is stereo. See <a class="apilink" href="core-api-common.html#fmod_speakermode" title="Speaker mode types.">FMOD_SPEAKERMODE</a> and <a class="apilink" href="core-api-system.html#fmod_outputtype" title="Built-in output types that can be used to run the mixer.">FMOD_OUTPUTTYPE</a> for more details.</p>
+<h3 id="r4162-confirm-that-the-application-audio-is-being-output-even-if-the-system-software-audio-output-format-is-changed"><a href="#r4162-confirm-that-the-application-audio-is-being-output-even-if-the-system-software-audio-output-format-is-changed">R4162 - Confirm that the application audio is being output even if the system software audio output format is changed.</a></h3>
+<p>As FMOD uses speakermode <a class="apilink" href="core-api-common.html#fmod_speakermode_7point1" title="">FMOD_SPEAKERMODE_7POINT1</a> and does not automatically use sceAudioOutGetPortState() to change the audio output format, no additional implementation is required for this TRC.</p>
+<h3 id="r4069-the-application-performs-loudness-measurement-for-each-scene-and-the-measurements-are-within-the-sie-recommended-value-range"><a href="#r4069-the-application-performs-loudness-measurement-for-each-scene-and-the-measurements-are-within-the-sie-recommended-value-range">R4069 - The application performs loudness measurement for each scene and the measurements are within the SIE recommended value range.</a></h3>
+<p>FMOD does NOT automatically handle this requirement. FMOD does include a loudness meter DSP that can be enabled and observed. This should be placed on the global master bus for this purpose.</p>
+<p>Additionally, Sony provides the Sulpha tool which has a loudness meter at the end of the platform audio pipeline to assist with this TRC.</p></div>
+
+<p class="manual-footer">FMOD API User Manual 2.00.20 (2021-09-08). &copy; 2021 Firelight Technologies Pty Ltd.</p>
+</body>
+</html>
+
+</div>

@@ -17,6 +17,8 @@ TutorialGame::TutorialGame()	{
 	world		= new GameWorld();
 	renderer	= new GameTechRenderer(*world);
 	physics		= new PhysicsSystem(*world);
+	//audio->LoadSound("Assets/Audio/keyboardcat.mp3", false, true, false);
+	//audio->StartPlayingSound("Assets/Audio/keyboardcat.mp3");
 
 	forceMagnitude	= 30.0f;
 	useGravity		= true;
