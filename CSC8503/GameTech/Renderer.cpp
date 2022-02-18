@@ -61,7 +61,6 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 		"/Cubemap/skyrender0005.png"
 	);
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	shadowFBO = new OGLFrameBuffer();
 	shadowFBO->AddTexture();
 
@@ -81,14 +80,15 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 	// TODO: figure out why font breaks other stuff when placed above
 	font = new SimpleFont("PressStart2P.fnt", "PressStart2P.png");
 
-	OGLTexture* t = (OGLTexture*)font->GetTexture();
+	// TODO : add this to font load
+	/*OGLTexture* t = (OGLTexture*)font->GetTexture();
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, t->GetObjectID());
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glBindTexture(GL_TEXTURE_2D, 0);
-	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);*/
 
 	//Set up the light properties
 	lightColour = Vector4(0.8f, 0.8f, 0.5f, 1.0f);
@@ -160,7 +160,6 @@ void Renderer::RenderScene() {
 	rendererAPI->SetViewportSize(4096, 4096);
 	rendererAPI->SetCullType(NCL::Rendering::RendererAPI::CULL_TYPE::FRONT);
 
-	glEnable(GL_DEPTH_TEST);
 	rendererAPI->BindShader(shadowShader);
 
 	Matrix4 shadowViewMatrix = Matrix4::BuildViewMatrix(lightPos, Vector3(0, 0, 0), Vector3(0, 1, 0));
