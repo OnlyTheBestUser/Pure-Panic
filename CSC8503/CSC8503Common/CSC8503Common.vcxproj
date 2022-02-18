@@ -83,11 +83,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(SolutionDir)\Plugins\FMod\api\core\inc;$(SolutionDir)\Plugins\Networking-ENet\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64;$(SolutionDir)\Plugins\FMod\api\studio\lib;</LibraryPath>
+    <LibraryPath>$(SolutionDir)\Plugins\FMod\api\core\lib\x64;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(SolutionDir)\Plugins\FMod\api\core\inc;$(SolutionDir)\Plugins\Networking-ENet\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64;$(SolutionDir)\Plugins\FMod\api\studio\lib;</LibraryPath>
+    <LibraryPath>$(SolutionDir)\Plugins\FMod\api\core\lib\x64;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -104,6 +104,10 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
+    <Lib>
+      <AdditionalDependencies>fmodstudioL_vc.lib;fmodL_vc.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\Plugins\FMod\api\studio\lib\x64\</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -132,6 +136,10 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <Lib>
+      <AdditionalDependencies>fmodstudioL_vc.lib;fmodL_vc.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\Plugins\FMod\api\studio\lib\x64\</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AABBVolume.h" />

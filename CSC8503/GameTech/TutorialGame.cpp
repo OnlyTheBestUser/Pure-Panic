@@ -17,8 +17,10 @@ TutorialGame::TutorialGame()	{
 	world		= new GameWorld();
 	renderer	= new GameTechRenderer(*world);
 	physics		= new PhysicsSystem(*world);
-	//audio->LoadSound("Assets/Audio/keyboardcat.mp3", false, true, false);
-	//audio->StartPlayingSound("Assets/Audio/keyboardcat.mp3");
+	audio = audio->GetInstance();
+	audio->Initialize();
+	audio->LoadSound("../../Assets/Audio/splat_neutral_01.ogg", false, true, false);
+	audio->StartPlayingSound("../../Assets/Audio/splat_neutral_01.ogg", Vector3(0,0,0), 100.0f);
 
 	forceMagnitude	= 30.0f;
 	useGravity		= true;
@@ -170,6 +172,7 @@ void TutorialGame::UpdateGame(float dt) {
 
 void TutorialGame::UpdateGameWorld(float dt)
 {
+	audio->Update();
 	if (!inSelectionMode) {
 		world->GetMainCamera()->UpdateCamera(dt);
 	}
