@@ -14,8 +14,7 @@ namespace NCL {
             TextureBase* GetTexture() const override;
         protected:
             GLuint frameBuffer;
-            GLuint tex;
-            OGLTexture* texObj;
+            OGLTexture* texture;
         };
     }
 }

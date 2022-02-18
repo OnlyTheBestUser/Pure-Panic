@@ -19,8 +19,7 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 
 #ifdef _WIN64
 	rendererAPI = new OGLRendererAPI(*Window::GetWindow());
-
-	font = new SimpleFont("PressStart2P.fnt", "PressStart2P.png");
+	TextureLoader::RegisterAPILoadFunction(OGLTexture::RGBATextureFromFilename);
 
 	debugLinesMesh = new OGLMesh();
 	debugTextMesh = new OGLMesh();
@@ -39,9 +38,6 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 
 	shadowShader = new OGLShader("GameTechShadowVert.glsl", "GameTechShadowFrag.glsl");
 
-	shadowFBO = new OGLFrameBuffer();
-	shadowFBO->AddTexture();
-
 	rendererAPI->SetDepth(true);
 	rendererAPI->SetClearColour(1, 1, 1, 1);
 
@@ -52,19 +48,9 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 	skyboxMesh->SetVertexIndices({ 0,1,2,2,3,0 });
 	skyboxMesh->UploadToGPU();
 
-	TextureLoader::RegisterAPILoadFunction(OGLTexture::RGBATextureFromFilename);
-
-	//OGLTexture* t = (OGLTexture*)font->GetTexture();
-
-	/*glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, t->GetObjectID());
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);*/
 	debugShader = new OGLShader("debugVert.glsl", "debugFrag.glsl");
 
-	//ForceValidDebugState(false);
+	ForceValidDebugState(false);
 
 	skyboxTex = OGLTexture::RGBATextureCubemapFromFilename(
 		"/Cubemap/skyrender0004.png",
@@ -75,6 +61,9 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 		"/Cubemap/skyrender0005.png"
 	);
 
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	shadowFBO = new OGLFrameBuffer();
+	shadowFBO->AddTexture();
 
 #endif
 #ifdef _ORBIS
@@ -89,7 +78,17 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 	debugLinesMesh->SetPrimitiveType(GeometryPrimitive::Lines);
 #endif
 
+	// TODO: figure out why font breaks other stuff when placed above
 	font = new SimpleFont("PressStart2P.fnt", "PressStart2P.png");
+
+	OGLTexture* t = (OGLTexture*)font->GetTexture();
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, t->GetObjectID());
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 
 	//Set up the light properties
 	lightColour = Vector4(0.8f, 0.8f, 0.5f, 1.0f);
@@ -124,7 +123,7 @@ void Renderer::Render() {
 	rendererAPI->SetCullFace(false);
 
 	rendererAPI->EndFrame();
-	//DrawDebugData();
+	DrawDebugData();
 	rendererAPI->SwapBuffers();
 }
 
@@ -150,12 +149,18 @@ void Renderer::SortObjectList() {
 void Renderer::RenderScene() {
 // Render Shadow Map
 
+	rendererAPI->SetCullFace(true);
+	rendererAPI->SetBlend(true);
+	rendererAPI->SetDepth(true);
+
 	rendererAPI->BindFrameBuffer(shadowFBO);
+
 	rendererAPI->ClearBuffer(false, true, false);
 	rendererAPI->SetColourMask(false, false, false, false);
 	rendererAPI->SetViewportSize(4096, 4096);
 	rendererAPI->SetCullType(NCL::Rendering::RendererAPI::CULL_TYPE::FRONT);
 
+	glEnable(GL_DEPTH_TEST);
 	rendererAPI->BindShader(shadowShader);
 
 	Matrix4 shadowViewMatrix = Matrix4::BuildViewMatrix(lightPos, Vector3(0, 0, 0), Vector3(0, 1, 0));
@@ -178,10 +183,11 @@ void Renderer::RenderScene() {
 	rendererAPI->SetCullType(NCL::Rendering::RendererAPI::CULL_TYPE::BACK);
 
 // Render skybox
+	
 	rendererAPI->SetCullFace(false);
 	rendererAPI->SetBlend(false);
 	rendererAPI->SetDepth(false);
-
+	
 	float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
 	Matrix4 viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
 	Matrix4 projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);
@@ -198,19 +204,16 @@ void Renderer::RenderScene() {
 	rendererAPI->SetCullFace(true);
 	rendererAPI->SetBlend(true);
 	rendererAPI->SetDepth(true);
-
+	
 // Render Scene
 
 	/*float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
 	Matrix4 viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
 	Matrix4 projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);*/
-
 	for (const auto& i : activeObjects) {
-
 		ShaderBase* shader = (*i).GetShader();
 		rendererAPI->BindShader(shader);
 		
-
 		rendererAPI->BindTexture((*i).GetDefaultTexture(), "mainTex", 0);
 
 		rendererAPI->UpdateUniformMatrix4(shader, "projMatrix", projMatrix);
