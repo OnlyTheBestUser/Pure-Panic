@@ -151,9 +151,7 @@ hide or show the
 
 int main() {
 	Window*w = Window::CreateGameWindow("CSC8503 Game technology!", 1600, 900);
-
-	//TestPushdownAutomata(w);
-
+		
 	if (!w->HasInitialised()) {
 		return -1;
 	}	
@@ -161,7 +159,10 @@ int main() {
 	w->ShowOSPointer(false);
 	w->LockMouseToWindow(true);
 
-	//TestBehaviourTree();
+	float avgTimeWait = 3.0f;
+	float curTimeWait = 3.0f;
+	float totalTime = 0.0f;
+	int totalFrames = 0;
 
 	TutorialGame* g = new TutorialGame();
 	MainMenu* m = new MainMenu();
@@ -190,14 +191,19 @@ int main() {
 		if (frameRate < smallestFrameRate)
 			smallestFrameRate = frameRate;
 
-		//w->SetTitle("Gametech frame time:" + std::to_string(1000.0f * dt));
-		w->SetTitle("Gametech frame time:" + std::to_string(frameRate));
+		w->SetTitle("Gametech frame time:" + std::to_string(1000.0f * dt) + " | Gametech frame rate:" + std::to_string(frameRate));
+
+		curTimeWait -= dt;
+		totalTime += dt;
+		totalFrames++;
+		if (curTimeWait < 0.0f) {
+			std::cout << "Average Frame Time: " << 1000.0f * (totalTime / totalFrames) << "\n";
+			curTimeWait = avgTimeWait;
+		}
 
 		if (!p.Update(dt)) {
 			return 0;
 		}
-		//f->UpdateGame(dt);
-		//g->UpdateGame(dt);
 	}
 	Window::DestroyGameWindow();
 }
