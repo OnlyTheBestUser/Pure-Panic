@@ -19,8 +19,8 @@ TutorialGame::TutorialGame()	{
 	physics		= new PhysicsSystem(*world);
 	audio = audio->GetInstance();
 	audio->Initialize();
-	audio->LoadSound("../../Assets/Audio/splat_neutral_01.ogg", false, true, false);
-	audio->StartPlayingSound("../../Assets/Audio/splat_neutral_01.ogg", Vector3(0,0,0), 100.0f);
+	audio->LoadSound("../../Assets/Audio/splat_neutral_01.ogg", false, false, false);
+	audio->LoadSound("../../Assets/Audio/splat_neutral_02.ogg", false, false, false);
 
 	forceMagnitude	= 30.0f;
 	useGravity		= true;
@@ -748,6 +748,7 @@ void TutorialGame::MoveSelectedObject(float dt) {
 		if (world->Raycast(ray, closestCollision, true)) {
 			if (closestCollision.node == selectionObject) {
 				selectionObject->GetPhysicsObject()->AddForceAtPosition(ray.GetDirection() * forceMagnitude, closestCollision.collidedAt);
+				audio->StartPlayingSound(AUDIO_PATH + "splat_neutral_01.ogg", selectionObject->GetTransform().GetPosition(), 100.0f);
 			}
 		}
 	}
