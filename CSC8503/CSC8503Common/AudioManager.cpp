@@ -15,7 +15,6 @@ AudioManager::AudioManager() {
 
 void AudioManager::Initialize() {
 	studioSystem = NULL;
-	int ver;
 	IsErroneous(FMOD::Studio::System::create(&studioSystem));
 	studioSystem->initialize(32, FMOD_STUDIO_INIT_LIVEUPDATE, FMOD_INIT_PROFILE_ENABLE, NULL);
 
@@ -36,7 +35,7 @@ void AudioManager::Close() {
 }
 
 void AudioManager::Update() {
-	//@TODO erase channels that aren't playing anything anymore
+	//@TODO erase channels that aren't playing anything anymore & release sounds
 	studioSystem->update();
 }
 
