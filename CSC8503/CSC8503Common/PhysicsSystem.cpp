@@ -489,14 +489,17 @@ void PhysicsSystem::IntegrateAccel(float dt, GameObject* gobj) {
 	object->SetLinearVelocity(linearVel);
 
 	// Angular Stuff
-	Vector3 torque = object->GetTorque();
-	Vector3 angVel = object->GetAngularVelocity();
+	if (object->ShouldApplyAngular())
+	{
+		Vector3 torque = object->GetTorque();
+		Vector3 angVel = object->GetAngularVelocity();
 
-	object->UpdateInertiaTensor();
+		object->UpdateInertiaTensor();
 
-	Vector3 angAccel = object->GetInertiaTensor() * torque;
-	angVel += angAccel * dt;
-	object->SetAngularVelocity(angVel);	
+		Vector3 angAccel = object->GetInertiaTensor() * torque;
+		angVel += angAccel * dt;
+		object->SetAngularVelocity(angVel);
+	}
 }
 
 /*
@@ -522,18 +525,21 @@ void PhysicsSystem::IntegrateVelocity(float dt, PhysicsObject* object, Transform
 	object->SetLinearVelocity(linearVel);
 
 	// Orientation Stuff
-	Quaternion orientation = transform.GetOrientation();
-	Vector3 angVel = object->GetAngularVelocity();
+	if (object->ShouldApplyAngular())
+	{
+		Quaternion orientation = transform.GetOrientation();
+		Vector3 angVel = object->GetAngularVelocity();
 
-	orientation = orientation + (Quaternion(angVel * dt * 0.5f, 0.0f) * orientation);
-	orientation.Normalise();
+		orientation = orientation + (Quaternion(angVel * dt * 0.5f, 0.0f) * orientation);
+		orientation.Normalise();
 
-	transform.SetOrientation(orientation);
+		transform.SetOrientation(orientation);
 
-	// Damp the angular velocity too
-	float frameAngularDamping = 1.0f - (0.4f * dt);
-	angVel = angVel * frameAngularDamping;
-	object->SetAngularVelocity(angVel);	
+		// Damp the angular velocity too
+		float frameAngularDamping = 1.0f - (0.4f * dt);
+		angVel = angVel * frameAngularDamping;
+		object->SetAngularVelocity(angVel);
+	}
 }
 
 /*

@@ -13,6 +13,8 @@ namespace NCL {
 
 			void Update(float dt);
 
+			void SetGravity(const Vector3& g);
+
 			void UseGravity(bool state) {
 				applyGravity = state;
 			}
@@ -22,8 +24,6 @@ namespace NCL {
 				globalDamping = d;
 			}
 						
-			void SetGravity(const Vector3& g);
-
 			void BuildStaticList();
 
 		protected:
