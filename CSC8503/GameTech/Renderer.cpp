@@ -206,22 +206,27 @@ void Renderer::RenderScene() {
 	
 // Render Scene
 
+	ShaderBase* activeShader = nullptr;
 	/*float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
 	Matrix4 viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
 	Matrix4 projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);*/
 	for (const auto& i : activeObjects) {
 		ShaderBase* shader = (*i).GetShader();
+
 		rendererAPI->BindShader(shader);
-		
+
 		rendererAPI->BindTexture((*i).GetDefaultTexture(), "mainTex", 0);
+		if (activeShader != shader) {
+			rendererAPI->UpdateUniformMatrix4(shader, "projMatrix", projMatrix);
+			rendererAPI->UpdateUniformMatrix4(shader, "viewMatrix", viewMatrix);
+			rendererAPI->UpdateUniformVector3(shader, "cameraPos", gameWorld.GetMainCamera()->GetPosition());
 
-		rendererAPI->UpdateUniformMatrix4(shader, "projMatrix", projMatrix);
-		rendererAPI->UpdateUniformMatrix4(shader, "viewMatrix", viewMatrix);
-		rendererAPI->UpdateUniformVector3(shader, "cameraPos", gameWorld.GetMainCamera()->GetPosition());
+			rendererAPI->UpdateUniformVector4(shader, "lightColour", lightColour);
+			rendererAPI->UpdateUniformVector3(shader, "lightPos", lightPos);
+			rendererAPI->UpdateUniformFloat(shader, "lightRadius", lightRadius);
 
-		rendererAPI->UpdateUniformVector4(shader, "lightColour", lightColour);
-		rendererAPI->UpdateUniformVector3(shader, "lightPos", lightPos);
-		rendererAPI->UpdateUniformFloat(shader, "lightRadius", lightRadius);
+			activeShader = shader;
+		}
 
 		rendererAPI->BindTexture(shadowFBO->GetTexture(), "shadowTex", 1);
 		
