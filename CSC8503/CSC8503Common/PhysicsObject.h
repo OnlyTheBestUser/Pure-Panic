@@ -87,6 +87,9 @@ namespace NCL {
 			void SetFriction(float f) { friction = f; }
 			float GetFriction() const { return friction; }
 
+			void SetLinearDamping(float l) { linearDamping = l; }
+			float GetLinearDamping() const { return linearDamping; }
+
 			bool UsesGravity() const { return useGravity; }
 			void SetGravity(bool k) { useGravity = k; }
 
@@ -135,6 +138,7 @@ namespace NCL {
 			//linear stuff
 			Vector3 linearVelocity;
 			Vector3 force;
+			float	linearDamping;
 			
 			bool useSpringResolution = false;
 

@@ -22,7 +22,6 @@ PhysicsSystem::PhysicsSystem(GameWorld& g) : gameWorld(g)	{
 	useBroadPhase	= true;	
 	dTOffset		= 0.0f;
 	globalDamping	= 0.995f;
-	linearDamping	= 0.4f;
 	SetGravity(Vector3(0.0f, -19.6f, 0.0f));
 }
 
@@ -508,7 +507,7 @@ the world, looking for collisions.
 */
 void PhysicsSystem::IntegrateVelocity(float dt, PhysicsObject* object, Transform& transform) {
 	
-	float frameLinearDamping = 1.0f - (linearDamping * dt);
+	float frameLinearDamping = 1.0f - (object->GetLinearDamping() * dt);
 
 	if (object->isSleeping())
 		return;
