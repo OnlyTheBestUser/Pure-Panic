@@ -86,6 +86,10 @@ int realHZ		= idealHZ;
 float realDT	= idealDT;
 
 void PhysicsSystem::Update(float dt) {	
+	/*if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::B)) {
+		useBroadPhase = !useBroadPhase;
+		std::cout << "Setting broadphase to " << useBroadPhase << std::endl;
+	}
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::I)) {
 		constraintIterationCount--;
 		std::cout << "Setting constraint iterations to " << constraintIterationCount << std::endl;
@@ -93,7 +97,7 @@ void PhysicsSystem::Update(float dt) {
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::O)) {
 		constraintIterationCount++;
 		std::cout << "Setting constraint iterations to " << constraintIterationCount << std::endl;
-	}
+	}*/
 
 	dTOffset += dt; //We accumulate time delta here - there might be remainders from previous frame!
 
@@ -332,9 +336,8 @@ void PhysicsSystem::BroadPhase() {
 			//if(i->object->GetName() == "player")
 			staticTree->GetContentsAtNode(i->object, i->pos, i->size, list);
 			for (auto j = list.begin(); j != list.end(); j++) {
-				info.a = min((*i).object, (*j).object);
-				info.b = max((*i).object, (*j).object);
-
+				info.a = std::min((*i).object, (*j).object);
+				info.b = std::max((*i).object, (*j).object);
 				if ((info.a->GetCollisionLayers() & info.b->GetCollisionLayers()) != 0) {
 					broadphaseCollisions.insert(info);
 				}
@@ -348,8 +351,13 @@ void PhysicsSystem::BroadPhase() {
 			for (auto j = std::next(i); j != data.end(); ++j) {
 				//is this pair of items already in the collision set - 
 				// if the same pair is in another Octree node together etc
-				info.a = min((*i).object, (*j).object);
-				info.b = max((*i).object, (*j).object);
+#ifdef _WIN64
+				info.a = std::min((*i).object, (*j).object);
+				info.b = std::max((*i).object, (*j).object);
+#else // _WIN64
+				info.a = std::min((*i).object, (*j).object);
+				info.b = std::max((*i).object, (*j).object);
+#endif
 				if (((info.a->GetCollisionLayers() & info.b->GetCollisionLayers()) != 0) && !(!info.a->IsDynamic() && !info.b->IsDynamic())) {
 					broadphaseCollisions.insert(info);
 				}

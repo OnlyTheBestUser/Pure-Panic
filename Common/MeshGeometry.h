@@ -13,7 +13,7 @@ namespace NCL {
 		class Matrix4;
 	}
 	namespace Rendering {
-		class RendererBase;
+		class RendererAPI;
 	}
 	using namespace Maths;
 
@@ -130,7 +130,8 @@ namespace NCL {
 
 		void SetDebugName(const std::string& debugName);
 
-		virtual void UploadToGPU(Rendering::RendererBase* renderer = nullptr) = 0;
+		virtual void UploadToGPU(Rendering::RendererAPI* renderer = nullptr) = 0;
+		virtual void UpdateGPUBuffers(unsigned int startVertex, unsigned int vertexCount) = 0;
 
 		static MeshGeometry* GenerateTriangle(MeshGeometry* input);
 

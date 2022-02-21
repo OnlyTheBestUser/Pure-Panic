@@ -1,0 +1,14 @@
+SamplerState samp0 : register(s0);
+
+TextureCube colorMap : register( t0 );
+
+struct VS_OUTPUT
+{
+	float3 Normal		: NORMAL;
+};
+
+float4 main(VS_OUTPUT In) : S_TARGET_OUTPUT
+{
+	float4 test = colorMap.Sample(samp0, normalize(In.Normal));
+	return test;
+}  

@@ -22,11 +22,17 @@
     <Filter Include="Windowing and Input">
       <UniqueIdentifier>{d69f79a2-9da3-495f-9471-bd5892e60bf9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{71cdcdd5-9a3d-448b-b0ad-da2a849c41e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Shaders">
+      <UniqueIdentifier>{128c3292-71f7-42e5-9502-bfbede1ff775}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Textures">
+      <UniqueIdentifier>{0e907a07-0e3f-44cf-90d0-69bb81274166}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PS4MemoryAware.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -39,7 +45,7 @@
     <ClCompile Include="PS4ComputeShader.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="PS4RendererBase.cpp">
+    <ClCompile Include="PS4RendererAPI.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="PS4Shader.cpp">
@@ -95,7 +101,7 @@
     <ClInclude Include="PS4Window.h">
       <Filter>Windowing and Input</Filter>
     </ClInclude>
-    <ClInclude Include="PS4RendererBase.h">
+    <ClInclude Include="PS4RendererAPI.h">
       <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="PS4Mesh.h">
@@ -113,5 +119,27 @@
     <ClInclude Include="Ps4AudioSystem.h">
       <Filter>Audio</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <WavePsslc Include="..\..\Assets\Shaders\PS4\PixelShader.pssl">
+      <Filter>Assets\Shaders</Filter>
+    </WavePsslc>
+    <WavePsslc Include="..\..\Assets\Shaders\PS4\VertexShader.pssl">
+      <Filter>Assets\Shaders</Filter>
+    </WavePsslc>
+    <WavePsslc Include="..\..\Assets\Shaders\PS4\skyboxPixel.pssl">
+      <Filter>Assets\Shaders</Filter>
+    </WavePsslc>
+    <WavePsslc Include="..\..\Assets\Shaders\PS4\skyboxVertex.pssl">
+      <Filter>Assets\Shaders</Filter>
+    </WavePsslc>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\Assets\Textures\checkerboard.png">
+      <Filter>Assets\Textures</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\Cubemap\skyrender0001.png">
+      <Filter>Assets\Textures</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

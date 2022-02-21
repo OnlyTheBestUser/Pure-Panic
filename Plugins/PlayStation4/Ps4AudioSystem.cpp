@@ -12,9 +12,11 @@ Ps4AudioSystem::Ps4AudioSystem(int numSources)	{
 
 	SceAudio3dOpenParameters sParameters;
 	sceAudio3dGetDefaultOpenParameters(&sParameters);
-	sParameters.uiGranularity = 1024;
+	sParameters.uiGranularity = SAMPLE_GRANULARITY;
 	sParameters.uiMaxObjects  = numSources;
 	sParameters.uiQueueDepth  = 1;
+	sParameters.eBufferMode	  = SCE_AUDIO3D_BUFFER_ADVANCE_AND_PUSH;
+	sParameters.eRate = SCE_AUDIO3D_RATE_48000; //It only supports 48khz?!
 
 	SceUserServiceUserId userId;
 	int ret = sceUserServiceGetInitialUser(&userId);
@@ -31,13 +33,11 @@ Ps4AudioSystem::Ps4AudioSystem(int numSources)	{
 	}
 
 	testSound = new Sound();
-	testSound->LoadFromWAV("/app0/Assets/Audio/lol.wav");
+	testSound->LoadFromWAV("/app0/Assets/Audio/keyboardcat.wav");
 
 	testEmitter = new Ps4AudioEmitter(testSound, 1.0f);
 
 	testEmitter->SetSound(testSound);
-
-	//audioThread = std::thread(lolfunction);
 
 	threadFinished  = false;
 	audioThread = std::thread(&Ps4AudioSystem::AudioThread, this);

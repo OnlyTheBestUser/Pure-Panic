@@ -1,0 +1,36 @@
+ConstantBuffer CameraData
+{
+	float4x4 projMatrix;
+	float4x4 viewMatrix;
+	float4x4 viewProjMatrix;
+	float4x4 invProjMatrix;
+};
+
+struct VS_INPUT
+{
+	float3 Position		: POSITION0;
+	float2 UV			: TEXCOORD0;
+	float3 Normal		: TEXCOORD1;
+	float3 Tangent		: TEXCOORD2;
+};
+
+struct VS_OUTPUT
+{
+	float4 Position		: S_POSITION;
+	float3 Normal		: NORMAL;
+};
+
+VS_OUTPUT main(VS_INPUT Input)
+{
+	VS_OUTPUT Output;
+	
+	float3 pos = Input.Position;
+	float4x4  invproj  = (invProjMatrix);
+
+	pos.xy	  *= float2(invproj[0][0],invproj[1][1]);
+	pos.z 	= -1.0f;
+
+	Output.Normal		= mul(transpose(float3x3(viewMatrix)),normalize(pos));
+	Output.Position		= float4(Input.Position, 1.0);
+	return Output;
+}
