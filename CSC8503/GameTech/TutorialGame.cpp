@@ -819,6 +819,7 @@ Player* TutorialGame::AddPlayerToWorld(const Vector3& position) {
 	character->GetPhysicsObject()->SetLinearDamping(10.0f);
 	character->GetPhysicsObject()->InitSphereInertia();
 	character->SetDynamic(true);
+	character->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 
 	world->AddGameObject(character);
 
