@@ -1,9 +1,11 @@
 #pragma once
-#include "../../Plugins/OpenGLRendering/OGLRenderer.h"
-#include "../../Common/Quaternion.h"
 #include <vector>
 #include <string>
+#include "../GameTech/RendererBase.h"
+#include "../../Common/Quaternion.h"
 
+
+// TODO: fix debug
 namespace NCL {
 	class Debug
 	{

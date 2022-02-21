@@ -1,9 +1,12 @@
 #pragma once
-#include "GameTechRenderer.h"
+#include "Renderer.h"
 #include "../CSC8503Common/PhysicsSystem.h"
 #include "../CSC8503Common/Player.h"
 
 namespace NCL {
+	namespace PS4 {
+		class InputBase;
+	}
 	namespace CSC8503 {
 		enum GameState {
 			PLAY,
@@ -45,7 +48,7 @@ namespace NCL {
 			void InitSphereGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, float radius);
 			void InitCapsuleGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing);
 			void InitMixedGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing);
-			void InitCubeGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, const Vector3& cubeDims);
+			void InitCubeGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, const Maths::Vector3& cubeDims);
 			void InitDefaultFloor();
 	
 			bool SelectObject();
@@ -58,22 +61,24 @@ namespace NCL {
 			GameObject* AddFloorToWorld(const Vector3& position);
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f, bool rubber = false, bool hollow = false, bool dynamic = false);
 			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, bool OBB = false, float inverseMass = 10.0f, int layer = 1, bool isTrigger = false, bool dynamic = false);
-			void AddLongWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, OGLMesh* mesh, OGLTexture* texture);
-			GameObject* AddAABBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name = "");
-			GameObject* AddRenderPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, OGLMesh* mesh, OGLTexture* texture);
+
+			void AddLongWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture);
+			GameObject* AddAABBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation);
+			GameObject* AddRenderPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture);
+
 			GameObject* AddWallToWorld(const Vector3& position, Vector3 dimensions, int rotation);
 			GameObject* AddOBBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name = "");
 			void AddCornerWallToWorld(const Vector3& position, Vector3 dimensions, int rotation);
 			void AddSecurityCameraToWorld(const Vector3& position, int rotation);
 			void AddWallHammerToWorld(const Vector3& position, Vector3 dimensions, int rotation);
 			
-			GameObject* AddCapsuleToWorld(const Vector3& position, float halfHeight, float radius, float inverseMass = 10.0f);
+			GameObject* AddCapsuleToWorld(const Maths::Vector3& position, float halfHeight, float radius, float inverseMass = 10.0f);
 
 			Player* AddPlayerToWorld(const Vector3& position);
 
 			StateGameObject* testStateObject;
 
-			RendererBase*	renderer;
+			Renderer*	renderer;
 			PhysicsSystem*		physics;
 			GameWorld*			world;
 
@@ -91,37 +96,37 @@ namespace NCL {
 
 			GameObject* selectionObject = nullptr;
 
-			OGLMesh*	capsuleMesh = nullptr;
-			OGLMesh*	cubeMesh	= nullptr;
-			OGLMesh*	sphereMesh	= nullptr;
+			MeshGeometry*	capsuleMesh = nullptr;
+			MeshGeometry*	cubeMesh	= nullptr;
+			MeshGeometry*	sphereMesh	= nullptr;
 
-			OGLMesh*	corridorFloor = nullptr;
-			OGLTexture*	corridorFloorTex = nullptr;
-			OGLMesh*	corridorWallAlert = nullptr;
-			OGLTexture*	corridorWallAlertTex = nullptr;
-			OGLMesh*	corridorWallCorner = nullptr;
-			OGLTexture*	corridorWallCornerTex = nullptr;
-			OGLMesh*	corridorWallLight = nullptr;
-			OGLTexture*	corridorWallLightTex = nullptr;
-			OGLMesh*	securityCamera = nullptr;
-			OGLTexture*	securityCameraTex = nullptr;
-			OGLMesh*	corridorWallScreen = nullptr;
-			OGLTexture*	corridorWallScreenTex = nullptr;
-			OGLMesh*	corridorWallStraight = nullptr;
-			OGLTexture*	corridorWallStraightTex = nullptr;
-			OGLMesh*	corridorWallHammer = nullptr;
-			OGLTexture*	corridorWallHammerTex = nullptr;
+			MeshGeometry*	corridorFloor = nullptr;
+			TextureBase*	corridorFloorTex = nullptr;
+			MeshGeometry*	corridorWallAlert = nullptr;
+			TextureBase*	corridorWallAlertTex = nullptr;
+			MeshGeometry*	corridorWallCorner = nullptr;
+			TextureBase*	corridorWallCornerTex = nullptr;
+			MeshGeometry*	corridorWallLight = nullptr;
+			TextureBase*	corridorWallLightTex = nullptr;
+			MeshGeometry*	securityCamera = nullptr;
+			TextureBase*	securityCameraTex = nullptr;
+			MeshGeometry*	corridorWallScreen = nullptr;
+			TextureBase*	corridorWallScreenTex = nullptr;
+			MeshGeometry*	corridorWallStraight = nullptr;
+			TextureBase*	corridorWallStraightTex = nullptr;
+			MeshGeometry*	corridorWallHammer = nullptr;
+			TextureBase*	corridorWallHammerTex = nullptr;
 
-			OGLTexture* basicTex	= nullptr;
-			OGLShader*	basicShader = nullptr;
+			TextureBase* basicTex	= nullptr;
+			ShaderBase*	basicShader = nullptr;
 
-			OGLTexture* playerTex	= nullptr;
+			TextureBase* playerTex	= nullptr;
 
 			//Coursework Meshes
-			OGLMesh*	charMeshA	= nullptr;
-			OGLMesh*	charMeshB	= nullptr;
-			OGLMesh*	enemyMesh	= nullptr;
-			OGLMesh*	bonusMesh	= nullptr;
+			MeshGeometry*	charMeshA	= nullptr;
+			MeshGeometry*	charMeshB	= nullptr;
+			MeshGeometry*	enemyMesh	= nullptr;
+			MeshGeometry*	bonusMesh	= nullptr;
 			
 			bool won = false;
 			Player* player1 = nullptr;

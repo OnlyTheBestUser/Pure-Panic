@@ -8,29 +8,29 @@
 #include "PS4AudioSource.h"
 #include "Ps4AudioEmitter.h"
 
-namespace NCL {
-	namespace PS4 {
-		class Ps4AudioSystem
-		{
-		public:
-			Ps4AudioSystem(int audioSources = 32);
-			~Ps4AudioSystem();
+#define SAMPLE_GRANULARITY 1024
 
-		protected:
-			void AudioThread();
-			void UpdateSound();
+namespace NCL::PS4 {
+	class Ps4AudioSystem
+	{
+	public:
+		Ps4AudioSystem(int audioSources = 32);
+		~Ps4AudioSystem();
 
-			std::thread			audioThread;
-			std::atomic<bool>	threadFinished;
+	protected:
+		void AudioThread();
+		void UpdateSound();
 
-			//libaudio3D
-			SceAudio3dPortId	audioPort;
+		std::thread			audioThread;
+		std::atomic<bool>	threadFinished;
 
-			std::vector<PS4AudioSource*> audioSources;
+		//libaudio3D
+		SceAudio3dPortId	audioPort;
 
-			Ps4AudioEmitter*	testEmitter;
-			Sound*				testSound;
-		};
-	}
+		std::vector<PS4AudioSource*> audioSources;
+
+		Ps4AudioEmitter*	testEmitter;
+		Sound*				testSound;
+	};
 }
 #endif
