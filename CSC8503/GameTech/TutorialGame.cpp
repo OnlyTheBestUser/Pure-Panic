@@ -432,6 +432,7 @@ GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius
 
 	world->AddGameObject(sphere);
 	sphere->SetDynamic(dynamic);
+	sphere->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	return sphere;
 }
 
