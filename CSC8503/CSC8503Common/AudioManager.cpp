@@ -46,9 +46,16 @@ void AudioManager::Update() {
 	studioSystem->update();
 }
 
+void AudioManager::UpdateAudioListener(int listenerID, const Vector3& position, const Quaternion& orientration) {
+	Vector3 forwardRot = orientration * Vector3(0, 0, -1);
+	Vector3 upRot = orientration * Vector3(0, 1, 0);
+	system->set3DListenerAttributes(listenerID, VectorToFMODVector(position), 0,VectorToFMODVector(forwardRot), VectorToFMODVector(upRot));
+}
+
 /*Adds the sound into the sound map, if the name isn't already used.*/
 void AudioManager::LoadSound(const std::string& soundName, bool threeDimensional, bool looping, bool stream) {
 
+	//Create mode bitmask
 	FMOD_MODE mode = FMOD_DEFAULT;
 	mode = mode | (threeDimensional ? FMOD_3D : FMOD_2D);
 	mode = mode | (looping ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
