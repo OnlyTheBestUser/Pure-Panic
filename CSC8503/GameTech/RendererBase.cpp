@@ -101,14 +101,14 @@ void RendererBase::DrawDebugData() {
 	if (debugLines.size() > 0) {
 		pMat = SetupDebugLineMatrix();
 		rendererAPI->UpdateUniformMatrix4(debugShader, "viewProjMatrix", pMat);
-		rendererAPI->UpdateUniformFloat(debugShader, "useTexture", 0);
+		rendererAPI->UpdateUniformInt(debugShader, "useTexture", 0);
 		DrawDebugLines();
 	}
 
 	if (debugStrings.size() > 0) {
 		pMat = SetupDebugStringMatrix();
 		rendererAPI->UpdateUniformMatrix4(debugShader, "viewProjMatrix", pMat);
-		rendererAPI->UpdateUniformFloat(debugShader, "useTexture", 1);
+		rendererAPI->UpdateUniformInt(debugShader, "useTexture", 1);
 		DrawDebugStrings();
 	}
 
@@ -158,7 +158,7 @@ void RendererBase::DrawDebugLines() {
 	debugLinesMesh->SetVertexColours(vertCol);
 	debugLinesMesh->UpdateGPUBuffers(0, vertPos.size());
 
-	rendererAPI->DrawMesh(debugTextMesh);
+	rendererAPI->DrawMesh(debugLinesMesh);
 
 	debugLines.clear();
 }
