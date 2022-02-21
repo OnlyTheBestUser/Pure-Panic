@@ -1,40 +1,22 @@
 #include "PS4GameRenderer.h"
 #include "Renderer.h"
-#include "../../Plugins/OpenGLRendering/OGLRendererAPI.h"
-#include "../../Plugins/OpenGLRendering/OGLFrameBuffer.h"
-#include "../../Plugins/OpenGLRendering/OGLShader.h"
-#include "../../Plugins/OpenGLRendering/OGLMesh.h"
-#include "../../Plugins/OpenGLRendering/OGLTexture.h"
 
 #include "../../Common/SimpleFont.h"
 #include "../../Common/TextureLoader.h"
 
 #include "../../Common/MeshGeometry.h"
 #include "../../Plugins/PlayStation4/PS4Mesh.h"
+
+#include "../../Plugins/OpenGLRendering/OGLFrameBuffer.h"
+#include "../../Plugins/OpenGLRendering/OGLShader.h"
+#include "../../Plugins/OpenGLRendering/OGLMesh.h"
+#include "../../Plugins/OpenGLRendering/OGLTexture.h"
 using namespace NCL;
 using namespace Rendering;
 using namespace CSC8503;
 
 Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
-
 #ifdef _WIN64
-	rendererAPI = new OGLRendererAPI(*Window::GetWindow());
-	TextureLoader::RegisterAPILoadFunction(OGLTexture::RGBATextureFromFilename);
-
-	debugLinesMesh = new OGLMesh();
-	debugTextMesh = new OGLMesh();
-
-	debugLinesMesh->SetVertexPositions(std::vector<Vector3>(5000, Vector3()));
-	debugLinesMesh->SetVertexColours(std::vector<Vector4>(5000, Vector3()));
-
-	debugTextMesh->SetVertexPositions(std::vector<Vector3>(5000, Vector3()));
-	debugTextMesh->SetVertexColours(std::vector<Vector4>(5000, Vector3()));
-	debugTextMesh->SetVertexTextureCoords(std::vector<Vector2>(5000, Vector3()));
-
-	debugTextMesh->UploadToGPU();
-	debugLinesMesh->UploadToGPU();
-
-	debugLinesMesh->SetPrimitiveType(GeometryPrimitive::Lines);
 
 	shadowShader = new OGLShader("GameTechShadowVert.glsl", "GameTechShadowFrag.glsl");
 
@@ -48,9 +30,7 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 	skyboxMesh->SetVertexIndices({ 0,1,2,2,3,0 });
 	skyboxMesh->UploadToGPU();
 
-	debugShader = new OGLShader("debugVert.glsl", "debugFrag.glsl");
-
-	ForceValidDebugState(false);
+	ForceValidDebugState(true);
 
 	skyboxTex = OGLTexture::RGBATextureCubemapFromFilename(
 		"/Cubemap/skyrender0004.png",
@@ -66,29 +46,8 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 
 #endif
 #ifdef _ORBIS
-	rendererAPI = new PS4::PS4GameRenderer(world);
-
-	debugLinesMesh = PS4::PS4Mesh::GenerateQuad();
-	debugTextMesh = PS4::PS4Mesh::GenerateQuad();
-
-	debugTextMesh->UploadToGPU();
-	debugLinesMesh->UploadToGPU();
-
-	debugLinesMesh->SetPrimitiveType(GeometryPrimitive::Lines);
+	
 #endif
-
-	// TODO: figure out why font breaks other stuff when placed above
-	font = new SimpleFont("PressStart2P.fnt", "PressStart2P.png");
-
-	// TODO : add this to font load
-	/*OGLTexture* t = (OGLTexture*)font->GetTexture();
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, t->GetObjectID());
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);*/
 
 	//Set up the light properties
 	lightColour = Vector4(0.8f, 0.8f, 0.5f, 1.0f);

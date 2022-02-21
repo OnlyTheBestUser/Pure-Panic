@@ -50,40 +50,6 @@ OGLRendererAPI::OGLRendererAPI(Window& w) : RendererAPI(w)	{
 
 	currentWidth	= (int)w.GetScreenSize().x;
 	currentHeight	= (int)w.GetScreenSize().y;
-
-	/*if (initState) {
-		TextureLoader::RegisterAPILoadFunction(OGLTexture::RGBATextureFromFilename);
-
-		font = new SimpleFont("PressStart2P.fnt", "PressStart2P.png");
-
-		OGLTexture* t = (OGLTexture*)font->GetTexture();
-
-		if (t) {
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, t->GetObjectID());
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glBindTexture(GL_TEXTURE_2D, 0);
-		}
-		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-		debugShader = new OGLShader("debugVert.glsl", "debugFrag.glsl");
-	}*/
-
-	/*debugLinesMesh = new OGLMesh();
-	debugTextMesh		= new OGLMesh();
-
-
-	debugLinesMesh->SetVertexPositions(std::vector<Vector3>(5000, Vector3()));
-	debugLinesMesh->SetVertexColours(std::vector<Vector4>(5000, Vector3()));
-
-	debugTextMesh->SetVertexPositions(std::vector<Vector3>(5000, Vector3()));
-	debugTextMesh->SetVertexColours(std::vector<Vector4>(5000, Vector3()));
-	debugTextMesh->SetVertexTextureCoords(std::vector<Vector2>(5000, Vector3()));
-
-	debugTextMesh->UploadToGPU();
-	debugLinesMesh->UploadToGPU();
-
-	debugLinesMesh->SetPrimitiveType(GeometryPrimitive::Lines);*/
 }
 
 OGLRendererAPI::~OGLRendererAPI()	{
@@ -117,39 +83,6 @@ void OGLRendererAPI::EndFrame()		{
 void OGLRendererAPI::SwapBuffers()   {
 	::SwapBuffers(deviceContext);
 }
-
-void OGLRendererAPI::UpdateShaderMatrices(OGLShader* shader, Matrix4 projMatrix, Matrix4 viewMatrix) {
-	int projLocation = glGetUniformLocation(shader->GetProgramID(), "projMatrix");
-	int viewLocation = glGetUniformLocation(shader->GetProgramID(), "viewMatrix");
-	glUniformMatrix4fv(projLocation, 1, false, (float*)&projMatrix);
-	glUniformMatrix4fv(viewLocation, 1, false, (float*)&viewMatrix);
-}
-
-void OGLRendererAPI::UpdateModelShaderMatrices(OGLShader* shader, Matrix4 modelMatrix) {
-	int modelLocation = 0;
-	modelLocation = glGetUniformLocation(shader->GetProgramID(), "modelMatrix");
-	glUniformMatrix4fv(modelLocation, 1, false, (float*)&modelMatrix);
-}
-
-void OGLRendererAPI::UpdateModelShaderMatrices(OGLShader* shader, Matrix4 modelMatrix, Matrix4 shadowMatrix) {
-	UpdateModelShaderMatrices(shader, modelMatrix);
-	int shadowLocation = 0;
-	shadowLocation = glGetUniformLocation(shader->GetProgramID(), "shadowMatrix");
-	glUniformMatrix4fv(shadowLocation, 1, false, (float*)&shadowMatrix);
-}
-
-void OGLRendererAPI::UpdateLightUniforms(OGLShader* shader, Vector3 lightPos, Vector4 lightColor, float lightRadius) {
-	int lightPosLocation = 0;
-	int lightColourLocation = 0;
-	int lightRadiusLocation = 0;
-	lightPosLocation = glGetUniformLocation(shader->GetProgramID(), "lightPos");
-	lightColourLocation = glGetUniformLocation(shader->GetProgramID(), "lightColour");
-	lightRadiusLocation = glGetUniformLocation(shader->GetProgramID(), "lightRadius");
-	glUniform3fv(lightPosLocation, 1, (float*)&lightPos);
-	glUniform4fv(lightColourLocation, 1, (float*)&lightColor);
-	glUniform1f(lightRadiusLocation, lightRadius);
-}
-
 
 void OGLRendererAPI::BindShader(ShaderBase*s) {
 	if (!s) {

@@ -1,6 +1,10 @@
 #include "PS4GameRenderer.h"
 #include "RendererBase.h"
 #include "../../Plugins/OpenGLRendering/OGLRendererAPI.h"
+#include "../../Plugins/OpenGLRendering/OGLFrameBuffer.h"
+#include "../../Plugins/OpenGLRendering/OGLShader.h"
+#include "../../Plugins/OpenGLRendering/OGLMesh.h"
+#include "../../Plugins/OpenGLRendering/OGLTexture.h"
 
 #include "../../Common/SimpleFont.h"
 #include "../../Common/TextureLoader.h"
@@ -11,7 +15,50 @@ using namespace NCL;
 using namespace Rendering;
 
 RendererBase::RendererBase() {
-	
+#ifdef _WIN64
+	rendererAPI = new OGLRendererAPI(*Window::GetWindow());
+
+	TextureLoader::RegisterAPILoadFunction(OGLTexture::RGBATextureFromFilename);
+
+	font = new SimpleFont("PressStart2P.fnt", "PressStart2P.png");
+
+	if (rendererAPI->HasInitialised()) {
+		OGLTexture* t = (OGLTexture*)font->GetTexture();
+
+		if (t) {
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, t->GetObjectID());
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glBindTexture(GL_TEXTURE_2D, 0);
+			glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+		}
+		debugShader = new OGLShader("debugVert.glsl", "debugFrag.glsl");
+	}
+
+	debugLinesMesh = new OGLMesh();
+	debugTextMesh = new OGLMesh();
+
+#endif
+#ifdef _ORBIS
+	rendererAPI = new PS4::PS4GameRenderer(world);
+
+	debugLinesMesh = PS4::PS4Mesh::GenerateQuad();
+	debugTextMesh = PS4::PS4Mesh::GenerateQuad();
+
+
+#endif
+	debugLinesMesh->SetVertexPositions(std::vector<Vector3>(5000, Vector3()));
+	debugLinesMesh->SetVertexColours(std::vector<Vector4>(5000, Vector3()));
+
+	debugTextMesh->SetVertexPositions(std::vector<Vector3>(5000, Vector3()));
+	debugTextMesh->SetVertexColours(std::vector<Vector4>(5000, Vector3()));
+	debugTextMesh->SetVertexTextureCoords(std::vector<Vector2>(5000, Vector3()));
+
+	debugTextMesh->UploadToGPU();
+	debugLinesMesh->UploadToGPU();
+
+	debugLinesMesh->SetPrimitiveType(GeometryPrimitive::Lines);
 }
 
 RendererBase::~RendererBase() {

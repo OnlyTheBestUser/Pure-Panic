@@ -64,11 +64,6 @@ namespace NCL {
 
 		protected:			
 
-			void UpdateShaderMatrices(OGLShader* shader, Matrix4 proj, Matrix4 view);
-			void UpdateModelShaderMatrices(OGLShader* shader, Matrix4 model);
-			void UpdateModelShaderMatrices(OGLShader* shader, Matrix4 model, Matrix4 shadow);
-			void UpdateLightUniforms(OGLShader* shader, Vector3 lightPos, Vector4 lightColor, float lightRadius);
-
 			void BindTextureToShader(TextureType type,const TextureBase*t, const std::string& uniform, int texUnit) const;
 			void BindMesh(MeshGeometry*m);
 			void DrawBoundMesh(int subLayer = 0, int numInstances = 1);
