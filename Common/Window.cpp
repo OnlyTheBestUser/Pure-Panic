@@ -9,7 +9,7 @@
 #include "../Plugins/PlayStation4/PS4Window.h"
 #endif
 
-#include "RendererBase.h"
+#include "RendererAPI.h"
 
 using namespace NCL;
 using namespace Rendering;
@@ -45,7 +45,7 @@ Window* Window::CreateGameWindow(std::string title, int sizeX, int sizeY, bool f
 #endif
 }
 
-void	Window::SetRenderer(RendererBase* r) {
+void	Window::SetRenderer(RendererAPI* r) {
 	if (renderer && renderer != r) {
 		renderer->OnWindowDetach();
 	}

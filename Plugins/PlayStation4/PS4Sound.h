@@ -1,5 +1,6 @@
 #pragma once
 #ifdef _ORBIS
+
 class PS4Sound
 {
 public:
@@ -48,7 +49,6 @@ public:
 
 	static void		DeleteSounds();
 
-//protected:
 	Sound();
 	virtual ~Sound(void);
 
@@ -56,12 +56,11 @@ public:
 	void			LoadWAVChunkInfo(ifstream &file, string &name, unsigned int &size);
 
 	char*			data;
-	//ALuint			buffer;
 
 	bool			streaming;			//Part 2
 
 	float			freqRate;
-	double			length;
+	double			length;	//Length in seconds;
 	unsigned int	bitRate;
 	unsigned int	size;
 	unsigned int	channels;

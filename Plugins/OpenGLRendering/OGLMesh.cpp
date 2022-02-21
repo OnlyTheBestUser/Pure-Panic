@@ -55,7 +55,7 @@ void OGLMesh::BindVertexAttribute(int attribSlot, int buffer, int bindingID, int
 	glBindVertexBuffer(bindingID, buffer, elementOffset, elementSize);
 }
 
-void OGLMesh::UploadToGPU(Rendering::RendererBase* renderer) {
+void OGLMesh::UploadToGPU(Rendering::RendererAPI* renderer) {
 	if (!ValidateMeshData()) {
 		return;
 	}

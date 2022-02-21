@@ -1,21 +1,31 @@
+#ifdef _ORBIS
+#include "PS4GameRenderer.h"
+#include "../../Plugins/PlayStation4/PS4Mesh.h"
+#include "../../Plugins/PlayStation4/PS4Shader.h"
+#include "../../Plugins/PlayStation4/PS4Texture.h"
+#include "../../Plugins/PlayStation4/InputBase.h"
+#endif
+
 #include "TutorialGame.h"
 #include "../CSC8503Common/GameWorld.h"
+#ifdef _WIN64
 #include "../../Plugins/OpenGLRendering/OGLMesh.h"
 #include "../../Plugins/OpenGLRendering/OGLShader.h"
 #include "../../Plugins/OpenGLRendering/OGLTexture.h"
+#endif
 #include "../../Common/TextureLoader.h"
 #include "../../Common/Quaternion.h"
 
-#include "..//CSC8503Common/InputHandler.h"
-#include "..//CSC8503Common/GameActor.h"
-#include "..//CSC8503Common/Command.h"
+#include "../CSC8503Common/InputHandler.h"
+#include "../CSC8503Common/GameActor.h"
+#include "../CSC8503Common/Command.h"
 
 using namespace NCL;
 using namespace CSC8503;
 
 TutorialGame::TutorialGame()	{
 	world		= new GameWorld();
-	renderer	= new GameTechRenderer(*world);
+	renderer	= new Renderer(*world);
 	physics		= new PhysicsSystem(*world);
 
 	forceMagnitude	= 30.0f;
@@ -63,6 +73,8 @@ TutorialGame::TutorialGame()	{
 			
 	*/
 
+	// Character movement Go to Line 354
+
 	inputHandler = new InputHandler();
 
 	Command* toggleGrav = new ToggleGravityCommand(physics);
@@ -75,7 +87,6 @@ TutorialGame::TutorialGame()	{
 
 	InitialiseAssets();
 }
-
 /*
 
 Each of the little demo scenarios used in the game uses the same 2 meshes, 
@@ -84,12 +95,16 @@ for this module, even in the coursework, but you can add it if you like!
 
 */
 void TutorialGame::InitialiseAssets() {
-	auto loadFunc = [](const string& name, OGLMesh** into) {
+	auto loadFunc = [](const string& name, MeshGeometry** into) {
+#ifdef _ORBIS
+		*into = new PS4::PS4Mesh(name);
+#else
 		*into = new OGLMesh(name);
+#endif
 		(*into)->SetPrimitiveType(GeometryPrimitive::Triangles);
 		(*into)->UploadToGPU();
 	};
-
+	loadFunc("courier.msh", &cubeMesh);
 	loadFunc("cube.msh"		 , &cubeMesh);
 	loadFunc("sphere.msh"	 , &sphereMesh);
 	loadFunc("Male1.msh"	 , &charMeshA);
@@ -117,7 +132,11 @@ void TutorialGame::InitialiseAssets() {
 	basicTex	= (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
 	basicShader = new OGLShader("GameTechVert.glsl", "GameTechFrag.glsl");
 	playerTex = (OGLTexture*)TextureLoader::LoadAPITexture("me.png");
-
+#ifdef _ORBIS
+	basicTex = (PS4::PS4Texture*)TextureLoader::LoadAPITexture("checkerboard.png");
+	basicShader = PS4::PS4Shader::GenerateShader("/app0/Assets/Shaders/PS4/VertexShader.sb","/app0/Assets/Shaders/PS4/PixelShader.sb");
+	playerTex = (PS4::PS4Texture*)TextureLoader::LoadAPITexture("me.png");
+#endif
 	InitCamera();
 	InitWorld();
 }
@@ -173,6 +192,32 @@ void TutorialGame::UpdateGameWorld(float dt)
 	}
 
 	UpdateKeys();
+
+#ifdef _ORBIS
+	float frameSpeed = 10 * dt;
+	Camera* cam = world->GetMainCamera();
+	float deadzone = 0.2f;
+	if (input->GetAxis(1).y < -deadzone || input->GetAxis(1).y > deadzone) {
+		cam->SetPitch(cam->GetPitch() - input->GetAxis(1).y);
+	}
+	if (input->GetAxis(1).x < -deadzone || input->GetAxis(1).x > deadzone) {
+		cam->SetYaw(cam->GetYaw() - input->GetAxis(1).x);
+	}
+
+	// Movement
+	if (input->GetAxis(0).y < -deadzone) {
+		cam->SetPosition(cam->GetPosition() + Matrix4::Rotation(cam->GetYaw(), Vector3(0, 1, 0)) * Vector3(0, 0, -1) * frameSpeed);
+	}
+	if (input->GetAxis(0).y > deadzone) {
+		cam->SetPosition(cam->GetPosition() - Matrix4::Rotation(cam->GetYaw(), Vector3(0, 1, 0)) * Vector3(0, 0, -1) * frameSpeed);
+	}
+	if (input->GetAxis(0).x < -deadzone) {
+		cam->SetPosition(cam->GetPosition() + Matrix4::Rotation(cam->GetYaw(), Vector3(0, 1, 0)) * Vector3(-1, 0, 0) * frameSpeed);
+	}
+	if (input->GetAxis(0).x > deadzone) {
+		cam->SetPosition(cam->GetPosition() - Matrix4::Rotation(cam->GetYaw(), Vector3(0, 1, 0)) * Vector3(-1, 0, 0) * frameSpeed);
+	}
+#endif
 
 	if (physics->GetGravity()) {
 		Debug::Print("(G)ravity on", Vector2(5, 95));
@@ -333,6 +378,7 @@ void TutorialGame::InitWorld() {
 
 	AddLongWallToWorld(Vector3(255,0,5), Vector3(2, 20, 250), 270, corridorWallStraight, corridorWallAlertTex);
 	AddLongWallToWorld(Vector3(-255,0,5), Vector3(2, 20, 250), 90, corridorWallStraight, corridorWallAlertTex);
+
 	AddLongWallToWorld(Vector3(5,0,255), Vector3(250, 20, 2), 180, corridorWallStraight, corridorWallAlertTex);
 	AddLongWallToWorld(Vector3(5,0,-255), Vector3(250, 20, 2), 0, corridorWallStraight, corridorWallAlertTex);
 
@@ -344,17 +390,27 @@ void TutorialGame::InitWorld() {
 	AddSecurityCameraToWorld(Vector3(25, 4, 240), 180);
 	AddSecurityCameraToWorld(Vector3(-25, 4, 240), 180);
 
-	/*AddWallHammerToWorld(Vector3(0, 2, 241), Vector3(10, 10, 6), 180);
+	AddWallHammerToWorld(Vector3(0, 2, 241), Vector3(10, 10, 6), 180);
 	AddWallHammerToWorld(Vector3(50, 2, 241), Vector3(10, 10, 6), 180);
-	AddWallHammerToWorld(Vector3(-50, 2, 241), Vector3(10, 10, 6), 180);*/
+	AddWallHammerToWorld(Vector3(-50, 2, 241), Vector3(10, 10, 6), 180);
 
 	//InitSphereGridWorld(10, 10, 25, 25, 2);
 	
 	Player* player = AddPlayerToWorld(Vector3(0, 5, 0));
 
+	Command* f = new MoveForwardCommand(player);
+	Command* b = new MoveBackwardCommand(player);
+	Command* l = new MoveLeftCommand(player);
+	Command* r = new MoveRightCommand(player);
+	inputHandler->BindButtonW(f);
+	inputHandler->BindButtonS(b);
+	inputHandler->BindButtonA(l);
+	inputHandler->BindButtonD(r);
+
+
 	GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
 	cap1->SetDynamic(true);
-
+	
 	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
 	player->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	player1 = player;
@@ -367,7 +423,7 @@ void TutorialGame::InitWorld() {
 A single function to add a large immoveable cube to the bottom of our world
 
 */
-GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
+GameObject* TutorialGame::AddFloorToWorld(const Maths::Vector3& position) {
 	GameObject* floor = new GameObject("Floor");
 
 	Vector3 floorSize	= Vector3(250, 1, 250);
@@ -396,7 +452,7 @@ rigid body representation. This and the cube function will let you build a lot o
 physics worlds. You'll probably need another function for the creation of OBB cubes too.
 
 */
-GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius, float inverseMass, bool rubber, bool hollow, bool dynamic) {
+GameObject* TutorialGame::AddSphereToWorld(const Maths::Vector3& position, float radius, float inverseMass, bool rubber, bool hollow, bool dynamic) {
 	GameObject* sphere = new GameObject("Sphere");
 	
 	Vector3 sphereSize = Vector3(radius, radius, radius);
@@ -426,7 +482,7 @@ GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius
 	return sphere;
 }
 
-GameObject* TutorialGame::AddCapsuleToWorld(const Vector3& position, float halfHeight, float radius, float inverseMass) {
+GameObject* TutorialGame::AddCapsuleToWorld(const Maths::Vector3& position, float halfHeight, float radius, float inverseMass) {
 	GameObject* capsule = new GameObject("Capsule");
 
 	CapsuleVolume* volume = new CapsuleVolume(halfHeight, radius);
@@ -447,7 +503,7 @@ GameObject* TutorialGame::AddCapsuleToWorld(const Vector3& position, float halfH
 	return capsule;
 }
 
-GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimensions, bool OBB, float inverseMass, int layer, bool isTrigger, bool dynamic) {
+GameObject* TutorialGame::AddCubeToWorld(const Maths::Vector3& position, Maths::Vector3 dimensions, bool OBB, float inverseMass, int layer, bool isTrigger, bool dynamic) {
 	GameObject* cube = new GameObject();
 	if (OBB) {
 		OBBVolume* volume = new OBBVolume(dimensions);
@@ -491,7 +547,7 @@ GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimens
 	return cube;
 }
 
-void TutorialGame::AddLongWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, OGLMesh* mesh, OGLTexture* texture) {
+void TutorialGame::AddLongWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture) {
 	Vector3 location = position + Vector3(0, 10, 0);
 
 	if (position.x < 0)
@@ -545,7 +601,7 @@ GameObject* TutorialGame::AddAABBWallToWorld(const Vector3& position, Vector3 di
 	world->AddGameObject(cube);
 	return cube;
 }
-GameObject* TutorialGame::AddRenderPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, OGLMesh* mesh, OGLTexture* texture) {
+GameObject* TutorialGame::AddRenderPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture) {
 	GameObject* cube = new GameObject();
 	cube->SetBoundingVolume(nullptr);
 	
@@ -723,7 +779,7 @@ void TutorialGame::InitMixedGridWorld(int numRows, int numCols, float rowSpacing
 	}
 }
 
-void TutorialGame::InitCubeGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, const Vector3& cubeDims) {
+void TutorialGame::InitCubeGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, const Maths::Vector3& cubeDims) {
 	for (int x = 1; x < numCols+1; ++x) {
 		for (int z = 1; z < numRows+1; ++z) {
 			Vector3 position = Vector3(x * colSpacing, 10.0f, z * rowSpacing);
@@ -766,15 +822,6 @@ Player* TutorialGame::AddPlayerToWorld(const Vector3& position) {
 	character->SetDynamic(true);
 
 	world->AddGameObject(character);
-
-	Command* f = new MoveForwardCommand(character);
-	Command* b = new MoveBackwardCommand(character);
-	Command* l = new MoveLeftCommand(character);
-	Command* r = new MoveRightCommand(character);
-	inputHandler->BindButtonW(f);
-	inputHandler->BindButtonS(b);
-	inputHandler->BindButtonA(l);
-	inputHandler->BindButtonD(r);
 
 	return character;
 }

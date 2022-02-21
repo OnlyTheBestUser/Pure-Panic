@@ -1,5 +1,5 @@
 #pragma once
-#include "../../Plugins/OpenGLRendering/OGLRenderer.h"
+#include "../../Plugins/OpenGLRendering/OGLRendererAPI.h"
 #include "../../Plugins/OpenGLRendering/OGLShader.h"
 #include "../../Plugins/OpenGLRendering/OGLTexture.h"
 #include "../../Plugins/OpenGLRendering/OGLMesh.h"
@@ -8,7 +8,7 @@ namespace NCL {
 	class Camera;
 	class MeshAnimation;
 
-	class NavMeshRenderer : public OGLRenderer
+	class NavMeshRenderer : public OGLRendererAPI
 	{
 	public:
 		NavMeshRenderer();
