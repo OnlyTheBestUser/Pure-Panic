@@ -25,7 +25,7 @@ namespace NCL {
 			void SetLinearDamping(float d) {
 				linearDamping = d;
 			}
-
+			
 			void SetGravity(const Vector3& g);
 
 			void BuildStaticList();

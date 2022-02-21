@@ -36,6 +36,9 @@ void PhysicsObject::ApplyLinearImpulse(const Vector3& force) {
 void PhysicsObject::AddForce(const Vector3& addedForce) {
 	force += addedForce;
 }
+void PhysicsObject::AddAcceleration(const Vector3& force) {
+	linearVelocity += force;
+}
 
 void PhysicsObject::AddForceAtPosition(const Vector3& addedForce, const Vector3& position) {
 	Vector3 localPos = position - transform->GetPosition();

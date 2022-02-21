@@ -24,7 +24,7 @@ namespace NCL {
 			const CollisionVolume* GetBoundingVolume() const {
 				return boundingVolume;
 			}
-
+			
 			bool IsActive() const {
 				return isActive;
 			}

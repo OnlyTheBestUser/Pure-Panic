@@ -54,6 +54,7 @@ namespace NCL {
 			void ApplyLinearImpulse(const Vector3& force);
 			
 			void AddForce(const Vector3& force);
+			void AddAcceleration(const Vector3& acceleration);
 
 			void AddForceAtPosition(const Vector3& force, const Vector3& position);
 

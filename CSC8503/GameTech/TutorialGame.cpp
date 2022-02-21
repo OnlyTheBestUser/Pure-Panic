@@ -329,7 +329,8 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	GameObject* floor = AddFloorToWorld(Vector3(0, 0, 0));
+	GameObject* floor = AddFloorToWorld(Vector3(0, -1, 0));
+
 	AddLongWallToWorld(Vector3(255,0,5), Vector3(2, 20, 250), 270, corridorWallStraight, corridorWallAlertTex);
 	AddLongWallToWorld(Vector3(-255,0,5), Vector3(2, 20, 250), 90, corridorWallStraight, corridorWallAlertTex);
 	AddLongWallToWorld(Vector3(5,0,255), Vector3(250, 20, 2), 180, corridorWallStraight, corridorWallAlertTex);
@@ -348,9 +349,8 @@ void TutorialGame::InitWorld() {
 	AddWallHammerToWorld(Vector3(-50, 2, 241), Vector3(10, 10, 6), 180);*/
 
 	//InitSphereGridWorld(10, 10, 25, 25, 2);
-
+	
 	Player* player = AddPlayerToWorld(Vector3(0, 5, 0));
-	player->SetDynamic(true);
 
 	GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
 	cap1->SetDynamic(true);
@@ -370,7 +370,7 @@ A single function to add a large immoveable cube to the bottom of our world
 GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
 	GameObject* floor = new GameObject("Floor");
 
-	Vector3 floorSize	= Vector3(250, 2, 250);
+	Vector3 floorSize	= Vector3(250, 1, 250);
 	AABBVolume* volume	= new AABBVolume(floorSize);
 	floor->SetBoundingVolume((CollisionVolume*)volume);
 	floor->GetTransform()
@@ -746,10 +746,9 @@ Player* TutorialGame::AddPlayerToWorld(const Vector3& position) {
 	float meshSize = 3.0f;
 	float inverseMass = 0.5f;
 
-	Player* character = new Player(world->GetMainCamera(), "Player");
+	Player* character = new Player(world->GetMainCamera(), *world, "Player");
 
 	AABBVolume* volume = new AABBVolume(Vector3(0.3f, 0.85f, 0.3f) * meshSize);
-
 	character->SetBoundingVolume((CollisionVolume*)volume);
 
 	character->GetTransform()
@@ -760,8 +759,9 @@ Player* TutorialGame::AddPlayerToWorld(const Vector3& position) {
 	character->SetPhysicsObject(new PhysicsObject(&character->GetTransform(), character->GetBoundingVolume()));
 
 	character->GetPhysicsObject()->SetInverseMass(inverseMass);
-	character->GetPhysicsObject()->SetFriction(0.0f);
+	character->GetPhysicsObject()->SetFriction(1.0f);
 	character->GetPhysicsObject()->InitSphereInertia();
+	character->SetDynamic(true);
 
 	world->AddGameObject(character);
 

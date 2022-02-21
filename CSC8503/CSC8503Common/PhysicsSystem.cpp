@@ -481,32 +481,11 @@ void PhysicsSystem::IntegrateAccel(float dt, GameObject* gobj) {
 	Vector3 linearVel = object->GetLinearVelocity();
 	Vector3 force = object->GetForce();
 	Vector3 accel = force * inverseMass;
-
-	Ray ray(gobj->GetTransform().GetPosition(), Vector3(0, -1, 0));
-	RayCollision closestCollision;
-	gameWorld.Raycast(ray, closestCollision, true);
-	float distToGround = gobj->GetTransform().GetPosition().y - closestCollision.collidedAt.y;
-
-	std::cout << gobj->GetName() << ", distance " << distToGround << std::endl;
-	std::cout << gobj->GetTransform().GetPosition() << " | " << closestCollision.collidedAt << std::endl;
-
-	// TODO ----------------------------------------------------------------------------------
-
-	const CollisionVolume* volume = gobj->GetBoundingVolume();
-	switch (gobj->GetBoundingVolume()->type) {
-		case VolumeType::AABB:  ((const AABBVolume&)*volume).GetHalfDimensions(); break;
-		case VolumeType::OBB: ((const OBBVolume&)*volume).GetHalfDimensions(); break;
-		case VolumeType::Sphere: distToGround -= ((const SphereVolume&)*volume).GetRadius(); break;
-		case VolumeType::Capsule: ((const CapsuleVolume&)*volume); break;
-	}
-
-	if (applyGravity && inverseMass > 0 && object->UsesGravity() && gobj->IsDynamic() && (distToGround) > 0.5f) {
+	
+	if (applyGravity && inverseMass > 0 && object->UsesGravity() && gobj->IsDynamic()) {
 		accel += gravity;
 	}
-
-	// TODO ----------------------------------------------------------------------------------
-
-
+	
 	linearVel += accel * dt;
 	object->SetLinearVelocity(linearVel);
 
