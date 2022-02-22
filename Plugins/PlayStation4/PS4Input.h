@@ -11,7 +11,7 @@ namespace NCL {
 			PS4Input();
 			~PS4Input();
 
-			void Poll();
+			void Poll() override;
 
 		protected:
 			void InitController();

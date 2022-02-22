@@ -1,6 +1,6 @@
 #include "InputBase.h"
 
-using namespace NCL::PS4;
+using namespace NCL::CSC8503;
 
 InputBase::InputBase()
 {

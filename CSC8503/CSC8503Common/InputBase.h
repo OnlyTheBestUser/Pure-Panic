@@ -1,7 +1,9 @@
 #pragma once
+#include "InputList.h"
 
 namespace NCL {
-	namespace PS4 {
+
+	namespace CSC8503 {
 		struct AXIS {
 			float x;
 			float y;
@@ -27,6 +29,7 @@ namespace NCL {
 			float	GetButton(unsigned int i);
 			bool	GetButtonDown(unsigned int i);
 
+			virtual void Poll() = 0;
 
 		protected:
 

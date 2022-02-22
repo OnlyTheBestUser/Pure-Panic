@@ -1,5 +1,5 @@
 #ifdef _ORBIS
-#include "PS4Input.h"
+#include "InputBase.h"
 #include "pad.h"
 #include <sys\_defines\_sce_ok.h>
 #include <iostream>
@@ -48,12 +48,15 @@ void PS4Input::Poll() {
 
 	if (ret == SCE_OK) {
 		if (data.connected) {
-			axis[0].x = (((data.leftStick.x / 255.0f) * 2) - 1.0f);
+			// Left Stick
+			axis[0].x = (((data.leftStick.x / 255.0f) * 2) - 1.0f); 
 			axis[0].y = (((data.leftStick.y / 255.0f) * 2) - 1.0f);
 
+			// Right Stick
 			axis[1].x = (((data.rightStick.x / 255.0f) * 2) - 1.0f);
 			axis[1].y = (((data.rightStick.y / 255.0f) * 2) - 1.0f);
 
+			// DPAD (Should probably be moved from axis as they're actual buttons not used for movement or looking in our game)
 			axis[2].x  = 0.0f;
 			axis[2].x += ((data.buttons & SCE_PAD_BUTTON_RIGHT) ? 1.0f : 0.0f);
 			axis[2].x -= ((data.buttons & SCE_PAD_BUTTON_LEFT)  ? 1.0f : 0.0f);
@@ -61,6 +64,7 @@ void PS4Input::Poll() {
 			axis[2].y  = 0.0f;
 			axis[2].y += ((data.buttons & SCE_PAD_BUTTON_UP)    ? 1.0f : 0.0f);
 			axis[2].y -= ((data.buttons & SCE_PAD_BUTTON_DOWN)  ? 1.0f : 0.0f);
+
 
 			buttons[0] = ((data.buttons & SCE_PAD_BUTTON_TRIANGLE) ? 1.0f : 0.0f);
 			buttons[1] = ((data.buttons & SCE_PAD_BUTTON_CIRCLE)   ? 1.0f : 0.0f);

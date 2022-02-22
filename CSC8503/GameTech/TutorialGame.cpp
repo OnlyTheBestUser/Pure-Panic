@@ -20,6 +20,8 @@
 #include "../CSC8503Common/GameActor.h"
 #include "../CSC8503Common/Command.h"
 
+#include "../CSC8503Common/InputList.h"
+
 using namespace NCL;
 using namespace CSC8503;
 
@@ -80,8 +82,8 @@ TutorialGame::TutorialGame()	{
 	Command* toggleGrav = new ToggleGravityCommand(physics);
 	Command* toggleDebug = new ToggleBoolCommand(&debugDraw);
 	
-	inputHandler->BindButtonG(toggleGrav);
-	inputHandler->BindButtonJ(toggleDebug);
+	inputHandler->BindButton(TOGGLE_GRAV, toggleGrav);
+	inputHandler->BindButton(TOGGLE_DEBUG, toggleDebug);
 
 #pragma endregion
 
@@ -402,10 +404,10 @@ void TutorialGame::InitWorld() {
 	Command* b = new MoveBackwardCommand(player);
 	Command* l = new MoveLeftCommand(player);
 	Command* r = new MoveRightCommand(player);
-	inputHandler->BindButtonW(f);
-	inputHandler->BindButtonS(b);
-	inputHandler->BindButtonA(l);
-	inputHandler->BindButtonD(r);
+	inputHandler->BindButton(FORWARD, f);
+	inputHandler->BindButton(BACK, b);
+	inputHandler->BindButton(LEFT, l);
+	inputHandler->BindButton(RIGHT, r);
 
 
 	GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
