@@ -54,6 +54,7 @@ namespace NCL {
 			void ApplyLinearImpulse(const Vector3& force);
 			
 			void AddForce(const Vector3& force);
+			void AddAcceleration(const Vector3& acceleration);
 
 			void AddForceAtPosition(const Vector3& force, const Vector3& position);
 
@@ -85,6 +86,9 @@ namespace NCL {
 
 			void SetFriction(float f) { friction = f; }
 			float GetFriction() const { return friction; }
+
+			void SetLinearDamping(float l) { linearDamping = l; }
+			float GetLinearDamping() const { return linearDamping; }
 
 			bool UsesGravity() const { return useGravity; }
 			void SetGravity(bool k) { useGravity = k; }
@@ -134,6 +138,7 @@ namespace NCL {
 			//linear stuff
 			Vector3 linearVelocity;
 			Vector3 force;
+			float	linearDamping;
 			
 			bool useSpringResolution = false;
 

@@ -204,7 +204,6 @@ void Renderer::RenderScene() {
 
 }
 
-
 Maths::Matrix4 Renderer::SetupDebugLineMatrix()	const {
 	float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
 	Matrix4 viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();

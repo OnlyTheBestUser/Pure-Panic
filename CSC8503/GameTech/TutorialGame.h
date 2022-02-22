@@ -61,11 +61,13 @@ namespace NCL {
 			GameObject* AddFloorToWorld(const Vector3& position);
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f, bool rubber = false, bool hollow = false, bool dynamic = false);
 			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, bool OBB = false, float inverseMass = 10.0f, int layer = 1, bool isTrigger = false, bool dynamic = false);
+
 			void AddLongWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture);
-			GameObject* AddAABBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation);
+			GameObject* AddAABBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name = "AABBWall");
 			GameObject* AddRenderPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture);
+
 			GameObject* AddWallToWorld(const Vector3& position, Vector3 dimensions, int rotation);
-			GameObject* AddOBBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation);
+			GameObject* AddOBBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name = "");
 			void AddCornerWallToWorld(const Vector3& position, Vector3 dimensions, int rotation);
 			void AddSecurityCameraToWorld(const Vector3& position, int rotation);
 			void AddWallHammerToWorld(const Vector3& position, Vector3 dimensions, int rotation);
