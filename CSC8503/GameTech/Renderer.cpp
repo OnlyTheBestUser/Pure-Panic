@@ -84,15 +84,17 @@ void Renderer::Update(float dt) {
 void Renderer::Render() {
 	rendererAPI->BeginFrame();
 
-	//rendererAPI->SetCullFace(true);
-	//rendererAPI->SetClearColour(1, 1, 1, 1);
+	rendererAPI->SetCullFace(true);
+	rendererAPI->SetClearColour(1, 1, 1, 1);
 	BuildObjectList();
-	//SortObjectList();
+	SortObjectList();
 	RenderScene();
-	//rendererAPI->SetCullFace(false);
+	rendererAPI->SetCullFace(false);
 
 	rendererAPI->EndFrame();
-	//DrawDebugData();
+#ifdef _WIN64
+	DrawDebugData();
+#endif
 	rendererAPI->SwapBuffers();
 }
 
@@ -118,7 +120,8 @@ void Renderer::SortObjectList() {
 void Renderer::RenderScene() {
 // Render Shadow Map
 
-	/*rendererAPI->SetCullFace(true);
+#ifdef _WIN64
+	rendererAPI->SetCullFace(true);
 	rendererAPI->SetBlend(true);
 	rendererAPI->SetDepth(true);
 
@@ -148,7 +151,8 @@ void Renderer::RenderScene() {
 	rendererAPI->SetViewportSize(rendererAPI->GetCurrentWidth(), rendererAPI->GetCurrentHeight());
 	rendererAPI->SetColourMask(true, true, true, true);
 	rendererAPI->BindFrameBuffer();
-	rendererAPI->SetCullType(NCL::Rendering::RendererAPI::CULL_TYPE::BACK);*/
+	rendererAPI->SetCullType(NCL::Rendering::RendererAPI::CULL_TYPE::BACK);
+#endif
 
 // Render skybox
 
@@ -199,17 +203,23 @@ void Renderer::RenderScene() {
 		}
 
 		rendererAPI->BindTexture((*i).GetDefaultTexture(), "mainTex", 0);
-		//rendererAPI->BindTexture(shadowFBO->GetTexture(), "shadowTex", 1);
+#ifdef _WIN64
+		rendererAPI->BindTexture(shadowFBO->GetTexture(), "shadowTex", 1);
+#endif
 		
 		Matrix4 modelMatrix = (*i).GetTransform()->GetMatrix();
-		//Matrix4 fullShadowMat = shadowMatrix * modelMatrix;
+#ifdef _WIN64
+		Matrix4 fullShadowMat = shadowMatrix * modelMatrix;
+#endif
 		rendererAPI->UpdateUniformMatrix4(shader, "modelMatrix", modelMatrix);
 		rendererAPI->UpdateUniformMatrix4(shader, "invModelMatrix", modelMatrix.Inverse());
-		//rendererAPI->UpdateUniformMatrix4(shader, "shadowMatrix", fullShadowMat);
+#ifdef _WIN64
+		rendererAPI->UpdateUniformMatrix4(shader, "shadowMatrix", fullShadowMat);
 
-		//rendererAPI->UpdateUniformVector4(shader, "objectColour", i->GetColour());
-		//rendererAPI->UpdateUniformInt(shader, "hasVertexColours", !(*i).GetMesh()->GetColourData().empty());
-		//rendererAPI->UpdateUniformInt(shader, "hasTexture", (OGLTexture*)(*i).GetDefaultTexture() ? 1 : 0);
+		rendererAPI->UpdateUniformVector4(shader, "objectColour", i->GetColour());
+		rendererAPI->UpdateUniformInt(shader, "hasVertexColours", !(*i).GetMesh()->GetColourData().empty());
+		rendererAPI->UpdateUniformInt(shader, "hasTexture", (OGLTexture*)(*i).GetDefaultTexture() ? 1 : 0);
+#endif
 
 		rendererAPI->DrawMeshAndSubMesh((*i).GetMesh());
 	}

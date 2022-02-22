@@ -126,22 +126,23 @@ void TutorialGame::InitialiseAssets() {
 
 	auto loadTexFunc = [](const string& name, TextureBase** into) {
 #ifdef _ORBIS
-		* into = PS4::PS4Texture::LoadTextureFromFile(NCL::Assets::TEXTUREDIR + name);
+		* into = PS4::PS4Texture::LoadTextureFromFile(NCL::Assets::TEXTUREDIR + name + ".gnf");
 #else
-		* into = OGLTexture*)TextureLoader::LoadAPITexture(name);
+		* into = (OGLTexture*)TextureLoader::LoadAPITexture(name + ".png");
 #endif
 	};
 
 #ifdef _WIN64
-	corridorFloorTex = (OGLTexture*)TextureLoader::LoadAPITexture("Corridor_Light_Colour.png");
-	corridorWallAlertTex = (OGLTexture*)TextureLoader::LoadAPITexture("corridor_wall_c.png");
-	corridorWallCornerTex = (OGLTexture*)TextureLoader::LoadAPITexture("Corridor_Walls_Redux_Metal.png");
-	corridorWallLightTex = (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
-	securityCameraTex = (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
-	corridorWallScreenTex = (OGLTexture*)TextureLoader::LoadAPITexture("Animated_Screens_A_Colour.png");
-	corridorWallStraightTex = (OGLTexture*)TextureLoader::LoadAPITexture("Corridor_Walls_Redux_Colour.png");
-	corridorWallHammerTex = (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
+	loadTexFunc("Corridor_Light_Colour", &corridorFloorTex);
+	loadTexFunc("corridor_wall_c", &corridorWallAlertTex);
+	loadTexFunc("Corridor_Walls_Redux_Metal", &corridorWallCornerTex);
+	loadTexFunc("checkerboard", &corridorWallLightTex);
+	loadTexFunc("checkerboard", &securityCameraTex);
+	loadTexFunc("Animated_Screens_A_Colour", &corridorWallScreenTex);
+	loadTexFunc("Corridor_Walls_Redux_Colour", &corridorWallStraightTex);
+	loadTexFunc("checkerboard", &corridorWallHammerTex);
 
+	loadTexFunc("checkerboard", &basicTex);
 	basicTex	= (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
 	basicShader = new OGLShader("GameTechVert.glsl", "GameTechFrag.glsl");
 	playerTex = (OGLTexture*)TextureLoader::LoadAPITexture("me.png");
@@ -153,14 +154,6 @@ void TutorialGame::InitialiseAssets() {
 		NCL::Assets::SHADERDIR + "PS4/PixelShader.sb"
 	);
 	playerTex = basicTex;
-	corridorFloorTex = basicTex;
-	corridorWallAlertTex = basicTex;
-	corridorWallCornerTex = basicTex;
-	corridorWallLightTex = basicTex;
-	securityCameraTex = basicTex;
-	corridorWallScreenTex = basicTex;
-	corridorWallStraightTex = basicTex;
-	corridorWallHammerTex = basicTex;
 #endif
 	InitCamera();
 	InitWorld();
