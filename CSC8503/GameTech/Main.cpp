@@ -37,7 +37,7 @@ public:
 	PushdownResult OnUpdate(float dt, PushdownState** newState) override {
 		g->UpdateGame(dt);
 
-		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::R)) {
+		/*if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::R)) {
 			g->ResetGame();
 			g->UpdateGame(dt);
 			return PushdownResult::Pop;
@@ -45,7 +45,7 @@ public:
 
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
 			return PushdownResult::Reset;
-		}
+		}*/
 
 		return PushdownResult::NoChange;
 	}
@@ -65,13 +65,13 @@ public:
 	PushdownResult OnUpdate(float dt, PushdownState** newState) override {
 		g->UpdateGame(dt);
 
-		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::P)) {
+		/*if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::P)) {
 			return PushdownResult::Pop;
 		}
 
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
 			return PushdownResult::Reset;
-		}
+		}*/
 		return PushdownResult::NoChange;
 	}
 
@@ -96,10 +96,10 @@ public:
 		}
 		
 
-		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::P)) {
+		/*if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::P)) {
 			*newState = new PauseGame(g);
 			return PushdownResult::Push;
-		}
+		}*/
 
 		return PushdownResult::NoChange;
 	}
@@ -119,7 +119,7 @@ public:
 	PushdownResult OnUpdate(float dt, PushdownState** newState) override {
 		m->UpdateGame(dt);
 
-		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM1)) {
+		/*if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM1)) {
 			*newState = new Game(f);
 			return PushdownResult::Push;
 		}
@@ -136,7 +136,7 @@ public:
 
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
 			return PushdownResult::Exit;
-		}
+		}*/
 
 		return PushdownResult::NoChange;
 	}
@@ -185,8 +185,8 @@ int main() {
 	int totalFrames = 0;
 
 	TutorialGame* g = new TutorialGame();
-	MainMenu* m = new MainMenu();
-	PushdownMachine p = new Menu(m, g, g, g);
+	//MainMenu* m = new MainMenu();
+	//PushdownMachine p = new Menu(m, g, g, g);
 	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
 	float smallestFrameRate = 144.0f;
 	while (w->UpdateWindow()) { //&& !w->GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
@@ -196,7 +196,7 @@ int main() {
 			std::cout << "Skipping large time delta" << std::endl;
 			continue; //must have hit a breakpoint or something to have a 1 second frame time!
 		}
-		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::PRIOR)) {
+		/*if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::PRIOR)) {
 			w->ShowConsole(true);
 		}
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NEXT)) {
@@ -205,7 +205,7 @@ int main() {
 
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::T)) {
 			w->SetWindowPosition(0, 0);
-		}
+		}*/
 
 		float frameRate = (1.0f / dt);
 		if (frameRate < smallestFrameRate)
@@ -221,9 +221,11 @@ int main() {
 			curTimeWait = avgTimeWait;
 		}
 
-		if (!p.Update(dt)) {
-			return 0;
-		}
+		g->UpdateGame(dt);
+
+		//if (!p.Update(dt)) {
+		//	return 0;
+		//}
 	}
 	Window::DestroyGameWindow();
 }

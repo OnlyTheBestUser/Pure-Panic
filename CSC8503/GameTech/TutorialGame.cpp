@@ -1,3 +1,9 @@
+#ifdef _ORBIS
+#include "../../Plugins/PlayStation4/PS4Mesh.h"
+#include "../../Plugins/PlayStation4/PS4Shader.h"
+#include "../../Plugins/PlayStation4/PS4Texture.h"
+#endif
+
 #include "TutorialGame.h"
 #include "../CSC8503Common/GameWorld.h"
 #ifdef _WIN64
@@ -6,6 +12,7 @@
 #include "../../Plugins/OpenGLRendering/OGLTexture.h"
 #endif
 
+#include "../../Common/Assets.h"
 #include "../../Common/TextureLoader.h"
 #include "../../Common/MeshGeometry.h"
 
@@ -14,6 +21,7 @@
 #include "../CSC8503Common/InputHandler.h"
 #include "../CSC8503Common/GameActor.h"
 #include "../CSC8503Common/Command.h"
+
 
 using namespace NCL;
 using namespace CSC8503;
@@ -92,7 +100,7 @@ for this module, even in the coursework, but you can add it if you like!
 void TutorialGame::InitialiseAssets() {
 	auto loadFunc = [](const string& name, MeshGeometry** into) {
 #ifdef _ORBIS
-		//*into = new PS4::PS4Mesh(name);
+		*into = new PS4::PS4Mesh(name);
 #else
 		*into = new OGLMesh(name);
 #endif
@@ -108,16 +116,21 @@ void TutorialGame::InitialiseAssets() {
 	loadFunc("coin.msh"		 , &bonusMesh);
 	loadFunc("capsule.msh"	 , &capsuleMesh); 
 	loadFunc("Corridor_Floor_Basic.msh"	 , &corridorFloor);
-
-
 	loadFunc("Corridor_Wall_Alert.msh"	 , &corridorWallAlert);
-
 	loadFunc("Corridor_Wall_Corner_In_Both.msh"	 , &corridorWallCorner);
 	loadFunc("Corridor_Wall_Light.msh"	 , &corridorWallLight);
 	loadFunc("Security_Camera.msh"	 , &securityCamera);
 	loadFunc("corridor_wall_screen.msh"	 , &corridorWallScreen);
 	loadFunc("corridor_Wall_Straight_Mid_end_L.msh"	 , &corridorWallStraight);
 	loadFunc("Corridor_Wall_Hammer.msh"	 , &corridorWallHammer);
+
+	auto loadTexFunc = [](const string& name, TextureBase** into) {
+#ifdef _ORBIS
+		* into = PS4::PS4Texture::LoadTextureFromFile(NCL::Assets::TEXTUREDIR + name);
+#else
+		* into = OGLTexture*)TextureLoader::LoadAPITexture(name);
+#endif
+	};
 
 #ifdef _WIN64
 	corridorFloorTex = (OGLTexture*)TextureLoader::LoadAPITexture("Corridor_Light_Colour.png");
@@ -134,9 +147,20 @@ void TutorialGame::InitialiseAssets() {
 	playerTex = (OGLTexture*)TextureLoader::LoadAPITexture("me.png");
 #endif
 #ifdef _ORBIS
-	//basicTex = (PS4::PS4Texture*)TextureLoader::LoadAPITexture("checkerboard.png");
-	//basicShader = PS4::PS4Shader::GenerateShader("/app0/Assets/Shaders/PS4/VertexShader.sb","/app0/Assets/Shaders/PS4/PixelShader.sb");
-	//playerTex = (PS4::PS4Texture*)TextureLoader::LoadAPITexture("me.png");
+	basicTex = PS4::PS4Texture::LoadTextureFromFile(NCL::Assets::TEXTUREDIR + "checkerboard.gnf");
+	basicShader = PS4::PS4Shader::GenerateShader(
+		NCL::Assets::SHADERDIR + "PS4/VertexShader.sb",
+		NCL::Assets::SHADERDIR + "PS4/PixelShader.sb"
+	);
+	playerTex = basicTex;
+	corridorFloorTex = basicTex;
+	corridorWallAlertTex = basicTex;
+	corridorWallCornerTex = basicTex;
+	corridorWallLightTex = basicTex;
+	securityCameraTex = basicTex;
+	corridorWallScreenTex = basicTex;
+	corridorWallStraightTex = basicTex;
+	corridorWallHammerTex = basicTex;
 #endif
 	InitCamera();
 	InitWorld();
@@ -172,7 +196,7 @@ void TutorialGame::UpdateGame(float dt) {
 	}
 	}
 
-	inputHandler->HandleInput();
+//	inputHandler->HandleInput();
 
 	//Debug::DrawLine(Vector3(), Vector3(0, 20, 0), Debug::RED);
 	//Debug::DrawLine(Vector3(), Vector3(360, 0, 0), Debug::RED);
@@ -192,7 +216,7 @@ void TutorialGame::UpdateGameWorld(float dt)
 		world->GetMainCamera()->UpdateCamera(dt);
 	}
 
-	UpdateKeys();
+	//UpdateKeys();
 
 	if (physics->GetGravity()) {
 		Debug::Print("(G)ravity on", Vector2(5, 95));
@@ -213,8 +237,8 @@ void TutorialGame::UpdateGameWorld(float dt)
 		}
 	}
 
-	SelectObject();
-	MoveSelectedObject(dt);
+	//SelectObject();
+	//MoveSelectedObject(dt);
 	physics->Update(dt);
 
 	world->UpdateWorld(dt);
@@ -351,7 +375,7 @@ void TutorialGame::InitWorld() {
 
 	GameObject* floor = AddFloorToWorld(Vector3(0, -1, 0));
 
-	AddLongWallToWorld(Vector3(255,0,5), Vector3(2, 20, 250), 270, corridorWallStraight, corridorWallAlertTex);
+	AddLongWallToWorld(Vector3(255, 0, 5), Vector3(2, 20, 250), 270, corridorWallStraight, corridorWallAlertTex);
 	AddLongWallToWorld(Vector3(-255,0,5), Vector3(2, 20, 250), 90, corridorWallStraight, corridorWallAlertTex);
 
 	AddLongWallToWorld(Vector3(5,0,255), Vector3(250, 20, 2), 180, corridorWallStraight, corridorWallAlertTex);
@@ -383,10 +407,10 @@ void TutorialGame::InitWorld() {
 	inputHandler->BindButtonD(r);
 
 
-	GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
-	cap1->SetDynamic(true);
+	//GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
+	//cap1->SetDynamic(true);
 	
-	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
+	//cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
 	player->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	player1 = player;
 

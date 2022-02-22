@@ -1,6 +1,8 @@
+#ifdef _ORBIS
 #include "../../Plugins/PlayStation4/PS4Mesh.h"
 #include "../../Plugins/PlayStation4/PS4Shader.h"
 #include "../../Plugins/PlayStation4/PS4Texture.h"
+#endif
 #include "Renderer.h"
 
 #include "../../Common/Assets.h"
@@ -50,6 +52,7 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 #endif
 #ifdef _ORBIS
 	skyboxMesh = PS4::PS4Mesh::GenerateQuad();
+	skyboxMesh->UploadToGPU(rendererAPI);
 
 	skyboxShader = PS4::PS4Shader::GenerateShader(
 		Assets::SHADERDIR + "PS4/skyboxVertex.sb",
@@ -81,15 +84,15 @@ void Renderer::Update(float dt) {
 void Renderer::Render() {
 	rendererAPI->BeginFrame();
 
-	rendererAPI->SetCullFace(true);
-	rendererAPI->SetClearColour(1, 1, 1, 1);
+	//rendererAPI->SetCullFace(true);
+	//rendererAPI->SetClearColour(1, 1, 1, 1);
 	BuildObjectList();
-	SortObjectList();
+	//SortObjectList();
 	RenderScene();
-	rendererAPI->SetCullFace(false);
+	//rendererAPI->SetCullFace(false);
 
 	rendererAPI->EndFrame();
-	DrawDebugData();
+	//DrawDebugData();
 	rendererAPI->SwapBuffers();
 }
 
@@ -115,7 +118,7 @@ void Renderer::SortObjectList() {
 void Renderer::RenderScene() {
 // Render Shadow Map
 
-	rendererAPI->SetCullFace(true);
+	/*rendererAPI->SetCullFace(true);
 	rendererAPI->SetBlend(true);
 	rendererAPI->SetDepth(true);
 
@@ -145,7 +148,7 @@ void Renderer::RenderScene() {
 	rendererAPI->SetViewportSize(rendererAPI->GetCurrentWidth(), rendererAPI->GetCurrentHeight());
 	rendererAPI->SetColourMask(true, true, true, true);
 	rendererAPI->BindFrameBuffer();
-	rendererAPI->SetCullType(NCL::Rendering::RendererAPI::CULL_TYPE::BACK);
+	rendererAPI->SetCullType(NCL::Rendering::RendererAPI::CULL_TYPE::BACK);*/
 
 // Render skybox
 
@@ -161,6 +164,7 @@ void Renderer::RenderScene() {
 
 	rendererAPI->UpdateUniformMatrix4(skyboxShader, "projMatrix", projMatrix);
 	rendererAPI->UpdateUniformMatrix4(skyboxShader, "viewMatrix", viewMatrix);
+	rendererAPI->UpdateUniformMatrix4(skyboxShader, "invProjMatrix", projMatrix.Inverse());
 
 	rendererAPI->BindCubemap(skyboxTex, "cubeTex", 0);
 
@@ -171,7 +175,6 @@ void Renderer::RenderScene() {
 	rendererAPI->SetDepth(true);
 	
 // Render Scene
-
 	ShaderBase* activeShader = nullptr;
 	/*float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
 	Matrix4 viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
@@ -181,28 +184,32 @@ void Renderer::RenderScene() {
 
 		if (activeShader != shader) {
 			rendererAPI->BindShader(shader);
+
 			rendererAPI->UpdateUniformMatrix4(shader, "projMatrix", projMatrix);
 			rendererAPI->UpdateUniformMatrix4(shader, "viewMatrix", viewMatrix);
+			rendererAPI->UpdateUniformMatrix4(shader, "viewProjMatrix", projMatrix * viewMatrix);
+			rendererAPI->UpdateUniformMatrix4(shader, "invProjMatrix", projMatrix.Inverse());
 			rendererAPI->UpdateUniformVector3(shader, "cameraPos", gameWorld.GetMainCamera()->GetPosition());
 
 			rendererAPI->UpdateUniformVector4(shader, "lightColour", lightColour);
 			rendererAPI->UpdateUniformVector3(shader, "lightPos", lightPos);
 			rendererAPI->UpdateUniformFloat(shader, "lightRadius", lightRadius);
-
+			
 			activeShader = shader;
 		}
 
 		rendererAPI->BindTexture((*i).GetDefaultTexture(), "mainTex", 0);
-		rendererAPI->BindTexture(shadowFBO->GetTexture(), "shadowTex", 1);
+		//rendererAPI->BindTexture(shadowFBO->GetTexture(), "shadowTex", 1);
 		
 		Matrix4 modelMatrix = (*i).GetTransform()->GetMatrix();
-		Matrix4 fullShadowMat = shadowMatrix * modelMatrix;
+		//Matrix4 fullShadowMat = shadowMatrix * modelMatrix;
 		rendererAPI->UpdateUniformMatrix4(shader, "modelMatrix", modelMatrix);
-		rendererAPI->UpdateUniformMatrix4(shader, "shadowMatrix", fullShadowMat);
+		rendererAPI->UpdateUniformMatrix4(shader, "invModelMatrix", modelMatrix.Inverse());
+		//rendererAPI->UpdateUniformMatrix4(shader, "shadowMatrix", fullShadowMat);
 
-		rendererAPI->UpdateUniformVector4(shader, "objectColour", i->GetColour());
-		rendererAPI->UpdateUniformInt(shader, "hasVertexColours", !(*i).GetMesh()->GetColourData().empty());
-		rendererAPI->UpdateUniformInt(shader, "hasTexture", (OGLTexture*)(*i).GetDefaultTexture() ? 1 : 0);
+		//rendererAPI->UpdateUniformVector4(shader, "objectColour", i->GetColour());
+		//rendererAPI->UpdateUniformInt(shader, "hasVertexColours", !(*i).GetMesh()->GetColourData().empty());
+		//rendererAPI->UpdateUniformInt(shader, "hasTexture", (OGLTexture*)(*i).GetDefaultTexture() ? 1 : 0);
 
 		rendererAPI->DrawMeshAndSubMesh((*i).GetMesh());
 	}

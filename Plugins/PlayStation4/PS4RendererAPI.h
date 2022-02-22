@@ -54,6 +54,7 @@ namespace NCL::PS4 {
 		void	OnWindowResize(int w, int h) override;
 		void	BeginFrame()    override;
 		void	EndFrame()		override;
+		void RenderFrame() override;
 		void	SwapBuffers()	override;
 
 		void	SwapScreenBuffer();

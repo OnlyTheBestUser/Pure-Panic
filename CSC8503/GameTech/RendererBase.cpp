@@ -49,7 +49,7 @@ RendererBase::RendererBase() {
 
 #endif
 #ifdef _ORBIS
-	//rendererAPI = new PS4::PS4RendererAPI();
+	rendererAPI = new PS4::PS4RendererAPI(*Window::GetWindow());
 
 	debugLinesMesh = PS4::PS4Mesh::GenerateQuad();
 	debugTextMesh = PS4::PS4Mesh::GenerateQuad();

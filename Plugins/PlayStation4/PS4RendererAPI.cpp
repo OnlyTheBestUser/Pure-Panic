@@ -47,6 +47,7 @@ PS4RendererAPI::PS4RendererAPI(Window& window)
 	window.SetRenderer(this);
 	SwapScreenBuffer();
 	SwapCommandBuffer();//always swap at least once...
+
 }
 
 PS4RendererAPI::~PS4RendererAPI()	{
@@ -198,11 +199,35 @@ void	PS4RendererAPI::OnWindowResize(int w, int h)  {
 }
 
 void	PS4RendererAPI::BeginFrame()   {
+	currentFrame->StartFrame();
 
+	currentGFXContext->waitUntilSafeForRendering(videoHandle, currentGPUBuffer);
+
+	SetRenderBuffer(currentPS4Buffer, true, true, true);
+
+	//Primitive Setup State
+	Gnm::PrimitiveSetup primitiveSetup;
+	primitiveSetup.init();
+	primitiveSetup.setCullFace(Gnm::kPrimitiveSetupCullFaceNone);
+	primitiveSetup.setFrontFace(Gnm::kPrimitiveSetupFrontFaceCcw);
+	//primitiveSetup.setPolygonMode()
+	currentGFXContext->setPrimitiveSetup(primitiveSetup);
+
+	////Screen Access State
+	Gnm::DepthStencilControl dsc;
+	dsc.init();
+	dsc.setDepthControl(Gnm::kDepthControlZWriteEnable, Gnm::kCompareFuncLessEqual);
+	dsc.setDepthEnable(false);
+	currentGFXContext->setDepthStencilControl(dsc);
 }
 
 void PS4RendererAPI::EndFrame()			{
+	currentFrame->EndFrame();
 	framesSubmitted++;
+}
+
+void NCL::PS4::PS4RendererAPI::RenderFrame()
+{
 }
 
 void	PS4RendererAPI::SwapBuffers() {
@@ -306,11 +331,23 @@ void PS4RendererAPI::BindTexture(const TextureBase* tex, std::string uniform, in
 	Gnm::Sampler trilinearSampler;
 	trilinearSampler.init();
 	trilinearSampler.setMipFilterMode(Gnm::kMipFilterModeLinear);
+
+	currentGFXContext->setTextures(Gnm::kShaderStagePs, 0, 1, &ps4Tex->GetAPITexture());
+	currentGFXContext->setSamplers(Gnm::kShaderStagePs, 0, 1, &trilinearSampler);
 }
 
 void NCL::PS4::PS4RendererAPI::BindCubemap(const TextureBase* tex, std::string uniform, int texSlot)
 {
+	const PS4Texture* ps4Tex = static_cast<const PS4Texture*>(tex);
+	if (!ps4Tex) {
+		return;
+	}
+	Gnm::Sampler trilinearSampler;
+	trilinearSampler.init();
+	trilinearSampler.setMipFilterMode(Gnm::kMipFilterModeLinear);
 
+	currentGFXContext->setTextures(Gnm::kShaderStagePs, 0, 1, &ps4Tex->GetAPITexture());
+	currentGFXContext->setSamplers(Gnm::kShaderStagePs, 0, 1, &trilinearSampler);
 }
 
 void NCL::PS4::PS4RendererAPI::BindFrameBuffer()
@@ -346,12 +383,36 @@ void PS4RendererAPI::UpdateUniformFloat(ShaderBase* shader, std::string uniform,
 
 void NCL::PS4::PS4RendererAPI::UpdateUniformVector3(ShaderBase* shader, std::string uniform, const Maths::Vector3 vec)
 {
+	PS4Shader* ps4Shader = static_cast<PS4Shader*>(shader);
+	if (!ps4Shader) {
+		return;
+	}
 
+	Vector3* modelData = (Vector3*)currentGFXContext->allocateFromCommandBuffer(sizeof(Vector3), Gnm::kEmbeddedDataAlignment4);
+	*modelData = vec;
+
+	Gnm::Buffer constantBuffer;
+	constantBuffer.initAsConstantBuffer(modelData, sizeof(Vector3));
+	constantBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
+
+	UpdateAllUniform(ps4Shader, uniform, constantBuffer);
 }
 
 void NCL::PS4::PS4RendererAPI::UpdateUniformVector4(ShaderBase* shader, std::string uniform, const Maths::Vector4 vec)
 {
+	PS4Shader* ps4Shader = static_cast<PS4Shader*>(shader);
+	if (!ps4Shader) {
+		return;
+	}
 
+	Vector4* modelData = (Vector4*)currentGFXContext->allocateFromCommandBuffer(sizeof(Vector4), Gnm::kEmbeddedDataAlignment4);
+	*modelData = vec;
+
+	Gnm::Buffer constantBuffer;
+	constantBuffer.initAsConstantBuffer(modelData, sizeof(Vector4));
+	constantBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
+
+	UpdateAllUniform(ps4Shader, uniform, constantBuffer);
 }
 
 void PS4RendererAPI::UpdateUniformMatrix4(ShaderBase* shader, std::string uniform, Maths::Matrix4 matrix) {
@@ -395,8 +456,6 @@ void NCL::PS4::PS4RendererAPI::SetViewportSize(int x, int y)
 }
 
 void PS4RendererAPI::UpdateAllUniform(PS4Shader* shader, std::string uniform, Gnm::Buffer buffer) {
-	int vsIndex = shader->GetConstantBufferIndex(Gnm::kShaderStageVs, uniform.c_str());
-void PS4RendererAPI::UpdateAllUniform(PS4Shader* shader, std::string uniform, Gnm::Buffer buffer) {
 	PS4Shader* ps4Shader = static_cast<PS4Shader*>(shader);
 	if (!ps4Shader) {
 		return;
@@ -406,7 +465,7 @@ void PS4RendererAPI::UpdateAllUniform(PS4Shader* shader, std::string uniform, Gn
 	if (vsIndex != -1) {
 		currentGFXContext->setConstantBuffers(Gnm::kShaderStageVs, vsIndex, 1, &buffer);
 	}
-	int psIndex = ps4Shader->GetConstantBufferIndex(Gnm::kShaderStageVs, uniform.c_str());
+	int psIndex = ps4Shader->GetConstantBufferIndex(Gnm::kShaderStagePs, uniform.c_str());
 	if (psIndex != -1) {
 		currentGFXContext->setConstantBuffers(Gnm::kShaderStagePs, psIndex, 1, &buffer);
 	}
