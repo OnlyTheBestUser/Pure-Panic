@@ -1,11 +1,14 @@
-#include "PS4GameRenderer.h"
+#include "../../Plugins/PlayStation4/PS4Mesh.h"
+#include "../../Plugins/PlayStation4/PS4Shader.h"
+#include "../../Plugins/PlayStation4/PS4Texture.h"
 #include "Renderer.h"
 
+#include "../../Common/Assets.h"
 #include "../../Common/SimpleFont.h"
 #include "../../Common/TextureLoader.h"
-
 #include "../../Common/MeshGeometry.h"
-#include "../../Plugins/PlayStation4/PS4Mesh.h"
+
+
 
 #include "../../Plugins/OpenGLRendering/OGLFrameBuffer.h"
 #include "../../Plugins/OpenGLRendering/OGLShader.h"
@@ -46,7 +49,14 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 
 #endif
 #ifdef _ORBIS
-	
+	skyboxMesh = PS4::PS4Mesh::GenerateQuad();
+
+	skyboxShader = PS4::PS4Shader::GenerateShader(
+		Assets::SHADERDIR + "PS4/skyboxVertex.sb",
+		Assets::SHADERDIR + "PS4/skyboxPixel.sb"
+	);
+
+	skyboxTex = PS4::PS4Texture::LoadSkyboxFromFile(NCL::Assets::TEXTUREDIR + "Cubemap/cubemap.gnf");
 #endif
 
 	//Set up the light properties
@@ -56,9 +66,6 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 }
 
 Renderer::~Renderer() {
-	delete rendererAPI;
-	delete font;
-
 	delete shadowFBO;
 	delete shadowShader;
 
@@ -141,7 +148,7 @@ void Renderer::RenderScene() {
 	rendererAPI->SetCullType(NCL::Rendering::RendererAPI::CULL_TYPE::BACK);
 
 // Render skybox
-	
+
 	rendererAPI->SetCullFace(false);
 	rendererAPI->SetBlend(false);
 	rendererAPI->SetDepth(false);
@@ -199,9 +206,6 @@ void Renderer::RenderScene() {
 
 		rendererAPI->DrawMeshAndSubMesh((*i).GetMesh());
 	}
-
-
-
 }
 
 Maths::Matrix4 Renderer::SetupDebugLineMatrix()	const {

@@ -59,19 +59,37 @@ namespace NCL::PS4 {
 		void	SwapScreenBuffer();
 		void	SwapCommandBuffer();
 		void	SetRenderBuffer(PS4ScreenBuffer*buffer, bool clearColour, bool clearDepth, bool clearStencil);
-		void	ClearBuffer(bool colour, bool depth, bool stencil);
 		PS4ScreenBuffer* GenerateScreenBuffer(uint width, uint height, bool colour = true, bool depth = true, bool stencil = false);
 
-		void UpdateAllUniform(PS4Shader* shader, std::string uniform, Gnm::buffer buffer);
+		void UpdateAllUniform(PS4Shader* shader, std::string uniform, Gnm::Buffer buffer);
 
 		//Render commands
 		void DrawMesh(MeshGeometry* mesh) override;
+		void DrawMeshAndSubMesh(MeshGeometry* mesh) override;
+
 		void BindShader(ShaderBase* shader) override;
 		void BindTexture(const TextureBase* tex, std::string uniform, int texSlot) override;
-		void UpdateUniformFloat(ShaderBase* shader, std::string uniform, float f) override;
-		void UpdateUniformMatrix4(ShaderBase* shader, std::string uniform, Maths::Matrix4 matrix) override;
+		void BindCubemap(const TextureBase* tex, std::string uniform, int texSlot) override;
+		void BindFrameBuffer() override;
+		void BindFrameBuffer(const FrameBufferBase* fbo) override;
+
+		void UpdateUniformInt(ShaderBase* shader, std::string uniform, const int f) override;
+		void UpdateUniformFloat(ShaderBase* shader, std::string uniform, const float f) override;
+		void UpdateUniformVector3(ShaderBase* shader, std::string uniform, const Maths::Vector3 vec) override;
+		void UpdateUniformVector4(ShaderBase* shader, std::string uniform, const Maths::Vector4 vec) override;
+		void UpdateUniformMatrix4(ShaderBase* shader, std::string uniform, const Maths::Matrix4 matrix) override;
+
 		void SetDepth(bool depth) override;
 		void SetBlend(bool blend) override;
+
+		void SetCullFace(bool cull) override;
+		void SetCullType(CULL_TYPE type) override;
+
+		void SetViewportSize(int x, int y) override;
+
+		void ClearBuffer(bool color, bool depth, bool stencil) override;
+		void SetClearColour(float r, float g, float b, float a) override;
+		void SetColourMask(bool r, bool g, bool b, bool a) override;
 
 	private:
 		void	InitialiseMemoryAllocators();

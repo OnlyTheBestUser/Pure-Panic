@@ -1,5 +1,13 @@
-#ifdef _WIN64
+#include <stdlib.h>
+unsigned int sceLibcHeapExtendedAlloc = 1;			/* Switch to dynamic allocation */
+size_t       sceLibcHeapSize = 256 * 1024 * 1024;	/* Set up heap area upper limit as 256 MiB */
+
+#include "../../Plugins/PlayStation4/PS4Window.h"
+#include "../../Plugins/PlayStation4/Ps4AudioSystem.h"
+#include "../../Plugins/PlayStation4/PS4Input.h"
 #include "../../Common/Window.h"
+
+#include "TutorialGame.h"
 
 #include "../CSC8503Common/StateMachine.h"
 #include "../CSC8503Common/StateTransition.h"
@@ -15,9 +23,12 @@
 
 #include "../CSC8503Common/PushdownState.h"
 #include "../CSC8503Common/PushdownMachine.h"
+#include <iostream>
 
 using namespace NCL;
 using namespace CSC8503;
+using namespace NCL;
+using namespace NCL::PS4;
 
 class WinGame : public PushdownState {
 public:
@@ -151,7 +162,15 @@ hide or show the
 */
 
 int main() {
-	Window*w = Window::CreateGameWindow("CSC8503 Game technology!", 1600, 900);
+#ifdef _WIN64
+	Window* w = Window::CreateGameWindow("CSC8503 Game technology!", 1600, 900);
+#endif
+#ifdef _ORBIS
+	Window* w = (PS4Window*)Window::CreateGameWindow("PS4 Example Code", 1920, 1080);
+	PS4Input		input = PS4Input();
+	Ps4AudioSystem* audioSystem = new Ps4AudioSystem(8);
+#endif
+
 		
 	if (!w->HasInitialised()) {
 		return -1;
@@ -208,71 +227,3 @@ int main() {
 	}
 	Window::DestroyGameWindow();
 }
-#endif
-#ifdef _ORBIS
-#include <stdlib.h>
-unsigned int sceLibcHeapExtendedAlloc = 1;			/* Switch to dynamic allocation */
-size_t       sceLibcHeapSize = 256 * 1024 * 1024;	/* Set up heap area upper limit as 256 MiB */
-
-#include "../../Plugins/PlayStation4/PS4Window.h"
-#include "../../Plugins/PlayStation4/Ps4AudioSystem.h"
-#include "../../Plugins/PlayStation4/PS4Input.h"
-#include "../../Common/Window.h"
-
-#include "TutorialGame.h"
-
-#include <iostream>
-
-
-
-using namespace NCL;
-using namespace NCL::PS4;
-
-int main(void) {
-#ifdef _ORBIS
-	Window* w = (PS4Window*)Window::CreateGameWindow("PS4 Example Code", 1920, 1080);
-	PS4Input		input = PS4Input();
-	Ps4AudioSystem* audioSystem = new Ps4AudioSystem(8);
-#endif
-#ifdef _WIN64
-	Window* w = Window::CreateGameWindow("CSC8503 Game technology!", 1600, 900);
-#endif
-
-	//if (!w->HasInitialised()) {
-		//return -1;
-	//}
-	srand(time(NULL));
-	w->ShowOSPointer(false);
-	w->LockMouseToWindow(true);
-
-	TutorialGame* g = new TutorialGame(&input);
-	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
-	while (w->UpdateWindow()) { //&& !w->GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
-		float dt = w->GetTimer()->GetTimeDeltaSeconds();
-
-#ifdef _ORBIS
-		input.Poll();
-#endif
-		
-
-		w->SetTitle("Gametech frame time:" + std::to_string(1000.0f * dt));
-
-		g->UpdateGame(dt);
-	}
-	Window::DestroyGameWindow();
-
-	// PS4 specific code
-
-	/*
-	PS4Input		input = PS4Input();
-
-	Ps4AudioSystem* audioSystem = new Ps4AudioSystem(8);
-
-	GameTimer t;
-
-	delete audioSystem;
-
-	return 1;*/
-}
-
-#endif
