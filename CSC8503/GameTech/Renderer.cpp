@@ -172,10 +172,8 @@ void Renderer::RenderScene() {
 	for (const auto& i : activeObjects) {
 		ShaderBase* shader = (*i).GetShader();
 
-		rendererAPI->BindShader(shader);
-
-		rendererAPI->BindTexture((*i).GetDefaultTexture(), "mainTex", 0);
 		if (activeShader != shader) {
+			rendererAPI->BindShader(shader);
 			rendererAPI->UpdateUniformMatrix4(shader, "projMatrix", projMatrix);
 			rendererAPI->UpdateUniformMatrix4(shader, "viewMatrix", viewMatrix);
 			rendererAPI->UpdateUniformVector3(shader, "cameraPos", gameWorld.GetMainCamera()->GetPosition());
@@ -187,6 +185,7 @@ void Renderer::RenderScene() {
 			activeShader = shader;
 		}
 
+		rendererAPI->BindTexture((*i).GetDefaultTexture(), "mainTex", 0);
 		rendererAPI->BindTexture(shadowFBO->GetTexture(), "shadowTex", 1);
 		
 		Matrix4 modelMatrix = (*i).GetTransform()->GetMatrix();
