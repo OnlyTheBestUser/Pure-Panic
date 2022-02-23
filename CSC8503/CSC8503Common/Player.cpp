@@ -50,10 +50,11 @@ float Player::CheckDistToGround()
 	return distToGround;
 }
 
-Projectile* Player::AddProjectileToWorld(const Vector3& position, const float& radius, const float& height, const float& initialSpeed) {
+Projectile* Player::spawnProjectile(const float& radius, const float& height, const float& initialSpeed) {
 	float meshSize = 0.5f;
 	float inverseMass = 5.0f;
-	Vector3 offsetFromPlayer = Vector3(5.0f, 2.5f, 0);
+	Vector3 offset = Vector3(0, 2.5f, 0);
+	Vector3 forwardVector = this->GetForwardVector();
 
 	Projectile* projectile = new Projectile(gameWorld, radius, height);
 
@@ -62,8 +63,8 @@ Projectile* Player::AddProjectileToWorld(const Vector3& position, const float& r
 
 	projectile->GetTransform()
 		.SetScale(Vector3(meshSize, meshSize, meshSize))
-		.SetOrientation(Quaternion(Matrix3::Rotation(90, Vector3(0, 0, 1))))
-		.SetPosition(this->GetTransform().GetPosition() + offsetFromPlayer);
+		.SetOrientation( Quaternion(Matrix3::Rotation(90, Vector3(0, 0, 1))) * Quaternion(Matrix3::Rotation(camera->GetYaw() + 90, Vector3(1, 0, 0))) )
+		.SetPosition(this->GetTransform().GetPosition() + forwardVector * 5.0f + offset);
 
 	projectile->SetRenderObject(new RenderObject(&projectile->GetTransform(), projectileMesh, nullptr, basicShader));
 	projectile->SetPhysicsObject(new PhysicsObject(&projectile->GetTransform(), projectile->GetBoundingVolume()));
@@ -72,8 +73,8 @@ Projectile* Player::AddProjectileToWorld(const Vector3& position, const float& r
 	//projectile->GetPhysicsObject()->SetFriction(1.0f);
 	//projectile->GetPhysicsObject()->SetLinearDamping(10.0f);
 	projectile->GetPhysicsObject()->InitSphereInertia();
-	projectile->GetPhysicsObject()->AddAcceleration(Vector3(1, 0, 0) * initialSpeed);//player1->GetForwardVector()
-	Debug::DrawAxisLines(projectile->GetTransform().GetMatrix(), 2.0f, 1000.0f);
+	projectile->GetPhysicsObject()->AddAcceleration(forwardVector * initialSpeed);
+	//Debug::DrawAxisLines(projectile->GetTransform().GetMatrix(), 2.0f, 1000.0f);
 	projectile->SetDynamic(true);
 	projectile->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 
@@ -83,7 +84,7 @@ Projectile* Player::AddProjectileToWorld(const Vector3& position, const float& r
 }
 
 void Player::Fire() {
-	AddProjectileToWorld(Vector3(5, 5, 0), 0.3f, 1.0f);
+	spawnProjectile(0.3f, 1.0f);
 }
 
 void Player::Reset() 

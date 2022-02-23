@@ -45,7 +45,6 @@ namespace NCL {
 			void MoveLeft() override { force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(-1, 0, 0) * 50.0f; }
 			void MoveRight() override { force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(1, 0, 0) * 50.0f; }
 
-			Projectile* AddProjectileToWorld(const Vector3& position, const float& radius, const float& height, const float& initialSpeed = 25.0f);
 			void Fire() override;
 
 			Vector3 GetForwardVector() {
@@ -75,6 +74,9 @@ namespace NCL {
 			
 			ShaderBase* basicShader;
 			MeshGeometry* projectileMesh;
+
+		private:
+			Projectile* spawnProjectile(const float& radius, const float& height, const float& initialSpeed = 25.0f);
         };
     }
 }
