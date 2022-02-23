@@ -2,6 +2,7 @@
 #include "Renderer.h"
 #include "../CSC8503Common/PhysicsSystem.h"
 #include "../CSC8503Common/Player.h"
+#include "../CSC8503Common/Projectile.h"
 
 namespace NCL {
 	namespace PS4 {
@@ -75,6 +76,7 @@ namespace NCL {
 			GameObject* AddCapsuleToWorld(const Maths::Vector3& position, float halfHeight, float radius, float inverseMass = 10.0f);
 
 			Player* AddPlayerToWorld(const Vector3& position);
+			Projectile* TutorialGame::AddProjectileToWorld(const Vector3& position, const float& radius, const float& height, const float& initialSpeed = 50);
 
 			StateGameObject* testStateObject;
 

@@ -44,6 +44,10 @@ namespace NCL {
 			void MoveLeft() override { force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(-1, 0, 0) * 50.0f; }
 			void MoveRight() override { force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(1, 0, 0) * 50.0f; }
 
+			Vector3 GetForwardVector() {
+				return (Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(0, 0, -1)).Normalised();
+			}
+
 			void ChangeCamLock() { camLocked = !camLocked; }
 
         protected:

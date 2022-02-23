@@ -408,12 +408,14 @@ void TutorialGame::InitWorld() {
 	inputHandler->BindButtonD(r);
 
 
-	GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
+	GameObject* cap1 = AddCapsuleToWorld(Vector3(35, 5, 0), 3.0f, 1.5f);
 	cap1->SetDynamic(true);
 	
 	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
 	player->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	player1 = player;
+
+	Projectile* spit = AddProjectileToWorld(Vector3(5, 5, 0), 0.3f, 1.0f);
 
 	physics->BuildStaticList();
 }
@@ -824,6 +826,37 @@ Player* TutorialGame::AddPlayerToWorld(const Vector3& position) {
 	world->AddGameObject(character);
 
 	return character;
+}
+
+Projectile* TutorialGame::AddProjectileToWorld(const Vector3& position, const float& radius, const float& height, const float& initialSpeed) {
+	float meshSize = 0.5f;
+	float inverseMass = 10.0f;
+
+	Projectile* projectile = new Projectile(radius, height);
+
+	SphereVolume* volume = new SphereVolume(height / 2.0f * meshSize * 1.3f);
+	projectile->SetBoundingVolume((CollisionVolume*)volume);
+
+	projectile->GetTransform()
+		.SetScale(Vector3(meshSize, meshSize, meshSize))
+		.SetOrientation(Quaternion(Matrix3::Rotation(90, Vector3(0, 0, 1))))
+		.SetPosition(position);
+
+	projectile->SetRenderObject(new RenderObject(&projectile->GetTransform(), capsuleMesh, nullptr, basicShader));
+	projectile->SetPhysicsObject(new PhysicsObject(&projectile->GetTransform(), projectile->GetBoundingVolume()));
+
+	projectile->GetPhysicsObject()->SetInverseMass(inverseMass);
+	//projectile->GetPhysicsObject()->SetFriction(1.0f);
+	//projectile->GetPhysicsObject()->SetLinearDamping(10.0f);
+	projectile->GetPhysicsObject()->InitSphereInertia();
+	projectile->GetPhysicsObject()->AddForce(Vector3(1,0,0) * 50.0f);//player1->GetForwardVector()
+	Debug::DrawAxisLines(projectile->GetTransform().GetMatrix(), 2.0f, 1000.0f);
+	projectile->SetDynamic(true);
+	projectile->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+
+	world->AddGameObject(projectile);
+
+	return projectile;
 }
 
 /*
