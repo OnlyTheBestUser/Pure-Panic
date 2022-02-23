@@ -3,6 +3,7 @@
 #include "GameWorld.h"
 #include "../../Common/Vector3.h"
 #include "../../Common/Camera.h"
+#include "Projectile.h"
 #include <chrono>
 
 namespace NCL {
@@ -12,7 +13,7 @@ namespace NCL {
         class Player : public GameActor
         {
         public:
-			Player(Camera* camera, GameWorld& g, string name = "", Vector3 ch = Vector3(0, 2, 0)) : GameActor(name), checkpoint(ch), spawnPos(ch), gameWorld(g) {
+			Player(Camera* camera, GameWorld& g, MeshGeometry* pm, ShaderBase* shd, string name = "", Vector3 ch = Vector3(0, 2, 0)) : GameActor(name), checkpoint(ch), spawnPos(ch), gameWorld(g), projectileMesh(pm), basicShader(shd) {
 				this->camera = camera;
 				camLocked = true;
 			};
@@ -44,6 +45,9 @@ namespace NCL {
 			void MoveLeft() override { force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(-1, 0, 0) * 50.0f; }
 			void MoveRight() override { force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(1, 0, 0) * 50.0f; }
 
+			Projectile* AddProjectileToWorld(const Vector3& position, const float& radius, const float& height, const float& initialSpeed = 25.0f);
+			void Fire() override;
+
 			Vector3 GetForwardVector() {
 				return (Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(0, 0, -1)).Normalised();
 			}
@@ -68,6 +72,9 @@ namespace NCL {
 			Camera* camera;
 			GameWorld& gameWorld;
 			bool camLocked;
+			
+			ShaderBase* basicShader;
+			MeshGeometry* projectileMesh;
         };
     }
 }

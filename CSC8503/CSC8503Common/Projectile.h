@@ -1,4 +1,5 @@
 #pragma once
+#include "GameWorld.h"
 #include "GameObject.h"
 
 namespace NCL {
@@ -8,12 +9,15 @@ namespace NCL {
 		class Projectile : public GameObject
 		{
 		public:
-			Projectile(float capsuleRadius, float capsuleHeight): GameObject("projectile") {
-				radius = capsuleRadius;
-				height = capsuleHeight;
+			Projectile(GameWorld& gWorld, float capsuleRadius, float capsuleHeight): GameObject("projectile"), gameWorld(gWorld), radius(capsuleRadius), height(capsuleHeight) {
 			};
+
+			void OnCollisionEnd(GameObject* otherObject) override {
+				gameWorld.RemoveGameObject(this, true);
+			}
 		private:
 			//Vector3 velocity;
+			GameWorld& gameWorld;
 			float radius;
 			float height;
 		};

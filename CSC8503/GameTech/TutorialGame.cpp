@@ -417,7 +417,7 @@ void TutorialGame::InitWorld() {
 	player->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	player1 = player;
 
-	Projectile* spit = AddProjectileToWorld(Vector3(5, 5, 0), 0.3f, 1.0f);
+	//Projectile* spit = AddProjectileToWorld(Vector3(5, 5, 0), 0.3f, 1.0f);
 
 	physics->BuildStaticList();
 }
@@ -806,7 +806,7 @@ Player* TutorialGame::AddPlayerToWorld(const Vector3& position) {
 	float meshSize = 3.0f;
 	float inverseMass = 0.5f;
 
-	Player* character = new Player(world->GetMainCamera(), *world, "Player");
+	Player* character = new Player(world->GetMainCamera(), *world, capsuleMesh, basicShader, "Player");
 
 	AABBVolume* volume = new AABBVolume(Vector3(0.3f, 0.85f, 0.3f) * meshSize);
 	character->SetBoundingVolume((CollisionVolume*)volume);
@@ -830,36 +830,36 @@ Player* TutorialGame::AddPlayerToWorld(const Vector3& position) {
 	return character;
 }
 
-Projectile* TutorialGame::AddProjectileToWorld(const Vector3& position, const float& radius, const float& height, const float& initialSpeed) {
-	float meshSize = 0.5f;
-	float inverseMass = 10.0f;
-
-	Projectile* projectile = new Projectile(radius, height);
-
-	SphereVolume* volume = new SphereVolume(height / 2.0f * meshSize * 1.3f);
-	projectile->SetBoundingVolume((CollisionVolume*)volume);
-
-	projectile->GetTransform()
-		.SetScale(Vector3(meshSize, meshSize, meshSize))
-		.SetOrientation(Quaternion(Matrix3::Rotation(90, Vector3(0, 0, 1))))
-		.SetPosition(position);
-
-	projectile->SetRenderObject(new RenderObject(&projectile->GetTransform(), capsuleMesh, nullptr, basicShader));
-	projectile->SetPhysicsObject(new PhysicsObject(&projectile->GetTransform(), projectile->GetBoundingVolume()));
-
-	projectile->GetPhysicsObject()->SetInverseMass(inverseMass);
-	//projectile->GetPhysicsObject()->SetFriction(1.0f);
-	//projectile->GetPhysicsObject()->SetLinearDamping(10.0f);
-	projectile->GetPhysicsObject()->InitSphereInertia();
-	projectile->GetPhysicsObject()->AddForce(Vector3(1,0,0) * 50.0f);//player1->GetForwardVector()
-	Debug::DrawAxisLines(projectile->GetTransform().GetMatrix(), 2.0f, 1000.0f);
-	projectile->SetDynamic(true);
-	projectile->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-
-	world->AddGameObject(projectile);
-
-	return projectile;
-}
+//Projectile* TutorialGame::AddProjectileToWorld(const Vector3& position, const float& radius, const float& height, const float& initialSpeed) {
+//	float meshSize = 0.5f;
+//	float inverseMass = 10.0f;
+//
+//	Projectile* projectile = new Projectile(radius, height);
+//
+//	SphereVolume* volume = new SphereVolume(height / 2.0f * meshSize * 1.3f);
+//	projectile->SetBoundingVolume((CollisionVolume*)volume);
+//
+//	projectile->GetTransform()
+//		.SetScale(Vector3(meshSize, meshSize, meshSize))
+//		.SetOrientation(Quaternion(Matrix3::Rotation(90, Vector3(0, 0, 1))))
+//		.SetPosition(position);
+//
+//	projectile->SetRenderObject(new RenderObject(&projectile->GetTransform(), capsuleMesh, nullptr, basicShader));
+//	projectile->SetPhysicsObject(new PhysicsObject(&projectile->GetTransform(), projectile->GetBoundingVolume()));
+//
+//	projectile->GetPhysicsObject()->SetInverseMass(inverseMass);
+//	//projectile->GetPhysicsObject()->SetFriction(1.0f);
+//	//projectile->GetPhysicsObject()->SetLinearDamping(10.0f);
+//	projectile->GetPhysicsObject()->InitSphereInertia();
+//	projectile->GetPhysicsObject()->AddForce(Vector3(1,0,0) * 50.0f);//player1->GetForwardVector()
+//	Debug::DrawAxisLines(projectile->GetTransform().GetMatrix(), 2.0f, 1000.0f);
+//	projectile->SetDynamic(true);
+//	projectile->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+//
+//	world->AddGameObject(projectile);
+//
+//	return projectile;
+//}
 
 /*
 

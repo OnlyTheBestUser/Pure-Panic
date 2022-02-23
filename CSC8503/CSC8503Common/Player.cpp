@@ -50,6 +50,42 @@ float Player::CheckDistToGround()
 	return distToGround;
 }
 
+Projectile* Player::AddProjectileToWorld(const Vector3& position, const float& radius, const float& height, const float& initialSpeed) {
+	float meshSize = 0.5f;
+	float inverseMass = 5.0f;
+	Vector3 offsetFromPlayer = Vector3(5.0f, 2.5f, 0);
+
+	Projectile* projectile = new Projectile(gameWorld, radius, height);
+
+	SphereVolume* volume = new SphereVolume(height / 2.0f * meshSize * 1.3f);
+	projectile->SetBoundingVolume((CollisionVolume*)volume);
+
+	projectile->GetTransform()
+		.SetScale(Vector3(meshSize, meshSize, meshSize))
+		.SetOrientation(Quaternion(Matrix3::Rotation(90, Vector3(0, 0, 1))))
+		.SetPosition(this->GetTransform().GetPosition() + offsetFromPlayer);
+
+	projectile->SetRenderObject(new RenderObject(&projectile->GetTransform(), projectileMesh, nullptr, basicShader));
+	projectile->SetPhysicsObject(new PhysicsObject(&projectile->GetTransform(), projectile->GetBoundingVolume()));
+
+	projectile->GetPhysicsObject()->SetInverseMass(inverseMass);
+	//projectile->GetPhysicsObject()->SetFriction(1.0f);
+	//projectile->GetPhysicsObject()->SetLinearDamping(10.0f);
+	projectile->GetPhysicsObject()->InitSphereInertia();
+	projectile->GetPhysicsObject()->AddAcceleration(Vector3(1, 0, 0) * initialSpeed);//player1->GetForwardVector()
+	Debug::DrawAxisLines(projectile->GetTransform().GetMatrix(), 2.0f, 1000.0f);
+	projectile->SetDynamic(true);
+	projectile->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+
+	gameWorld.AddGameObject(projectile);
+
+	return projectile;
+}
+
+void Player::Fire() {
+	AddProjectileToWorld(Vector3(5, 5, 0), 0.3f, 1.0f);
+}
+
 void Player::Reset() 
 {
 
