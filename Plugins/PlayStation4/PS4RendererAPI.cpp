@@ -208,7 +208,7 @@ void	PS4RendererAPI::BeginFrame()   {
 	//Primitive Setup State
 	Gnm::PrimitiveSetup primitiveSetup;
 	primitiveSetup.init();
-	primitiveSetup.setCullFace(Gnm::kPrimitiveSetupCullFaceNone);
+	primitiveSetup.setCullFace(Gnm::kPrimitiveSetupCullFaceBack);
 	primitiveSetup.setFrontFace(Gnm::kPrimitiveSetupFrontFaceCcw);
 	//primitiveSetup.setPolygonMode()
 	currentGFXContext->setPrimitiveSetup(primitiveSetup);
@@ -228,6 +228,7 @@ void PS4RendererAPI::EndFrame()			{
 
 void NCL::PS4::PS4RendererAPI::RenderFrame()
 {
+
 }
 
 void	PS4RendererAPI::SwapBuffers() {
@@ -257,7 +258,7 @@ void	PS4RendererAPI::SwapCommandBuffer() {
 	currentGFXContext	= &currentFrame->GetCommandBuffer();
 }
  
-void	PS4RendererAPI::SetRenderBuffer(PS4ScreenBuffer*buffer, bool clearColour, bool clearDepth, bool clearStencil) {
+void NCL::PS4::PS4RendererAPI::SetRenderBuffer(PS4ScreenBuffer*buffer, bool clearColour, bool clearDepth, bool clearStencil) {
 	currentPS4Buffer = buffer;
 	currentGFXContext->setRenderTargetMask(0xF);
 	currentGFXContext->setRenderTarget(0, &currentPS4Buffer->colourTarget);
@@ -271,7 +272,7 @@ void	PS4RendererAPI::SetRenderBuffer(PS4ScreenBuffer*buffer, bool clearColour, b
 	ClearBuffer(clearColour, clearDepth, clearStencil);
 }
 
-void	PS4RendererAPI::ClearBuffer(bool colour, bool depth, bool stencil) {
+void NCL::PS4::PS4RendererAPI::ClearBuffer(bool colour, bool depth, bool stencil) {
 	if (colour) {
 		//Vector4 defaultClearColour(rand() / (float)RAND_MAX, rand() / (float)RAND_MAX, rand() / (float)RAND_MAX, 1.0f);
 		SonyMath::Vector4 defaultClearColour(0.1f, 0.1f, 0.1f, 1.0f);
@@ -297,7 +298,7 @@ void NCL::PS4::PS4RendererAPI::SetColourMask(bool r, bool g, bool b, bool a)
 {
 }
 
-void PS4RendererAPI::DrawMesh(MeshGeometry* mesh) {
+void NCL::PS4::PS4RendererAPI::DrawMesh(MeshGeometry* mesh) {
 	PS4Mesh* ps4Mesh = static_cast<PS4Mesh*>(mesh);
 	if (!ps4Mesh) {
 		return;
@@ -314,7 +315,7 @@ void NCL::PS4::PS4RendererAPI::DrawMeshAndSubMesh(MeshGeometry* mesh)
 	ps4Mesh->SubmitDraw(*currentGFXContext, Gnm::ShaderStage::kShaderStageVs);
 }
 
-void PS4RendererAPI::BindShader(ShaderBase* shader) {
+void NCL::PS4::PS4RendererAPI::BindShader(ShaderBase* shader) {
 	PS4Shader* ps4Shader = static_cast<PS4Shader*>(shader);
 	if (!ps4Shader) {
 		return;
@@ -323,7 +324,7 @@ void PS4RendererAPI::BindShader(ShaderBase* shader) {
 	ps4Shader->SubmitShaderSwitch(*currentGFXContext);
 }
 
-void PS4RendererAPI::BindTexture(const TextureBase* tex, std::string uniform, int texSlot) {
+void NCL::PS4::PS4RendererAPI::BindTexture(const TextureBase* tex, std::string uniform, int texSlot) {
 	const PS4Texture* ps4Tex = static_cast<const PS4Texture*>(tex);
 	if (!ps4Tex) {
 		return;
@@ -365,7 +366,7 @@ void NCL::PS4::PS4RendererAPI::UpdateUniformInt(ShaderBase* shader, std::string 
 
 }
 
-void PS4RendererAPI::UpdateUniformFloat(ShaderBase* shader, std::string uniform, float f) {
+void NCL::PS4::PS4RendererAPI::UpdateUniformFloat(ShaderBase* shader, std::string uniform, float f) {
 	PS4Shader* ps4Shader = static_cast<PS4Shader*>(shader);
 	if (!ps4Shader) {
 		return;
@@ -415,7 +416,7 @@ void NCL::PS4::PS4RendererAPI::UpdateUniformVector4(ShaderBase* shader, std::str
 	UpdateAllUniform(ps4Shader, uniform, constantBuffer);
 }
 
-void PS4RendererAPI::UpdateUniformMatrix4(ShaderBase* shader, std::string uniform, Maths::Matrix4 matrix) {
+void NCL::PS4::PS4RendererAPI::UpdateUniformMatrix4(ShaderBase* shader, std::string uniform, Maths::Matrix4 matrix) {
 	PS4Shader* ps4Shader = static_cast<PS4Shader*>(shader);
 	if (!ps4Shader) {
 		return;
@@ -431,18 +432,34 @@ void PS4RendererAPI::UpdateUniformMatrix4(ShaderBase* shader, std::string unifor
 	UpdateAllUniform(ps4Shader, uniform, constantBuffer);
 }
 
-void PS4RendererAPI::SetDepth(bool d) {
-	//d ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST);
+void NCL::PS4::PS4RendererAPI::SetDepth(bool d) {
+	//Gnm::DepthEqaaControl depth;
+	//depth.init();
+	//currentGFXContext->setDepthEqaaControl();
 }
 
-void PS4RendererAPI::SetBlend(bool b) {
-	//b ? glEnable(GL_BLEND) : glDisable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+void NCL::PS4::PS4RendererAPI::SetBlend(bool b) {
+	/*sce::Gnm::BlendControl blend;
+	blend.init();
+	blend.setBlendEnable(b);
+	blend.setAlphaEquation(Gnm::BlendMultiplier::kBlendMultiplierOne, Gnm::BlendFunc::kBlendFuncAdd, Gnm::BlendMultiplier::kBlendMultiplierOne);
+	currentGFXContext->setBlendControl(currentGPUBuffer, blend);
+	*/
 }
 
 void NCL::PS4::PS4RendererAPI::SetCullFace(bool cull)
 {
-
+	Gnm::PrimitiveSetup primitiveSetup;
+	primitiveSetup.init();
+	if (cull) {
+		primitiveSetup.setCullFace(Gnm::kPrimitiveSetupCullFaceBack);
+	}
+	else {
+		primitiveSetup.setCullFace(Gnm::kPrimitiveSetupCullFaceNone);
+	}
+	primitiveSetup.setFrontFace(Gnm::kPrimitiveSetupFrontFaceCcw);
+	//primitiveSetup.setPolygonMode()
+	currentGFXContext->setPrimitiveSetup(primitiveSetup);
 }
 
 void NCL::PS4::PS4RendererAPI::SetCullType(CULL_TYPE type)
@@ -455,7 +472,7 @@ void NCL::PS4::PS4RendererAPI::SetViewportSize(int x, int y)
 
 }
 
-void PS4RendererAPI::UpdateAllUniform(PS4Shader* shader, std::string uniform, Gnm::Buffer buffer) {
+void NCL::PS4::PS4RendererAPI::UpdateAllUniform(PS4Shader* shader, std::string uniform, Gnm::Buffer buffer) {
 	PS4Shader* ps4Shader = static_cast<PS4Shader*>(shader);
 	if (!ps4Shader) {
 		return;

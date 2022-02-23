@@ -132,7 +132,7 @@ void TutorialGame::InitialiseAssets() {
 #endif
 	};
 
-#ifdef _WIN64
+
 	loadTexFunc("Corridor_Light_Colour", &corridorFloorTex);
 	loadTexFunc("corridor_wall_c", &corridorWallAlertTex);
 	loadTexFunc("Corridor_Walls_Redux_Metal", &corridorWallCornerTex);
@@ -143,6 +143,7 @@ void TutorialGame::InitialiseAssets() {
 	loadTexFunc("checkerboard", &corridorWallHammerTex);
 
 	loadTexFunc("checkerboard", &basicTex);
+#ifdef _WIN64
 	basicTex	= (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
 	basicShader = new OGLShader("GameTechVert.glsl", "GameTechFrag.glsl");
 	playerTex = (OGLTexture*)TextureLoader::LoadAPITexture("me.png");
