@@ -44,4 +44,10 @@ void InputHandler::HandleInput()
 			buttonJ_->execute();
 		}
 	}
+
+	if (buttonLeftClick_) {
+		if (Window::GetMouse()->ButtonPressed(NCL::MouseButtons::LEFT)) {
+			buttonLeftClick_->execute();
+		}
+	}
 }
