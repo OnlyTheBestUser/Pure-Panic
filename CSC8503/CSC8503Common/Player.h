@@ -51,6 +51,10 @@ namespace NCL {
 				return (Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(0, 0, -1)).Normalised();
 			}
 
+			Vector3 GetCamFrontVec() {
+				return ( Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Matrix4::Rotation(camera->GetPitch(), Vector3(1, 0, 0)) * Vector3(0, 0, -1)).Normalised();
+			}
+
 			void ChangeCamLock() { camLocked = !camLocked; }
 
         protected:
