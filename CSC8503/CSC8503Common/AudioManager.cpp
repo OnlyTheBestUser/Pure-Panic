@@ -24,6 +24,7 @@ void AudioManager::Initialize() {
 
 	system = NULL;
 	studioSystem->getCoreSystem(&system);
+	system->set3DSettings(1.0f, 1.0f, 50.0f);
 }
 
 AudioManager* AudioManager::GetInstance()
@@ -49,7 +50,13 @@ void AudioManager::Update() {
 void AudioManager::UpdateAudioListener(int listenerID, const Vector3& position, const Quaternion& orientration) {
 	Vector3 forwardRot = orientration * Vector3(0, 0, -1);
 	Vector3 upRot = orientration * Vector3(0, 1, 0);
-	system->set3DListenerAttributes(listenerID, VectorToFMODVector(position), 0,VectorToFMODVector(forwardRot), VectorToFMODVector(upRot));
+	FMOD_VECTOR* pos = VectorToFMODVector(position);
+	FMOD_VECTOR* fr = VectorToFMODVector(forwardRot);
+	FMOD_VECTOR* ur = VectorToFMODVector(upRot);
+	system->set3DListenerAttributes(listenerID, pos, 0, fr, ur);
+	delete pos;
+	delete fr;
+	delete ur;
 }
 
 /*Adds the sound into the sound map, if the name isn't already used.*/
@@ -60,6 +67,7 @@ void AudioManager::LoadSound(const std::string& soundName, bool threeDimensional
 	mode = mode | (threeDimensional ? FMOD_3D : FMOD_2D);
 	mode = mode | (looping ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
 	mode = mode | (stream ? FMOD_CREATESTREAM : FMOD_CREATECOMPRESSEDSAMPLE);
+	mode = (mode | FMOD_3D_LINEARROLLOFF);
 
 	FMOD::Sound* newSound = nullptr;
 	IsErroneous(system->createSound(soundName.c_str(), mode, nullptr, &newSound));
@@ -68,7 +76,7 @@ void AudioManager::LoadSound(const std::string& soundName, bool threeDimensional
 }
 
 /*Plays sound, returns channel ID.*/
-int AudioManager::StartPlayingSound(const std::string& soundName, const Vector3& position, float volumePercent) {
+int AudioManager::StartPlayingSound(const std::string& soundName, const Vector3& position, const float& volumePercent, const float& positionInSong) {
 	int newChannel = nextChannelID + 1;
 	FMOD::Channel* channel = nullptr;
 	Sound* sound = FindSound(soundName);
@@ -79,8 +87,9 @@ int AudioManager::StartPlayingSound(const std::string& soundName, const Vector3&
 			sound->getMode(&mode);
 			//if the 3d flag is set, update positional audio
 			if (mode & FMOD_3D) {
-				FMOD_VECTOR posF = VectorToFMODVector(position);
-				channel->set3DAttributes(&posF, nullptr);
+				FMOD_VECTOR* posF = VectorToFMODVector(position);
+				channel->set3DAttributes(posF, 0);
+				delete posF;
 			}
 			channel->setVolume(volumePercent);
 			channel->setPaused(false);
@@ -93,10 +102,10 @@ int AudioManager::StartPlayingSound(const std::string& soundName, const Vector3&
 	return -1;
 }
 
-AudioManager& AudioManager::SetChannelVolume(int channelID, const float& DBvol) {
+AudioManager& AudioManager::SetChannelVolume(int channelID, const float& volPercent) {
 	Channel* channel = FindChannel(channelID);
 	if (channel != nullptr) {
-		channel->setVolume(DBvol);
+		channel->setVolume(volPercent);
 	}
 	return *inst;
 }
@@ -111,8 +120,9 @@ AudioManager& AudioManager::SetChannelPitch(int channelID, const float& pitch){
 AudioManager& AudioManager::SetChannel3DPos(int channelID, const Vector3& position) {
 	Channel* channel = FindChannel(channelID);
 	if (channel != nullptr) {
-		FMOD_VECTOR Fpos = VectorToFMODVector(position);
-		channel->set3DAttributes(&Fpos, nullptr);
+		FMOD_VECTOR* Fpos = VectorToFMODVector(position);
+		channel->set3DAttributes(Fpos, nullptr);
+		delete Fpos;
 	}
 	return *inst;
 }
@@ -136,8 +146,8 @@ float AudioManager::LinearVolToDB(float LinearVol) {
 	return (6.02 * log2(LinearVol));
 }
 
-FMOD_VECTOR	AudioManager::VectorToFMODVector(const Vector3& v) {
-	return FMOD_VECTOR{ v.x, v.y, v.z };
+FMOD_VECTOR* AudioManager::VectorToFMODVector(const Vector3& v) {
+	return new FMOD_VECTOR{ v.x, v.y, v.z };
 }
 
 bool AudioManager::IsErroneous(FMOD_RESULT result) {

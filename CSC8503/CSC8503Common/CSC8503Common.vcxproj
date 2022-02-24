@@ -149,6 +149,7 @@
     <ClInclude Include="BehaviourNodeWithChildren.h" />
     <ClInclude Include="BehaviourSelector.h" />
     <ClInclude Include="BehaviourSequence.h" />
+    <ClInclude Include="BGMManager.h" />
     <ClInclude Include="CapsuleVolume.h" />
     <ClInclude Include="Command.h" />
     <ClInclude Include="GameActor.h" />
@@ -182,6 +183,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AudioManager.cpp" />
+    <ClCompile Include="BGMManager.cpp" />
     <ClCompile Include="CollisionDetection.cpp" />
     <ClCompile Include="Debug.cpp" />
     <ClCompile Include="GameObject.cpp" />

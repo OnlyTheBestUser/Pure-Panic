@@ -7,8 +7,6 @@
 #include <map>
 #include "../../Common/Quaternion.h"
 
-#define AUDIO_PATH std::string("../../Assets/Audio/")
-
 using namespace NCL::Maths;
 
 namespace NCL {
@@ -47,15 +45,16 @@ namespace NCL {
 			void					LoadSoundBank(const std::string& bankName);
 			void					LoadSound(const std::string& soundName, bool threeDimensional = false, bool looping = false, bool stream = false);
 			void					UnLoadSound(const std::string& soundName);
-			int						StartPlayingSound(const std::string& soundName, const Vector3& position = Vector3(0, 0, 0), float volumePercent = 1);
-			AudioManager&			SetChannelVolume(int channelID, const float& DBvol);
+			int						StartPlayingSound(const std::string& soundName, const Vector3& position = Vector3(0, 0, 0), const float& volumePercent = 1.0f, const float& positionInSong = 0.0f);
+			AudioManager&			SetChannelVolume(int channelID, const float& volPercent);
 			AudioManager&			SetChannelPitch(int channelID, const float& pitch);
 			AudioManager&			SetChannel3DPos(int channelID, const Vector3& position);
+			void					StopLoopingSound(int channelID);
 			void					UpdateAudioListener(int audioListenerID, const Vector3& position, const Quaternion& orientration);
 
 			float					DBToLinearVol(float dbVol);
 			float					LinearVolToDB(float linearVol);
-			FMOD_VECTOR				VectorToFMODVector(const Vector3& v);
+			FMOD_VECTOR*			VectorToFMODVector(const Vector3& v);
 		};
 	}
 }

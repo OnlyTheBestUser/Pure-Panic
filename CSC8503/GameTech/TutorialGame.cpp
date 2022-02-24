@@ -9,6 +9,7 @@
 #include "..//CSC8503Common/InputHandler.h"
 #include "..//CSC8503Common/GameActor.h"
 #include "..//CSC8503Common/Command.h"
+#include "../../Common/Assets.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -19,8 +20,8 @@ TutorialGame::TutorialGame()	{
 	physics		= new PhysicsSystem(*world);
 	audio = audio->GetInstance();
 	audio->Initialize();
-	audio->LoadSound("../../Assets/Audio/splat_neutral_01.ogg", false, false, false);
-	audio->LoadSound("../../Assets/Audio/splat_neutral_02.ogg", false, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_01.ogg", true, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_02.ogg", true, false, false);
 
 	forceMagnitude	= 30.0f;
 	useGravity		= true;
@@ -173,6 +174,7 @@ void TutorialGame::UpdateGame(float dt) {
 void TutorialGame::UpdateGameWorld(float dt)
 {
 	audio->Update();
+	audio->UpdateAudioListener(0, player1->GetTransform().GetPosition(), player1->GetTransform().GetOrientation());
 	if (!inSelectionMode) {
 		world->GetMainCamera()->UpdateCamera(dt);
 	}
@@ -748,7 +750,7 @@ void TutorialGame::MoveSelectedObject(float dt) {
 		if (world->Raycast(ray, closestCollision, true)) {
 			if (closestCollision.node == selectionObject) {
 				selectionObject->GetPhysicsObject()->AddForceAtPosition(ray.GetDirection() * forceMagnitude, closestCollision.collidedAt);
-				audio->StartPlayingSound(AUDIO_PATH + "splat_neutral_01.ogg", selectionObject->GetTransform().GetPosition(), 100.0f);
+				audio->StartPlayingSound(Assets::AUDIODIR + "splat_neutral_01.ogg", selectionObject->GetTransform().GetPosition(), 1.0f);
 			}
 		}
 	}
