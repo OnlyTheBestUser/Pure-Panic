@@ -63,7 +63,7 @@ Projectile* Player::spawnProjectile(const float& radius, const float& height, co
 
 	projectile->GetTransform()
 		.SetScale(Vector3(meshSize, meshSize, meshSize))
-		.SetOrientation(Quaternion(Matrix3::Rotation(90, Vector3(0, 0, 1))) * Quaternion(Matrix3::Rotation(camera->GetYaw() + 90, Vector3(1, 0, 0))))
+		//.SetOrientation(Quaternion(Matrix3::Rotation(camera->GetPitch() + 90, Vector3(0, 0, 1))) * Quaternion(Matrix3::Rotation(camera->GetYaw() + 90, Vector3(1, 0, 0))))
 		.SetPosition(camera->GetPosition() + camForwardVector * 5.0f); //+ offset);
 
 	projectile->SetRenderObject(new RenderObject(&projectile->GetTransform(), projectileMesh, nullptr, basicShader));
@@ -74,10 +74,11 @@ Projectile* Player::spawnProjectile(const float& radius, const float& height, co
 	//projectile->GetPhysicsObject()->SetLinearDamping(10.0f);
 	projectile->GetPhysicsObject()->InitSphereInertia();
 	projectile->GetPhysicsObject()->AddAcceleration(camForwardVector * initialSpeed);
+	projectile->GetTransform().SetOrientation(Quaternion(Matrix3::Rotation(-acos(Vector3::Dot(Vector3(0, 1, 0), camForwardVector)) * 180.0f / 3.14f, Vector3::Cross(camForwardVector, Vector3(0, 1, 0)).Normalised())));
 	//Debug::DrawAxisLines(projectile->GetTransform().GetMatrix(), 2.0f, 1000.0f);
 	//Debug::DrawArrow(camera->GetPosition(), (camera->GetPosition() + this->GetCamFrontVec() * 100.0f), Debug::RED, 5.0f);
 	projectile->SetDynamic(true);
-	projectile->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	projectile->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
 
 	gameWorld.AddGameObject(projectile);
 
