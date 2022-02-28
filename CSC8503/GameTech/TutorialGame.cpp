@@ -404,12 +404,10 @@ void TutorialGame::InitWorld() {
 	inputHandler->BindButtonA(l);
 	inputHandler->BindButtonD(r);
 
-
 	GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
 	cap1->SetDynamic(true);
-	
 	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
-	player->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+
 	player1 = player;
 
 	physics->BuildStaticList();
@@ -817,7 +815,7 @@ Player* TutorialGame::AddPlayerToWorld(const Vector3& position) {
 	character->GetPhysicsObject()->InitSphereInertia();
 	character->GetPhysicsObject()->SetShouldApplyAngular(false);
 	character->SetDynamic(true);
-	character->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	character->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
 
 	world->AddGameObject(character);
 
