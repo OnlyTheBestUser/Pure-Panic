@@ -4,9 +4,9 @@ using namespace NCL;
 using namespace NCL::CSC8503;
 using namespace FMOD;
 
-AudioManager* AudioManager::inst = NULL;
-Studio::System* AudioManager::studioSystem = NULL;
-System* AudioManager::system = NULL;
+AudioManager* AudioManager::inst = nullptr;
+Studio::System* AudioManager::studioSystem = nullptr;
+System* AudioManager::system = nullptr;
 int AudioManager::nextChannelID = 0;
 
 AudioManager::AudioManager() {
@@ -18,18 +18,18 @@ AudioManager::~AudioManager() {
 }
 
 void AudioManager::Initialize() {
-	studioSystem = NULL;
+	studioSystem = nullptr;
 	IsErroneous(Studio::System::create(&studioSystem));
 	studioSystem->initialize(32, FMOD_STUDIO_INIT_LIVEUPDATE, FMOD_INIT_PROFILE_ENABLE, NULL);
 
-	system = NULL;
+	system = nullptr;
 	studioSystem->getCoreSystem(&system);
 	system->set3DSettings(1.0f, 1.0f, 50.0f);
 }
 
 AudioManager* AudioManager::GetInstance()
 {
-	if (AudioManager::inst == NULL)
+	if (AudioManager::inst == nullptr)
 		AudioManager::inst = new AudioManager();
 	return AudioManager::inst;
 }
@@ -77,7 +77,7 @@ void AudioManager::LoadSound(const std::string& soundName, bool threeDimensional
 
 /*Plays sound, returns channel ID.*/
 int AudioManager::StartPlayingSound(const std::string& soundName, const Vector3& position, const float& volumePercent, const float& positionInSong) {
-	int newChannel = nextChannelID + 1;
+	int newChannel = nextChannelID;
 	FMOD::Channel* channel = nullptr;
 	Sound* sound = FindSound(soundName);
 	if (sound != nullptr) {
@@ -102,17 +102,48 @@ int AudioManager::StartPlayingSound(const std::string& soundName, const Vector3&
 	return -1;
 }
 
+int AudioManager::FadeInSound(const std::string& soundName, float fadeInTime, const Vector3& position, const float& volumePercent, const float& positionInSong) {
+	int newChannel = nextChannelID;
+	unsigned long long dspclock;
+	int softRate;
+	FMOD::Channel* channel = nullptr;
+	Sound* sound = FindSound(soundName);
+	if (sound != nullptr) {
+		IsErroneous(system->playSound(sounds[soundName], nullptr, true, &channel));
+		if (channel) {
+			FMOD_MODE mode;
+			sound->getMode(&mode);
+			//if the 3d flag is set, update positional audio
+			if (mode & FMOD_3D) {
+				FMOD_VECTOR* posF = VectorToFMODVector(position);
+				channel->set3DAttributes(posF, 0);
+				delete posF;
+			}
+			system->getSoftwareFormat(&softRate, 0, 0);
+			channel->getDSPClock(0, &dspclock);
+			channel->addFadePoint(dspclock, 0.0f);
+			channel->addFadePoint(dspclock + (softRate * fadeInTime), volumePercent);
+			channel->setPaused(false);
+			channels.insert(std::pair<int, Channel*>(nextChannelID, channel));
+		}
+		nextChannelID++;
+		return newChannel;
+	}
+	std::cout << "FMOD Sound hasn't been loaded - " << soundName << std::endl;
+	return -1;
+}
+
 AudioManager& AudioManager::SetChannelVolume(int channelID, const float& volPercent) {
 	Channel* channel = FindChannel(channelID);
 	if (channel != nullptr) {
-		channel->setVolume(volPercent);
+		IsErroneous(channel->setVolume(volPercent));
 	}
 	return *inst;
 }
 AudioManager& AudioManager::SetChannelPitch(int channelID, const float& pitch){
 	Channel* channel = FindChannel(channelID);
 	if (channel != nullptr) {
-		channel->setPitch(pitch);
+		IsErroneous(channel->setPitch(pitch));
 	}
 	return *inst;
 }
@@ -121,10 +152,17 @@ AudioManager& AudioManager::SetChannel3DPos(int channelID, const Vector3& positi
 	Channel* channel = FindChannel(channelID);
 	if (channel != nullptr) {
 		FMOD_VECTOR* Fpos = VectorToFMODVector(position);
-		channel->set3DAttributes(Fpos, nullptr);
+		IsErroneous(channel->set3DAttributes(Fpos, nullptr));
 		delete Fpos;
 	}
 	return *inst;
+}
+
+void AudioManager::StopChannel(int channelID) {
+	Channel* channel = FindChannel(channelID);
+	if (channel != nullptr) {
+		IsErroneous(channel->stop());
+	}
 }
 
 Channel* AudioManager::FindChannel(int channelID) {

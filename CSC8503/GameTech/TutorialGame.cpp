@@ -22,6 +22,8 @@ TutorialGame::TutorialGame()	{
 	audio->Initialize();
 	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_01.ogg", true, false, false);
 	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_02.ogg", true, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "menu_music.ogg", false, true, true);
+	bgm = new BGMManager(audio);
 
 	forceMagnitude	= 30.0f;
 	useGravity		= true;
@@ -122,7 +124,6 @@ void TutorialGame::InitialiseAssets() {
 	basicTex	= (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
 	basicShader = new OGLShader("GameTechVert.glsl", "GameTechFrag.glsl");
 	playerTex = (OGLTexture*)TextureLoader::LoadAPITexture("me.png");
-
 	InitCamera();
 	InitWorld();
 }
@@ -796,4 +797,24 @@ void TutorialGame::MoveSelectedObject(float dt) {
 		else
 			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 1, 0) * forceMagnitude * 0.1);
 	}*/
+}
+
+void TutorialGame::UpdateBGM() {
+	switch (state) {
+	case PLAY:
+		std::cout << "play";
+		bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 3.0f);
+		break;
+	case PAUSE:
+		std::cout << "pause";
+		bgm->StopMusic();
+		break;
+	case RESET:
+		std::cout << "reset";
+		bgm->StopMusic();
+		break;
+	default:
+		bgm->StopMusic();
+		break;
+	}
 }
