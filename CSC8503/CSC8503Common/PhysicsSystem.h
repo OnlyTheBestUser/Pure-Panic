@@ -46,6 +46,8 @@ namespace NCL {
 			void ImpulseResolveCollision(GameObject& a , GameObject&b, CollisionDetection::ContactPoint& p) const;
 			void ResolveSpringCollision(GameObject& a , GameObject&b, CollisionDetection::ContactPoint& p) const;
 
+			bool ValidCollisionLayers(int aLayer, int bLayer);
+
 			GameWorld& gameWorld;
 			Octree<GameObject*>* staticTree;
 
@@ -55,6 +57,8 @@ namespace NCL {
 			float	globalDamping;
 			std::set<CollisionDetection::CollisionInfo> allCollisions;
 			std::set<CollisionDetection::CollisionInfo> broadphaseCollisions;
+
+			vector<Vector2> validLayers;
 
 			bool useBroadPhase		= true;
 			int numCollisionFrames	= 5;
