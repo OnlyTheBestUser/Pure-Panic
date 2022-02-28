@@ -19,6 +19,7 @@ void Player::Update(float dt)
 	GetPhysicsObject()->AddAcceleration(force.Normalised() * curSpeed * dt);
 	force = Vector3(0, 0, 0);
 
+	// Check if grounded, if so don't apply more gravity
 	if (CheckDistToGround() < 0.01f)
 	{
 		Vector3 currentVel = GetPhysicsObject()->GetLinearVelocity();
