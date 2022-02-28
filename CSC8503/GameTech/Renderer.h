@@ -18,6 +18,7 @@ namespace NCL {
 			void SortObjectList();
 			void RenderScene();
 
+
 			// Debug
 			Maths::Matrix4 SetupDebugLineMatrix() const override;
 			Maths::Matrix4 SetupDebugStringMatrix() const override;
