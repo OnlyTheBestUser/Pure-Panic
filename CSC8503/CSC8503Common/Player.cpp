@@ -1,5 +1,4 @@
 #include "Player.h"
-#include "PhysicsSystem.cpp"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -19,6 +18,7 @@ void Player::Update(float dt)
 	GetPhysicsObject()->AddAcceleration(force.Normalised() * speed);
 	force = Vector3(0, 0, 0);
 
+	// Check if grounded, if so don't apply more gravity
 	if (CheckDistToGround() < 0.01f)
 	{
 		Vector3 currentVel = GetPhysicsObject()->GetLinearVelocity();
