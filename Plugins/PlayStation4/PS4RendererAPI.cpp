@@ -300,7 +300,7 @@ void PS4RendererAPI::UpdateUniformMatrix4(ShaderBase* shader, std::string unifor
 	constantBuffer.initAsConstantBuffer(modelData, sizeof(Matrix4));
 	constantBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
 
-	UpdateAllUniform(shader, uniform, buffer);
+//	UpdateAllUniform(shader, uniform, buffer);
 
 	//int matLoc = glGetUniformLocation(oglShader->GetProgramID(), uniform.c_str());
 	//glUniformMatrix4fv(matLoc, 1, false, (float*)&matrix);
@@ -314,7 +314,7 @@ void PS4RendererAPI::SetBlend(bool b) {
 	//b ? glEnable(GL_BLEND) : glDisable(GL_BLEND);
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
-
+/*
 void PS4RendererAPI::UpdateAllUniform(PS4Shader* shader, std::string uniform, Gnm::buffer buffer) {
 	int vsIndex = realShader->GetConstantBufferIndex(Gnm::kShaderStageVs, uniform.c_str());
 	if (vsIndex != -1) {
@@ -325,5 +325,5 @@ void PS4RendererAPI::UpdateAllUniform(PS4Shader* shader, std::string uniform, Gn
 		currentGFXContext->setConstantBuffers(Gnm::kShaderStagePs, objIndex, 1, &buffer);
 	}
 }
-
+*/
 #endif

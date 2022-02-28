@@ -3,7 +3,6 @@
 #include "../../Plugins/PlayStation4/PS4Mesh.h"
 #include "../../Plugins/PlayStation4/PS4Shader.h"
 #include "../../Plugins/PlayStation4/PS4Texture.h"
-#include "../../Plugins/PlayStation4/InputBase.h"
 #endif
 
 #include "TutorialGame.h"

@@ -2,6 +2,7 @@
 #include "Command.h"
 #include <vector>
 #include "PCInput.h"
+#include "../../Plugins/PlayStation4/PS4Input.h"
 
 namespace NCL {
 
@@ -11,14 +12,20 @@ namespace NCL {
 
 			InputHandler() {
 #ifdef _ORBIS
-				inputBase = new PS4Input();
+				inputBase = new PS4::PS4Input();
 #endif
 #ifndef _ORBIS
 				inputBase = new PCInput();
 #endif
 			}
 
-			~InputHandler() { delete inputBase; delete[] commands; }
+			~InputHandler() { 
+				delete inputBase;
+				for (auto x : commands) {
+					if (x)
+						delete x;
+				}
+			}
 
 			void HandleInput();
 

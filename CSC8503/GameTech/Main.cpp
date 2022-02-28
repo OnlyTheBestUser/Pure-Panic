@@ -231,7 +231,6 @@ using namespace NCL::PS4;
 int main(void) {
 #ifdef _ORBIS
 	Window* w = (PS4Window*)Window::CreateGameWindow("PS4 Example Code", 1920, 1080);
-	PS4Input		input = PS4Input();
 	Ps4AudioSystem* audioSystem = new Ps4AudioSystem(8);
 #endif
 #ifdef _WIN64
@@ -245,15 +244,10 @@ int main(void) {
 	w->ShowOSPointer(false);
 	w->LockMouseToWindow(true);
 
-	TutorialGame* g = new TutorialGame(&input);
+	TutorialGame* g = new TutorialGame();
 	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
 	while (w->UpdateWindow()) { //&& !w->GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
 		float dt = w->GetTimer()->GetTimeDeltaSeconds();
-
-#ifdef _ORBIS
-		input.Poll();
-#endif
-		
 
 		w->SetTitle("Gametech frame time:" + std::to_string(1000.0f * dt));
 

@@ -1,7 +1,6 @@
 #pragma once
 
 namespace NCL {
-	namespace CSC8503 {
 		enum Input {
 			FIRE,
 			JUMP,
@@ -12,5 +11,4 @@ namespace NCL {
 			LEFT,
 			RIGHT
 		};
-	}
 }

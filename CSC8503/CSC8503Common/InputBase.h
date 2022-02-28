@@ -21,7 +21,7 @@ namespace NCL {
 		{
 		public:
 			InputBase();
-			~InputBase();
+			virtual ~InputBase();
 
 			void ResetInput();
 

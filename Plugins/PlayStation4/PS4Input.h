@@ -1,17 +1,17 @@
 #pragma once
 #ifdef _ORBIS
 #include "pad.h"
-#include "InputBase.h"
+#include "../../CSC8503/CSC8503Common/InputBase.h"
 
 namespace NCL {
 	namespace PS4 {
-		class PS4Input : public InputBase
+		class PS4Input : public CSC8503::InputBase
 		{
 		public:
 			PS4Input();
-			~PS4Input();
+			~PS4Input(); 
 
-			void Poll() override;
+			void Poll() override; 
 
 		protected:
 			void InitController();
@@ -22,3 +22,4 @@ namespace NCL {
 	}
 }
 #endif
+

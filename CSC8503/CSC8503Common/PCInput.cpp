@@ -1,3 +1,4 @@
+#ifndef _ORBIS
 #include "PCInput.h"
 #include "../../Common/Keyboard.h"
 #include "../../Common/Window.h"
@@ -25,3 +26,4 @@ void PCInput::Poll()
 	buttons[RIGHT] = Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::D) ? 1.0f : 0.0f;
 
 }
+#endif

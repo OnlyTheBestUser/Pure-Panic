@@ -62,7 +62,7 @@ namespace NCL::PS4 {
 		void	ClearBuffer(bool colour, bool depth, bool stencil);
 		PS4ScreenBuffer* GenerateScreenBuffer(uint width, uint height, bool colour = true, bool depth = true, bool stencil = false);
 
-		void UpdateAllUniform(PS4Shader* shader, std::string uniform, Gnm::buffer buffer);
+		void UpdateAllUniform(PS4Shader* shader, std::string uniform, Gnm::Buffer buffer);
 
 		//Render commands
 		void DrawMesh(MeshGeometry* mesh) override;
