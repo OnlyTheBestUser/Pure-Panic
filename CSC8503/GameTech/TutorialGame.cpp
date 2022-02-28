@@ -406,21 +406,11 @@ void TutorialGame::InitWorld() {
 
 	GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
 	cap1->SetDynamic(true);
-	cap1->SetCollisionLayers(CollisionLayer::LAYER_THREE);
+	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
 
 	player1 = player;
 
 	physics->BuildStaticList();
-
-	std::cout << "LAYER ONE: " << CollisionLayer::LAYER_ONE << std::endl;
-	std::cout << "LAYER TWO: " << CollisionLayer::LAYER_TWO << std::endl;
-	std::cout << "LAYER THREE: " << CollisionLayer::LAYER_THREE << std::endl;
-	std::cout << "LAYER ONE | THREE: " << (CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE) << std::endl;
-	std::cout << "LAYER ONE & THREE: " << (CollisionLayer::LAYER_ONE & CollisionLayer::LAYER_THREE) << std::endl;
-	std::cout << "LAYER THREE & THREE: " << (CollisionLayer::LAYER_THREE & CollisionLayer::LAYER_THREE) << std::endl;
-	std::cout << "LAYER FOUR: " << CollisionLayer::LAYER_FOUR << std::endl;
-	std::cout << "LAYER FIVE: " << CollisionLayer::LAYER_FIVE << std::endl;
-	std::cout << "LAYER SIX: " << CollisionLayer::LAYER_SIX << std::endl;
 }
 
 /*
@@ -501,7 +491,6 @@ GameObject* TutorialGame::AddCapsuleToWorld(const Maths::Vector3& position, floa
 
 	capsule->GetPhysicsObject()->SetInverseMass(inverseMass);
 	capsule->GetPhysicsObject()->InitCubeInertia();
-	capsule->GetPhysicsObject()->SetGravity(false);
 
 	world->AddGameObject(capsule);
 
@@ -826,7 +815,7 @@ Player* TutorialGame::AddPlayerToWorld(const Vector3& position) {
 	character->GetPhysicsObject()->InitSphereInertia();
 	character->GetPhysicsObject()->SetShouldApplyAngular(false);
 	character->SetDynamic(true);
-	character->SetCollisionLayers(CollisionLayer::LAYER_THREE);
+	character->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
 
 	world->AddGameObject(character);
 
