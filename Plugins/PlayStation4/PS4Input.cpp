@@ -79,11 +79,23 @@ void PS4Input::Poll() {
 			//buttons[8] = ((data.buttons & SCE_PAD_BUTTON_L3) ? 1.0f : 0.0f);
 			//buttons[9] = ((data.buttons & SCE_PAD_BUTTON_R3) ? 1.0f : 0.0f);
 
-			buttons[JUMP] = ((data.buttons & SCE_PAD_BUTTON_CROSS) ? 1.0f : 0.0f);
-			buttons[FORWARD] = ((((data.leftStick.y / 255.0f) * 2) - 1.0f) > 0.0f) ? 1.0f : 0.0f;
-			buttons[BACK] = ((((data.leftStick.y / 255.0f) * 2) - 1.0f) < 0.0f) ? 1.0f : 0.0f;
-			buttons[LEFT] = ((((data.leftStick.x / 255.0f) * 2) - 1.0f) > 0.0f) ? 1.0f : 0.0f;
-			buttons[RIGHT] = ((((data.leftStick.x / 255.0f) * 2) - 1.0f) < 0.0f) ? 1.0f : 0.0f;
+			// Left Stick
+			float x = (((data.leftStick.x / 255.0f) * 2) - 1.0f);
+			float y = (((data.leftStick.y / 255.0f) * 2) - 1.0f);
+			axis[0].x = abs(x) > 0.1f ? x : 0.0f;
+			axis[0].y = abs(y) > 0.1f ? y : 0.0f;
+
+			// Right Stick
+			x = (((data.rightStick.x / 255.0f) * 2) - 1.0f);
+			y = (((data.rightStick.y / 255.0f) * 2) - 1.0f);
+			axis[1].x = abs(x) > 0.1f ? x * 5.0f : 0.0f;
+			axis[1].y = abs(y) > 0.1f ? y * 3.0f : 0.0f;
+
+			buttons[JUMP]		= ((data.buttons & SCE_PAD_BUTTON_CROSS) ? 1.0f : 0.0f);
+			//buttons[FORWARD]	= ((data.leftStick.y / 255.0f) * 2) - 1.0f;
+			//buttons[BACK]		= ((data.leftStick.y / 255.0f) * 2) - 1.0f;
+			//buttons[LEFT]		= ((((data.leftStick.x / 255.0f) * 2) - 1.0f) > 0.1f) ? 0.0f : 1.0f;
+			//buttons[RIGHT]		= ((((data.leftStick.x / 255.0f) * 2) - 1.0f) < -0.1f) ? 0.0f : 1.0f;
 
 		}
 	}

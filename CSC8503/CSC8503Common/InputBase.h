@@ -14,7 +14,7 @@ namespace NCL {
 			}
 		};
 
-#define MAX_AXIS 8
+#define MAX_AXIS 127
 #define MAX_BUTTONS 127
 
 		class InputBase
@@ -25,7 +25,7 @@ namespace NCL {
 
 			void ResetInput();
 
-			AXIS	GetAxis(unsigned int i);
+			AXIS*	GetAxis(unsigned int i);
 			float	GetButton(unsigned int i);
 			bool	GetButtonDown(unsigned int i);
 

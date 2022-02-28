@@ -77,7 +77,7 @@ TutorialGame::TutorialGame()	{
 			
 	*/
 
-	// Character movement Go to Line 354
+	// Character movement Go to Line 395
 
 	inputHandler = new InputHandler();
 
@@ -191,7 +191,7 @@ void TutorialGame::UpdateGame(float dt) {
 	}
 	}
 
-//	inputHandler->HandleInput();
+	inputHandler->HandleInput();
 
 	//Debug::DrawLine(Vector3(), Vector3(0, 20, 0), Debug::RED);
 	//Debug::DrawLine(Vector3(), Vector3(360, 0, 0), Debug::RED);
@@ -392,15 +392,19 @@ void TutorialGame::InitWorld() {
 	
 	Player* player = AddPlayerToWorld(Vector3(0, 5, 0));
 
-	Command* f = new MoveForwardCommand(player);
-	Command* b = new MoveBackwardCommand(player);
-	Command* l = new MoveLeftCommand(player);
-	Command* r = new MoveRightCommand(player);
-	inputHandler->BindButton(FORWARD, f);
-	inputHandler->BindButton(BACK, b);
-	inputHandler->BindButton(LEFT, l);
-	inputHandler->BindButton(RIGHT, r);
+	//Command* f = new MoveForwardCommand(player);
+	//Command* b = new MoveBackwardCommand(player);
+	//Command* l = new MoveLeftCommand(player);
+	//Command* r = new MoveRightCommand(player);
+	//inputHandler->BindButton(FORWARD, f);
+	//inputHandler->BindButton(BACK, b);
+	//inputHandler->BindButton(LEFT, l);
+	//inputHandler->BindButton(RIGHT, r);
+	AxisCommand* m = new MoveCommand(player);
+	inputHandler->BindAxis(0, m);
 
+	AxisCommand* l = new LookCommand(player);
+	inputHandler->BindAxis(1, l);
 
 	//GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
 	//cap1->SetDynamic(true);

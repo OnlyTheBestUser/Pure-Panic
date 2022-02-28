@@ -167,7 +167,6 @@ int main() {
 #endif
 #ifdef _ORBIS
 	Window* w = (PS4Window*)Window::CreateGameWindow("PS4 Example Code", 1920, 1080);
-	PS4Input		input = PS4Input();
 	Ps4AudioSystem* audioSystem = new Ps4AudioSystem(8);
 #endif
 

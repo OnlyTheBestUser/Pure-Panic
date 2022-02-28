@@ -28,12 +28,17 @@ namespace NCL {
 			}
 
 			void HandleInput();
-
 			void BindButton(Input action, Command* command) { commands[action] = command; }
+			void BindAxis(int axisIndex, AxisCommand* command) { axisCommands[axisIndex] = command; }
+
+			AXIS* GetAxis(int index) {
+				return inputBase->GetAxis(index);
+			}
 
 		private:
 
 			Command* commands[127];
+			AxisCommand* axisCommands[127];
 			InputBase* inputBase;
 
 			//std::vector<Command*> commandsToExecute;

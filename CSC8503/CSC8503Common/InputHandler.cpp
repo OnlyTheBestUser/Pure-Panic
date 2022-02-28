@@ -14,7 +14,14 @@ void InputHandler::HandleInput()
 			if(commands[i])
 				commands[i]->execute();
 		}
+
+		if (axisCommands[i]) {
+			axisCommands[i]->execute(inputBase->GetAxis(i));
+		}
 	}
+
+	
 
 	inputBase->ResetInput();
 }
+

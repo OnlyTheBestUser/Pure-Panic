@@ -487,5 +487,4 @@ void NCL::PS4::PS4RendererAPI::UpdateAllUniform(PS4Shader* shader, std::string u
 		currentGFXContext->setConstantBuffers(Gnm::kShaderStagePs, psIndex, 1, &buffer);
 	}
 }
-*/
 #endif

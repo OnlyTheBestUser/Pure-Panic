@@ -22,11 +22,11 @@ void InputBase::ResetInput() {
 	}
 }
 
-AXIS	InputBase::GetAxis(unsigned int i) {
+AXIS*	InputBase::GetAxis(unsigned int i) {
 	if (i > MAX_AXIS) {
-		return AXIS();
+		return nullptr;
 	}
-	return axis[i];
+	return &axis[i];
 }
 
 float	InputBase::GetButton(unsigned int i) {

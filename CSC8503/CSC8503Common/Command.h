@@ -1,7 +1,7 @@
 #pragma once
 #include "GameActor.h"
 #include "PhysicsSystem.h"
-
+#include "InputBase.h"
 namespace NCL {
 	namespace CSC8503 {
 		class Command {
@@ -10,7 +10,39 @@ namespace NCL {
 			virtual void execute() = 0;
 		};
 
+		class AxisCommand {
+		public:
+			virtual ~AxisCommand() {};
+			virtual void execute(AXIS* axis) = 0;
+		};
+
 #pragma region Actor Commands
+
+		class MoveCommand : public AxisCommand {
+		public:
+			MoveCommand(GameActor* actor) : actor(actor){};
+			virtual ~MoveCommand() {};
+
+			void execute(AXIS* axis) {
+				actor->Move(Vector3(axis->x, 0, axis->y));
+			}
+
+		protected:
+			GameActor* actor;
+		};
+
+		class LookCommand : public AxisCommand {
+		public:
+			LookCommand(GameActor* actor) : actor(actor) {};
+			virtual ~LookCommand() {};
+
+			void execute(AXIS* axis) {
+				actor->Look(Vector2(axis->x, axis->y));
+			}
+
+		protected:
+			GameActor* actor;
+		};
 
 		class MoveForwardCommand : public Command {
 		public:

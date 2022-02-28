@@ -43,7 +43,11 @@ namespace NCL {
 			void MoveBackwards() override { force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(0, 0, 1) * 100.0f; }
 			void MoveLeft() override { force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(-1, 0, 0) * 50.0f; }
 			void MoveRight() override { force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(1, 0, 0) * 50.0f; }
-
+			void Move(Vector3 moveBy) { force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * moveBy * 50.0f; }
+			void Look(Vector2 moveBy) {
+				camera->ChangeYaw(moveBy.x);
+				camera->ChangePitch(moveBy.y);
+			}
 			void ChangeCamLock() { camLocked = !camLocked; }
 
         protected:
