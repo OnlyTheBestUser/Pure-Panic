@@ -820,6 +820,7 @@ Player* TutorialGame::AddPlayerToWorld(const Vector3& position) {
 	character->GetPhysicsObject()->InitSphereInertia();
 	character->GetPhysicsObject()->SetShouldApplyAngular(false);
 	character->SetDynamic(true);
+	character->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 
 	world->AddGameObject(character);
 
