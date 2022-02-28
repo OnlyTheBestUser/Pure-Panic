@@ -9,6 +9,7 @@ namespace NCL {
 			FORWARD,
 			BACK,
 			LEFT,
-			RIGHT
+			RIGHT,
+			LOCK
 		};
 }

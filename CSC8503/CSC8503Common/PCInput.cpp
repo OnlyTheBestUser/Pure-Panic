@@ -48,6 +48,7 @@ void PCInput::Poll()
 	buttons[BACK] = Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::S) ? 1.0f : 0.0f;
 	buttons[LEFT] = Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::A) ? 1.0f : 0.0f;
 	buttons[RIGHT] = Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::D) ? 1.0f : 0.0f;
+	buttons[LOCK] = Window::GetKeyboard()->KeyPressed(NCL::KeyboardKeys::L) ? 1.0f : 0.0f;
 
 }
 #endif

@@ -83,7 +83,6 @@ TutorialGame::TutorialGame()	{
 
 	Command* toggleGrav = new ToggleGravityCommand(physics);
 	Command* toggleDebug = new ToggleBoolCommand(&debugDraw);
-	
 	inputHandler->BindButton(TOGGLE_GRAV, toggleGrav);
 	inputHandler->BindButton(TOGGLE_DEBUG, toggleDebug);
 
@@ -405,6 +404,9 @@ void TutorialGame::InitWorld() {
 
 	AxisCommand* l = new LookCommand(player);
 	inputHandler->BindAxis(1, l);
+
+	Command* toggleLockCam = new ToggleBoolCommand(player->GetCamLock());
+	inputHandler->BindButton(LOCK, toggleLockCam);
 
 	//GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
 	//cap1->SetDynamic(true);

@@ -92,6 +92,7 @@ void PS4Input::Poll() {
 			axis[1].y = abs(y) > 0.1f ? y * 3.0f : 0.0f;
 
 			buttons[JUMP]		= ((data.buttons & SCE_PAD_BUTTON_CROSS) ? 1.0f : 0.0f);
+			buttons[LOCK]		= ((data.buttons & SCE_PAD_BUTTON_TRIANGLE) ? 1.0f : 0.0f);
 			//buttons[FORWARD]	= ((data.leftStick.y / 255.0f) * 2) - 1.0f;
 			//buttons[BACK]		= ((data.leftStick.y / 255.0f) * 2) - 1.0f;
 			//buttons[LEFT]		= ((((data.leftStick.x / 255.0f) * 2) - 1.0f) > 0.1f) ? 0.0f : 1.0f;
