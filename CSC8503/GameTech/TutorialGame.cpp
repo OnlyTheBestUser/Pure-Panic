@@ -804,7 +804,7 @@ Player* TutorialGame::AddPlayerToWorld(const Vector3& position) {
 
 	Player* character = new Player(world->GetMainCamera(), *world, "Player");
 
-	AABBVolume* volume = new AABBVolume(Vector3(0.3f, 0.85f, 0.3f) * meshSize);
+	CapsuleVolume* volume = new CapsuleVolume(0.85f * meshSize, 0.3f * meshSize);
 	character->SetBoundingVolume((CollisionVolume*)volume);
 
 	character->GetTransform()
@@ -818,6 +818,7 @@ Player* TutorialGame::AddPlayerToWorld(const Vector3& position) {
 	character->GetPhysicsObject()->SetFriction(1.0f);
 	character->GetPhysicsObject()->SetLinearDamping(10.0f);
 	character->GetPhysicsObject()->InitSphereInertia();
+	character->GetPhysicsObject()->SetShouldApplyAngular(false);
 	character->SetDynamic(true);
 	character->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 

@@ -93,6 +93,9 @@ namespace NCL {
 			bool UsesGravity() const { return useGravity; }
 			void SetGravity(bool k) { useGravity = k; }
 
+			bool ShouldApplyAngular() const { return applyAngular; }
+			void SetShouldApplyAngular(bool apply) { applyAngular = apply; }
+
 			void SetSpringRes(bool k) { useSpringResolution = k; }
 			bool UseSpringRes() const { return useSpringResolution; }
 
@@ -140,6 +143,7 @@ namespace NCL {
 			Vector3 force;
 			float	linearDamping;
 			
+			bool applyAngular = true;
 			bool useSpringResolution = false;
 
 			//angular stuff
