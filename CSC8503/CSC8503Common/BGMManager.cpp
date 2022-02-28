@@ -5,17 +5,19 @@ using namespace NCL;
 using namespace CSC8503;
 
 int BGMManager::PlaySong(std::string songName, float posInSong) {
+	StopMusic();
 	curSongChannel = audioManager->StartPlayingSound(songName);
 	return curSongChannel;
 }
 
 int BGMManager::PlaySongFade(std::string songName, float fadeInTime, float posInSong) {
-	curSongChannel = audioManager->StartPlayingSound(songName);
+	StopMusic();
+	curSongChannel = audioManager->FadeInSound(songName, fadeInTime);
 	return curSongChannel;
 }
 
 void BGMManager::StopMusic() {
-	if (curSongChannel) {
-		//stop playing that channel
+	if (curSongChannel != -1) {
+		audioManager->StopChannel(curSongChannel);
 	}
 }

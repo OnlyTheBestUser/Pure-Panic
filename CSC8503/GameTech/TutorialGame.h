@@ -3,6 +3,7 @@
 #include "../CSC8503Common/PhysicsSystem.h"
 #include "../CSC8503Common/Player.h"
 #include "../CSC8503Common/AudioManager.h"
+#include "../CSC8503Common/BGMManager.h"
 
 namespace NCL {
 	namespace CSC8503 {
@@ -22,7 +23,12 @@ namespace NCL {
 			virtual ~TutorialGame();
 
 			virtual void UpdateGame(float dt);
-			void SetState(GameState s) { state = s; }
+
+			void SetState(GameState s) { 
+				state = s; 
+				UpdateBGM(); 
+			}
+
 			void ResetGame() {
 				state = RESET;
 			}
@@ -55,6 +61,7 @@ namespace NCL {
 			void DebugDrawCollider(const CollisionVolume* c, Transform* worldTransform);
 			void DebugDrawVelocity(const Vector3& vel, Transform* worldTransform);
 			void DebugDrawObjectInfo(const GameObject* obj);
+			void UpdateBGM();
 
 			GameObject* AddFloorToWorld(const Vector3& position);
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f, bool rubber = false, bool hollow = false, bool dynamic = false);
@@ -73,6 +80,7 @@ namespace NCL {
 			PhysicsSystem*		physics;
 			GameWorld*			world;
 			AudioManager*		audio;
+			BGMManager*	bgm;
 
 			GameState state;
 

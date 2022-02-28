@@ -11,7 +11,7 @@ namespace NCL {
 			void StopMusic();
 		private:
 			AudioManager* audioManager;
-			int curSongChannel;
+			int curSongChannel = -1;
 		};
 	}
 }
