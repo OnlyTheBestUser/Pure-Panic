@@ -369,7 +369,6 @@ void TutorialGame::InitCamera() {
 	world->GetMainCamera()->SetYaw(315.0f);
 	world->GetMainCamera()->SetPosition(Vector3(-60, 40, 60));
 }
-
 void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
@@ -390,11 +389,9 @@ void TutorialGame::InitWorld() {
 	AddSecurityCameraToWorld(Vector3(25, 4, 240), 180);
 	AddSecurityCameraToWorld(Vector3(-25, 4, 240), 180);
 
-	AddWallHammerToWorld(Vector3(0, 2, 241), Vector3(10, 10, 6), 180);
-	AddWallHammerToWorld(Vector3(50, 2, 241), Vector3(10, 10, 6), 180);
-	AddWallHammerToWorld(Vector3(-50, 2, 241), Vector3(10, 10, 6), 180);
-
-	//InitSphereGridWorld(10, 10, 25, 25, 2);
+	AddWallHammerToWorld(Vector3(0, 2, 241), 180);
+	AddWallHammerToWorld(Vector3(50, 2, 241), 180);
+	AddWallHammerToWorld(Vector3(-50, 2, 241), 180);
 	
 	Player* player = AddPlayerToWorld(Vector3(0, 5, 0));
 
@@ -481,7 +478,6 @@ GameObject* TutorialGame::AddSphereToWorld(const Maths::Vector3& position, float
 	sphere->SetDynamic(dynamic);
 	return sphere;
 }
-
 GameObject* TutorialGame::AddCapsuleToWorld(const Maths::Vector3& position, float halfHeight, float radius, float inverseMass) {
 	GameObject* capsule = new GameObject("Capsule");
 
@@ -502,7 +498,6 @@ GameObject* TutorialGame::AddCapsuleToWorld(const Maths::Vector3& position, floa
 
 	return capsule;
 }
-
 GameObject* TutorialGame::AddCubeToWorld(const Maths::Vector3& position, Maths::Vector3 dimensions, bool OBB, float inverseMass, int layer, bool isTrigger, bool dynamic) {
 	GameObject* cube = new GameObject();
 	if (OBB) {
@@ -708,28 +703,34 @@ void TutorialGame::AddSecurityCameraToWorld(const Vector3& position, int rotatio
 	AddRenderPartToWorld(position, Vector3(5, 5, 5), rotation, securityCamera, securityCameraTex);
 	return;
 }
-void TutorialGame::AddWallHammerToWorld(const Vector3& position, Vector3 dimensions, int rotation)
+void TutorialGame::AddWallHammerToWorld(const Vector3& position, int rotation)
 {
-	GameObject* cube = new GameObject();
+	Vector3 location = position + Vector3(0, 18.25, 0);
+	Vector3 dimensions = Vector3(1, 5.5, 4);
+	if (rotation == 0)
+	{
+		dimensions = Vector3(4, 5.5, 1);
+		location += Vector3(-0.25, 0, -5.5);
+	}
+	if (rotation == 90)
+	{
+		dimensions = Vector3(1, 5.5, 4);
+		location += Vector3(-5.5, 0, 0.25);
+	}
+	if (rotation == 180)
+	{
+		dimensions = Vector3(4, 5.5, 1);
+		location += Vector3(0.25, 0, 5.5);
+	}
+	if (rotation == 270)
+	{
+		dimensions = Vector3(1, 5.5, 4);
+		location += Vector3(5.5, 0, -0.25);
+	}
 
-	AABBVolume* volume = new AABBVolume(dimensions);
-	cube->SetBoundingVolume((CollisionVolume*)volume);
-
-	cube->GetTransform()
-		.SetPosition(position)
-		.SetScale(dimensions * 2)
-		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
-
-
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallHammer, corridorWallHammerTex, basicShader));
-	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
-
-	cube->GetPhysicsObject()->SetInverseMass(0.0f);
-	cube->GetPhysicsObject()->InitCubeInertia();
-
-	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	cube->SetDynamic(false);
-	world->AddGameObject(cube);
+	GameObject* physicalObject = AddAABBWallToWorld(location, dimensions, rotation, "Wall Hammer");
+	physicalObject->GetPhysicsObject()->Sleep();
+	AddRenderPartToWorld(position, Vector3(10, 10, 6), rotation, corridorWallHammer, corridorWallHammerTex);
 	return;
 }
 
@@ -742,7 +743,6 @@ void TutorialGame::InitSphereGridWorld(int numRows, int numCols, float rowSpacin
 		}
 	}
 }
-
 void TutorialGame::InitCapsuleGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing) {
 	for (int x = 0; x < numCols; ++x) {
 		for (int z = 0; z < numRows; ++z) {
@@ -753,7 +753,6 @@ void TutorialGame::InitCapsuleGridWorld(int numRows, int numCols, float rowSpaci
 		}
 	}
 }
-
 void TutorialGame::InitMixedGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing) {
 	float sphereRadius = 1.0f;
 	Vector3 cubeDims = Vector3(1, 1, 1);
@@ -778,7 +777,6 @@ void TutorialGame::InitMixedGridWorld(int numRows, int numCols, float rowSpacing
 		}
 	}
 }
-
 void TutorialGame::InitCubeGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, const Maths::Vector3& cubeDims) {
 	for (int x = 1; x < numCols+1; ++x) {
 		for (int z = 1; z < numRows+1; ++z) {
@@ -792,7 +790,6 @@ void TutorialGame::InitCubeGridWorld(int numRows, int numCols, float rowSpacing,
 void TutorialGame::InitDefaultFloor() {
 	AddFloorToWorld(Vector3(0, -2, 0));
 }
-
 void TutorialGame::InitGameExamples() {
 	AddPlayerToWorld(Vector3(0, 5, 0));
 	AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f, 1.0f);
