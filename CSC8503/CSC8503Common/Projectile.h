@@ -13,7 +13,8 @@ namespace NCL {
 			};
 
 			void OnCollisionEnd(GameObject* otherObject) override {
-				if(otherObject->GetCollisionLayers() != (CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO)) gameWorld.RemoveGameObject(this, true);
+				//if(otherObject->GetCollisionLayers() != (CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO)) 
+				gameWorld.RemoveGameObject(this, true);
 			}
 
 			void Update(float dt) override;
