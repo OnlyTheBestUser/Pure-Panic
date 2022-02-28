@@ -1,5 +1,6 @@
 #pragma once
 #include "../CSC8503Common/GameWorld.h"
+#include "../../Common/Vector2.h"
 #include <set>
 
 namespace NCL {

@@ -595,7 +595,6 @@ bool PhysicsSystem::ValidCollisionLayers(int aLayers, int bLayers)
 {
 	for (auto v : validLayers)
 	{
-		std::cout << "a= " << aLayers << ", b= " << bLayers << ",v.x = " << v.x << ",v.y = " << v.y << std::endl;
 		if (aLayers == v.x && bLayers == v.y)
 			return true;
 	}
