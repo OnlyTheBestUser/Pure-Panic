@@ -43,7 +43,7 @@ PS4GameRenderer::PS4GameRenderer(GameWorld& world) : PS4RendererAPI(*Window::Get
 
 
 	// Skybox
-	skyboxMesh = PS4Mesh::GenerateQuad();
+	/*skyboxMesh = PS4Mesh::GenerateQuad();
 	skyboxMesh->UploadToGPU(this);
 
 	skyboxShader = PS4Shader::GenerateShader(
@@ -51,7 +51,7 @@ PS4GameRenderer::PS4GameRenderer(GameWorld& world) : PS4RendererAPI(*Window::Get
 		NCL::Assets::SHADERDIR + "PS4/skyboxPixel.sb"
 	);
 
-	skyboxTexture = PS4Texture::LoadSkyboxFromFile(NCL::Assets::TEXTUREDIR + "Cubemap/cubemap.gnf");
+	skyboxTexture = PS4Texture::LoadSkyboxFromFile(NCL::Assets::TEXTUREDIR + "Cubemap/cubemap.gnf");*/
 
 }
 
@@ -133,8 +133,6 @@ void PS4GameRenderer::RenderFrame() {
 	dsc.setDepthControl(Gnm::kDepthControlZWriteEnable, Gnm::kCompareFuncLessEqual);
 	dsc.setDepthEnable(true);
 	currentGFXContext->setDepthStencilControl(dsc);
-
-
 
 	defaultShader->SubmitShaderSwitch(*currentGFXContext);
 	currentGFXContext->setTextures(Gnm::kShaderStagePs, 0, 1, &defaultTexture->GetAPITexture());

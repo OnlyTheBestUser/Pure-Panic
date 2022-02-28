@@ -6,7 +6,7 @@ namespace NCL {
 		{
 		public:
 			FrameBufferBase() {};
-			~FrameBufferBase() {};
+			virtual ~FrameBufferBase() {};
 
 			virtual void AddTexture() = 0;
 			virtual TextureBase* GetTexture() const = 0;

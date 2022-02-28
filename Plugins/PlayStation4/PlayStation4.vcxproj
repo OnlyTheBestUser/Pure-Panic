@@ -242,6 +242,40 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
     </CustomBuild>
   </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\Assets\Textures\Animated_Screens_A_Colour.png">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\Corridor_Light_Colour.png">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\Corridor_Light_Normal.png">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\Corridor_Walls_Redux_Colour.png">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\Corridor_Walls_Redux_Metal.png">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\Corridor_Walls_Redux_Normal.png">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\corridor_wall_c.png">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\corridor_wall_n.png">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+    </CustomBuild>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
