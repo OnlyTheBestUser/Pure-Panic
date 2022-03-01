@@ -8,18 +8,8 @@ RenderObject::RenderObject(Transform* parentTransform, MeshGeometry* mesh, Textu
 	this->transform	= parentTransform;
 	this->mesh		= mesh;
 	this->texture	= tex;
-	this->paintMask = nullptr;
 	this->shader	= shader;
 	this->colour	= Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-}
-
-RenderObject::RenderObject(Transform* parentTransform, MeshGeometry* mesh, TextureBase* tex, TextureBase* paintMask, ShaderBase* shader) {
-	this->transform = parentTransform;
-	this->mesh = mesh;
-	this->texture = tex;
-	this->paintMask = paintMask;
-	this->shader = shader;
-	this->colour = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
 RenderObject::~RenderObject() {

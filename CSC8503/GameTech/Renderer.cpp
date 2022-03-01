@@ -88,9 +88,6 @@ void Renderer::Render() {
 	rendererAPI->SetClearColour(1, 1, 1, 1);
 	BuildObjectList();
 	SortObjectList();
-
-	ApplyPaintToMasks();
-
 	RenderScene();
 	rendererAPI->SetCullFace(false);
 
@@ -120,25 +117,10 @@ void Renderer::SortObjectList() {
 	//Who cares!
 }
 
-void Renderer::ApplyPaintToMasks() {
-	for (const auto& i : paintInstances) {
-		// Bind texture paint shader
-		// Bind mask texture from i.object
-		// Update any other uniforms needed
-		// Draw to mask texture
-	}
-}
-
 void Renderer::RenderScene() {
+// Render Shadow Map
+
 #ifdef _WIN64
-	RenderShadows();
-#endif
-	RenderSkybox();
-	RenderObjects();
-
-}
-
-void Renderer::RenderShadows() {
 	rendererAPI->SetCullFace(true);
 	rendererAPI->SetBlend(true);
 	rendererAPI->SetDepth(true);
@@ -170,14 +152,14 @@ void Renderer::RenderShadows() {
 	rendererAPI->SetColourMask(true, true, true, true);
 	rendererAPI->BindFrameBuffer();
 	rendererAPI->SetCullType(NCL::Rendering::RendererAPI::CULL_TYPE::BACK);
-}
+#endif
 
-void Renderer::RenderSkybox() {
-	// Render skybox
+// Render skybox
+
 	rendererAPI->SetCullFace(false);
 	rendererAPI->SetBlend(false);
 	rendererAPI->SetDepth(false);
-
+	
 	float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
 	Matrix4 viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
 	Matrix4 projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);
@@ -195,14 +177,12 @@ void Renderer::RenderSkybox() {
 	rendererAPI->SetCullFace(true);
 	rendererAPI->SetBlend(true);
 	rendererAPI->SetDepth(true);
-}
-
-void Renderer::RenderObjects() {
-	// Render Scene
+	
+// Render Scene
 	ShaderBase* activeShader = nullptr;
-	float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
+	/*float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
 	Matrix4 viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
-	Matrix4 projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);
+	Matrix4 projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);*/
 	for (const auto& i : activeObjects) {
 		ShaderBase* shader = (*i).GetShader();
 
@@ -218,19 +198,15 @@ void Renderer::RenderObjects() {
 			rendererAPI->UpdateUniformVector4(shader, "lightColour", lightColour);
 			rendererAPI->UpdateUniformVector3(shader, "lightPos", lightPos);
 			rendererAPI->UpdateUniformFloat(shader, "lightRadius", lightRadius);
-
+			
 			activeShader = shader;
 		}
 
 		rendererAPI->BindTexture((*i).GetDefaultTexture(), "mainTex", 0);
-		rendererAPI->UpdateUniformInt(shader, "hasTexture", (OGLTexture*)(*i).GetDefaultTexture() ? 1 : 0);
 #ifdef _WIN64
 		rendererAPI->BindTexture(shadowFBO->GetTexture(), "shadowTex", 1);
-
-		rendererAPI->BindTexture((*i).GetPaintMask(), "paintMaskTex", 2);
-		rendererAPI->UpdateUniformInt(shader, "hasPaintMask", (OGLTexture*)(*i).GetPaintMask() ? 1 : 0);
 #endif
-
+		
 		Matrix4 modelMatrix = (*i).GetTransform()->GetMatrix();
 #ifdef _WIN64
 		Matrix4 fullShadowMat = shadowMatrix * modelMatrix;
@@ -242,12 +218,12 @@ void Renderer::RenderObjects() {
 
 		rendererAPI->UpdateUniformVector4(shader, "objectColour", i->GetColour());
 		rendererAPI->UpdateUniformInt(shader, "hasVertexColours", !(*i).GetMesh()->GetColourData().empty());
+		rendererAPI->UpdateUniformInt(shader, "hasTexture", (OGLTexture*)(*i).GetDefaultTexture() ? 1 : 0);
 #endif
 
 		rendererAPI->DrawMeshAndSubMesh((*i).GetMesh());
 	}
 }
-
 
 Maths::Matrix4 Renderer::SetupDebugLineMatrix()	const {
 	float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
@@ -260,13 +236,3 @@ Maths::Matrix4 Renderer::SetupDebugLineMatrix()	const {
 Maths::Matrix4 Renderer::SetupDebugStringMatrix()	const {
 	return Matrix4::Orthographic(-1, 1.0f, 100, 0, 0, 100);
 }
-
-void Renderer::Paint( RenderObject* obj,  Vector3& pos,  float strength,  Vector4& colour) {
-	PaintInstance paint;
-	paint.object = obj;
-	paint.pos = pos;
-	paint.strength = strength;
-	paint.colour = colour;
-	paintInstances.emplace_back(paint);
-}
-
