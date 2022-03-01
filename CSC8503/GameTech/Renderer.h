@@ -18,6 +18,10 @@ namespace NCL {
 			void SortObjectList();
 			void RenderScene();
 
+			void RenderShadows();
+			void RenderSkybox();
+			void RenderObjects();
+
 
 			// Debug
 			Maths::Matrix4 SetupDebugLineMatrix() const override;
