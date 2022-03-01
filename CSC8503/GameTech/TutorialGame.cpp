@@ -24,9 +24,10 @@ using namespace NCL;
 using namespace CSC8503;
 
 TutorialGame::TutorialGame()	{
-	world		= new GameWorld();
-	renderer	= new Renderer(*world);
-	physics		= new PhysicsSystem(*world);
+	world			= new GameWorld();
+	renderer		= new Renderer(*world);
+	physics			= new PhysicsSystem(*world);
+	paintManager	= PaintManager::GetInstance();
 
 	forceMagnitude	= 30.0f;
 	useGravity		= true;
@@ -397,6 +398,15 @@ void TutorialGame::InitWorld() {
 	//InitSphereGridWorld(10, 10, 25, 25, 2);
 	
 	Player* player = AddPlayerToWorld(Vector3(0, 5, 0));
+	player->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	player1 = player;
+
+	GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
+	cap1->SetDynamic(true);
+	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
+
+	GameObject* paintCube = AddCubeToWorld(Vector3(10, 5, 10), Vector3(1, 1, 1), false, 0);
+	paintCube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 
 	Command* f = new MoveForwardCommand(player);
 	Command* b = new MoveBackwardCommand(player);
@@ -406,14 +416,6 @@ void TutorialGame::InitWorld() {
 	inputHandler->BindButtonS(b);
 	inputHandler->BindButtonA(l);
 	inputHandler->BindButtonD(r);
-
-
-	GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
-	cap1->SetDynamic(true);
-	
-	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
-	player->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	player1 = player;
 
 	physics->BuildStaticList();
 }
@@ -954,4 +956,21 @@ void TutorialGame::MoveSelectedObject(float dt) {
 		else
 			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 1, 0) * forceMagnitude * 0.1);
 	}*/
+}
+
+void TutorialGame::PaintSelectedObject() {
+	if (!selectionObject)
+		return;
+
+	if (Window::GetMouse()->ButtonPressed(NCL::MouseButtons::RIGHT)) {
+		Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
+		RayCollision closestCollision;
+		if (world->Raycast(ray, closestCollision, true)) {
+			if (closestCollision.node == selectionObject) {
+				//Paint that node
+				selectionObject->GetPhysicsObject()->AddForceAtPosition(ray.GetDirection() * forceMagnitude, closestCollision.collidedAt);
+			}
+		}
+	}
+
 }

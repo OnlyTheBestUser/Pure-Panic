@@ -138,6 +138,9 @@
     <ClInclude Include="MoveForwardCommand.h">
       <Filter>Input Handling</Filter>
     </ClInclude>
+    <ClInclude Include="PaintManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameWorld.cpp">
@@ -192,6 +195,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MoveForwardCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PaintManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

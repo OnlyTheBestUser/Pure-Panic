@@ -74,10 +74,12 @@ void Renderer::Update(float dt) {
 void Renderer::Render() {
 	rendererAPI->BeginFrame();
 
+
 	rendererAPI->SetCullFace(true);
 	rendererAPI->SetClearColour(1, 1, 1, 1);
 	BuildObjectList();
 	SortObjectList();
+
 	RenderScene();
 	rendererAPI->SetCullFace(false);
 
@@ -198,11 +200,29 @@ void Renderer::RenderScene() {
 		rendererAPI->UpdateUniformInt(shader, "hasVertexColours", !(*i).GetMesh()->GetColourData().empty());
 		rendererAPI->UpdateUniformInt(shader, "hasTexture", (OGLTexture*)(*i).GetDefaultTexture() ? 1 : 0);
 
+		if (i->GetPaintMask() != 0) {
+			rendererAPI->BindTexture(i->GetPaintMask(), "paintMaskTex", 2);
+			rendererAPI->UpdateUniformInt(shader, "hasPaintMask", (OGLTexture*)(*i).GetPaintMask() ? 1 : 0);
+		}
+
 		rendererAPI->DrawMeshAndSubMesh((*i).GetMesh());
 	}
 
+	/* 
+	* Go through all paint instances <- struct of all information from paint method
+	* bind paint shader 
+	* draw each object that is part
+	*/
+}
 
-
+void Renderer::ApplyPaintToMasks() {
+	for (const auto& i : paintInstances) {
+		// Bind texture to paint shader 
+		// Bind mask texture from i.object
+		// update any other uniforms needed
+		// draw to mask texture
+	}
+	paintInstances.clear();
 }
 
 Maths::Matrix4 Renderer::SetupDebugLineMatrix()	const {
@@ -216,3 +236,4 @@ Maths::Matrix4 Renderer::SetupDebugLineMatrix()	const {
 Maths::Matrix4 Renderer::SetupDebugStringMatrix()	const {
 	return Matrix4::Orthographic(-1, 1.0f, 100, 0, 0, 100);
 }
+
