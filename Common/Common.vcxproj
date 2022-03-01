@@ -133,6 +133,9 @@
       <CppLanguageStd>Cpp17</CppLanguageStd>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </ClCompile>
+    <PostBuildEvent>
+      <Command>xcopy "$(ProjectDir)..\Plugins\FMod\PS4\api\core\lib\libfmox.prx" "$(OutDir)" /y &amp;&amp; xcopy "$(ProjectDir)..\Plugins\FMod\Windows\api\core\lib\libfmodL.prx" "$(OutDir)" /y&amp;&amp; xcopy "$(ProjectDir)..\Plugins\FMod\Windows\api\studio\lib\libfmodstudioL.prx" "$(OutDir)" /y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -146,6 +149,9 @@
       <AdditionalDependencies>
       </AdditionalDependencies>
     </Lib>
+    <PostBuildEvent>
+      <Command>xcopy "$(ProjectDir)..\Plugins\FMod\Windows\api\core\lib\x64\fmod.dll" "$(OutDir)" /y &amp;&amp; xcopy "$(ProjectDir)..\Plugins\FMod\Windows\api\core\lib\x64\fmodL.dll" "$(OutDir)" /y&amp;&amp; xcopy "$(ProjectDir)..\Plugins\FMod\Windows\api\studio\lib\x64\fmodstudioL.dll" "$(OutDir)" /y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -176,6 +182,9 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(ProjectDir)..\Plugins\FMod\PS4\api\core\lib\libfmox.prx" "$(OutDir)" /y &amp;&amp; xcopy "$(ProjectDir)..\Plugins\FMod\Windows\api\core\lib\libfmodL.prx" "$(OutDir)" /y&amp;&amp; xcopy "$(ProjectDir)..\Plugins\FMod\Windows\api\studio\lib\libfmodstudioL.prx" "$(OutDir)" /y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -191,6 +200,9 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(ProjectDir)..\Plugins\FMod\Windows\api\core\lib\x64\fmod.dll" "$(OutDir)" /y &amp;&amp; xcopy "$(ProjectDir)..\Plugins\FMod\Windows\api\core\lib\x64\fmodL.dll" "$(OutDir)" /y&amp;&amp; xcopy "$(ProjectDir)..\Plugins\FMod\Windows\api\studio\lib\x64\fmodstudioL.dll" "$(OutDir)" /y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Assets.cpp" />

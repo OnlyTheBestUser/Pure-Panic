@@ -1,6 +1,15 @@
 #pragma once
-#include "../../Plugins/FMod/api/studio/inc/fmod_studio.hpp"
-#include "../../Plugins/FMod/api/studio/inc/fmod_studio_common.h"
+
+#ifdef _ORBIS
+#include "../../Plugins/FMod/PS4/api/studio/inc/fmod_studio.hpp"
+#include "../../Plugins/FMod/PS4/api/studio/inc/fmod_studio_common.h"
+#endif
+
+#ifdef _WIN64
+#include "../../Plugins/FMod/Windows/api/studio/inc/fmod_studio.hpp"
+#include "../../Plugins/FMod/Windows/api/studio/inc/fmod_studio_common.h"
+#endif
+
 #include "../../Common/Vector3.h"
 #include <windows.h>
 #include <string>
@@ -15,7 +24,6 @@ namespace NCL {
 		{
 			//Singleton AudioManager, should be called by anything that wants
 			//to make a sound
-			// TODO: Integration with the PS4 version of FMOD
 		private:
 			AudioManager();
 			~AudioManager();
