@@ -83,8 +83,12 @@ TutorialGame::TutorialGame()	{
 
 	Command* toggleGrav = new ToggleGravityCommand(physics);
 	Command* toggleDebug = new ToggleBoolCommand(&debugDraw);
+	Command* togglePause = new ToggleBoolCommand(&pause);
+	Command* quitCommand = new QuitCommand(&quit, &pause);
 	inputHandler->BindButton(TOGGLE_GRAV, toggleGrav);
 	inputHandler->BindButton(TOGGLE_DEBUG, toggleDebug);
+	inputHandler->BindButton(TOGGLE_PAUSE, togglePause);
+	inputHandler->BindButton(QUIT, quitCommand);
 
 #pragma endregion
 
@@ -407,6 +411,12 @@ void TutorialGame::InitWorld() {
 
 	Command* toggleLockCam = new ToggleBoolCommand(player->GetCamLock());
 	inputHandler->BindButton(LOCK, toggleLockCam);
+
+	Command* j = new JumpCommand(player);
+	inputHandler->BindButton(JUMP, j);
+
+	Command* d = new DescendCommand(player);
+	inputHandler->BindButton(DESCEND, d);
 
 	//GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
 	//cap1->SetDynamic(true);

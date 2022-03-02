@@ -37,15 +37,15 @@ public:
 	PushdownResult OnUpdate(float dt, PushdownState** newState) override {
 		g->UpdateGame(dt);
 
-		/*if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::R)) {
-			g->ResetGame();
-			g->UpdateGame(dt);
-			return PushdownResult::Pop;
-		}
+		//if (g->GetQuit()) {
+		//	g->ResetGame();
+		//	g->UpdateGame(dt);
+		//	return PushdownResult::Pop;
+		//}
 
-		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
-			return PushdownResult::Reset;
-		}*/
+		//if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
+		//	return PushdownResult::Reset;
+		//}
 
 		return PushdownResult::NoChange;
 	}
@@ -65,13 +65,13 @@ public:
 	PushdownResult OnUpdate(float dt, PushdownState** newState) override {
 		g->UpdateGame(dt);
 
-		/*if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::P)) {
+		if (!g->GetPaused()) {
 			return PushdownResult::Pop;
 		}
 
-		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
+		if (g->GetQuit()) {
 			return PushdownResult::Reset;
-		}*/
+		}
 		return PushdownResult::NoChange;
 	}
 
@@ -96,10 +96,10 @@ public:
 		}
 		
 
-		/*if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::P)) {
+		if (g->GetPaused()) {
 			*newState = new PauseGame(g);
 			return PushdownResult::Push;
-		}*/
+		}
 
 		return PushdownResult::NoChange;
 	}
@@ -137,6 +137,12 @@ public:
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
 			return PushdownResult::Exit;
 		}*/
+
+		if (m->GetPaused()) {
+			
+			*newState = new PauseGame(m);
+			return PushdownResult::Push;
+		}
 
 		return PushdownResult::NoChange;
 	}

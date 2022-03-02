@@ -6,10 +6,9 @@ namespace NCL {
 			JUMP,
 			TOGGLE_GRAV,
 			TOGGLE_DEBUG,
-			FORWARD,
-			BACK,
-			LEFT,
-			RIGHT,
-			LOCK
+			TOGGLE_PAUSE,
+			LOCK,
+			QUIT,
+			DESCEND
 		};
 }

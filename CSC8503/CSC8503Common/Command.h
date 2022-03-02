@@ -44,54 +44,31 @@ namespace NCL {
 			GameActor* actor;
 		};
 
-		class MoveForwardCommand : public Command {
+		class JumpCommand : public Command {
 		public:
-			MoveForwardCommand(GameActor* actor) : actor(actor) {};
-			virtual ~MoveForwardCommand() {};
+			JumpCommand(GameActor* actor) : actor(actor) {};
+			virtual ~JumpCommand() {};
+
 			void execute() {
-				actor->MoveForwards();
+				actor->Jump();
 			}
 
 		protected:
 			GameActor* actor;
 		};
 
-		class MoveBackwardCommand : public Command {
+		class DescendCommand : public Command {
 		public:
-			MoveBackwardCommand(GameActor* actor) : actor(actor) {};
-			virtual ~MoveBackwardCommand() {};
+			DescendCommand(GameActor* actor) : actor(actor) {};
+			virtual ~DescendCommand() {};
+
 			void execute() {
-				actor->MoveBackwards();
+				actor->Descend();
 			}
 
 		protected:
 			GameActor* actor;
 		};
-
-		class MoveLeftCommand : public Command {
-		public:
-			MoveLeftCommand(GameActor* actor) : actor(actor) {};
-			virtual ~MoveLeftCommand() {};
-			void execute() {
-				actor->MoveLeft();
-			}
-
-		protected:
-			GameActor* actor;
-		};
-
-		class MoveRightCommand : public Command {
-		public:
-			MoveRightCommand(GameActor* actor) : actor(actor) {};
-			virtual ~MoveRightCommand() {};
-			void execute() {
-				actor->MoveRight();
-			}
-
-		protected:
-			GameActor* actor;
-		};
-
 #pragma endregion
 
 #pragma region World Commands
@@ -118,6 +95,19 @@ namespace NCL {
 			}
 		protected:
 			bool* toggleVar;
+		};
+
+		class QuitCommand : public Command {
+			public:
+				QuitCommand(bool* quit, bool* paused) : paused(paused), quit(quit) {};
+				virtual ~QuitCommand() {};
+				void execute() {
+					if (paused)
+						*quit = true;
+				}
+			protected:
+				bool* paused;
+				bool* quit;
 		};
 #pragma endregion
 	}
