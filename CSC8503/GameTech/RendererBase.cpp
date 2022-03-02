@@ -173,6 +173,8 @@ void RendererBase::DrawDebugLines() {
 	debugLines.clear();
 }
 
+
+
 Maths::Matrix4 RendererBase::SetupDebugLineMatrix()	const {
 	return Matrix4();
 }
