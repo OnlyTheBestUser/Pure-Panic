@@ -23,6 +23,20 @@ PhysicsSystem::PhysicsSystem(GameWorld& g) : gameWorld(g)	{
 	dTOffset		= 0.0f;
 	globalDamping	= 0.995f;
 	SetGravity(Vector3(0.0f, -19.6f, 0.0f));
+
+	// Sets the valid different collision layers here
+	/* Col Layer 1 = 1
+	Col Layer 2 = 2
+	Col Layer 3 = 4
+	Col Layer 4 = 8
+	Col Layer 5 = 16
+	Col Layer 6 = 32 
+	...so Col1 | Col3  = 5 */
+	validLayers.emplace_back(Vector2(1, 1));
+	validLayers.emplace_back(Vector2(1, 3));
+	validLayers.emplace_back(Vector2(3, 1));
+	validLayers.emplace_back(Vector2(1, 5));
+	validLayers.emplace_back(Vector2(5, 1));
 }
 
 PhysicsSystem::~PhysicsSystem()	{
@@ -181,6 +195,11 @@ rocket launcher, gaining a point when the player hits the gold coin, and so on).
 */
 void PhysicsSystem::UpdateCollisionList() {
 	for (std::set<CollisionDetection::CollisionInfo>::iterator i = allCollisions.begin(); i != allCollisions.end(); ) {
+		/*if (i->a == nullptr || i->b == nullptr)
+		{
+			i = allCollisions.erase(i);
+			continue;
+		}*/
 		if ((*i).framesLeft == numCollisionFrames) {
 			i->a->OnCollisionBegin(i->b, i->point.localA, i->point.localB, i->point.normal);
 			i->b->OnCollisionBegin(i->a, i->point.localB, i->point.localA, -i->point.normal);
@@ -279,7 +298,6 @@ void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, Collis
 
 void PhysicsSystem::ResolveSpringCollision(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p) const
 {
-
 	PhysicsObject* physA = a.GetPhysicsObject();
 	PhysicsObject* physB = b.GetPhysicsObject();
 
@@ -300,7 +318,6 @@ void PhysicsSystem::ResolveSpringCollision(GameObject& a, GameObject& b, Collisi
 	//Debug::DrawLine(b.GetTransform().GetPosition(), b.GetTransform().GetPosition() + (force.Normalised() * 10), Debug::RED);
 	//Debug::DrawLine(b.GetTransform().GetPosition(), b.GetTransform().GetPosition() + Vector3(10,0,0), Debug::BLUE);
 	//Debug::DrawLine(a.GetTransform().GetPosition(), a.GetTransform().GetPosition() + Vector3(20,0,0), Debug::GREEN);
-
 }
 
 /*
@@ -337,7 +354,7 @@ void PhysicsSystem::BroadPhase() {
 			for (auto j = list.begin(); j != list.end(); j++) {
 				info.a = std::min((*i).object, (*j).object);
 				info.b = std::max((*i).object, (*j).object);
-				if ((info.a->GetCollisionLayers() & info.b->GetCollisionLayers()) != 0) {
+				if (ValidCollisionLayers(info.a->GetCollisionLayers(), info.b->GetCollisionLayers())) {
 					broadphaseCollisions.insert(info);
 				}
 			}
@@ -357,7 +374,7 @@ void PhysicsSystem::BroadPhase() {
 				info.a = std::min((*i).object, (*j).object);
 				info.b = std::max((*i).object, (*j).object);
 #endif
-				if (((info.a->GetCollisionLayers() & info.b->GetCollisionLayers()) != 0) && !(!info.a->IsDynamic() && !info.b->IsDynamic())) {
+				if (ValidCollisionLayers(info.a->GetCollisionLayers(), info.b->GetCollisionLayers()) && !(!info.a->IsDynamic() && !info.b->IsDynamic())) {
 					broadphaseCollisions.insert(info);
 				}
 			}
@@ -577,4 +594,14 @@ void PhysicsSystem::UpdateConstraints(float dt) {
 	for (auto i = first; i != last; ++i) {
 		(*i)->UpdateConstraint(dt);
 	}
+}
+
+bool PhysicsSystem::ValidCollisionLayers(int aLayers, int bLayers)
+{
+	for (auto v : validLayers)
+	{
+		if (aLayers == v.x && bLayers == v.y)
+			return true;
+	}
+	return false;
 }

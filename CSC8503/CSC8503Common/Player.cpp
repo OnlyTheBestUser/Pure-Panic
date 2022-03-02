@@ -1,5 +1,4 @@
 #include "Player.h"
-#include "PhysicsSystem.cpp"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -16,11 +15,11 @@ void Player::Update(float dt)
 		camera->SetPosition(GetTransform().GetPosition() + Vector3(0, 3, 0));
 		GetTransform().SetOrientation(Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)));
 	}
+
 	GetPhysicsObject()->AddAcceleration(force.Normalised() * curSpeed * dt);
-	force = Vector3(0, 0, 0);
 
 	// Check if grounded, if so don't apply more gravity
-	if (CheckDistToGround() < 0.01f)
+	if (CheckDistToGround() < 0.01f && force.y <= 0.0f)
 	{
 		Vector3 currentVel = GetPhysicsObject()->GetLinearVelocity();
 		GetPhysicsObject()->SetLinearVelocity(Vector3(currentVel.x, 0.0f, currentVel.z));
@@ -30,6 +29,8 @@ void Player::Update(float dt)
 	else {
 		physicsObject->SetGravity(true);
 	}
+
+	force = Vector3(0, 0, 0);
 }
 
 float Player::CheckDistToGround()
