@@ -134,7 +134,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </ClCompile>
     <PostBuildEvent>
-      <Command>xcopy "$(ProjectDir)..\Plugins\FMod\PS4\api\core\lib\libfmox.prx" "$(OutDir)" /y &amp;&amp; xcopy "$(ProjectDir)..\Plugins\FMod\Windows\api\core\lib\libfmodL.prx" "$(OutDir)" /y&amp;&amp; xcopy "$(ProjectDir)..\Plugins\FMod\Windows\api\studio\lib\libfmodstudioL.prx" "$(OutDir)" /y</Command>
+      <Command>xcopy "$(ProjectDir)..\Plugins\FMod\PS4\api\core\lib\libfmod.prx" "$(OutDir)" /y &amp;&amp; xcopy "$(ProjectDir)..\Plugins\FMod\PS4\api\core\lib\libfmodL.prx" "$(OutDir)" /y&amp;&amp; xcopy "$(ProjectDir)..\Plugins\FMod\PS4\api\studio\lib\libfmodstudioL.prx" "$(OutDir)" /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

@@ -106,12 +106,12 @@
     <IncludePath>$(SolutionDir)\Plugins\OpenGLRendering;$(SolutionDir)\Plugins\Networking-ENet\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>$(SolutionDir)\Plugins\FMod\Windows\api\core\lib\x64;$(SolutionDir)\Plugins\FMod\PS4\api\core\lib;$(SolutionDir)\Plugins\OpenGLRendering;$(SolutionDir)\Plugins\Networking-ENet\include;;$(SolutionDir)\Plugins\OpenGLRendering;$(SolutionDir)\Plugins\FMod\api\core\lib;$(SolutionDir)$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)\Plugins\FMod\Windows\api\core\lib\x64;$(SolutionDir)\Plugins\OpenGLRendering;$(SolutionDir)\Plugins\Networking-ENet\include;;$(SolutionDir)\Plugins\OpenGLRendering;$(SolutionDir)\Plugins\FMod\api\core\lib;$(SolutionDir)$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
     <IncludePath>$(SolutionDir)\Plugins\OpenGLRendering;$(SolutionDir)\Plugins\Networking-ENet\include;;$(SolutionDir)\Plugins\OpenGLRendering;$(SolutionDir)\Plugins\FMod\Windows\api\core\inc;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">
-    <LibraryPath>$(SCE_ORBIS_SAMPLE_DIR)\sample_code\graphics\api_gnm\toolkit;$(SolutionDir)$(Platform)_$(Configuration)\;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(SCE_ORBIS_SAMPLE_DIR)\sample_code\graphics\api_gnm\toolkit;$(SolutionDir)$(Platform)_$(Configuration)\;$(LibraryPath);$(SolutionDir)\Plugins\FMod\PS4\api\studio\lib\;$(SolutionDir)\Plugins\FMod\PS4\api\core\lib\</LibraryPath>
+    <IncludePath>$(IncludePath);$(SolutionDir)\Plugins\FMod\PS4\api\core\inc\;</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LibraryPath>$(SolutionDir)\Plugins\FMod\Windows\api\core\lib\x64;$(SolutionDir)\Plugins\FMod\PS4\api\core\lib;$(SolutionDir)\Plugins\OpenGLRendering;$(SolutionDir)\Plugins\Networking-ENet\include;;$(SolutionDir)\Plugins\OpenGLRendering;$(SolutionDir)\Plugins\FMod\api\core\lib;$(SolutionDir)$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
@@ -204,7 +204,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="PS4GameRenderer.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="Renderer.cpp" />
@@ -212,7 +211,6 @@
     <ClCompile Include="TutorialGame.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="PS4GameRenderer.h" />
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RendererBase.h" />

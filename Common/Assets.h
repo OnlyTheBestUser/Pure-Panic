@@ -11,6 +11,7 @@ https://research.ncl.ac.uk/game/
 
 namespace NCL {
 	namespace Assets {
+#ifdef _WIN64
 		const std::string AUDIODIR("../../Assets/Audio/");
 		const std::string SHADERDIR("../../Assets/Shaders/");
 		const std::string MESHDIR("../../Assets/Meshes/");

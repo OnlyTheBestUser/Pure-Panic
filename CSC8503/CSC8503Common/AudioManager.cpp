@@ -101,9 +101,9 @@ int AudioManager::StartPlayingSound(const std::string& soundName, const Vector3&
 	return -1;
 }
 
-AudioManager& AudioManager::SetChannelCallback(int channelID, FMOD_CHANNELCONTROL_CALLBACK_TYPE callbackType, std::function<void> callbackFunction) {
+/*AudioManager& AudioManager::SetChannelCallback(int channelID, FMOD_CHANNELCONTROL_CALLBACK_TYPE callbackType, std::function<void> callbackFunction) {
 	FMOD::Channel* channel = FindChannel(channelID);
-}
+}*/
 
 int AudioManager::FadeInSound(const std::string& soundName, float fadeInTime, const Vector3& position, const float& volumePercent, const float& positionInSong) {
 	int newChannel = nextChannelID;
