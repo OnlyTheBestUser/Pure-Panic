@@ -60,6 +60,18 @@ namespace NCL {
 			GameActor* actor;
 		};
 
+		class JumpCommand : public Command {
+		public:
+			JumpCommand(GameActor* actor) : actor(actor) {};
+			virtual ~JumpCommand() {};
+			void execute() {
+				actor->Jump();
+			}
+
+		protected:
+			GameActor* actor;
+		};
+
 #pragma endregion
 
 #pragma region World Commands

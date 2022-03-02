@@ -13,7 +13,7 @@ namespace NCL {
 			virtual void MoveBackwards()	{ std::cout << "Move Backwards!" << std::endl; }
 			virtual void MoveLeft()			{ std::cout << "Move Left!" << std::endl; }
 			virtual void MoveRight()		{ std::cout << "Move Right!" << std::endl; }
-			void Jump()				{ std::cout << "Jump!" << std::endl; }
+			virtual void Jump()				{ std::cout << "Jump!" << std::endl; }
 			void Fire()				{ std::cout << "Fire!" << std::endl; }
 
 			/*

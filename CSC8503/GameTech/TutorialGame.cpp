@@ -399,10 +399,12 @@ void TutorialGame::InitWorld() {
 	Command* b = new MoveBackwardCommand(player);
 	Command* l = new MoveLeftCommand(player);
 	Command* r = new MoveRightCommand(player);
+	Command* jump = new JumpCommand(player);
 	inputHandler->BindButtonW(f);
 	inputHandler->BindButtonS(b);
 	inputHandler->BindButtonA(l);
 	inputHandler->BindButtonD(r);
+	inputHandler->BindButtonSpace(jump);
 
 
 	GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);

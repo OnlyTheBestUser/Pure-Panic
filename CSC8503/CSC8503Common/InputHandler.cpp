@@ -44,4 +44,10 @@ void InputHandler::HandleInput()
 			buttonJ_->execute();
 		}
 	}
+
+	if (buttonSpace_) {
+		if (Window::GetKeyboard()->KeyPressed(NCL::KeyboardKeys::SPACE)) {
+			buttonSpace_->execute();
+		}
+	}
 }
