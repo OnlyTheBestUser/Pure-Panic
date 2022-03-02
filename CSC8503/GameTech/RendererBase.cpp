@@ -51,6 +51,8 @@ RendererBase::RendererBase() {
 #ifdef _ORBIS
 	rendererAPI = new PS4::PS4RendererAPI(*Window::GetWindow());
 
+	TextureLoader::RegisterAPILoadFunction(PS4::PS4Texture::LoadTextureFromFile);
+
 	debugLinesMesh = PS4::PS4Mesh::GenerateQuad();
 	debugTextMesh = PS4::PS4Mesh::GenerateQuad();
 

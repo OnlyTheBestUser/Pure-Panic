@@ -2,6 +2,7 @@
 #include "../../Plugins/PlayStation4/PS4Mesh.h"
 #include "../../Plugins/PlayStation4/PS4Shader.h"
 #include "../../Plugins/PlayStation4/PS4Texture.h"
+#include "../../Plugins/PlayStation4/PS4UniformBuffer.h"
 #endif
 #include "Renderer.h"
 
@@ -19,6 +20,8 @@
 using namespace NCL;
 using namespace Rendering;
 using namespace CSC8503;
+
+
 
 Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 #ifdef _WIN64
@@ -60,6 +63,9 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 	);
 
 	skyboxTex = PS4::PS4Texture::LoadSkyboxFromFile(NCL::Assets::TEXTUREDIR + "Cubemap/cubemap.gnf");
+	PS4::PS4UniformBuffer test((PS4::PS4RendererAPI*)rendererAPI, (uint32_t)sizeof(CamMatrix));
+	CamMatrix* cam = new CamMatrix();
+	test.SetData(cam, (uint32_t)sizeof(CamMatrix), 0);
 #endif
 
 	//Set up the light properties

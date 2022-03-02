@@ -5,6 +5,10 @@ namespace NCL {
 	namespace Rendering {
 		class SimpleFont;
 
+		struct CamMatrix {
+			Vector3 viewMatrix;
+		}
+
 		class Renderer : public RendererBase
 		{
 		public:
