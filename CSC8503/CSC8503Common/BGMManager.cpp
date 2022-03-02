@@ -16,6 +16,7 @@ int BGMManager::PlaySongFade(std::string songName, float fadeInTime, float posIn
 	return curSongChannel;
 }
 
+
 void BGMManager::StopMusic() {
 	if (curSongChannel != -1) {
 		audioManager->StopChannel(curSongChannel);

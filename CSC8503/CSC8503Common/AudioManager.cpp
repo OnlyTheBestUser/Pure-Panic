@@ -75,7 +75,6 @@ void AudioManager::LoadSound(const std::string& soundName, bool threeDimensional
 	if (newSound) { sounds[soundName] = newSound; };
 }
 
-/*Plays sound, returns channel ID.*/
 int AudioManager::StartPlayingSound(const std::string& soundName, const Vector3& position, const float& volumePercent, const float& positionInSong) {
 	int newChannel = nextChannelID;
 	FMOD::Channel* channel = nullptr;
@@ -100,6 +99,10 @@ int AudioManager::StartPlayingSound(const std::string& soundName, const Vector3&
 	}
 	std::cout << "FMOD Sound hasn't been loaded - " << soundName << std::endl;
 	return -1;
+}
+
+AudioManager& AudioManager::SetChannelCallback(int channelID, FMOD_CHANNELCONTROL_CALLBACK_TYPE callbackType, std::function<void> callbackFunction) {
+	FMOD::Channel* channel = FindChannel(channelID);
 }
 
 int AudioManager::FadeInSound(const std::string& soundName, float fadeInTime, const Vector3& position, const float& volumePercent, const float& positionInSong) {

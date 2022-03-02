@@ -14,6 +14,7 @@
 #include <windows.h>
 #include <string>
 #include <map>
+#include <functional>
 #include "../../Common/Quaternion.h"
 
 using namespace NCL::Maths;
@@ -58,6 +59,7 @@ namespace NCL {
 			AudioManager&			SetChannelVolume(int channelID, const float& volPercent);
 			AudioManager&			SetChannelPitch(int channelID, const float& pitch);
 			AudioManager&			SetChannel3DPos(int channelID, const Vector3& position);
+			AudioManager&			SetChannelCallback(int channelID, FMOD_CHANNELCONTROL_CALLBACK_TYPE callbackType, std::function<void> callbackFunction);
 			void					StopChannel(int channelID);
 			void					StopLoopingSound(int channelID);
 			void					UpdateAudioListener(int audioListenerID, const Vector3& position, const Quaternion& orientration);
