@@ -229,9 +229,11 @@ void Renderer::RenderObjects() {
 		}
 
 		rendererAPI->BindTexture((*i).GetDefaultTexture(), "mainTex", 0);
-		rendererAPI->UpdateUniformInt(shader, "hasTexture", (OGLTexture*)(*i).GetDefaultTexture() ? 1 : 0);
+		rendererAPI->UpdateUniformInt(shader, "hasTexture", (*i).GetDefaultTexture() ? 1 : 0);
 #ifdef _WIN64
 		rendererAPI->BindTexture(shadowFBO->GetTexture(), "shadowTex", 1);
+		rendererAPI->BindTexture(i->GetPaintMask(), "paintMaskTex", 2);
+		rendererAPI->UpdateUniformInt(shader, "hasPaintMask", (*i).GetPaintMask() ? 1 : 0);
 #endif
 
 		Matrix4 modelMatrix = (*i).GetTransform()->GetMatrix();
@@ -247,9 +249,6 @@ void Renderer::RenderObjects() {
 		rendererAPI->UpdateUniformInt(shader, "hasVertexColours", !(*i).GetMesh()->GetColourData().empty());
 #endif
 
-		rendererAPI->BindTexture(i->GetPaintMask(), "paintMaskTex", 2);
-		rendererAPI->UpdateUniformInt(shader, "hasPaintMask", (OGLTexture*)(*i).GetPaintMask() ? 1 : 0);
-
 		rendererAPI->DrawMeshAndSubMesh((*i).GetMesh());
 	}
 
@@ -261,7 +260,6 @@ void Renderer::RenderObjects() {
 }
 
 void Renderer::ApplyPaintToMasks() {
-	rendererAPI->SetViewportSize(2048, 2048);
 	rendererAPI->SetDepth(false);
 
 	rendererAPI->BindShader(maskShader);
@@ -270,10 +268,16 @@ void Renderer::ApplyPaintToMasks() {
 	rendererAPI->UpdateUniformMatrix4(maskShader, "modelMatrix", Matrix4());
 	rendererAPI->UpdateUniformMatrix4(maskShader, "textureMatrix", Matrix4());
 
+	Vector2 currentSize;
+
 	for (const auto& i : paintInstances) {
 		if (i.object->GetPaintMask() == 0) continue;
 		maskFBO = new OGLFrameBuffer();
 		maskFBO->AddTexture((OGLTexture*)(i.object->GetPaintMask()));
+		if (Vector2(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight()) != currentSize) {
+			currentSize = Vector2(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight());
+			rendererAPI->SetViewportSize(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight());
+		}
 
 		rendererAPI->BindFrameBuffer(maskFBO);
 		rendererAPI->BindTexture(i.object->GetPaintMask(), "maskTex", 0);

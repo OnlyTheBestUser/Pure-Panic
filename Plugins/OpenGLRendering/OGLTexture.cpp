@@ -30,6 +30,8 @@ OGLTexture::~OGLTexture()
 
 TextureBase* OGLTexture::RGBATextureFromData(char* data, int width, int height, int channels) {
 	OGLTexture* tex = new OGLTexture();
+	tex->width = width;
+	tex->height = height;
 
 	int dataSize = width * height * channels; //This always assumes data is 1 byte per channel
 
@@ -113,4 +115,21 @@ TextureBase* OGLTexture::RGBATextureCubemapFromFilename(const std::string& side1
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 	return new OGLTexture(tex);
+}
+
+TextureBase* OGLTexture::RGBATextureEmpty(int width, int height) {
+	GLuint mask;
+	glGenTextures(1, &mask);
+	glBindTexture(GL_TEXTURE_2D, mask);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0,
+		GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	OGLTexture* tex = new OGLTexture(mask);
+	tex->height = height;
+	tex->width = width;
+	return tex;
 }

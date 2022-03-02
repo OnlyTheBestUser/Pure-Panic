@@ -2,7 +2,7 @@
 
 uniform vec4 		objectColour;
 uniform sampler2D 	mainTex;
-uniform sampler2D  paintMaskTex;
+uniform sampler2D	paintMaskTex;
 uniform sampler2DShadow shadowTex;
 
 uniform vec3	lightPos;
@@ -58,7 +58,7 @@ void main(void)
             //float f = mask(i.worldPos, _PainterPosition, _Radius, _Hardness);
             //float edge = f * _Strength;
                //return lerp(col, _PainterColor, edge);
-			albedo.rgb = vec3(0.5,0.5,0.5);
+			albedo.rgb = col;
 	}
 	
 	albedo.rgb = pow(albedo.rgb, vec3(2.2));

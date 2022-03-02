@@ -605,7 +605,7 @@ GameObject* TutorialGame::AddRenderPartToWorld(const Vector3& position, Vector3 
 		.SetScale(dimensions * 2)
 		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
 
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, basicShader));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, OGLTexture::RGBATextureEmpty(2048/8,2048/8), basicShader));
 	cube->SetPhysicsObject(nullptr);
 
 	cube->SetDynamic(false);
