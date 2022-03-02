@@ -11,6 +11,7 @@ namespace NCL {
 
             GLuint GetBufferObject() const { return frameBuffer; }
             void AddTexture() override;
+            void AddTexture(int width, int height) override;
             TextureBase* GetTexture() const override;
         protected:
             GLuint frameBuffer;

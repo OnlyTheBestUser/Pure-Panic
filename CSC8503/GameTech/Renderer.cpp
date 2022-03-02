@@ -52,6 +52,10 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 	shadowFBO = new OGLFrameBuffer();
 	shadowFBO->AddTexture();
 
+	maskFBO = new OGLFrameBuffer();
+	maskFBO->AddTexture(2048 / 4, 2048 / 4);
+	maskShader = new OGLShader("MaskVertex.glsl", "MaskFragment.glsl");
+
 #endif
 #ifdef _ORBIS
 	skyboxMesh = PS4::PS4Mesh::GenerateQuad();
@@ -81,6 +85,9 @@ Renderer::~Renderer() {
 	delete skyboxShader;
 	delete skyboxMesh;
 	delete skyboxTex;
+
+	delete maskFBO;
+	delete maskShader;
 }
 
 void Renderer::Update(float dt) {
@@ -124,6 +131,53 @@ void Renderer::SortObjectList() {
 }
 
 void Renderer::RenderScene() {
+
+	rendererAPI->BindFrameBuffer(maskFBO);
+	rendererAPI->SetDepth(false);
+	rendererAPI->SetViewportSize(2048 / 4, 2048 / 4);
+
+	float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
+	Matrix4 viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
+	Matrix4 projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);
+
+	rendererAPI->BindShader(maskShader);
+
+	GLuint texTest = 0;
+	glGenTextures(1, &texTest);
+	glBindTexture(GL_TEXTURE_2D, texTest);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 2048 / 4, 2048 / 4, 0,
+		GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+
+	for (const auto& i : activeObjects) {
+		rendererAPI->UpdateUniformMatrix4(maskShader, "projMatrix", Matrix4());
+		rendererAPI->UpdateUniformMatrix4(maskShader, "viewMatrix", Matrix4());
+		rendererAPI->UpdateUniformMatrix4(maskShader, "modelMatrix", Matrix4());
+		rendererAPI->UpdateUniformMatrix4(maskShader, "textureMatrix", Matrix4());
+
+		rendererAPI->BindTexture(i->GetDefaultTexture(), "maskTex", 0);
+
+		rendererAPI->DrawMesh(skyboxMesh);
+
+		glCopyTextureSubImage2D(texTest, 0, 0, 0, 0, 0, 2048 / 4, 2048 / 4);
+	}
+
+	rendererAPI->BindFrameBuffer();
+	rendererAPI->SetDepth(true);
+	rendererAPI->SetViewportSize(rendererAPI->GetCurrentWidth(), rendererAPI->GetCurrentHeight());
+
+
+	glActiveTexture(GL_TEXTURE0 + 5);
+	glBindTexture(GL_TEXTURE_2D, texTest);
+
+	rendererAPI->DrawMesh(skyboxMesh);
+	glDeleteTextures(1, &texTest);
+
 #ifdef _WIN64
 	RenderShadows();
 #endif
