@@ -1,3 +1,8 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+
 #include "LevelLoader.h"
 #include "../CSC8503Common/GameWorld.h"
 #include "../../Common/TextureLoader.h"
@@ -80,26 +85,59 @@ LevelLoader::~LevelLoader() {
 	delete bonusMesh;
 }
 
-void LevelLoader::LoadLevel() {
-	GameObject* floor = AddFloorToWorld(Vector3(0, -1, 0));
+void LevelLoader::ReadInLevelFile(std::string filename) {
+	std::ifstream file;
+	std::string line;
+	char space = ' ';
 
-	AddLongWallToWorld(Vector3(255, 0, 5), Vector3(2, 20, 250), 270, corridorWallStraight, corridorWallAlertTex);
-	AddLongWallToWorld(Vector3(-255, 0, 5), Vector3(2, 20, 250), 90, corridorWallStraight, corridorWallAlertTex);
+	file.open(filename);
 
-	AddLongWallToWorld(Vector3(5, 0, 255), Vector3(250, 20, 2), 180, corridorWallStraight, corridorWallAlertTex);
-	AddLongWallToWorld(Vector3(5, 0, -255), Vector3(250, 20, 2), 0, corridorWallStraight, corridorWallAlertTex);
+	if (file.is_open()) {
+		while (getline(file, line)) {
+			vector<std::string> lineContents;
 
-	AddCornerWallToWorld(Vector3(-247.5, 0, -250), Vector3(8, 5, 4), 45);
-	AddCornerWallToWorld(Vector3(-247.5, 0, 250), Vector3(8, 5, 4), 135);
-	AddCornerWallToWorld(Vector3(247.5, 0, 250), Vector3(8, 5, 4), 225);
-	AddCornerWallToWorld(Vector3(247.5, 0, -250), Vector3(8, 5, 4), 315);
+			SplitStringOnDelimiter(line, ' ', lineContents);
 
-	AddSecurityCameraToWorld(Vector3(25, 4, 240), 180);
-	AddSecurityCameraToWorld(Vector3(-25, 4, 240), 180);
+			if (lineContents.size() > 0) {
+				if (lineContents[0] == "FLOOR") {
+					AddFloorToWorld(Vec3FromStr(lineContents[1]));
+				}
+				else if (lineContents[0] == "LONG_WALL") {
+					AddLongWallToWorld(Vec3FromStr(lineContents[1]), Vec3FromStr(lineContents[2]), std::stof(lineContents[3]));
+				}
+				else if (lineContents[0] == "CORNER_WALL") {
+					AddCornerWallToWorld(Vec3FromStr(lineContents[1]), Vec3FromStr(lineContents[2]), std::stoi(lineContents[3]));
+				}
+				else if (lineContents[0] == "SECURITY_CAM") {
+					AddSecurityCameraToWorld(Vec3FromStr(lineContents[1]), std::stoi(lineContents[2]));
+				}
+				else if (lineContents[0] == "WALL_HAMMER") {
+					AddWallHammerToWorld(Vec3FromStr(lineContents[1]), std::stoi(lineContents[2]));
+				}
+			}
+		}
 
-	AddWallHammerToWorld(Vector3(0, 2, 241), 180);
-	AddWallHammerToWorld(Vector3(50, 2, 241), 180);
-	AddWallHammerToWorld(Vector3(-50, 2, 241), 180);
+		file.close();
+	}
+	else {
+		std::cout << "Failed to load map" << std::endl;
+	}
+}
+
+void LevelLoader::SplitStringOnDelimiter(const std::string& s, char delim, vector<std::string>& result) {
+	std::istringstream iss(s);
+	std::string item;
+	while (std::getline(iss, item, delim)) {
+		result.push_back(item);
+	}
+}
+
+Vector3 LevelLoader::Vec3FromStr(std::string input) {
+	vector<std::string> values;
+
+	SplitStringOnDelimiter(input, ',', values);
+
+	return Vector3(std::stof(values[0]), std::stof(values[1]), std::stof(values[2]));
 }
 
 GameObject* LevelLoader::AddFloorToWorld(const Maths::Vector3& position) {
@@ -122,11 +160,6 @@ GameObject* LevelLoader::AddFloorToWorld(const Maths::Vector3& position) {
 	floor->SetDynamic(false);
 	world->AddGameObject(floor);
 	return floor;
-}
-
-void LevelLoader::InitGameExamples() {
-	AddPlayerToWorld(Vector3(0, 5, 0));
-	AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f, 1.0f);
 }
 
 Player* LevelLoader::AddPlayerToWorld(const Vector3& position) {
@@ -156,29 +189,6 @@ Player* LevelLoader::AddPlayerToWorld(const Vector3& position) {
 	world->AddGameObject(character);
 
 	return character;
-}
-
-GameObject* LevelLoader::AddWallToWorld(const Vector3& position, Vector3 dimensions, int rotation) {
-	GameObject* cube = new GameObject();
-
-	AABBVolume* volume = new AABBVolume(dimensions);
-	cube->SetBoundingVolume((CollisionVolume*)volume);
-
-	cube->GetTransform()
-		.SetPosition(position)
-		.SetScale(dimensions * 2)
-		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
-
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, basicShader));
-	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
-
-	cube->GetPhysicsObject()->SetInverseMass(0.0f);
-	cube->GetPhysicsObject()->InitCubeInertia();
-
-	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	cube->SetDynamic(false);
-	world->AddGameObject(cube);
-	return cube;
 }
 
 GameObject* LevelLoader::AddAABBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name) {
@@ -225,7 +235,7 @@ GameObject* LevelLoader::AddOBBWallToWorld(const Vector3& position, Vector3 dime
 	return cube;
 }
 
-GameObject* LevelLoader::AddLongWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture) {
+GameObject* LevelLoader::AddLongWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name) {
 	Vector3 location = position + Vector3(0, 10, 0);
 
 	if (position.x < 0)
@@ -238,7 +248,7 @@ GameObject* LevelLoader::AddLongWallToWorld(const Vector3& position, Vector3 dim
 	if (position.z > 0)
 		location += Vector3(1, 0, -2);
 
-	GameObject* physicalObject = AddAABBWallToWorld(location, dimensions, rotation, "Long wall");
+	GameObject* physicalObject = AddAABBWallToWorld(location, dimensions, rotation, name);
 	physicalObject->GetPhysicsObject()->Sleep();
 	if (rotation == 90 || rotation == 270)
 	{

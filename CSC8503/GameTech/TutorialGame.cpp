@@ -86,9 +86,7 @@ void TutorialGame::InitialiseAssets() {
 	InitWorld();
 }
 
-TutorialGame::~TutorialGame()	{
-
-
+TutorialGame::~TutorialGame() {
 	delete physics;
 	delete renderer;
 	delete world;
@@ -307,11 +305,12 @@ void TutorialGame::InitCamera() {
 	world->GetMainCamera()->SetYaw(315.0f);
 	world->GetMainCamera()->SetPosition(Vector3(-60, 40, 60));
 }
+
 void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	levelLoader->LoadLevel();
+	levelLoader->ReadInLevelFile("../../Assets/Maps/map1.txt");
 	
 	Player* player = levelLoader->AddPlayerToWorld(Vector3(0, 5, 0));
 
@@ -333,61 +332,6 @@ void TutorialGame::InitWorld() {
 
 	physics->BuildStaticList();
 }
-
-//void TutorialGame::InitSphereGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, float radius) {
-//	for (int x = 0; x < numCols; ++x) {
-//		for (int z = 0; z < numRows; ++z) {
-//			Vector3 position = Vector3(x * colSpacing, 10.0f, z * rowSpacing);
-//			GameObject* sphere = AddSphereToWorld(position, radius, 10.0f, false, false, false);
-//			sphere->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-//		}
-//	}
-//}
-//void TutorialGame::InitCapsuleGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing) {
-//	for (int x = 0; x < numCols; ++x) {
-//		for (int z = 0; z < numRows; ++z) {
-//			Vector3 position = Vector3(x * colSpacing, 10.0f, z * rowSpacing);
-//			GameObject* capsule = AddCapsuleToWorld(position, 3.0f, 1.5f);
-//			capsule->SetDynamic(true);
-//			capsule->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-//		}
-//	}
-//}
-//void TutorialGame::InitMixedGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing) {
-//	float sphereRadius = 1.0f;
-//	Vector3 cubeDims = Vector3(1, 1, 1);
-//
-//	for (int x = 0; x < numCols; ++x) {
-//		for (int z = 0; z < numRows; ++z) {
-//			Vector3 position = Vector3(x * colSpacing, 10.0f, z * rowSpacing);
-//			int choice = rand() % 3;
-//			if (choice == 2) {
-//				GameObject* obb = AddCubeToWorld(position, cubeDims, true, 10.0f, 1, false, true);
-//				obb->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-//			}
-//			else if (choice == 1) {
-//				GameObject* capsule = AddCapsuleToWorld(position, 3.0f, 1.5f);
-//				capsule->SetDynamic(true);
-//				capsule->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-//			}
-//			else {
-//				GameObject* sphere = AddSphereToWorld(position, sphereRadius, 10.0f, false, false, true);
-//				sphere->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-//			}
-//		}
-//	}
-//}
-//void TutorialGame::InitCubeGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, const Maths::Vector3& cubeDims) {
-//	for (int x = 1; x < numCols+1; ++x) {
-//		for (int z = 1; z < numRows+1; ++z) {
-//			Vector3 position = Vector3(x * colSpacing, 10.0f, z * rowSpacing);
-//			GameObject* obb = AddCubeToWorld(position, cubeDims, true, 10.0f, 1, false, true);
-//			obb->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-//		}
-//	}
-//}
-
-
 
 /*
 

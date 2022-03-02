@@ -10,29 +10,29 @@ namespace NCL {
 			LevelLoader(GameWorld* world, PhysicsSystem* physics);
 			~LevelLoader();
 
-			void LoadLevel();
-			void InitGameExamples();
+			void ReadInLevelFile(std::string filename);
 
 			Player* AddPlayerToWorld(const Vector3& position);
-
-			GameObject* AddFloorToWorld(const Vector3& position);
-
-			GameObject* AddWallToWorld(const Vector3& position, Vector3 dimensions, int rotation);
-			GameObject* AddAABBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name = "AABBWall");
-			GameObject* AddOBBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name = "OBBWall");
-			GameObject* AddLongWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture);
-
-			void AddCornerWallToWorld(const Vector3& position, Vector3 dimensions, int rotation);
-			void AddSecurityCameraToWorld(const Vector3& position, int rotation);
-			void AddWallHammerToWorld(const Vector3& position, int rotation);
 
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f, bool rubber = false, bool hollow = false, bool dynamic = false);
 			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, bool OBB = false, float inverseMass = 10.0f, int layer = 1, bool isTrigger = false, bool dynamic = false);
 			GameObject* AddCapsuleToWorld(const Maths::Vector3& position, float halfHeight, float radius, float inverseMass = 10.0f);
 
+		protected:
+			GameObject* AddFloorToWorld(const Vector3& position);
+			GameObject* AddAABBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name = "AABBWall");
+			GameObject* AddOBBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name = "OBBWall");
+			GameObject* AddLongWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name = "LongWall");
+
+			void AddCornerWallToWorld(const Vector3& position, Vector3 dimensions, int rotation);
+			void AddSecurityCameraToWorld(const Vector3& position, int rotation);
+			void AddWallHammerToWorld(const Vector3& position, int rotation);
+
+			void SplitStringOnDelimiter(const std::string& s, char delim, vector<std::string>& result);
+			Vector3 Vec3FromStr(std::string input);
+
 			GameObject* AddRenderPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture);
 
-		protected:
 			GameWorld*     world;
 			PhysicsSystem* physics;
 
