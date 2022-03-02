@@ -52,8 +52,8 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 	shadowFBO = new OGLFrameBuffer();
 	shadowFBO->AddTexture();
 
-	maskFBO = new OGLFrameBuffer();
-	maskFBO->AddTexture(2048 / 4, 2048 / 4);
+	//maskFBO = new OGLFrameBuffer();
+	//maskFBO->AddTexture(2048 / 4, 2048 / 4);
 	maskShader = new OGLShader("MaskVertex.glsl", "MaskFragment.glsl");
 
 #endif
@@ -103,6 +103,10 @@ void Renderer::Render() {
 	BuildObjectList();
 	SortObjectList();
 
+	for (const auto& i : activeObjects) {
+		Paint(i, Vector3(0, 0, 0), 1.0f, 1.0f, 1.0f, Vector4(1, 0, 0, 1));
+	}
+	ApplyPaintToMasks();
 	RenderScene();
 	rendererAPI->SetCullFace(false);
 
@@ -133,53 +137,6 @@ void Renderer::SortObjectList() {
 }
 
 void Renderer::RenderScene() {
-
-	rendererAPI->BindFrameBuffer(maskFBO);
-	rendererAPI->SetDepth(false);
-	rendererAPI->SetViewportSize(2048 / 4, 2048 / 4);
-
-	float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
-	Matrix4 viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
-	Matrix4 projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);
-
-	rendererAPI->BindShader(maskShader);
-
-	GLuint texTest = 0;
-	glGenTextures(1, &texTest);
-	glBindTexture(GL_TEXTURE_2D, texTest);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 2048 / 4, 2048 / 4, 0,
-		GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-
-	for (const auto& i : activeObjects) {
-		rendererAPI->UpdateUniformMatrix4(maskShader, "projMatrix", Matrix4());
-		rendererAPI->UpdateUniformMatrix4(maskShader, "viewMatrix", Matrix4());
-		rendererAPI->UpdateUniformMatrix4(maskShader, "modelMatrix", Matrix4());
-		rendererAPI->UpdateUniformMatrix4(maskShader, "textureMatrix", Matrix4());
-
-		rendererAPI->BindTexture(i->GetDefaultTexture(), "maskTex", 0);
-
-		rendererAPI->DrawMesh(skyboxMesh);
-
-		glCopyTextureSubImage2D(texTest, 0, 0, 0, 0, 0, 2048 / 4, 2048 / 4);
-	}
-
-	rendererAPI->BindFrameBuffer();
-	rendererAPI->SetDepth(true);
-	rendererAPI->SetViewportSize(rendererAPI->GetCurrentWidth(), rendererAPI->GetCurrentHeight());
-
-
-	glActiveTexture(GL_TEXTURE0 + 5);
-	glBindTexture(GL_TEXTURE_2D, texTest);
-
-	rendererAPI->DrawMesh(skyboxMesh);
-	glDeleteTextures(1, &texTest);
-
 #ifdef _WIN64
 	RenderShadows();
 #endif
@@ -290,10 +247,8 @@ void Renderer::RenderObjects() {
 		rendererAPI->UpdateUniformInt(shader, "hasVertexColours", !(*i).GetMesh()->GetColourData().empty());
 #endif
 
-		if (i->GetPaintMask() != 0) {
-			rendererAPI->BindTexture(i->GetPaintMask(), "paintMaskTex", 2);
-			rendererAPI->UpdateUniformInt(shader, "hasPaintMask", (OGLTexture*)(*i).GetPaintMask() ? 1 : 0);
-		}
+		rendererAPI->BindTexture(i->GetPaintMask(), "paintMaskTex", 2);
+		rendererAPI->UpdateUniformInt(shader, "hasPaintMask", (OGLTexture*)(*i).GetPaintMask() ? 1 : 0);
 
 		rendererAPI->DrawMeshAndSubMesh((*i).GetMesh());
 	}
@@ -306,13 +261,41 @@ void Renderer::RenderObjects() {
 }
 
 void Renderer::ApplyPaintToMasks() {
+	rendererAPI->SetViewportSize(2048, 2048);
+	rendererAPI->SetDepth(false);
+
+	rendererAPI->BindShader(maskShader);
+	rendererAPI->UpdateUniformMatrix4(maskShader, "projMatrix", Matrix4());
+	rendererAPI->UpdateUniformMatrix4(maskShader, "viewMatrix", Matrix4());
+	rendererAPI->UpdateUniformMatrix4(maskShader, "modelMatrix", Matrix4());
+	rendererAPI->UpdateUniformMatrix4(maskShader, "textureMatrix", Matrix4());
+
 	for (const auto& i : paintInstances) {
-		// Bind texture to paint shader 
-		// Bind mask texture from i.object
-		// update any other uniforms needed
-		// draw to mask texture
+		if (i.object->GetPaintMask() == 0) continue;
+		maskFBO = new OGLFrameBuffer();
+		maskFBO->AddTexture((OGLTexture*)(i.object->GetPaintMask()));
+
+		rendererAPI->BindFrameBuffer(maskFBO);
+		rendererAPI->BindTexture(i.object->GetPaintMask(), "maskTex", 0);
+
+		rendererAPI->DrawMesh(skyboxMesh);
+		delete maskFBO;
 	}
+	rendererAPI->SetDepth(true);
+	rendererAPI->SetViewportSize(rendererAPI->GetCurrentWidth(), rendererAPI->GetCurrentHeight());
+	rendererAPI->ClearBuffer(true, true, true);
+	rendererAPI->BindFrameBuffer();
 	paintInstances.clear();
+}
+
+void Renderer::Paint(const RenderObject* paintable, Vector3 pos, float radius, float hardness, float strength, Vector4 color) {
+	PaintInstance paint;
+	paint.object = paintable;
+	paint.radius = radius;
+	paint.hardness = hardness;
+	paint.strength = strength;
+	paint.colour = color;
+	paintInstances.emplace_back(paint);
 }
 
 Maths::Matrix4 Renderer::SetupDebugLineMatrix()	const {

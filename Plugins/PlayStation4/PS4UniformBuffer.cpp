@@ -1,3 +1,4 @@
+#ifdef _ORBIS
 #include "PS4UniformBuffer.h"
 #include "PS4Shader.h"
 using namespace NCL::PS4;
@@ -18,3 +19,4 @@ PS4UniformBuffer::~PS4UniformBuffer() {
 void PS4UniformBuffer::SetData(const void* value, uint32_t size, uint32_t offset) {
 	memcpy(data, value, size);
 }
+#endif
