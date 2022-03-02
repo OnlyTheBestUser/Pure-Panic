@@ -1,0 +1,19 @@
+
+RW_RegularBuffer<float> rotationAmount;
+
+ConstantBuffer InputData
+{
+	float timeStep;
+};
+
+ConstantBuffer InputData2
+{
+	float timeStep2;
+};
+
+[NUM_THREADS(1, 1, 1)]
+void main( uint2 offset : S_GROUP_ID, uint2 thread_id : S_GROUP_THREAD_ID)
+{
+	int index = 0;
+	rotationAmount[index] = rotationAmount[index] + timeStep + 1.0f;
+}

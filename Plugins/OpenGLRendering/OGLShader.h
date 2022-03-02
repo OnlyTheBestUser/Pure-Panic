@@ -15,7 +15,7 @@ namespace NCL {
 		class OGLShader : public ShaderBase
 		{
 		public:
-			friend class OGLRenderer;
+			friend class OGLRendererAPI;
 			OGLShader(const string& vertex, const string& fragment, const string& geometry = "", const string& domain = "", const string& hull = "");
 			~OGLShader();
 

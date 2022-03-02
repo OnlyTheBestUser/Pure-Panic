@@ -13,10 +13,8 @@ using namespace NCL;
 using namespace CSC8503;
 
 /*
-
 These two variables help define the relationship between positions
 and the forces that are added to objects to change those positions
-
 */
 
 PhysicsSystem::PhysicsSystem(GameWorld& g) : gameWorld(g)	{
@@ -24,7 +22,6 @@ PhysicsSystem::PhysicsSystem(GameWorld& g) : gameWorld(g)	{
 	useBroadPhase	= true;	
 	dTOffset		= 0.0f;
 	globalDamping	= 0.995f;
-	linearDamping	= 0.4f;
 	SetGravity(Vector3(0.0f, -19.6f, 0.0f));
 }
 
@@ -88,6 +85,10 @@ int realHZ		= idealHZ;
 float realDT	= idealDT;
 
 void PhysicsSystem::Update(float dt) {	
+	/*if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::B)) {
+		useBroadPhase = !useBroadPhase;
+		std::cout << "Setting broadphase to " << useBroadPhase << std::endl;
+	}
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::I)) {
 		constraintIterationCount--;
 		std::cout << "Setting constraint iterations to " << constraintIterationCount << std::endl;
@@ -95,16 +96,14 @@ void PhysicsSystem::Update(float dt) {
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::O)) {
 		constraintIterationCount++;
 		std::cout << "Setting constraint iterations to " << constraintIterationCount << std::endl;
-	}
+	}*/
 
 	dTOffset += dt; //We accumulate time delta here - there might be remainders from previous frame!
 
 	GameTimer t;
 	t.GetTimeDeltaSeconds();
 
-	//if (useBroadPhase) {
 	UpdateObjectAABBs();
-	//}
 
 	while(dTOffset >= realDT) {
 		std::vector<GameObject*>::const_iterator first;
@@ -115,17 +114,11 @@ void PhysicsSystem::Update(float dt) {
 			if (object == nullptr)
 				continue;
 			CheckToWake(object);
-			IntegrateAccel(realDT, object); //Update accelerations from external forces
-
-			/*if (!useBroadPhase) {
-				BasicCollisionDetection(i, first, last);
-			}*/
+			IntegrateAccel(realDT, *i); //Update accelerations from external forces
 		}
 
-		//if (useBroadPhase) {
 		BroadPhase();
 		NarrowPhase();
-		//}
 
 		// TODO
 		//This is our simple iterative solver - 
@@ -211,36 +204,6 @@ void PhysicsSystem::UpdateObjectAABBs() {
 		}
 	);
 }
-
-/*
-
-This is how we'll be doing collision detection in tutorial 4.
-We step thorugh every pair of objects once (the inner for loop offset 
-ensures this), and determine whether they collide, and if so, add them
-to the collision set for later processing. The set will guarantee that
-a particular pair will only be added once, so objects colliding for
-multiple frames won't flood the set with duplicates.
-*/
-//void PhysicsSystem::BasicCollisionDetection(std::vector<GameObject*>::const_iterator i, std::vector<GameObject*>::const_iterator first, std::vector<GameObject*>::const_iterator last) {
-//	gameWorld.GetObjectIterators(first, last);
-//
-//	for (auto j = i + 1; j != last; ++j) {
-//		if ((*j)->GetPhysicsObject() == nullptr)
-//			continue;
-//
-//		CollisionDetection::CollisionInfo info;
-//		if (CollisionDetection::ObjectIntersection(*i, *j, info)) {
-//			if((*i)->GetPhysicsObject()->UseSpringRes() || (*j)->GetPhysicsObject()->UseSpringRes())
-//				ResolveSpringCollision(*info.a, *info.b, info.point);
-//			else
-//			{
-//				ImpulseResolveCollision(*info.a, *info.b, info.point);
-//			}
-//			info.framesLeft = numCollisionFrames;
-//			allCollisions.insert(info);
-//		}
-//	}
-//}
 
 /*
 
@@ -341,14 +304,11 @@ void PhysicsSystem::ResolveSpringCollision(GameObject& a, GameObject& b, Collisi
 }
 
 /*
-
 Later, we replace the BasicCollisionDetection method with a broadphase
 and a narrowphase collision detection method. In the broad phase, we
 split the world up using an acceleration structure, so that we can only
 compare the collisions that we absolutely need to. 
-
 */
-
 void PhysicsSystem::BroadPhase() {
 	broadphaseCollisions.clear();
 	Octree<GameObject*> tree(Vector3(1024, 1024, 1024), 7, 6);
@@ -366,8 +326,6 @@ void PhysicsSystem::BroadPhase() {
 		tree.Insert(*i, pos, halfSizes);
 	}
 
-	//tree.DebugDraw(Debug::RED);
-	//staticTree->DebugDraw(Debug::BLUE);
 	// Test dynamic against static
 	std::list<OctreeEntry<GameObject*>> list;
 	tree.OperateOnContents([&](std::list<OctreeEntry<GameObject*>>& data) {
@@ -377,15 +335,14 @@ void PhysicsSystem::BroadPhase() {
 			//if(i->object->GetName() == "player")
 			staticTree->GetContentsAtNode(i->object, i->pos, i->size, list);
 			for (auto j = list.begin(); j != list.end(); j++) {
-				info.a = min((*i).object, (*j).object);
-				info.b = max((*i).object, (*j).object);
+				info.a = std::min((*i).object, (*j).object);
+				info.b = std::max((*i).object, (*j).object);
 				if ((info.a->GetCollisionLayers() & info.b->GetCollisionLayers()) != 0) {
 					broadphaseCollisions.insert(info);
 				}
 			}
 		}
 		});
-	//tree.DebugDraw(Debug::RED);
 	// Test all dynamic objects against eachother
 	tree.OperateOnContents([&](std::list<OctreeEntry<GameObject*>>& data) {
 		CollisionDetection::CollisionInfo info;
@@ -393,8 +350,13 @@ void PhysicsSystem::BroadPhase() {
 			for (auto j = std::next(i); j != data.end(); ++j) {
 				//is this pair of items already in the collision set - 
 				// if the same pair is in another Octree node together etc
-				info.a = min((*i).object, (*j).object);
-				info.b = max((*i).object, (*j).object);
+#ifdef _WIN64
+				info.a = std::min((*i).object, (*j).object);
+				info.b = std::max((*i).object, (*j).object);
+#else // _WIN64
+				info.a = std::min((*i).object, (*j).object);
+				info.b = std::max((*i).object, (*j).object);
+#endif
 				if (((info.a->GetCollisionLayers() & info.b->GetCollisionLayers()) != 0) && !(!info.a->IsDynamic() && !info.b->IsDynamic())) {
 					broadphaseCollisions.insert(info);
 				}
@@ -516,7 +478,8 @@ This function will update both linear and angular acceleration,
 based on any forces that have been accumulated in the objects during
 the course of the previous game frame.
 */
-void PhysicsSystem::IntegrateAccel(float dt, PhysicsObject* object) {
+void PhysicsSystem::IntegrateAccel(float dt, GameObject* gobj) {
+	PhysicsObject* object = gobj->GetPhysicsObject();
 	if (object->isSleeping())
 		return;
 
@@ -525,11 +488,11 @@ void PhysicsSystem::IntegrateAccel(float dt, PhysicsObject* object) {
 	Vector3 linearVel = object->GetLinearVelocity();
 	Vector3 force = object->GetForce();
 	Vector3 accel = force * inverseMass;
-
-	if (applyGravity && inverseMass > 0 && object->UsesGravity()) {
+	
+	if (applyGravity && inverseMass > 0 && object->UsesGravity() && gobj->IsDynamic()) {
 		accel += gravity;
 	}
-
+	
 	linearVel += accel * dt;
 	object->SetLinearVelocity(linearVel);
 
@@ -552,7 +515,7 @@ the world, looking for collisions.
 */
 void PhysicsSystem::IntegrateVelocity(float dt, PhysicsObject* object, Transform& transform) {
 	
-	float frameLinearDamping = 1.0f - (linearDamping * dt);
+	float frameLinearDamping = 1.0f - (object->GetLinearDamping() * dt);
 
 	if (object->isSleeping())
 		return;
@@ -589,17 +552,16 @@ ones in the next 'game' frame.
 void PhysicsSystem::ClearForces() {
 	gameWorld.OperateOnContents(
 		[](GameObject* o) {
-			o->GetPhysicsObject()->ClearForces();
+			if (o->GetPhysicsObject() != nullptr)
+				o->GetPhysicsObject()->ClearForces();
 		}
 	);
 }
 
 /*
-
 As part of the final physics tutorials, we add in the ability
 to constrain objects based on some extra calculation, allowing
 us to model springs and ropes etc. 
-
 */
 void PhysicsSystem::UpdateConstraints(float dt) {
 	std::vector<Constraint*>::const_iterator first;

@@ -21,17 +21,12 @@ namespace NCL {
 			void SetGlobalDamping(float d) {
 				globalDamping = d;
 			}
-
-			void SetLinearDamping(float d) {
-				linearDamping = d;
-			}
-
+						
 			void SetGravity(const Vector3& g);
 
 			void BuildStaticList();
 
 		protected:
-//			void BasicCollisionDetection(std::vector<GameObject*>::const_iterator i, std::vector<GameObject*>::const_iterator first, std::vector<GameObject*>::const_iterator last);
 			void BroadPhase();
 			void NarrowPhase();
 
@@ -40,7 +35,7 @@ namespace NCL {
 			void CheckToWake(PhysicsObject* object);
 			void CheckToSleep(PhysicsObject* object);
 
-			void IntegrateAccel(float dt, PhysicsObject* object);
+			void IntegrateAccel(float dt, GameObject* object);
 			void IntegrateVelocity(float dt, PhysicsObject* object, Transform& transform);
 
 			void UpdateConstraints(float dt);
@@ -58,7 +53,6 @@ namespace NCL {
 			Vector3 gravity;
 			float	dTOffset;
 			float	globalDamping;
-			float	linearDamping;
 			std::set<CollisionDetection::CollisionInfo> allCollisions;
 			std::set<CollisionDetection::CollisionInfo> broadphaseCollisions;
 
@@ -67,4 +61,3 @@ namespace NCL {
 		};
 	}
 }
-

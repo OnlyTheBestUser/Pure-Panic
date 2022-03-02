@@ -207,6 +207,7 @@
   <ItemGroup>
     <ClCompile Include="Assets.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="FrameBufferBase.cpp" />
     <ClCompile Include="GameTimer.cpp" />
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Maths.cpp" />
@@ -219,7 +220,7 @@
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Quaternion.cpp" />
-    <ClCompile Include="RendererBase.cpp" />
+    <ClCompile Include="RendererAPI.cpp" />
     <ClCompile Include="ShaderBase.cpp" />
     <ClCompile Include="SimpleFont.cpp" />
     <ClCompile Include="TextureBase.cpp" />
@@ -236,6 +237,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Assets.h" />
+    <ClInclude Include="FrameBufferBase.h" />
     <ClInclude Include="GameTimer.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Maths.h" />
@@ -248,7 +250,7 @@
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="Quaternion.h" />
-    <ClInclude Include="RendererBase.h" />
+    <ClInclude Include="RendererAPI.h" />
     <ClInclude Include="ShaderBase.h" />
     <ClInclude Include="SimpleFont.h" />
     <ClInclude Include="TextureBase.h" />

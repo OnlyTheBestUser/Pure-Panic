@@ -1,5 +1,6 @@
 #pragma once
 #include "GameActor.h"
+#include "GameWorld.h"
 #include "../../Common/Vector3.h"
 #include "../../Common/Camera.h"
 #include <chrono>
@@ -11,7 +12,7 @@ namespace NCL {
         class Player : public GameActor
         {
         public:
-			Player(Camera* camera, string name = "", Vector3 ch = Vector3(0, 2, 0)) : GameActor(name), checkpoint(ch), spawnPos(ch) {
+			Player(Camera* camera, GameWorld& g, string name = "", Vector3 ch = Vector3(0, 2, 0)) : GameActor(name), checkpoint(ch), spawnPos(ch), gameWorld(g) {
 				this->camera = camera;
 				camLocked = true;
 			};
@@ -19,7 +20,7 @@ namespace NCL {
 
             void OnCollisionBegin(GameObject* other, Vector3 localA, Vector3 localB, Vector3 normal) override;
             void Update(float dt) override;
-
+			
             float GetTimeTaken() const { return timeTaken; }
             int GetScore() const { return score; }
             Vector3 GetCheckpoint() const { return checkpoint; }
@@ -46,6 +47,8 @@ namespace NCL {
 			void ChangeCamLock() { camLocked = !camLocked; }
 
         protected:
+			float CheckDistToGround();
+
             bool start = false;
             bool finish = false;
             float timeTaken = 0.0f;
@@ -54,14 +57,13 @@ namespace NCL {
             Vector3 checkpoint;
 			bool key = false;
 			float powerupTime = 0.0f;
-			float speed = 25.0f;
+			float speed = 15.0f;
 			float curSpeed = 50.0f;
 			Vector3 force = Vector3(0,0,0);
 
 			Camera* camera;
+			GameWorld& gameWorld;
 			bool camLocked;
         };
     }
 }
-
-

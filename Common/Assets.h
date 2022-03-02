@@ -17,6 +17,15 @@ namespace NCL {
 		const std::string TEXTUREDIR("../../Assets/Textures/");
 		const std::string FONTSSDIR("../../Assets/Fonts/");
 		const std::string DATADIR("../../Assets/Data/");
+#endif
+#ifdef _ORBIS
+		const std::string AUDIODIR("/app0/Assets/Audio/");
+		const std::string SHADERDIR("/app0/Assets/Shaders/");
+		const std::string MESHDIR("/app0/Assets/Meshes/");
+		const std::string TEXTUREDIR("/app0/Assets/Textures/");
+		const std::string FONTSSDIR("/app0/Assets/Fonts/");
+		const std::string DATADIR("/app0/Assets/Data/");
+#endif
 		extern bool ReadTextFile(const std::string &filepath, std::string& result);
 		extern bool ReadBinaryFile(const std::string &filepath, char** into, size_t& size);
 	}

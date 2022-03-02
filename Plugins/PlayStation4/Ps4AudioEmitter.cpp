@@ -1,5 +1,6 @@
 #ifdef _ORBIS
 #include "Ps4AudioEmitter.h"
+#include "Ps4AudioSystem.h"
 
 using namespace NCL::PS4;
 Ps4AudioEmitter::Ps4AudioEmitter(const Sound* sound, float volume)
@@ -30,12 +31,13 @@ Ps4AudioEmitter::~Ps4AudioEmitter()
 	//}
 }
 
-#define SAMPLE_GRANULARITY 1024
+
 
 void Ps4AudioEmitter::Update(PS4AudioSource*s, SceAudio3dPortId& port) {
 	currentSource = s;
 
-	SceAudio3dAttribute sAttributes[5];
+	const int NUM_ATTRIBUTES = 5;
+	SceAudio3dAttribute sAttributes[NUM_ATTRIBUTES];
 
 	sAttributes[0].uiAttributeId	= SCE_AUDIO3D_ATTRIBUTE_GAIN;
 	sAttributes[0].pValue			= &gain;
@@ -69,7 +71,7 @@ void Ps4AudioEmitter::Update(PS4AudioSource*s, SceAudio3dPortId& port) {
 	SampleFromSound(currentSound, iSampleBuffer , SAMPLE_GRANULARITY, samplesUsed);
 	samplesUsed += SAMPLE_GRANULARITY;
 
-	sceAudio3dObjectSetAttributes(port, s->uiObjectId, 5, sAttributes);
+	sceAudio3dObjectSetAttributes(port, s->uiObjectId, NUM_ATTRIBUTES, sAttributes);
 }
 
 void Ps4AudioEmitter::SetSound(const Sound* s) {
@@ -77,17 +79,16 @@ void Ps4AudioEmitter::SetSound(const Sound* s) {
 
 }
 
-void Ps4AudioEmitter::SampleFromSound(const Sound*s, int16_t* output, int samplesPerChannel, int startSample) {
-	int currentSamplePos = startSample;
-	currentSamplePos = (currentSamplePos + 1) % (s->GetSize() / 2);
+void Ps4AudioEmitter::SampleFromSound(const Sound*s, int16_t* output, int sampleTotal, int startSample) {
+	int16_t* sData		= (int16_t*)s->GetData();
+	int realDataSize	= s->GetSize() / sizeof(int16_t); //Size is byte count, we're reading in 16bit samples!
+	int channelCount	= s->GetChannels();
 
-	int16_t* sData = (int16_t*)s->GetData();
-
-	for (int i = 0; i < samplesPerChannel; ++i) {
-		*output = sData[currentSamplePos];
+	for (int i = 0; i < sampleTotal; ++i) {
+		int readPos = ((startSample + i) * channelCount) % realDataSize;
+		
+		*output = sData[readPos];
 		output++;
-
-		currentSamplePos = (currentSamplePos + 1) % (s->GetSize() / 2);
 	}
 }
 #endif
