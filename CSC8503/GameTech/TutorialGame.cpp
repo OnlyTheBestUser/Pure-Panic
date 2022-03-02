@@ -408,7 +408,7 @@ void TutorialGame::InitWorld() {
 
 	GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
 	cap1->SetDynamic(true);
-	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
+	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 
 	player1 = player;
 

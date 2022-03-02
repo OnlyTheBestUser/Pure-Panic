@@ -39,11 +39,11 @@ namespace NCL {
 
             void SetSpawn(Vector3 l) { spawnPos = l; }
 
-			void MoveForwards() override { force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(0, 0, -1) * 100.0f; }
-			void MoveBackwards() override { force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(0, 0, 1) * 100.0f; }
-			void MoveLeft() override { force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(-1, 0, 0) * 50.0f; }
-			void MoveRight() override { force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(1, 0, 0) * 50.0f; }
-			void Jump() override { force += Vector3(0, 1, 0) * 500000.0f; }
+			void MoveForwards() override { force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(0, 0, -1);}// *100.0f; }
+			void MoveBackwards() override { force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(0, 0, 1);}// * 100.0f; }
+			void MoveLeft() override { force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(-1, 0, 0);}// * 50.0f; }
+			void MoveRight() override { force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(1, 0, 0);}// * 50.0f; }
+			void Jump() override { if(canJump) force += Vector3(0, 1, 0); }
 
 			void ChangeCamLock() { camLocked = !camLocked; }
 
@@ -61,6 +61,8 @@ namespace NCL {
 
 			float defaultSpeed = 15.0f;
 			float curSpeed = 150.0f;
+			float inAirSpeed = 1300.0f;
+			bool canJump;
 
 			Vector3 force = Vector3(0,0,0);
 
