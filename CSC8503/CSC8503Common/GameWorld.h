@@ -24,6 +24,8 @@ namespace NCL {
 
 			void AddGameObject(GameObject* o);
 			void RemoveGameObject(GameObject* o, bool andDelete = false);
+			void RemoveGameObjectsFromWorld();
+			void DeleteGameObjectsFromWorld();
 
 			void AddConstraint(Constraint* c);
 			void RemoveConstraint(Constraint* c, bool andDelete = false);
@@ -59,6 +61,8 @@ namespace NCL {
 
 		protected:
 			std::vector<GameObject*> gameObjects;
+			std::vector<GameObject*> toDeleteGameObjects;
+			std::vector<GameObject*> toRemoveGameObjects;
 			std::vector<Constraint*> constraints;
 
 			Camera* mainCamera;
