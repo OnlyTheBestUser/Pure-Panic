@@ -275,6 +275,7 @@ void Renderer::Paint(const RenderObject* paintable, Vector3 pos, float radius, f
 }
 
 void Renderer::ApplyPaintToMasks() {
+#ifdef _WIN64
 	rendererAPI->SetDepth(false);
 	rendererAPI->SetBlend(true);
 	glBlendFunc(GL_ONE, GL_SRC_ALPHA);
@@ -307,6 +308,7 @@ void Renderer::ApplyPaintToMasks() {
 	rendererAPI->SetViewportSize(rendererAPI->GetCurrentWidth(), rendererAPI->GetCurrentHeight());
 	rendererAPI->ClearBuffer(true, true, true);
 	rendererAPI->BindFrameBuffer();
+#endif
 	paintInstances.clear();
 }
 

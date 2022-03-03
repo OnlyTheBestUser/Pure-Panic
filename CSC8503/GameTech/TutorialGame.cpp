@@ -604,7 +604,12 @@ GameObject* TutorialGame::AddRenderPartToWorld(const Vector3& position, Vector3 
 		.SetScale(dimensions * 2)
 		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
 
+#ifdef _WIN64
 	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, OGLTexture::RGBATextureEmpty(texture->GetWidth()/8, texture->GetHeight() / 8), basicShader));
+#endif
+#ifdef _ORBIS
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, basicShader));
+#endif
 	cube->SetPhysicsObject(nullptr);
 
 	cube->SetDynamic(false);
