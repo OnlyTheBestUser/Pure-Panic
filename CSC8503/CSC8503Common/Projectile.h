@@ -11,9 +11,9 @@ namespace NCL {
 		public:
 			Projectile(GameWorld& gWorld, float capsuleRadius, float capsuleHeight): GameObject("projectile"), gameWorld(gWorld), radius(capsuleRadius), height(capsuleHeight) {
 			};
+			~Projectile() {}
 
-			void OnCollisionEnd(GameObject* otherObject) override {
-				//if(otherObject->GetCollisionLayers() != (CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO)) 
+			void OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vector3 localB, Vector3 normal) override {
 				gameWorld.RemoveGameObject(this, true);
 			}
 
