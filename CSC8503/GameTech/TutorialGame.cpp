@@ -117,6 +117,7 @@ void TutorialGame::InitialiseAssets() {
 	corridorFloorTex = (OGLTexture*)TextureLoader::LoadAPITexture("Corridor_Light_Colour.png");
 	loadFunc("Corridor_Wall_Alert.msh"	 , &corridorWallAlert);
 	corridorWallAlertTex = (OGLTexture*)TextureLoader::LoadAPITexture("corridor_wall_c.png");
+	maskTex = (OGLTexture*)TextureLoader::LoadAPITexture("corridor_wall_c.png");
 	loadFunc("Corridor_Wall_Corner_In_Both.msh"	 , &corridorWallCorner);
 	corridorWallCornerTex = (OGLTexture*)TextureLoader::LoadAPITexture("Corridor_Walls_Redux_Metal.png");
 	loadFunc("Corridor_Wall_Light.msh"	 , &corridorWallLight);
@@ -568,7 +569,7 @@ void TutorialGame::AddLongWallToWorld(const Vector3& position, Vector3 dimension
 	{
 		for (int i = -dimensions.z; i < dimensions.z; i += 10)
 		{
-			AddRenderPartToWorld(Vector3(position.x, position.y, position.z + i), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallAlertTex);
+			AddRenderPartToWorld(Vector3(position.x, position.y, position.z + i), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallAlertTex, maskTex);
 		}
 		return;
 	}
@@ -576,7 +577,7 @@ void TutorialGame::AddLongWallToWorld(const Vector3& position, Vector3 dimension
 	{
 		for (int i = -dimensions.x; i < dimensions.x; i += 10)
 		{
-			AddRenderPartToWorld(Vector3(position.x + i, position.y, position.z), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallAlertTex);
+			AddRenderPartToWorld(Vector3(position.x + i, position.y, position.z), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallAlertTex, maskTex);
 		}
 		return;
 	}
@@ -603,7 +604,7 @@ GameObject* TutorialGame::AddAABBWallToWorld(const Vector3& position, Vector3 di
 	world->AddGameObject(cube);
 	return cube;
 }
-GameObject* TutorialGame::AddRenderPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture) {
+GameObject* TutorialGame::AddRenderPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture, TextureBase* mask) {
 	GameObject* cube = new GameObject();
 	cube->SetBoundingVolume(nullptr);
 	
@@ -612,7 +613,7 @@ GameObject* TutorialGame::AddRenderPartToWorld(const Vector3& position, Vector3 
 		.SetScale(dimensions * 2)
 		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
 
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, basicShader));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, mask, basicShader));
 	cube->SetPhysicsObject(nullptr);
 
 	cube->SetDynamic(false);
@@ -677,7 +678,7 @@ void TutorialGame::AddCornerWallToWorld(const Vector3& position, Vector3 dimensi
 
 	GameObject* physicalObject = AddOBBWallToWorld(location, dimensions, rotation, "Corner wall");
 	physicalObject->GetPhysicsObject()->Sleep();
-	AddRenderPartToWorld(position, dimensions, rotation, corridorWallCorner, corridorWallAlertTex);
+	AddRenderPartToWorld(position, dimensions, rotation, corridorWallCorner, corridorWallAlertTex, maskTex);
 	return;
 }
 void TutorialGame::AddSecurityCameraToWorld(const Vector3& position, int rotation)
@@ -707,7 +708,7 @@ void TutorialGame::AddSecurityCameraToWorld(const Vector3& position, int rotatio
 
 	GameObject* physicalObject = AddAABBWallToWorld(location, dimensions, rotation, "Security Camera");
 	physicalObject->GetPhysicsObject()->Sleep();
-	AddRenderPartToWorld(position, Vector3(5, 5, 5), rotation, securityCamera, securityCameraTex);
+	AddRenderPartToWorld(position, Vector3(5, 5, 5), rotation, securityCamera, securityCameraTex, maskTex);
 	return;
 }
 void TutorialGame::AddWallHammerToWorld(const Vector3& position, Vector3 dimensions, int rotation)

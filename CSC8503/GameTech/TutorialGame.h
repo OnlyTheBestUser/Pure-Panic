@@ -66,7 +66,7 @@ namespace NCL {
 
 			void AddLongWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture);
 			GameObject* AddAABBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name = "AABBWall");
-			GameObject* AddRenderPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture);
+			GameObject* AddRenderPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture, TextureBase* mask);
 
 			GameObject* AddWallToWorld(const Vector3& position, Vector3 dimensions, int rotation);
 			GameObject* AddOBBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name = "");
@@ -107,6 +107,7 @@ namespace NCL {
 			TextureBase*	corridorFloorTex = nullptr;
 			MeshGeometry*	corridorWallAlert = nullptr;
 			TextureBase*	corridorWallAlertTex = nullptr;
+			TextureBase*	maskTex = nullptr;
 			MeshGeometry*	corridorWallCorner = nullptr;
 			TextureBase*	corridorWallCornerTex = nullptr;
 			MeshGeometry*	corridorWallLight = nullptr;

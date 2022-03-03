@@ -80,6 +80,8 @@ void Renderer::Render() {
 	BuildObjectList();
 	SortObjectList();
 
+	ApplyPaintToMasks();
+
 	RenderScene();
 	rendererAPI->SetCullFace(false);
 
@@ -200,10 +202,8 @@ void Renderer::RenderScene() {
 		rendererAPI->UpdateUniformInt(shader, "hasVertexColours", !(*i).GetMesh()->GetColourData().empty());
 		rendererAPI->UpdateUniformInt(shader, "hasTexture", (OGLTexture*)(*i).GetDefaultTexture() ? 1 : 0);
 
-		if (i->GetPaintMask() != 0) {
-			rendererAPI->BindTexture(i->GetPaintMask(), "paintMaskTex", 2);
-			rendererAPI->UpdateUniformInt(shader, "hasPaintMask", (OGLTexture*)(*i).GetPaintMask() ? 1 : 0);
-		}
+		rendererAPI->BindTexture(i->GetPaintMask(), "paintMaskTex", 2);
+		rendererAPI->UpdateUniformInt(shader, "hasPaintMask", (OGLTexture*)(*i).GetPaintMask() ? 1 : 0);
 
 		rendererAPI->DrawMeshAndSubMesh((*i).GetMesh());
 	}
@@ -215,9 +215,24 @@ void Renderer::RenderScene() {
 	*/
 }
 
+void Renderer::Paint(RenderObject* paintable, Vector3 pos, float radius, float hardness, float strength, Vector4 colour)
+{
+	PaintInstance pi;
+	pi.object = paintable;
+	pi.pos = pos;
+	pi.radius = radius;
+	pi.hardness = hardness;
+	pi.strength = strength;
+	pi.colour = colour;
+
+	paintInstances.push_back(pi);
+}
+
 void Renderer::ApplyPaintToMasks() {
 	for (const auto& i : paintInstances) {
 		// Bind texture to paint shader 
+		// Bind weird fbo
+		// draw quad
 		// Bind mask texture from i.object
 		// update any other uniforms needed
 		// draw to mask texture
