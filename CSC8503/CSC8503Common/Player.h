@@ -41,7 +41,7 @@ namespace NCL {
 
 			void Move(Vector3 moveBy) override { 
 				if (camLocked)
-					force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * moveBy * 50.0f;
+					force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * moveBy;// *50.0f;
 				else
 					camera->SetPosition(camera->GetPosition() + (Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * moveBy));
 			}
@@ -53,6 +53,7 @@ namespace NCL {
 			void Jump() override {
 				if (!camLocked)
 					camera->SetPosition(camera->GetPosition() + (Vector3(0, 1, 0) * cameraVertMult));
+				else if (canJump) force += Vector3(0, 1, 0);
 			}
 
 			void Descend() override {
@@ -74,9 +75,11 @@ namespace NCL {
             Vector3 checkpoint;
 			bool key = false;
 			float powerupTime = 0.0f;
-			float speed = 5.0f;
-			float curSpeed = 50.0f;
+			float curSpeed = 500.0f;
 			Vector3 force = Vector3(0,0,0);
+
+			float inAirSpeed = 1300.0f;
+			bool canJump;
 
 			float cameraVertMult = 0.5f;
 			Camera* camera;
