@@ -74,9 +74,6 @@ namespace NCL {
 		//Sets position in world space
 		void	SetPosition(const Vector3& val) { position = val; }
 
-		void ChangeYaw(float by) { yaw -= by; }
-		void ChangePitch(float by) { pitch -= by; }
-
 		//Gets yaw, in degrees
 		float	GetYaw()   const { return yaw; }
 		//Sets yaw, in degrees

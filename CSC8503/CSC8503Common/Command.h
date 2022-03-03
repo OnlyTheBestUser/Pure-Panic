@@ -1,7 +1,7 @@
 #pragma once
 #include "GameActor.h"
 #include "PhysicsSystem.h"
-#include "InputBase.h"
+
 namespace NCL {
 	namespace CSC8503 {
 		class Command {
@@ -10,34 +10,50 @@ namespace NCL {
 			virtual void execute() = 0;
 		};
 
-		class AxisCommand {
-		public:
-			virtual ~AxisCommand() {};
-			virtual void execute(AXIS* axis) = 0;
-		};
-
 #pragma region Actor Commands
 
-		class MoveCommand : public AxisCommand {
+		class MoveForwardCommand : public Command {
 		public:
-			MoveCommand(GameActor* actor) : actor(actor){};
-			virtual ~MoveCommand() {};
-
-			void execute(AXIS* axis) {
-				actor->Move(Vector3(axis->x, 0, axis->y));
+			MoveForwardCommand(GameActor* actor) : actor(actor) {};
+			virtual ~MoveForwardCommand() {};
+			void execute() {
+				actor->MoveForwards();
 			}
 
 		protected:
 			GameActor* actor;
 		};
 
-		class LookCommand : public AxisCommand {
+		class MoveBackwardCommand : public Command {
 		public:
-			LookCommand(GameActor* actor) : actor(actor) {};
-			virtual ~LookCommand() {};
+			MoveBackwardCommand(GameActor* actor) : actor(actor) {};
+			virtual ~MoveBackwardCommand() {};
+			void execute() {
+				actor->MoveBackwards();
+			}
 
-			void execute(AXIS* axis) {
-				actor->Look(Vector2(axis->x, axis->y));
+		protected:
+			GameActor* actor;
+		};
+
+		class MoveLeftCommand : public Command {
+		public:
+			MoveLeftCommand(GameActor* actor) : actor(actor) {};
+			virtual ~MoveLeftCommand() {};
+			void execute() {
+				actor->MoveLeft();
+			}
+
+		protected:
+			GameActor* actor;
+		};
+
+		class MoveRightCommand : public Command {
+		public:
+			MoveRightCommand(GameActor* actor) : actor(actor) {};
+			virtual ~MoveRightCommand() {};
+			void execute() {
+				actor->MoveRight();
 			}
 
 		protected:
@@ -48,7 +64,6 @@ namespace NCL {
 		public:
 			JumpCommand(GameActor* actor) : actor(actor) {};
 			virtual ~JumpCommand() {};
-
 			void execute() {
 				actor->Jump();
 			}
@@ -57,18 +72,6 @@ namespace NCL {
 			GameActor* actor;
 		};
 
-		class DescendCommand : public Command {
-		public:
-			DescendCommand(GameActor* actor) : actor(actor) {};
-			virtual ~DescendCommand() {};
-
-			void execute() {
-				actor->Descend();
-			}
-
-		protected:
-			GameActor* actor;
-		};
 #pragma endregion
 
 #pragma region World Commands
@@ -95,19 +98,6 @@ namespace NCL {
 			}
 		protected:
 			bool* toggleVar;
-		};
-
-		class QuitCommand : public Command {
-			public:
-				QuitCommand(bool* quit, bool* paused) : paused(paused), quit(quit) {};
-				virtual ~QuitCommand() {};
-				void execute() {
-					if (paused)
-						*quit = true;
-				}
-			protected:
-				bool* paused;
-				bool* quit;
 		};
 #pragma endregion
 	}

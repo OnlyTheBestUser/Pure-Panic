@@ -16,7 +16,7 @@ namespace NCL::PS4 {
 		static PS4Texture* LoadTextureFromFile(const std::string& filename);
 		static PS4Texture* LoadSkyboxFromFile(const std::string& filename);
 
-		const sce::Gnm::Texture&  GetAPITexture() const{
+		const sce::Gnm::Texture&  GetAPITexture() {
 			return apiTexture;
 		}
 

@@ -114,9 +114,6 @@
     <ClCompile Include="FrameBufferBase.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="UniformBuffer.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -201,9 +198,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FrameBufferBase.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="UniformBuffer.h">
       <Filter>Rendering</Filter>
     </ClInclude>
   </ItemGroup>

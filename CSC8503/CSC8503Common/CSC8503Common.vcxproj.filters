@@ -135,17 +135,8 @@
     <ClInclude Include="InputHandler.h">
       <Filter>Input Handling</Filter>
     </ClInclude>
-    <ClInclude Include="PCInput.h">
+    <ClInclude Include="MoveForwardCommand.h">
       <Filter>Input Handling</Filter>
-    </ClInclude>
-    <ClInclude Include="InputBase.h">
-      <Filter>Input Handling</Filter>
-    </ClInclude>
-    <ClInclude Include="InputList.h">
-      <Filter>Input Handling</Filter>
-    </ClInclude>
-    <ClInclude Include="PaintManager.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -198,15 +189,9 @@
       <Filter>CollisionDetection</Filter>
     </ClCompile>
     <ClCompile Include="InputHandler.cpp">
-      <Filter>Input Handling</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="InputBase.cpp">
-      <Filter>Input Handling</Filter>
-    </ClCompile>
-    <ClCompile Include="PCInput.cpp">
-      <Filter>Input Handling</Filter>
-    </ClCompile>
-    <ClCompile Include="PaintManager.cpp">
+    <ClCompile Include="MoveForwardCommand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

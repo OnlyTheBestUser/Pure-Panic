@@ -1,13 +1,5 @@
-#include <stdlib.h>
-unsigned int sceLibcHeapExtendedAlloc = 1;			/* Switch to dynamic allocation */
-size_t       sceLibcHeapSize = 256 * 1024 * 1024;	/* Set up heap area upper limit as 256 MiB */
-
-#include "../../Plugins/PlayStation4/PS4Window.h"
-#include "../../Plugins/PlayStation4/Ps4AudioSystem.h"
-#include "../../Plugins/PlayStation4/PS4Input.h"
+#ifdef _WIN64
 #include "../../Common/Window.h"
-
-#include "TutorialGame.h"
 
 #include "../CSC8503Common/StateMachine.h"
 #include "../CSC8503Common/StateTransition.h"
@@ -23,12 +15,9 @@ size_t       sceLibcHeapSize = 256 * 1024 * 1024;	/* Set up heap area upper limi
 
 #include "../CSC8503Common/PushdownState.h"
 #include "../CSC8503Common/PushdownMachine.h"
-#include <iostream>
 
 using namespace NCL;
 using namespace CSC8503;
-using namespace NCL;
-using namespace NCL::PS4;
 
 class WinGame : public PushdownState {
 public:
@@ -37,15 +26,15 @@ public:
 	PushdownResult OnUpdate(float dt, PushdownState** newState) override {
 		g->UpdateGame(dt);
 
-		//if (g->GetQuit()) {
-		//	g->ResetGame();
-		//	g->UpdateGame(dt);
-		//	return PushdownResult::Pop;
-		//}
+		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::R)) {
+			g->ResetGame();
+			g->UpdateGame(dt);
+			return PushdownResult::Pop;
+		}
 
-		//if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
-		//	return PushdownResult::Reset;
-		//}
+		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
+			return PushdownResult::Reset;
+		}
 
 		return PushdownResult::NoChange;
 	}
@@ -65,11 +54,11 @@ public:
 	PushdownResult OnUpdate(float dt, PushdownState** newState) override {
 		g->UpdateGame(dt);
 
-		if (!g->GetPaused()) {
+		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::P)) {
 			return PushdownResult::Pop;
 		}
 
-		if (g->GetQuit()) {
+		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
 			return PushdownResult::Reset;
 		}
 		return PushdownResult::NoChange;
@@ -96,7 +85,7 @@ public:
 		}
 		
 
-		if (g->GetPaused()) {
+		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::P)) {
 			*newState = new PauseGame(g);
 			return PushdownResult::Push;
 		}
@@ -119,7 +108,7 @@ public:
 	PushdownResult OnUpdate(float dt, PushdownState** newState) override {
 		m->UpdateGame(dt);
 
-		/*if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM1)) {
+		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM1)) {
 			*newState = new Game(f);
 			return PushdownResult::Push;
 		}
@@ -136,12 +125,6 @@ public:
 
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
 			return PushdownResult::Exit;
-		}*/
-
-		if (m->GetPaused()) {
-			
-			*newState = new PauseGame(m);
-			return PushdownResult::Push;
 		}
 
 		return PushdownResult::NoChange;
@@ -168,14 +151,7 @@ hide or show the
 */
 
 int main() {
-#ifdef _WIN64
-	Window* w = Window::CreateGameWindow("CSC8503 Game technology!", 1600, 900);
-#endif
-#ifdef _ORBIS
-	Window* w = (PS4Window*)Window::CreateGameWindow("PS4 Example Code", 1920, 1080);
-	Ps4AudioSystem* audioSystem = new Ps4AudioSystem(8);
-#endif
-
+	Window*w = Window::CreateGameWindow("CSC8503 Game technology!", 1600, 900);
 		
 	if (!w->HasInitialised()) {
 		return -1;
@@ -190,8 +166,8 @@ int main() {
 	int totalFrames = 0;
 
 	TutorialGame* g = new TutorialGame();
-	//MainMenu* m = new MainMenu();
-	//PushdownMachine p = new Menu(m, g, g, g);
+	MainMenu* m = new MainMenu();
+	PushdownMachine p = new Menu(m, g, g, g);
 	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
 	float smallestFrameRate = 144.0f;
 	while (w->UpdateWindow()) { //&& !w->GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
@@ -201,7 +177,7 @@ int main() {
 			std::cout << "Skipping large time delta" << std::endl;
 			continue; //must have hit a breakpoint or something to have a 1 second frame time!
 		}
-		/*if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::PRIOR)) {
+		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::PRIOR)) {
 			w->ShowConsole(true);
 		}
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NEXT)) {
@@ -210,7 +186,7 @@ int main() {
 
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::T)) {
 			w->SetWindowPosition(0, 0);
-		}*/
+		}
 
 		float frameRate = (1.0f / dt);
 		if (frameRate < smallestFrameRate)
@@ -226,11 +202,77 @@ int main() {
 			curTimeWait = avgTimeWait;
 		}
 
-		g->UpdateGame(dt);
-
-		//if (!p.Update(dt)) {
-		//	return 0;
-		//}
+		if (!p.Update(dt)) {
+			return 0;
+		}
 	}
 	Window::DestroyGameWindow();
 }
+#endif
+#ifdef _ORBIS
+#include <stdlib.h>
+unsigned int sceLibcHeapExtendedAlloc = 1;			/* Switch to dynamic allocation */
+size_t       sceLibcHeapSize = 256 * 1024 * 1024;	/* Set up heap area upper limit as 256 MiB */
+
+#include "../../Plugins/PlayStation4/PS4Window.h"
+#include "../../Plugins/PlayStation4/Ps4AudioSystem.h"
+#include "../../Plugins/PlayStation4/PS4Input.h"
+#include "../../Common/Window.h"
+
+#include "TutorialGame.h"
+
+#include <iostream>
+
+
+
+using namespace NCL;
+using namespace NCL::PS4;
+
+int main(void) {
+#ifdef _ORBIS
+	Window* w = (PS4Window*)Window::CreateGameWindow("PS4 Example Code", 1920, 1080);
+	PS4Input		input = PS4Input();
+	Ps4AudioSystem* audioSystem = new Ps4AudioSystem(8);
+#endif
+#ifdef _WIN64
+	Window* w = Window::CreateGameWindow("CSC8503 Game technology!", 1600, 900);
+#endif
+
+	//if (!w->HasInitialised()) {
+		//return -1;
+	//}
+	srand(time(NULL));
+	w->ShowOSPointer(false);
+	w->LockMouseToWindow(true);
+
+	TutorialGame* g = new TutorialGame(&input);
+	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
+	while (w->UpdateWindow()) { //&& !w->GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
+		float dt = w->GetTimer()->GetTimeDeltaSeconds();
+
+#ifdef _ORBIS
+		input.Poll();
+#endif
+		
+
+		w->SetTitle("Gametech frame time:" + std::to_string(1000.0f * dt));
+
+		g->UpdateGame(dt);
+	}
+	Window::DestroyGameWindow();
+
+	// PS4 specific code
+
+	/*
+	PS4Input		input = PS4Input();
+
+	Ps4AudioSystem* audioSystem = new Ps4AudioSystem(8);
+
+	GameTimer t;
+
+	delete audioSystem;
+
+	return 1;*/
+}
+
+#endif

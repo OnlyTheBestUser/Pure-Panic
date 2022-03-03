@@ -1,27 +1,16 @@
-ConstantBuffer projMatrix
+ConstantBuffer RenderObjectData
+{
+	float4x4 modelMatrix;
+	float4x4 invModelMatrix;
+};
+
+ConstantBuffer CameraData
 {
 	column_major matrix projMatrix;
-};
-
-ConstantBuffer viewMatrix{
 	column_major matrix viewMatrix;
-}
-
-ConstantBuffer viewProjMatrix{
 	column_major matrix viewProjMatrix;
-};
-
-ConstantBuffer invProjMatrix{
 	float4x4 invProjMatrix;
 };
-
-ConstantBuffer modelMatrix{
-	float4x4 modelMatrix;
-}
-
-ConstantBuffer invModelMatrix{
-	float4x4 invModelMatrix;
-}
 
 struct VS_INPUT
 {

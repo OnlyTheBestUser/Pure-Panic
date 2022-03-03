@@ -29,8 +29,6 @@ namespace NCL {
 			static TextureBase* RGBATextureCubemapFromFilename(const std::string& side1, const std::string& side2, const std::string& side3,
 				const std::string& side4, const std::string& side5, const std::string& side6);
 
-			static TextureBase* RGBATextureEmpty(int width, int height);
-
 			GLuint GetObjectID() const	{
 				return texID;
 			}

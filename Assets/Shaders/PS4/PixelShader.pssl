@@ -1,30 +1,15 @@
-ConstantBuffer projMatrix
+ConstantBuffer CameraData
 {
 	column_major matrix projMatrix;
-};
-
-ConstantBuffer viewMatrix{
 	column_major matrix viewMatrix;
-}
-
-ConstantBuffer viewProjMatrix{
 	column_major matrix viewProjMatrix;
-};
-
-ConstantBuffer invProjMatrix{
 	float4x4 invProjMatrix;
 };
 
-ConstantBuffer lightPos
+ConstantBuffer LightData
 {
 	float3 LightPos;
-};
-
-ConstantBuffer lightRadius{
 	float LightRadius;
-};
-
-ConstantBuffer lightColour{
 	float4 LightColour;
 };
 

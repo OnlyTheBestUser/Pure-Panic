@@ -27,14 +27,14 @@
     <ClCompile Include="MainMenu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PS4GameRenderer.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
     <ClCompile Include="Renderer.cpp">
       <Filter>Renderers</Filter>
     </ClCompile>
     <ClCompile Include="RendererBase.cpp">
       <Filter>Renderers</Filter>
-    </ClCompile>
-    <ClCompile Include="LevelLoader.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -44,14 +44,14 @@
     <ClInclude Include="MainMenu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PS4GameRenderer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
     <ClInclude Include="Renderer.h">
       <Filter>Renderers</Filter>
     </ClInclude>
     <ClInclude Include="RendererBase.h">
       <Filter>Renderers</Filter>
-    </ClInclude>
-    <ClInclude Include="LevelLoader.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
