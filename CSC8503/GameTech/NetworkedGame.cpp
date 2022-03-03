@@ -2,6 +2,7 @@
 #include "NetworkedPlayer.h"
 #include "../CSC8503Common/GameServer.h"
 #include "../CSC8503Common/GameClient.h"
+#include "../GameTech/LevelLoader.h"
 
 #define COLLISION_MSG 30
 
@@ -57,7 +58,7 @@ void NetworkedGame::StartAsClient(char a, char b, char c, char d) {
 	//thisClient->RegisterPacketHandler(String_Message, this);
 
 	// Add one for the server
-	GameObject* serverPlayer = AddSphereToWorld(Vector3(5, 5, 5), 1);
+	GameObject* serverPlayer = levelLoader->AddSphereToWorld(Vector3(5, 5, 5), 1);
 	serverPlayer->SetNetworkObject(new NetworkObject(*serverPlayer, 0));
 	serverPlayer->SetDynamic(true);
 	if (networkObjects.size() <= 0) {
@@ -182,7 +183,7 @@ void NetworkedGame::UpdateMinimumState() {
 
 
 void NetworkedGame::SpawnPlayer() {
-	localPlayer = AddCubeToWorld(Vector3(10, 15, 10), Vector3(1, 1, 1), 10.0f);
+	localPlayer = levelLoader->AddCubeToWorld(Vector3(10, 15, 10), Vector3(1, 1, 1), 10.0f);
 	localPlayer->SetNetworkObject(new NetworkObject(*localPlayer, playerID));
 	localPlayer->SetDynamic(true);
 	std::cout << "Player Spawned with Network ID: " << localPlayer->GetNetworkObject()->GetNetID() << "." << std::endl;
@@ -192,7 +193,7 @@ void NetworkedGame::SpawnPlayer() {
 	networkObjects[playerID] = (localPlayer->GetNetworkObject());
 	for (int i = 0; i < playerID; i++) {
 		if (!networkObjects[i]) {
-			GameObject* p = AddSphereToWorld(Vector3(10, 10, 10), 1);
+			GameObject* p = levelLoader->AddSphereToWorld(Vector3(10, 10, 10), 1);
 			p->SetDynamic(true);
 			p->SetNetworkObject(new NetworkObject(*p, i));
 			networkObjects[i] = p->GetNetworkObject();
@@ -264,7 +265,7 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
 		// Broadcast to everyone
 
 		if (realPacket->playerID != playerID) {
-			GameObject* newPlayer = AddSphereToWorld(Vector3(10, 15, 10), 1, 10.0f);
+			GameObject* newPlayer = levelLoader->AddSphereToWorld(Vector3(10, 15, 10), 1, 10.0f);
 			newPlayer->SetNetworkObject(new NetworkObject(*newPlayer, realPacket->playerID));
 			newPlayer->SetDynamic(true);
 			std::cout << "Player Spawned with Network ID: " << newPlayer->GetNetworkObject()->GetNetID() << "." << std::endl;
@@ -313,7 +314,7 @@ void NetworkedGame::AddNewPlayerToServer(int clientID, int lastID)
 {
 	clientHistory.insert(std::pair<int, int>(clientID, lastID));
 
-	GameObject* client = AddSphereToWorld(Vector3(2,15,2), 1.0f, 10.0f);
+	GameObject* client = levelLoader->AddSphereToWorld(Vector3(2,15,2), 1.0f, 10.0f);
 	client->SetNetworkObject(new NetworkObject(*client, clientID));
 	client->SetDynamic(true);
 
