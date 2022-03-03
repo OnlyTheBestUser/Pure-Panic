@@ -33,6 +33,9 @@
     <ClCompile Include="RendererBase.cpp">
       <Filter>Renderers</Filter>
     </ClCompile>
+    <ClCompile Include="LevelLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TutorialGame.h">
@@ -46,6 +49,9 @@
     </ClInclude>
     <ClInclude Include="RendererBase.h">
       <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelLoader.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
