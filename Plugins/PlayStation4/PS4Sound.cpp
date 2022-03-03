@@ -1,6 +1,5 @@
 #ifdef _ORBIS
 #include "PS4Sound.h"
-//#include "OggSound.h"
 
 map<string, Sound*> Sound::sounds;
 
@@ -10,12 +9,11 @@ Sound::Sound()	{
 	freqRate = 0;
 	length = 0;
 	data = NULL;
-//	buffer = 0;
+
 }
 
 Sound::~Sound(void)	{
 	delete data;
-	//alDeleteBuffers(1, &buffer);
 }
 
 double	Sound::GetLength() {
@@ -67,7 +65,7 @@ void	Sound::LoadFromWAV(string filename) {
 		}
 	}
 
-	length = (float)size / (channels * freqRate * (bitRate / 8.0f)) * 1000.0f;
+	length = (float)size / (channels * freqRate * (bitRate / 8.0f));
 
 	file.close();
 }
@@ -90,9 +88,9 @@ void	Sound::AddSound(string name) {
 			s = new Sound();
 			s->LoadFromWAV(name);
 		}  
-		else if (extension == "ogg") {
+		//else if (extension == "ogg") {
 
-		}
+		//}
 		else{
 			s = new Sound();
 			cout << "Incompatible file extension '" << extension << "'!" << endl;

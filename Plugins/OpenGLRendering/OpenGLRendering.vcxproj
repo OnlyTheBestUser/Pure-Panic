@@ -145,18 +145,22 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="OGLComputeShader.h" />
+    <ClInclude Include="OGLFrameBuffer.h" />
     <ClInclude Include="OGLMesh.h" />
-    <ClInclude Include="OGLRenderer.h" />
+    <ClInclude Include="OGLRendererAPI.h" />
     <ClInclude Include="OGLShader.h" />
     <ClInclude Include="OGLTexture.h" />
+    <ClInclude Include="OpenGLUniformBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glad.c" />
     <ClCompile Include="OGLComputeShader.cpp" />
+    <ClCompile Include="OGLFrameBuffer.cpp" />
     <ClCompile Include="OGLMesh.cpp" />
-    <ClCompile Include="OGLRenderer.cpp" />
+    <ClCompile Include="OGLRendererAPI.cpp" />
     <ClCompile Include="OGLShader.cpp" />
     <ClCompile Include="OGLTexture.cpp" />
+    <ClCompile Include="OpenGLUniformBuffer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

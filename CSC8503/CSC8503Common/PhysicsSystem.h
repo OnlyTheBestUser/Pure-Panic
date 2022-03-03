@@ -1,5 +1,6 @@
 #pragma once
 #include "../CSC8503Common/GameWorld.h"
+#include "../../Common/Vector2.h"
 #include <set>
 
 namespace NCL {
@@ -13,6 +14,8 @@ namespace NCL {
 
 			void Update(float dt);
 
+			void SetGravity(const Vector3& g);
+
 			void UseGravity(bool state) {
 				applyGravity = state;
 			}
@@ -21,13 +24,7 @@ namespace NCL {
 			void SetGlobalDamping(float d) {
 				globalDamping = d;
 			}
-
-			void SetLinearDamping(float d) {
-				linearDamping = d;
-			}
-
-			void SetGravity(const Vector3& g);
-
+						
 			void BuildStaticList();
 
 		protected:
@@ -50,6 +47,8 @@ namespace NCL {
 			void ImpulseResolveCollision(GameObject& a , GameObject&b, CollisionDetection::ContactPoint& p) const;
 			void ResolveSpringCollision(GameObject& a , GameObject&b, CollisionDetection::ContactPoint& p) const;
 
+			bool ValidCollisionLayers(int aLayer, int bLayer);
+
 			GameWorld& gameWorld;
 			Octree<GameObject*>* staticTree;
 
@@ -57,9 +56,10 @@ namespace NCL {
 			Vector3 gravity;
 			float	dTOffset;
 			float	globalDamping;
-			float	linearDamping;
 			std::set<CollisionDetection::CollisionInfo> allCollisions;
 			std::set<CollisionDetection::CollisionInfo> broadphaseCollisions;
+
+			vector<Vector2> validLayers;
 
 			bool useBroadPhase		= true;
 			int numCollisionFrames	= 5;

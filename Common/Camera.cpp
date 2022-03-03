@@ -12,25 +12,23 @@ last frame (default value is for simplicities sake...)
 void Camera::UpdateCamera(float dt) {
 	if (lockCamera)
 		return;
-
 	//Update the mouse by how much
-	pitch	-= (Window::GetMouse()->GetRelativePosition().y);
-	yaw		-= (Window::GetMouse()->GetRelativePosition().x);
-
+	//pitch -= (Window::GetMouse()->GetRelativePosition().y);
+	//yaw -= (Window::GetMouse()->GetRelativePosition().x);
+	
 	//Bounds check the pitch, to be between straight up and straight down ;)
 	pitch = std::min(pitch, 90.0f);
 	pitch = std::max(pitch, -90.0f);
-
-	if (yaw <0) {
+	if (yaw < 0) {
 		yaw += 360.0f;
 	}
 	if (yaw > 360.0f) {
 		yaw -= 360.0f;
 	}
-
 	float frameSpeed = 100 * dt;
-
-	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::UP)) {
+	
+	// TODO Remove Input Code
+	/*if (Window::GetKeyboard()->KeyDown(KeyboardKeys::UP)) {
 		position += Matrix4::Rotation(yaw, Vector3(0, 1, 0)) * Vector3(0, 0, -1) * frameSpeed;
 	}
 	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::DOWN)) {
@@ -48,9 +46,8 @@ void Camera::UpdateCamera(float dt) {
 	}
 	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::SHIFT)) {
 		position.y -= frameSpeed;
-	}
+	}*/
 }
-
 /*
 Generates a view matrix for the camera's viewpoint. This matrix can be sent
 straight to the shader...it's already an 'inverse camera' matrix.

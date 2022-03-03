@@ -1,5 +1,4 @@
 #pragma once
-#include "GameTechRenderer.h"
 #include "TutorialGame.h"
 
 namespace NCL {

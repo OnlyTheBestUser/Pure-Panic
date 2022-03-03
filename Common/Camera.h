@@ -74,6 +74,9 @@ namespace NCL {
 		//Sets position in world space
 		void	SetPosition(const Vector3& val) { position = val; }
 
+		void ChangeYaw(float by) { yaw -= by; }
+		void ChangePitch(float by) { pitch -= by; }
+
 		//Gets yaw, in degrees
 		float	GetYaw()   const { return yaw; }
 		//Sets yaw, in degrees
@@ -85,24 +88,20 @@ namespace NCL {
 		void	SetPitch(float p) { pitch = p; }
 
 		void LockCamera() { lockCamera = true; }
-
 		static Camera BuildPerspectiveCamera(const Vector3& pos, float pitch, float yaw, float fov, float near, float far);
 		static Camera BuildOrthoCamera(const Vector3& pos, float pitch, float yaw, float left, float right, float top, float bottom, float near, float far);
 	protected:
 		CameraType camType;
-
 		float	nearPlane;
 		float	farPlane;
 		float	left;
 		float	right;
 		float	top;
 		float	bottom;
-
 		float	fov;
 		float	yaw;
 		float	pitch;
 		Vector3 position;
-
 		bool lockCamera = false;
 	};
 }

@@ -22,7 +22,7 @@ _-_-_-_-_-_-_-""  ""
 
 namespace NCL {
 	namespace Rendering {
-		class RendererBase;
+		class RendererAPI;
 	};
 	using namespace Rendering;
 	
@@ -36,7 +36,7 @@ namespace NCL {
 		}
 
 		bool		UpdateWindow();
-		void		SetRenderer(RendererBase* r);
+		void		SetRenderer(RendererAPI* r);
 
 		bool		HasInitialised()	const { return init; }
 
@@ -76,7 +76,7 @@ namespace NCL {
 
 		void ResizeRenderer();
 
-		RendererBase*	renderer;
+		RendererAPI*	renderer;
 
 		bool				init;
 		Vector2				position;

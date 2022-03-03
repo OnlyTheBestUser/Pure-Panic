@@ -18,7 +18,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="OGLRenderer.h">
+    <ClInclude Include="OGLRendererAPI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="OGLMesh.h">
@@ -33,9 +33,15 @@
     <ClInclude Include="OGLComputeShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="OGLFrameBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenGLUniformBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="OGLRenderer.cpp">
+    <ClCompile Include="OGLRendererAPI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OGLMesh.cpp">
@@ -51,6 +57,12 @@
       <Filter>GLAD</Filter>
     </ClCompile>
     <ClCompile Include="OGLComputeShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OGLFrameBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenGLUniformBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
