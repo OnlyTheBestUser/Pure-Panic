@@ -195,6 +195,11 @@ rocket launcher, gaining a point when the player hits the gold coin, and so on).
 */
 void PhysicsSystem::UpdateCollisionList() {
 	for (std::set<CollisionDetection::CollisionInfo>::iterator i = allCollisions.begin(); i != allCollisions.end(); ) {
+		/*if (i->a == nullptr || i->b == nullptr)
+		{
+			i = allCollisions.erase(i);
+			continue;
+		}*/
 		if ((*i).framesLeft == numCollisionFrames) {
 			i->a->OnCollisionBegin(i->b, i->point.localA, i->point.localB, i->point.normal);
 			i->b->OnCollisionBegin(i->a, i->point.localB, i->point.localA, -i->point.normal);

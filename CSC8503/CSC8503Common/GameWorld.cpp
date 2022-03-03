@@ -43,10 +43,10 @@ void GameWorld::AddGameObject(GameObject* o) {
 }
 
 void GameWorld::RemoveGameObject(GameObject* o, bool andDelete) {
+	toRemoveGameObjects.emplace_back(o);
 	if (andDelete) {
 		toDeleteGameObjects.emplace_back(o);
 	}
-	toRemoveGameObjects.emplace_back(o);
 }
 void GameWorld::RemoveGameObjectsFromWorld()
 {
