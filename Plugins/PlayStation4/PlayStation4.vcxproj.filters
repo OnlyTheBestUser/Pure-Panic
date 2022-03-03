@@ -72,6 +72,9 @@
     <ClCompile Include="Ps4AudioSystem.cpp">
       <Filter>Audio</Filter>
     </ClCompile>
+    <ClCompile Include="PS4UniformBuffer.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PS4MemoryAware.h">
@@ -112,6 +115,9 @@
     </ClInclude>
     <ClInclude Include="Ps4AudioSystem.h">
       <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="PS4UniformBuffer.h">
+      <Filter>Rendering</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

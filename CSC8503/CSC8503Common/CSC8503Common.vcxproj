@@ -207,6 +207,7 @@
     <ClInclude Include="NavigationMesh.h" />
     <ClInclude Include="NavigationPath.h" />
     <ClInclude Include="OBBVolume.h" />
+    <ClInclude Include="PaintManager.h" />
     <ClInclude Include="PCInput.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="SphereVolume.h" />
@@ -238,6 +239,7 @@
     <ClCompile Include="InputHandler.cpp" />
     <ClCompile Include="NavigationGrid.cpp" />
     <ClCompile Include="NavigationMesh.cpp" />
+    <ClCompile Include="PaintManager.cpp" />
     <ClCompile Include="PCInput.cpp" />
     <ClCompile Include="PhysicsObject.cpp" />
     <ClCompile Include="PhysicsSystem.cpp" />

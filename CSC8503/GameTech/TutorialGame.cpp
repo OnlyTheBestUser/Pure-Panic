@@ -8,6 +8,7 @@
 #include "../CSC8503Common/InputHandler.h"
 #include "../CSC8503Common/GameActor.h"
 #include "../CSC8503Common/Command.h"
+#include "../../Common/Assets.h"
 
 #include "../CSC8503Common/InputList.h"
 
@@ -15,9 +16,10 @@ using namespace NCL;
 using namespace CSC8503;
 
 TutorialGame::TutorialGame()	{
-	world		= new GameWorld();
-	renderer	= new Renderer(*world);
-	physics		= new PhysicsSystem(*world);
+	world			= new GameWorld();
+	renderer		= new Renderer(*world);
+	physics			= new PhysicsSystem(*world);
+	paintManager	= PaintManager::GetInstance();
 	levelLoader = new LevelLoader(world, physics);
 
 	forceMagnitude	= 30.0f;
@@ -291,7 +293,7 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	levelLoader->ReadInLevelFile("../../Assets/Maps/map1.txt");
+	levelLoader->ReadInLevelFile(NCL::Assets::DATADIR + "../../Assets/Maps/map1.txt");
 	Player* player = levelLoader->AddPlayerToWorld(Vector3(0, 5, 0));
 
 	//Command* f = new MoveForwardCommand(player);
@@ -455,4 +457,21 @@ void TutorialGame::MoveSelectedObject(float dt) {
 		else
 			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 1, 0) * forceMagnitude * 0.1);
 	}*/
+}
+
+void TutorialGame::PaintSelectedObject() {
+	if (!selectionObject)
+		return;
+
+	if (Window::GetMouse()->ButtonPressed(NCL::MouseButtons::RIGHT)) {
+		Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
+		RayCollision closestCollision;
+		if (world->Raycast(ray, closestCollision, true)) {
+			if (closestCollision.node == selectionObject) {
+				//Paint that node
+				selectionObject->GetPhysicsObject()->AddForceAtPosition(ray.GetDirection() * forceMagnitude, closestCollision.collidedAt);
+			}
+		}
+	}
+
 }
