@@ -28,10 +28,20 @@ namespace NCL {
 			void SetState(GameState s) { state = s; }
 			void ResetGame() {
 				state = RESET;
+				quit = false;
+				pause = false;
 			}
 
 			bool Win() const { 
 				return won;
+			}
+
+			bool GetPaused() {
+				return pause;
+			}
+
+			bool GetQuit() {
+				return quit;
 			}
 
 		protected:
@@ -72,6 +82,8 @@ namespace NCL {
 			bool useGravity;
 			bool inSelectionMode;
 			bool debugDraw;
+			bool pause = false;
+			bool quit = false;
 
 			float		forceMagnitude;
 

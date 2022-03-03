@@ -1,11 +1,16 @@
-#include "PS4GameRenderer.h"
+#ifdef _ORBIS
+#include "../../Plugins/PlayStation4/PS4Mesh.h"
+#include "../../Plugins/PlayStation4/PS4Shader.h"
+#include "../../Plugins/PlayStation4/PS4Texture.h"
+#endif
 #include "Renderer.h"
 
+#include "../../Common/Assets.h"
 #include "../../Common/SimpleFont.h"
 #include "../../Common/TextureLoader.h"
-
 #include "../../Common/MeshGeometry.h"
-#include "../../Plugins/PlayStation4/PS4Mesh.h"
+
+
 
 #include "../../Plugins/OpenGLRendering/OGLFrameBuffer.h"
 #include "../../Plugins/OpenGLRendering/OGLShader.h"
@@ -46,7 +51,15 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 
 #endif
 #ifdef _ORBIS
-	
+	skyboxMesh = PS4::PS4Mesh::GenerateQuad();
+	skyboxMesh->UploadToGPU(rendererAPI);
+
+	skyboxShader = PS4::PS4Shader::GenerateShader(
+		Assets::SHADERDIR + "PS4/skyboxVertex.sb",
+		Assets::SHADERDIR + "PS4/skyboxPixel.sb"
+	);
+
+	skyboxTex = PS4::PS4Texture::LoadSkyboxFromFile(NCL::Assets::TEXTUREDIR + "Cubemap/cubemap.gnf");
 #endif
 
 	//Set up the light properties
@@ -56,9 +69,6 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 }
 
 Renderer::~Renderer() {
-	delete rendererAPI;
-	delete font;
-
 	delete shadowFBO;
 	delete shadowShader;
 
@@ -82,7 +92,9 @@ void Renderer::Render() {
 	rendererAPI->SetCullFace(false);
 
 	rendererAPI->EndFrame();
+#ifdef _WIN64
 	DrawDebugData();
+#endif
 	rendererAPI->SwapBuffers();
 }
 
@@ -108,6 +120,7 @@ void Renderer::SortObjectList() {
 void Renderer::RenderScene() {
 // Render Shadow Map
 
+#ifdef _WIN64
 	rendererAPI->SetCullFace(true);
 	rendererAPI->SetBlend(true);
 	rendererAPI->SetDepth(true);
@@ -139,9 +152,10 @@ void Renderer::RenderScene() {
 	rendererAPI->SetColourMask(true, true, true, true);
 	rendererAPI->BindFrameBuffer();
 	rendererAPI->SetCullType(NCL::Rendering::RendererAPI::CULL_TYPE::BACK);
+#endif
 
 // Render skybox
-	
+
 	rendererAPI->SetCullFace(false);
 	rendererAPI->SetBlend(false);
 	rendererAPI->SetDepth(false);
@@ -154,6 +168,7 @@ void Renderer::RenderScene() {
 
 	rendererAPI->UpdateUniformMatrix4(skyboxShader, "projMatrix", projMatrix);
 	rendererAPI->UpdateUniformMatrix4(skyboxShader, "viewMatrix", viewMatrix);
+	rendererAPI->UpdateUniformMatrix4(skyboxShader, "invProjMatrix", projMatrix.Inverse());
 
 	rendererAPI->BindCubemap(skyboxTex, "cubeTex", 0);
 
@@ -164,7 +179,6 @@ void Renderer::RenderScene() {
 	rendererAPI->SetDepth(true);
 	
 // Render Scene
-
 	ShaderBase* activeShader = nullptr;
 	/*float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
 	Matrix4 viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
@@ -172,37 +186,43 @@ void Renderer::RenderScene() {
 	for (const auto& i : activeObjects) {
 		ShaderBase* shader = (*i).GetShader();
 
-		rendererAPI->BindShader(shader);
-
-		rendererAPI->BindTexture((*i).GetDefaultTexture(), "mainTex", 0);
 		if (activeShader != shader) {
+			rendererAPI->BindShader(shader);
+
 			rendererAPI->UpdateUniformMatrix4(shader, "projMatrix", projMatrix);
 			rendererAPI->UpdateUniformMatrix4(shader, "viewMatrix", viewMatrix);
+			rendererAPI->UpdateUniformMatrix4(shader, "viewProjMatrix", projMatrix * viewMatrix);
+			rendererAPI->UpdateUniformMatrix4(shader, "invProjMatrix", projMatrix.Inverse());
 			rendererAPI->UpdateUniformVector3(shader, "cameraPos", gameWorld.GetMainCamera()->GetPosition());
 
 			rendererAPI->UpdateUniformVector4(shader, "lightColour", lightColour);
 			rendererAPI->UpdateUniformVector3(shader, "lightPos", lightPos);
 			rendererAPI->UpdateUniformFloat(shader, "lightRadius", lightRadius);
-
+			
 			activeShader = shader;
 		}
 
+		rendererAPI->BindTexture((*i).GetDefaultTexture(), "mainTex", 0);
+#ifdef _WIN64
 		rendererAPI->BindTexture(shadowFBO->GetTexture(), "shadowTex", 1);
+#endif
 		
 		Matrix4 modelMatrix = (*i).GetTransform()->GetMatrix();
+#ifdef _WIN64
 		Matrix4 fullShadowMat = shadowMatrix * modelMatrix;
+#endif
 		rendererAPI->UpdateUniformMatrix4(shader, "modelMatrix", modelMatrix);
+		rendererAPI->UpdateUniformMatrix4(shader, "invModelMatrix", modelMatrix.Inverse());
+#ifdef _WIN64
 		rendererAPI->UpdateUniformMatrix4(shader, "shadowMatrix", fullShadowMat);
 
 		rendererAPI->UpdateUniformVector4(shader, "objectColour", i->GetColour());
 		rendererAPI->UpdateUniformInt(shader, "hasVertexColours", !(*i).GetMesh()->GetColourData().empty());
 		rendererAPI->UpdateUniformInt(shader, "hasTexture", (OGLTexture*)(*i).GetDefaultTexture() ? 1 : 0);
+#endif
 
 		rendererAPI->DrawMeshAndSubMesh((*i).GetMesh());
 	}
-
-
-
 }
 
 Maths::Matrix4 Renderer::SetupDebugLineMatrix()	const {

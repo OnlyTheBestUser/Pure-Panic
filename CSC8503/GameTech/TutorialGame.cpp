@@ -1,11 +1,15 @@
 #include "TutorialGame.h"
 #include "../CSC8503Common/GameWorld.h"
 #include "../../Common/TextureLoader.h"
+#include "../../Common/MeshGeometry.h"
+
 #include "../../Common/Quaternion.h"
 
 #include "../CSC8503Common/InputHandler.h"
 #include "../CSC8503Common/GameActor.h"
 #include "../CSC8503Common/Command.h"
+
+#include "../CSC8503Common/InputList.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -60,15 +64,18 @@ TutorialGame::TutorialGame()	{
 			
 	*/
 
-	// Character movement Go to Line 354
+	// Character movement Go to Line 395
 
 	inputHandler = new InputHandler();
 
 	Command* toggleGrav = new ToggleGravityCommand(physics);
 	Command* toggleDebug = new ToggleBoolCommand(&debugDraw);
-	
-	inputHandler->BindButtonG(toggleGrav);
-	inputHandler->BindButtonJ(toggleDebug);
+	Command* togglePause = new ToggleBoolCommand(&pause);
+	Command* quitCommand = new QuitCommand(&quit, &pause);
+	inputHandler->BindButton(TOGGLE_GRAV, toggleGrav);
+	inputHandler->BindButton(TOGGLE_DEBUG, toggleDebug);
+	inputHandler->BindButton(TOGGLE_PAUSE, togglePause);
+	inputHandler->BindButton(QUIT, quitCommand);
 
 #pragma endregion
 
@@ -127,33 +134,7 @@ void TutorialGame::UpdateGameWorld(float dt)
 		world->GetMainCamera()->UpdateCamera(dt);
 	}
 
-	UpdateKeys();
-
-#ifdef _ORBIS
-	float frameSpeed = 10 * dt;
-	Camera* cam = world->GetMainCamera();
-	float deadzone = 0.2f;
-	if (input->GetAxis(1).y < -deadzone || input->GetAxis(1).y > deadzone) {
-		cam->SetPitch(cam->GetPitch() - input->GetAxis(1).y);
-	}
-	if (input->GetAxis(1).x < -deadzone || input->GetAxis(1).x > deadzone) {
-		cam->SetYaw(cam->GetYaw() - input->GetAxis(1).x);
-	}
-
-	// Movement
-	if (input->GetAxis(0).y < -deadzone) {
-		cam->SetPosition(cam->GetPosition() + Matrix4::Rotation(cam->GetYaw(), Vector3(0, 1, 0)) * Vector3(0, 0, -1) * frameSpeed);
-	}
-	if (input->GetAxis(0).y > deadzone) {
-		cam->SetPosition(cam->GetPosition() - Matrix4::Rotation(cam->GetYaw(), Vector3(0, 1, 0)) * Vector3(0, 0, -1) * frameSpeed);
-	}
-	if (input->GetAxis(0).x < -deadzone) {
-		cam->SetPosition(cam->GetPosition() + Matrix4::Rotation(cam->GetYaw(), Vector3(0, 1, 0)) * Vector3(-1, 0, 0) * frameSpeed);
-	}
-	if (input->GetAxis(0).x > deadzone) {
-		cam->SetPosition(cam->GetPosition() - Matrix4::Rotation(cam->GetYaw(), Vector3(0, 1, 0)) * Vector3(-1, 0, 0) * frameSpeed);
-	}
-#endif
+	//UpdateKeys();
 
 	if (physics->GetGravity()) {
 		Debug::Print("(G)ravity on", Vector2(5, 95));
@@ -174,8 +155,8 @@ void TutorialGame::UpdateGameWorld(float dt)
 		}
 	}
 
-	SelectObject();
-	MoveSelectedObject(dt);
+	//SelectObject();
+	//MoveSelectedObject(dt);
 	physics->Update(dt);
 
 	world->UpdateWorld(dt);
@@ -311,23 +292,36 @@ void TutorialGame::InitWorld() {
 	physics->Clear();
 
 	levelLoader->ReadInLevelFile("../../Assets/Maps/map1.txt");
-	
 	Player* player = levelLoader->AddPlayerToWorld(Vector3(0, 5, 0));
 
-	Command* f = new MoveForwardCommand(player);
-	Command* b = new MoveBackwardCommand(player);
-	Command* l = new MoveLeftCommand(player);
-	Command* r = new MoveRightCommand(player);
+	//Command* f = new MoveForwardCommand(player);
+	//Command* b = new MoveBackwardCommand(player);
+	//Command* l = new MoveLeftCommand(player);
+	//Command* r = new MoveRightCommand(player);
+	//inputHandler->BindButton(FORWARD, f);
+	//inputHandler->BindButton(BACK, b);
+	//inputHandler->BindButton(LEFT, l);
+	//inputHandler->BindButton(RIGHT, r);
+	AxisCommand* m = new MoveCommand(player);
+	inputHandler->BindAxis(0, m);
 
-	inputHandler->BindButtonW(f);
-	inputHandler->BindButtonS(b);
-	inputHandler->BindButtonA(l);
-	inputHandler->BindButtonD(r);
+	AxisCommand* l = new LookCommand(player);
+	inputHandler->BindAxis(1, l);
 
-	GameObject* cap1 = levelLoader->AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
-	cap1->SetDynamic(true);
-	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
+	Command* toggleLockCam = new ToggleBoolCommand(player->GetCamLock());
+	inputHandler->BindButton(LOCK, toggleLockCam);
 
+	Command* j = new JumpCommand(player);
+	inputHandler->BindButton(JUMP, j);
+
+	Command* d = new DescendCommand(player);
+	inputHandler->BindButton(DESCEND, d);
+
+	//GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
+	//cap1->SetDynamic(true);
+	
+	//cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
+	player->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	player1 = player;
 
 	physics->BuildStaticList();
