@@ -261,7 +261,7 @@ void Renderer::RenderObjects() {
 	*/
 }
 
-void Renderer::Paint(RenderObject* paintable, Vector3 pos, float radius, float hardness, float strength, Vector4 colour)
+void Renderer::Paint(const RenderObject* paintable, Vector3 pos, float radius, float hardness, float strength, Vector4 colour)
 {
 	PaintInstance pi;
 	pi.object = paintable;
@@ -308,16 +308,6 @@ void Renderer::ApplyPaintToMasks() {
 	rendererAPI->ClearBuffer(true, true, true);
 	rendererAPI->BindFrameBuffer();
 	paintInstances.clear();
-}
-
-void Renderer::Paint(const RenderObject* paintable, Vector3 pos, float radius, float hardness, float strength, Vector4 color) {
-	PaintInstance paint;
-	paint.object = paintable;
-	paint.radius = radius;
-	paint.hardness = hardness;
-	paint.strength = strength;
-	paint.colour = color;
-	paintInstances.emplace_back(paint);
 }
 
 Maths::Matrix4 Renderer::SetupDebugLineMatrix()	const {
