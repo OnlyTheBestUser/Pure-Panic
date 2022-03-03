@@ -261,7 +261,21 @@ void Renderer::RenderObjects() {
 	*/
 }
 
+void Renderer::Paint(const RenderObject* paintable, Vector3 pos, float radius, float hardness, float strength, Vector4 colour)
+{
+	PaintInstance pi;
+	pi.object = paintable;
+	pi.pos = pos;
+	pi.radius = radius;
+	pi.hardness = hardness;
+	pi.strength = strength;
+	pi.colour = colour;
+
+	paintInstances.push_back(pi);
+}
+
 void Renderer::ApplyPaintToMasks() {
+#ifdef _WIN64
 	rendererAPI->SetDepth(false);
 	rendererAPI->SetBlend(true);
 	glBlendFunc(GL_ONE, GL_SRC_ALPHA);
@@ -294,17 +308,8 @@ void Renderer::ApplyPaintToMasks() {
 	rendererAPI->SetViewportSize(rendererAPI->GetCurrentWidth(), rendererAPI->GetCurrentHeight());
 	rendererAPI->ClearBuffer(true, true, true);
 	rendererAPI->BindFrameBuffer();
+#endif
 	paintInstances.clear();
-}
-
-void Renderer::Paint(const RenderObject* paintable, Vector3 pos, float radius, float hardness, float strength, Vector4 color) {
-	PaintInstance paint;
-	paint.object = paintable;
-	paint.radius = radius;
-	paint.hardness = hardness;
-	paint.strength = strength;
-	paint.colour = color;
-	paintInstances.emplace_back(paint);
 }
 
 Maths::Matrix4 Renderer::SetupDebugLineMatrix()	const {
