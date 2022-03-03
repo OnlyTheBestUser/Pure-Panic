@@ -21,7 +21,7 @@ namespace NCL {
 			void BuildObjectList();
 			void SortObjectList();
 			void RenderScene();
-			void Paint(const RenderObject* paintable, Vector3 pos, float radius = 1.0f, float hardness = .5f, float strength = 0.5f, Vector4 color = Vector4(0,0,0,0));
+			void Paint(const RenderObject* paintable, NCL::Maths::Vector3 pos, float radius = 1.0f, float hardness = .5f, float strength = 0.5f, NCL::Maths::Vector4 color = Vector4(0,0,0,0));
 			void ApplyPaintToMasks();
 
 			void RenderShadows();

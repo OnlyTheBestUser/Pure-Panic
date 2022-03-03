@@ -58,7 +58,9 @@ void main(void)
             //float f = mask(i.worldPos, _PainterPosition, _Radius, _Hardness);
             //float edge = f * _Strength;
                //return lerp(col, _PainterColor, edge);
-			albedo.rgb *= col;
+			if (col.r > 0.1){
+				albedo.rgb = col;
+			}
 	}
 	
 	albedo.rgb = pow(albedo.rgb, vec3(2.2));

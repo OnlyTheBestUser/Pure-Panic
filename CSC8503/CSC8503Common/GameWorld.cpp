@@ -43,10 +43,20 @@ void GameWorld::AddGameObject(GameObject* o) {
 }
 
 void GameWorld::RemoveGameObject(GameObject* o, bool andDelete) {
-	gameObjects.erase(std::remove(gameObjects.begin(), gameObjects.end(), o), gameObjects.end());
+	toRemoveGameObjects.emplace_back(o);
 	if (andDelete) {
-		delete o;
+		toDeleteGameObjects.emplace_back(o);
 	}
+}
+void GameWorld::RemoveGameObjectsFromWorld()
+{
+	for (auto o : toRemoveGameObjects)
+		gameObjects.erase(std::remove(gameObjects.begin(), gameObjects.end(), o), gameObjects.end());
+}
+void GameWorld::DeleteGameObjectsFromWorld()
+{
+	for (auto o : toDeleteGameObjects)
+		delete o;
 }
 
 void GameWorld::GetObjectIterators(
@@ -75,6 +85,11 @@ void GameWorld::UpdateWorld(float dt) {
 	for (auto x : gameObjects) {
 		x->Update(dt);
 	}
+
+	RemoveGameObjectsFromWorld();
+	DeleteGameObjectsFromWorld();
+	toRemoveGameObjects.clear();
+	toDeleteGameObjects.clear();
 }
 
 bool GameWorld::Raycast(Ray& r, RayCollision& closestCollision, bool closestObject) const {
