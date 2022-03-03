@@ -149,13 +149,17 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>_DEBUG;_ORBIS;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_ORBIS;FMOD_LIB_PATH="libfmodL.prx";FMOD_STUDIO_LIB_PATH="libfmodstudioL.prx";</PreprocessorDefinitions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <CppLanguageStd>Cpp17</CppLanguageStd>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>libfmodstudioL.prx;libfmodstudio.prx;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies);fmodstudioL_stub_weak;fmodL_stub_weak;</AdditionalDependencies>
     </Lib>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
