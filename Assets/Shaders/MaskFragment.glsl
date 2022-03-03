@@ -1,7 +1,5 @@
 #version 330 core
 
-
-
 in Vertex {
 	vec2 texCoord;
 	vec3 worldPos;
@@ -15,5 +13,5 @@ float mask(vec3 position, vec3 center, float radius, float hardness){
 }
 
 void main(void)	{
-	fragColour = vec4(0.01,0,0,1);
+	fragColour = vec4(1,0,0,1);
 }

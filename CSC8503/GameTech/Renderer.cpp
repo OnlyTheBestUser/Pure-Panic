@@ -234,8 +234,8 @@ void Renderer::RenderObjects() {
 		rendererAPI->UpdateUniformInt(shader, "hasTexture", (*i).GetDefaultTexture() ? 1 : 0);
 #ifdef _WIN64
 		rendererAPI->BindTexture(shadowFBO->GetTexture(), "shadowTex", 1);
-		rendererAPI->BindTexture(i->GetPaintMask(), "paintMaskTex", 2);
-		rendererAPI->UpdateUniformInt(shader, "hasPaintMask", (*i).GetPaintMask() ? 1 : 0);
+		//rendererAPI->BindTexture(i->GetPaintMask(), "paintMaskTex", 2);
+		//rendererAPI->UpdateUniformInt(shader, "hasPaintMask", (*i).GetPaintMask() ? 1 : 0);
 #endif
 
 		Matrix4 modelMatrix = (*i).GetTransform()->GetMatrix();

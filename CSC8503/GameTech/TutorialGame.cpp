@@ -580,7 +580,7 @@ void TutorialGame::AddLongWallToWorld(const Vector3& position, Vector3 dimension
 	{
 		for (int i = -dimensions.z; i < dimensions.z; i += 10)
 		{
-			AddRenderPartToWorld(Vector3(position.x, position.y, position.z + i), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallAlertTex, maskTex);
+			AddRenderPartToWorld(Vector3(position.x, position.y, position.z + i), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallAlertTex);
 		}
 		return;
 	}
@@ -588,7 +588,7 @@ void TutorialGame::AddLongWallToWorld(const Vector3& position, Vector3 dimension
 	{
 		for (int i = -dimensions.x; i < dimensions.x; i += 10)
 		{
-			AddRenderPartToWorld(Vector3(position.x + i, position.y, position.z), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallAlertTex, maskTex);
+			AddRenderPartToWorld(Vector3(position.x + i, position.y, position.z), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallAlertTex);
 		}
 		return;
 	}
@@ -615,7 +615,7 @@ GameObject* TutorialGame::AddAABBWallToWorld(const Vector3& position, Vector3 di
 	world->AddGameObject(cube);
 	return cube;
 }
-GameObject* TutorialGame::AddRenderPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture, TextureBase* mask) {
+GameObject* TutorialGame::AddRenderPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture) {
 	GameObject* cube = new GameObject();
 	cube->SetBoundingVolume(nullptr);
 	
@@ -694,7 +694,7 @@ void TutorialGame::AddCornerWallToWorld(const Vector3& position, Vector3 dimensi
 
 	GameObject* physicalObject = AddOBBWallToWorld(location, dimensions, rotation, "Corner wall");
 	physicalObject->GetPhysicsObject()->Sleep();
-	AddRenderPartToWorld(position, dimensions, rotation, corridorWallCorner, corridorWallAlertTex, maskTex);
+	AddRenderPartToWorld(position, dimensions, rotation, corridorWallCorner, corridorWallAlertTex);
 	return;
 }
 void TutorialGame::AddSecurityCameraToWorld(const Vector3& position, int rotation)
@@ -724,7 +724,7 @@ void TutorialGame::AddSecurityCameraToWorld(const Vector3& position, int rotatio
 
 	GameObject* physicalObject = AddAABBWallToWorld(location, dimensions, rotation, "Security Camera");
 	physicalObject->GetPhysicsObject()->Sleep();
-	AddRenderPartToWorld(position, Vector3(5, 5, 5), rotation, securityCamera, securityCameraTex, maskTex);
+	AddRenderPartToWorld(position, Vector3(5, 5, 5), rotation, securityCamera, securityCameraTex);
 	return;
 }
 void TutorialGame::AddWallHammerToWorld(const Vector3& position, int rotation)
