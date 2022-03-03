@@ -32,8 +32,10 @@ namespace NCL {
 			void DrawDebugData();
 			void DrawDebugLines();
 			void DrawDebugStrings();
+
 		protected:
 			RendererAPI* rendererAPI;
+
 			NCL::Rendering::SimpleFont* font;
 			MeshGeometry* debugTextMesh;
 			MeshGeometry* debugLinesMesh;
