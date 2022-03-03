@@ -36,7 +36,6 @@ LevelLoader::LevelLoader(GameWorld* world, PhysicsSystem* physics) : world(world
 		(*into)->UploadToGPU();
 	};
 
-	loadFunc("courier.msh",  &cubeMesh);
 	loadFunc("cube.msh",     &cubeMesh);
 	loadFunc("sphere.msh",   &sphereMesh);
 	loadFunc("Male1.msh",    &charMeshA);
@@ -53,14 +52,14 @@ LevelLoader::LevelLoader(GameWorld* world, PhysicsSystem* physics) : world(world
 	corridorWallCornerTex = (OGLTexture*)TextureLoader::LoadAPITexture("Corridor_Walls_Redux_Metal.png");
 	loadFunc("Corridor_Wall_Light.msh", &corridorWallLight);
 	corridorWallLightTex = (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
-	loadFunc("Security_Camera.msh", &securityCamera);
-	securityCameraTex = (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
 	loadFunc("corridor_wall_screen.msh", &corridorWallScreen);
 	corridorWallScreenTex = (OGLTexture*)TextureLoader::LoadAPITexture("Animated_Screens_A_Colour.png");
 	loadFunc("corridor_Wall_Straight_Mid_end_L.msh", &corridorWallStraight);
 	corridorWallStraightTex = (OGLTexture*)TextureLoader::LoadAPITexture("Corridor_Walls_Redux_Colour.png");
 	loadFunc("Corridor_Wall_Hammer.msh", &corridorWallHammer);
 	corridorWallHammerTex = (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
+	loadFunc("Security_Camera.msh", &securityCamera);
+	securityCameraTex = (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
 
 #ifdef _ORBIS
 	basicTex = (PS4::PS4Texture*)TextureLoader::LoadAPITexture("checkerboard.png");
@@ -79,16 +78,34 @@ LevelLoader::~LevelLoader() {
 
 	delete cubeMesh;
 	delete sphereMesh;
+	delete capsuleMesh;
+
 	delete charMeshA;
 	delete charMeshB;
 	delete enemyMesh;
 	delete bonusMesh;
+
+	delete corridorFloor;
+	delete corridorFloorTex;
+	delete corridorWallAlert;
+	delete corridorWallAlertTex;
+	delete corridorWallCorner;
+	delete corridorWallCornerTex;
+	delete corridorWallLight;
+	delete corridorWallLightTex;
+	delete corridorWallScreen;
+	delete corridorWallScreenTex;
+	delete corridorWallStraight;
+	delete corridorWallStraightTex;
+	delete corridorWallHammer;
+	delete corridorWallHammerTex;
+	delete securityCamera;
+	delete securityCameraTex;
 }
 
 void LevelLoader::ReadInLevelFile(std::string filename) {
 	std::ifstream file;
 	std::string line;
-	char space = ' ';
 
 	file.open(filename);
 
@@ -140,28 +157,6 @@ Vector3 LevelLoader::Vec3FromStr(std::string input) {
 	return Vector3(std::stof(values[0]), std::stof(values[1]), std::stof(values[2]));
 }
 
-GameObject* LevelLoader::AddFloorToWorld(const Maths::Vector3& position) {
-	GameObject* floor = new GameObject("Floor");
-
-	Vector3 floorSize = Vector3(250, 1, 250);
-	AABBVolume* volume = new AABBVolume(floorSize);
-	floor->SetBoundingVolume((CollisionVolume*)volume);
-	floor->GetTransform()
-		.SetScale(floorSize * 2)
-		.SetPosition(position);
-
-	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
-	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume()));
-
-	floor->GetPhysicsObject()->SetInverseMass(0);
-	floor->GetPhysicsObject()->InitCubeInertia();
-
-	floor->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	floor->SetDynamic(false);
-	world->AddGameObject(floor);
-	return floor;
-}
-
 Player* LevelLoader::AddPlayerToWorld(const Vector3& position) {
 	float meshSize = 3.0f;
 	float inverseMass = 0.5f;
@@ -189,6 +184,28 @@ Player* LevelLoader::AddPlayerToWorld(const Vector3& position) {
 	world->AddGameObject(character);
 
 	return character;
+}
+
+GameObject* LevelLoader::AddFloorToWorld(const Maths::Vector3& position) {
+	GameObject* floor = new GameObject("Floor");
+
+	Vector3 floorSize = Vector3(250, 1, 250);
+	AABBVolume* volume = new AABBVolume(floorSize);
+	floor->SetBoundingVolume((CollisionVolume*)volume);
+	floor->GetTransform()
+		.SetScale(floorSize * 2)
+		.SetPosition(position);
+
+	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
+	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume()));
+
+	floor->GetPhysicsObject()->SetInverseMass(0);
+	floor->GetPhysicsObject()->InitCubeInertia();
+
+	floor->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	floor->SetDynamic(false);
+	world->AddGameObject(floor);
+	return floor;
 }
 
 GameObject* LevelLoader::AddAABBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name) {

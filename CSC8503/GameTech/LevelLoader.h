@@ -28,10 +28,10 @@ namespace NCL {
 			void AddSecurityCameraToWorld(const Vector3& position, int rotation);
 			void AddWallHammerToWorld(const Vector3& position, int rotation);
 
+			GameObject* AddRenderPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture);
+
 			void SplitStringOnDelimiter(const std::string& s, char delim, vector<std::string>& result);
 			Vector3 Vec3FromStr(std::string input);
-
-			GameObject* AddRenderPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture);
 
 			GameWorld*     world;
 			PhysicsSystem* physics;
@@ -48,14 +48,14 @@ namespace NCL {
 			TextureBase*  corridorWallCornerTex		= nullptr;
 			MeshGeometry* corridorWallLight			= nullptr;
 			TextureBase*  corridorWallLightTex		= nullptr;
-			MeshGeometry* securityCamera			= nullptr;
-			TextureBase*  securityCameraTex			= nullptr;
 			MeshGeometry* corridorWallScreen		= nullptr;
 			TextureBase*  corridorWallScreenTex		= nullptr;
 			MeshGeometry* corridorWallStraight		= nullptr;
 			TextureBase*  corridorWallStraightTex	= nullptr;
 			MeshGeometry* corridorWallHammer		= nullptr;
 			TextureBase*  corridorWallHammerTex		= nullptr;
+			MeshGeometry* securityCamera			= nullptr;
+			TextureBase*  securityCameraTex			= nullptr;
 
 			MeshGeometry* sphereMesh				= nullptr;
 			MeshGeometry* cubeMesh					= nullptr;
