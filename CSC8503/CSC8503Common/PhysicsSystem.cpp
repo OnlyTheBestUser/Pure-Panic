@@ -22,7 +22,7 @@ PhysicsSystem::PhysicsSystem(GameWorld& g) : gameWorld(g)	{
 	useBroadPhase	= true;	
 	dTOffset		= 0.0f;
 	globalDamping	= 0.995f;
-	SetGravity(Vector3(0.0f, -50.0f, 0.0f));
+	SetGravity(Vector3(0.0f, -19.6f, 0.0f));
 
 	// Sets the valid different collision layers here
 	/* Col Layer 1 = 1
