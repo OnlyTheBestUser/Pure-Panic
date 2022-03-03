@@ -103,8 +103,13 @@ void Renderer::Render() {
 	BuildObjectList();
 	SortObjectList();
 
+	int iter = 0;
 	for (const auto& i : activeObjects) {
+		iter++;
 		Paint(i, Vector3(0, 0, 0), 1.0f, 1.0f, 1.0f, Vector4(1, 0, 0, 1));
+		if (iter >= 4) {
+			break;
+		}
 	}
 #ifdef _WIN64
 	ApplyPaintToMasks();
@@ -278,7 +283,7 @@ void Renderer::ApplyPaintToMasks() {
 #ifdef _WIN64
 	rendererAPI->SetDepth(false);
 	rendererAPI->SetBlend(true);
-	glBlendFunc(GL_ONE, GL_SRC_ALPHA);
+	//glBlendFunc(GL_ONE, GL_SRC_ALPHA);
 
 	rendererAPI->BindShader(maskShader);
 
@@ -293,16 +298,20 @@ void Renderer::ApplyPaintToMasks() {
 			rendererAPI->SetViewportSize(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight());
 		}
 
-		rendererAPI->UpdateUniformMatrix4(maskShader, "modelMatrix", i.object->GetTransform()->GetMatrix());
-
 		// Update uniforms here
+		rendererAPI->UpdateUniformMatrix4(maskShader, "modelMatrix", i.object->GetTransform()->GetMatrix());
+		rendererAPI->UpdateUniformVector3(maskShader, "painterPosition", i.pos);
+		rendererAPI->UpdateUniformFloat(maskShader, "radius", i.radius);
+		rendererAPI->UpdateUniformFloat(maskShader, "hardness", i.hardness);
+		rendererAPI->UpdateUniformFloat(maskShader, "stregth", i.strength);
+		rendererAPI->UpdateUniformVector4(maskShader, "colour", i.colour);
 
 		rendererAPI->BindFrameBuffer(maskFBO);
 
 		rendererAPI->DrawMesh(skyboxMesh);
 		delete maskFBO;
 	}
-	glBlendFunc(GL_ONE, GL_NONE);
+	//glBlendFunc(GL_ONE, GL_NONE);
 	rendererAPI->SetBlend(false);
 	rendererAPI->SetDepth(true);
 	rendererAPI->SetViewportSize(rendererAPI->GetCurrentWidth(), rendererAPI->GetCurrentHeight());
