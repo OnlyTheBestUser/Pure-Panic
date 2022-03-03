@@ -106,7 +106,9 @@ void Renderer::Render() {
 	for (const auto& i : activeObjects) {
 		Paint(i, Vector3(0, 0, 0), 1.0f, 1.0f, 1.0f, Vector4(1, 0, 0, 1));
 	}
+#ifdef _WIN64
 	ApplyPaintToMasks();
+#endif
 	RenderScene();
 	rendererAPI->SetCullFace(false);
 
