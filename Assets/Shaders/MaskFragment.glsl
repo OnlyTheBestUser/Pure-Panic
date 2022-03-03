@@ -1,9 +1,10 @@
 #version 330 core
 
-uniform sampler2D maskTex;
+
 
 in Vertex {
 	vec2 texCoord;
+	vec3 worldPos;
 } IN;
 
 out vec4 fragColour;
@@ -14,6 +15,5 @@ float mask(vec3 position, vec3 center, float radius, float hardness){
 }
 
 void main(void)	{
-	vec4 samp = texture(maskTex,IN.texCoord);
-	fragColour = samp;
+	fragColour = vec4(0.01,0,0,1);
 }

@@ -261,30 +261,33 @@ void Renderer::RenderObjects() {
 
 void Renderer::ApplyPaintToMasks() {
 	rendererAPI->SetDepth(false);
+	rendererAPI->SetBlend(true);
+	glBlendFunc(GL_ONE, GL_SRC_ALPHA);
 
 	rendererAPI->BindShader(maskShader);
-	rendererAPI->UpdateUniformMatrix4(maskShader, "projMatrix", Matrix4());
-	rendererAPI->UpdateUniformMatrix4(maskShader, "viewMatrix", Matrix4());
-	rendererAPI->UpdateUniformMatrix4(maskShader, "modelMatrix", Matrix4());
-	rendererAPI->UpdateUniformMatrix4(maskShader, "textureMatrix", Matrix4());
 
 	Vector2 currentSize;
-
 	for (const auto& i : paintInstances) {
 		if (i.object->GetPaintMask() == 0) continue;
 		maskFBO = new OGLFrameBuffer();
 		maskFBO->AddTexture((OGLTexture*)(i.object->GetPaintMask()));
+
 		if (Vector2(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight()) != currentSize) {
 			currentSize = Vector2(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight());
 			rendererAPI->SetViewportSize(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight());
 		}
 
+		rendererAPI->UpdateUniformMatrix4(maskShader, "modelMatrix", i.object->GetTransform()->GetMatrix());
+
+		// Update uniforms here
+
 		rendererAPI->BindFrameBuffer(maskFBO);
-		rendererAPI->BindTexture(i.object->GetPaintMask(), "maskTex", 0);
 
 		rendererAPI->DrawMesh(skyboxMesh);
 		delete maskFBO;
 	}
+	glBlendFunc(GL_ONE, GL_NONE);
+	rendererAPI->SetBlend(false);
 	rendererAPI->SetDepth(true);
 	rendererAPI->SetViewportSize(rendererAPI->GetCurrentWidth(), rendererAPI->GetCurrentHeight());
 	rendererAPI->ClearBuffer(true, true, true);
