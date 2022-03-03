@@ -70,6 +70,7 @@ namespace NCL {
 
 			StateGameObject* testStateObject;
 
+			PaintManager* paintManager;
 			Renderer*			renderer;
 			PhysicsSystem*		physics;
 			GameWorld*			world;

@@ -8,6 +8,7 @@
 #include "../CSC8503Common/InputHandler.h"
 #include "../CSC8503Common/GameActor.h"
 #include "../CSC8503Common/Command.h"
+#include "../../Common/Assets.h"
 
 #include "../CSC8503Common/InputList.h"
 
@@ -292,7 +293,7 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	levelLoader->ReadInLevelFile("../../Assets/Maps/map1.txt");
+	levelLoader->ReadInLevelFile(NCL::Assets::DATADIR + "../../Assets/Maps/map1.txt");
 	Player* player = levelLoader->AddPlayerToWorld(Vector3(0, 5, 0));
 
 	//Command* f = new MoveForwardCommand(player);

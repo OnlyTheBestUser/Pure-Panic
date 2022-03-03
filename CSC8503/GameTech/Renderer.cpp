@@ -261,7 +261,7 @@ void Renderer::RenderObjects() {
 	*/
 }
 
-void Renderer::Paint(const RenderObject* paintable, Vector3 pos, float radius, float hardness, float strength, Vector4 colour)
+void Renderer::Paint(const RenderObject* paintable, NCL::Maths::Vector3 pos, float radius, float hardness, float strength, NCL::Maths::Vector4 colour)
 {
 	PaintInstance pi;
 	pi.object = paintable;
