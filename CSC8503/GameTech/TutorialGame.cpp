@@ -74,10 +74,12 @@ TutorialGame::TutorialGame()	{
 	Command* toggleDebug = new ToggleBoolCommand(&debugDraw);
 	Command* togglePause = new ToggleBoolCommand(&pause);
 	Command* quitCommand = new QuitCommand(&quit, &pause);
+	Command* fireCommand = new FireCommand(&world);
 	inputHandler->BindButton(TOGGLE_GRAV, toggleGrav);
 	inputHandler->BindButton(TOGGLE_DEBUG, toggleDebug);
 	inputHandler->BindButton(TOGGLE_PAUSE, togglePause);
 	inputHandler->BindButton(QUIT, quitCommand);
+	inputHandler->BindButton(FIRE, fireCommand);
 
 #pragma endregion
 
@@ -459,19 +461,3 @@ void TutorialGame::MoveSelectedObject(float dt) {
 	}*/
 }
 
-void TutorialGame::PaintSelectedObject() {
-	if (!selectionObject)
-		return;
-
-	if (Window::GetMouse()->ButtonPressed(NCL::MouseButtons::RIGHT)) {
-		Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
-		RayCollision closestCollision;
-		if (world->Raycast(ray, closestCollision, true)) {
-			if (closestCollision.node == selectionObject) {
-				//Paint that node
-				selectionObject->GetPhysicsObject()->AddForceAtPosition(ray.GetDirection() * forceMagnitude, closestCollision.collidedAt);
-			}
-		}
-	}
-
-}

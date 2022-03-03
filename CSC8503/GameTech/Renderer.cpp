@@ -105,11 +105,9 @@ void Renderer::Render() {
 
 	int iter = 0;
 	for (const auto& i : activeObjects) {
-		iter++;
 		Paint(i, Vector3(0, 0, 0), 1.0f, 1.0f, 1.0f, Vector4(1, 0, 0, 1));
-		if (iter >= 4) {
-			break;
-		}
+		if (iter >= 10) { break; }
+		iter++;
 	}
 #ifdef _WIN64
 	ApplyPaintToMasks();
@@ -239,8 +237,8 @@ void Renderer::RenderObjects() {
 		rendererAPI->UpdateUniformInt(shader, "hasTexture", (*i).GetDefaultTexture() ? 1 : 0);
 #ifdef _WIN64
 		rendererAPI->BindTexture(shadowFBO->GetTexture(), "shadowTex", 1);
-		//rendererAPI->BindTexture(i->GetPaintMask(), "paintMaskTex", 2);
-		//rendererAPI->UpdateUniformInt(shader, "hasPaintMask", (*i).GetPaintMask() ? 1 : 0);
+		rendererAPI->BindTexture(i->GetPaintMask(), "paintMaskTex", 2);
+		rendererAPI->UpdateUniformInt(shader, "hasPaintMask", (*i).GetPaintMask() ? 1 : 0);
 #endif
 
 		Matrix4 modelMatrix = (*i).GetTransform()->GetMatrix();
@@ -270,7 +268,7 @@ void Renderer::Paint(const RenderObject* paintable, NCL::Maths::Vector3 pos, flo
 {
 	PaintInstance pi;
 	pi.object = paintable;
-	pi.pos = pos;
+	pi.pos = pos; // convert from world to UV
 	pi.radius = radius;
 	pi.hardness = hardness;
 	pi.strength = strength;
@@ -283,7 +281,7 @@ void Renderer::ApplyPaintToMasks() {
 #ifdef _WIN64
 	rendererAPI->SetDepth(false);
 	rendererAPI->SetBlend(true);
-	//glBlendFunc(GL_ONE, GL_SRC_ALPHA);
+	glBlendFunc(GL_ONE, GL_SRC_ALPHA);
 
 	rendererAPI->BindShader(maskShader);
 
@@ -311,7 +309,7 @@ void Renderer::ApplyPaintToMasks() {
 		rendererAPI->DrawMesh(skyboxMesh);
 		delete maskFBO;
 	}
-	//glBlendFunc(GL_ONE, GL_NONE);
+	glBlendFunc(GL_ONE, GL_NONE);
 	rendererAPI->SetBlend(false);
 	rendererAPI->SetDepth(true);
 	rendererAPI->SetViewportSize(rendererAPI->GetCurrentWidth(), rendererAPI->GetCurrentHeight());

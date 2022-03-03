@@ -23,9 +23,12 @@ float mask(vec3 position, vec3 center, float radius, float hardness){
 }
 
 void main(void)	{
+// This world possition is the position of verticies not fragments.
     float f = mask(IN.worldPos, painterPosition, radius, hardness);
     float edge = f * strength;
-    fragColour.rgb =   mix(colour.rgb, painterPosition, edge);
+
+    fragColour.rgb = mix(colour.rgb, painterPosition, edge);
+    
     fragColour.a = 1;
 
 	//fragColour = vec4(0.01,0,0,1);

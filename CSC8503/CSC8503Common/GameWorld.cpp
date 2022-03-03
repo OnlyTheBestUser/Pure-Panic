@@ -131,6 +131,21 @@ bool GameWorld::Raycast(Ray& r, RayCollision& closestCollision, bool closestObje
 	return false;
 }
 
+void GameWorld::PaintObject() {
+
+		//Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
+		//RayCollision closestCollision;
+		//if (world->Raycast(ray, closestCollision, true)) {
+		//	if (closestCollision.node == selectionObject) {
+		//		
+		//		//Paint first node
+		//		selectionObject->GetPhysicsObject()->AddForceAtPosition(ray.GetDirection() * forceMagnitude, closestCollision.collidedAt);
+		//	}
+		//}
+	}
+
+
+
 
 /*
 Constraint Tutorial Stuff

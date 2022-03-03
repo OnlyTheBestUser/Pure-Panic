@@ -69,6 +69,21 @@ namespace NCL {
 		protected:
 			GameActor* actor;
 		};
+
+		class FireCommand : public Command {
+		public:
+			FireCommand(GameWorld* world) : world(world) {};
+			virtual ~FireCommand() {};
+
+			void execute() {
+				world->PaintObject();
+			}
+
+		protected:
+			GameWorld* world;
+		};
+
+
 #pragma endregion
 
 #pragma region World Commands
