@@ -35,6 +35,7 @@ namespace NCL {
 
 		protected:
 			RendererAPI* rendererAPI;
+
 			NCL::Rendering::SimpleFont* font;
 			MeshGeometry* debugTextMesh;
 			MeshGeometry* debugLinesMesh;

@@ -1,4 +1,4 @@
-#include "PS4GameRenderer.h"
+#include "../../Plugins/PlayStation4/PS4RendererAPI.h"
 #include "RendererBase.h"
 #include "../../Plugins/OpenGLRendering/OGLRendererAPI.h"
 #include "../../Plugins/OpenGLRendering/OGLFrameBuffer.h"
@@ -39,15 +39,6 @@ RendererBase::RendererBase() {
 	debugLinesMesh = new OGLMesh();
 	debugTextMesh = new OGLMesh();
 
-#endif
-#ifdef _ORBIS
-	rendererAPI = new PS4::PS4GameRenderer(world);
-
-	debugLinesMesh = PS4::PS4Mesh::GenerateQuad();
-	debugTextMesh = PS4::PS4Mesh::GenerateQuad();
-
-
-#endif
 	debugLinesMesh->SetVertexPositions(std::vector<Vector3>(5000, Vector3()));
 	debugLinesMesh->SetVertexColours(std::vector<Vector4>(5000, Vector3()));
 
@@ -55,14 +46,33 @@ RendererBase::RendererBase() {
 	debugTextMesh->SetVertexColours(std::vector<Vector4>(5000, Vector3()));
 	debugTextMesh->SetVertexTextureCoords(std::vector<Vector2>(5000, Vector3()));
 
-	debugTextMesh->UploadToGPU();
-	debugLinesMesh->UploadToGPU();
+
+#endif
+#ifdef _ORBIS
+	rendererAPI = new PS4::PS4RendererAPI(*Window::GetWindow());
+
+	TextureLoader::RegisterAPILoadFunction(PS4::PS4Texture::LoadTextureFromFile);
+
+	debugLinesMesh = PS4::PS4Mesh::GenerateQuad();
+	debugTextMesh = PS4::PS4Mesh::GenerateQuad();
+
+
+#endif
+
+	debugTextMesh->UploadToGPU(rendererAPI);
+	debugLinesMesh->UploadToGPU(rendererAPI);
 
 	debugLinesMesh->SetPrimitiveType(GeometryPrimitive::Lines);
 }
 
 RendererBase::~RendererBase() {
+	delete font;
+	delete rendererAPI;
 
+	delete debugLinesMesh;
+	delete debugTextMesh;
+
+	delete debugShader;
 }
 
 

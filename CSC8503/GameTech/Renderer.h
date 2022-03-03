@@ -5,6 +5,10 @@ namespace NCL {
 	namespace Rendering {
 		class SimpleFont;
 
+		struct CamMatrix {
+			Vector3 viewMatrix;
+		};
+
 		class Renderer : public RendererBase
 		{
 		public:
@@ -17,8 +21,13 @@ namespace NCL {
 			void BuildObjectList();
 			void SortObjectList();
 			void RenderScene();
-			void Paint(RenderObject* paintable, Vector3 pos, float radius = 1.0f, float hardness = .5f, float strength = 0.5f, Vector4 color = Vector4(0,0,0,0));
+			void Paint(const RenderObject* paintable, Vector3 pos, float radius = 1.0f, float hardness = .5f, float strength = 0.5f, Vector4 color = Vector4(0,0,0,0));
 			void ApplyPaintToMasks();
+
+			void RenderShadows();
+			void RenderSkybox();
+			void RenderObjects();
+
 
 			// Debug
 			Maths::Matrix4 SetupDebugLineMatrix() const override;
@@ -26,7 +35,7 @@ namespace NCL {
 		protected:
 
 			struct PaintInstance {
-				RenderObject* object;
+				const RenderObject* object;
 				Maths::Vector3 pos;
 				float radius;
 				float hardness;
@@ -40,6 +49,9 @@ namespace NCL {
 
 			FrameBufferBase* shadowFBO;
 			ShaderBase* shadowShader;
+
+			FrameBufferBase* maskFBO;
+			ShaderBase* maskShader;
 
 			ShaderBase* skyboxShader;
 			MeshGeometry* skyboxMesh;
