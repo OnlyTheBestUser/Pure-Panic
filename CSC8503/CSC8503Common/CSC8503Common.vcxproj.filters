@@ -138,7 +138,7 @@
     <ClInclude Include="InputHandler.h">
       <Filter>Input Handling</Filter>
     </ClInclude>
-    <ClInclude Include="MoveForwardCommand.h">
+    <ClInclude Include="PCInput.h">
       <Filter>Input Handling</Filter>
     </ClInclude>
     <ClInclude Include="AudioManager.h">
@@ -146,6 +146,14 @@
     </ClInclude>
     <ClInclude Include="BGMManager.h">
       <Filter>Audio</Filter>
+    <ClInclude Include="InputBase.h">
+      <Filter>Input Handling</Filter>
+    </ClInclude>
+    <ClInclude Include="InputList.h">
+      <Filter>Input Handling</Filter>
+    </ClInclude>
+    <ClInclude Include="PaintManager.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -198,9 +206,15 @@
       <Filter>CollisionDetection</Filter>
     </ClCompile>
     <ClCompile Include="InputHandler.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Input Handling</Filter>
     </ClCompile>
-    <ClCompile Include="MoveForwardCommand.cpp">
+    <ClCompile Include="InputBase.cpp">
+      <Filter>Input Handling</Filter>
+    </ClCompile>
+    <ClCompile Include="PCInput.cpp">
+      <Filter>Input Handling</Filter>
+    </ClCompile>
+    <ClCompile Include="PaintManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AudioManager.cpp">

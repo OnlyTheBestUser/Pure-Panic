@@ -16,9 +16,9 @@ void Player::Update(float dt)
 		GetTransform().SetOrientation(Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)));
 	}
 	GetPhysicsObject()->AddAcceleration(force.Normalised() * speed);
-	force = Vector3(0, 0, 0);
 
-	if (CheckDistToGround() < 0.01f)
+	// Check if grounded, if so don't apply more gravity
+	if (CheckDistToGround() < 0.01f && force.y <= 0.0f)
 	{
 		Vector3 currentVel = GetPhysicsObject()->GetLinearVelocity();
 		GetPhysicsObject()->SetLinearVelocity(Vector3(currentVel.x, 0.0f, currentVel.z));
@@ -28,6 +28,8 @@ void Player::Update(float dt)
 	else {
 		physicsObject->SetGravity(true);
 	}
+
+	force = Vector3(0, 0, 0);
 }
 
 float Player::CheckDistToGround()

@@ -2,6 +2,7 @@
 
 uniform vec4 		objectColour;
 uniform sampler2D 	mainTex;
+uniform sampler2D	paintMaskTex;
 uniform sampler2DShadow shadowTex;
 
 uniform vec3	lightPos;
@@ -11,6 +12,7 @@ uniform vec4	lightColour;
 uniform vec3	cameraPos;
 
 uniform bool hasTexture;
+uniform bool hasPaintMask;
 
 in Vertex
 {
@@ -22,6 +24,11 @@ in Vertex
 } IN;
 
 out vec4 fragColor;
+
+float mask(vec3 position, vec3 center, float radius, float hardness){
+    float m = distance(center, position);
+    return 1 - smoothstep(radius * hardness, radius, m);    
+}
 
 void main(void)
 {
@@ -44,6 +51,16 @@ void main(void)
 	
 	if(hasTexture) {
 	 albedo *= texture(mainTex, IN.texCoord);
+	}
+
+	if(hasPaintMask) {
+		    vec3 col = texture(paintMaskTex, IN.texCoord).rgb;
+            //float f = mask(i.worldPos, _PainterPosition, _Radius, _Hardness);
+            //float edge = f * _Strength;
+               //return lerp(col, _PainterColor, edge);
+			if (col.r > 0.1){
+				albedo.rgb = col;
+			}
 	}
 	
 	albedo.rgb = pow(albedo.rgb, vec3(2.2));

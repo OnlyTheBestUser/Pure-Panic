@@ -178,7 +178,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="InputBase.cpp" />
     <ClCompile Include="Ps4AudioEmitter.cpp" />
     <ClCompile Include="PS4AudioSource.cpp" />
     <ClCompile Include="PS4ComputeShader.cpp" />
@@ -191,10 +190,10 @@
     <ClCompile Include="PS4Sound.cpp" />
     <ClCompile Include="Ps4AudioSystem.cpp" />
     <ClCompile Include="PS4Texture.cpp" />
+    <ClCompile Include="PS4UniformBuffer.cpp" />
     <ClCompile Include="PS4Window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="InputBase.h" />
     <ClInclude Include="Ps4AudioEmitter.h" />
     <ClInclude Include="PS4AudioSource.h" />
     <ClInclude Include="PS4ComputeShader.h" />
@@ -207,6 +206,7 @@
     <ClInclude Include="PS4Sound.h" />
     <ClInclude Include="Ps4AudioSystem.h" />
     <ClInclude Include="PS4Texture.h" />
+    <ClInclude Include="PS4UniformBuffer.h" />
     <ClInclude Include="PS4Window.h" />
   </ItemGroup>
   <ItemGroup>

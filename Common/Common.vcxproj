@@ -226,6 +226,7 @@
     <ClCompile Include="TextureBase.cpp" />
     <ClCompile Include="TextureLoader.cpp" />
     <ClCompile Include="TextureWriter.cpp" />
+    <ClCompile Include="UniformBuffer.cpp" />
     <ClCompile Include="Vector2.cpp" />
     <ClCompile Include="Vector3.cpp" />
     <ClCompile Include="Vector4.cpp" />
@@ -256,6 +257,7 @@
     <ClInclude Include="TextureBase.h" />
     <ClInclude Include="TextureLoader.h" />
     <ClInclude Include="TextureWriter.h" />
+    <ClInclude Include="UniformBuffer.h" />
     <ClInclude Include="Vector2.h" />
     <ClInclude Include="Vector3.h" />
     <ClInclude Include="Vector4.h" />
