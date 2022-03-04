@@ -486,6 +486,8 @@ void TutorialGame::UpdateBGM() {
 		bgm->StopMusic();
 		break;
 	}
+}
+
 void TutorialGame::PaintSelectedObject() {
 	if (!selectionObject)
 		return;
