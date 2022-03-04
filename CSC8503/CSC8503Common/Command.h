@@ -2,6 +2,8 @@
 #include "GameActor.h"
 #include "PhysicsSystem.h"
 #include "InputBase.h"
+#include "../GameTech/TutorialGame.h"
+
 namespace NCL {
 	namespace CSC8503 {
 		class Command {
@@ -72,15 +74,15 @@ namespace NCL {
 
 		class FireCommand : public Command {
 		public:
-			FireCommand(GameWorld* world) : world(world) {};
+			FireCommand(TutorialGame* game) : game(game) {};
 			virtual ~FireCommand() {};
 
 			void execute() {
-				world->PaintObject();
+				game->PaintObject();
 			}
 
 		protected:
-			GameWorld* world;
+			TutorialGame* game;
 		};
 
 

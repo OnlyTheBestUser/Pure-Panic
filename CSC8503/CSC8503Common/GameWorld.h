@@ -4,9 +4,11 @@
 #include "CollisionDetection.h"
 #include "Octree.h"
 #include "NavigationGrid.h"
+
 namespace NCL {
 		class Camera;
 		using Maths::Ray;
+
 	namespace CSC8503 {
 		class GameObject;
 		class Constraint;
@@ -43,8 +45,6 @@ namespace NCL {
 			}
 
 			bool Raycast(Ray& r, RayCollision& closestCollision, bool closestObject = false) const;
-
-			void PaintObject();
 
 			virtual void UpdateWorld(float dt);
 

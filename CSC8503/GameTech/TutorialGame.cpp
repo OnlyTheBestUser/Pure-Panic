@@ -74,7 +74,7 @@ TutorialGame::TutorialGame()	{
 	Command* toggleDebug = new ToggleBoolCommand(&debugDraw);
 	Command* togglePause = new ToggleBoolCommand(&pause);
 	Command* quitCommand = new QuitCommand(&quit, &pause);
-	Command* fireCommand = new FireCommand(&world);
+	Command* fireCommand = new FireCommand(this);
 	inputHandler->BindButton(TOGGLE_GRAV, toggleGrav);
 	inputHandler->BindButton(TOGGLE_DEBUG, toggleDebug);
 	inputHandler->BindButton(TOGGLE_PAUSE, togglePause);
@@ -461,3 +461,12 @@ void TutorialGame::MoveSelectedObject(float dt) {
 	}*/
 }
 
+
+void TutorialGame::PaintObject() {
+
+	Ray ray = Ray(world->GetMainCamera()->GetPosition(), Vector3(cos(world->GetMainCamera()->GetYaw()) * cos(world->GetMainCamera()->GetPitch()), sin(world->GetMainCamera()->GetYaw()) * cos(world->GetMainCamera()->GetPitch()), sin(world->GetMainCamera()->GetPitch())));
+	RayCollision closestCollision;
+	if (world->Raycast(ray, closestCollision, true)) {
+		renderer->Paint((RenderObject*)closestCollision.node, closestCollision.collidedAt, 1, 0.5, 0.5, Vector4(1, 0, 0, 1));
+	}
+}

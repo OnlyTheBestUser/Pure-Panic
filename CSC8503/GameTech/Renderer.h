@@ -22,7 +22,7 @@ namespace NCL {
 			void SortObjectList();
 			void RenderScene();
 			void Paint(const RenderObject* paintable, NCL::Maths::Vector3 pos, float radius = 1.0f, float hardness = .5f, float strength = 0.5f, NCL::Maths::Vector4 color = Vector4(0,0,0,0));
-			Maths::Vector2 GetUVCoord(const RenderObject* paintable, NCL::Maths::Vector3 pos); // Gets where the uv point on a texture is given the object and collision position
+			//Maths::Vector2 GetUVCoord(const RenderObject* paintable, NCL::Maths::Vector3 pos); // Gets where the uv point on a texture is given the object and collision position
 			void ApplyPaintToMasks();
 
 			void RenderShadows();

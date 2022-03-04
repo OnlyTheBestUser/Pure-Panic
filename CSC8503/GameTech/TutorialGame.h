@@ -45,6 +45,8 @@ namespace NCL {
 				return quit;
 			}
 
+			void PaintObject();
+
 		protected:
 			InputHandler* inputHandler;
 

@@ -103,12 +103,12 @@ void Renderer::Render() {
 	BuildObjectList();
 	SortObjectList();
 
-	int iter = 0;
-	for (const auto& i : activeObjects) {
-		Paint(i, Vector3(0, 0, 0), 1.0f, 1.0f, 1.0f, Vector4(1, 0, 0, 1));
-		if (iter >= 10) { break; }
-		iter++;
-	}
+	//int iter = 0;
+	//for (const auto& i : activeObjects) {
+	//	Paint(i, Vector3(0, 0, 0), 1.0f, 1.0f, 1.0f, Vector4(1, 0, 0, 1));
+	//	if (iter >= 10) { break; }
+	//	iter++;
+	//}
 #ifdef _WIN64
 	ApplyPaintToMasks();
 #endif
