@@ -56,7 +56,13 @@ void GameWorld::RemoveGameObjectsFromWorld()
 void GameWorld::DeleteGameObjectsFromWorld()
 {
 	for (auto o : toDeleteGameObjects)
-		delete o;
+	{
+		if (o != nullptr)
+		{
+			delete o;
+			o = nullptr;
+		}
+	}
 }
 
 void GameWorld::GetObjectIterators(
@@ -85,7 +91,7 @@ void GameWorld::UpdateWorld(float dt) {
 	for (auto x : gameObjects) {
 		x->Update(dt);
 	}
-
+	
 	RemoveGameObjectsFromWorld();
 	DeleteGameObjectsFromWorld();
 	toRemoveGameObjects.clear();
