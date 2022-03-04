@@ -74,7 +74,7 @@ TutorialGame::TutorialGame()	{
 	Command* toggleDebug = new ToggleBoolCommand(&debugDraw);
 	Command* togglePause = new ToggleBoolCommand(&pause);
 	Command* quitCommand = new QuitCommand(&quit, &pause);
-	Command* fireCommand = new FireCommand(&world);
+	Command* fireCommand = new FireCommand(world);
 	inputHandler->BindButton(TOGGLE_GRAV, toggleGrav);
 	inputHandler->BindButton(TOGGLE_DEBUG, toggleDebug);
 	inputHandler->BindButton(TOGGLE_PAUSE, togglePause);
