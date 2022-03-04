@@ -464,9 +464,13 @@ void TutorialGame::MoveSelectedObject(float dt) {
 
 void TutorialGame::PaintObject() {
 
+
 	Ray ray = Ray(world->GetMainCamera()->GetPosition(), Vector3(cos(world->GetMainCamera()->GetYaw()) * cos(world->GetMainCamera()->GetPitch()), sin(world->GetMainCamera()->GetYaw()) * cos(world->GetMainCamera()->GetPitch()), sin(world->GetMainCamera()->GetPitch())));
 	RayCollision closestCollision;
 	if (world->Raycast(ray, closestCollision, true)) {
-		renderer->Paint((RenderObject*)closestCollision.node, closestCollision.collidedAt, 1, 0.5, 0.5, Vector4(1, 0, 0, 1));
+		auto test = ((GameObject*)closestCollision.node)->GetRenderObject();
+		if (test) {
+			renderer->Paint(test, closestCollision.collidedAt, 1, 0.5, 0.5, Vector4(0.3, 0, 0.5, 1));
+		}
 	}
 }

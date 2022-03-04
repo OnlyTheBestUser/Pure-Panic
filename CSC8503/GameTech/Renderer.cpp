@@ -287,7 +287,9 @@ void Renderer::ApplyPaintToMasks() {
 
 	Vector2 currentSize;
 	for (const auto& i : paintInstances) {
-		if (i.object->GetPaintMask() == 0) continue;
+		if (i.object->GetPaintMask() == nullptr) {
+			continue;
+		}
 		maskFBO = new OGLFrameBuffer();
 		maskFBO->AddTexture((OGLTexture*)(i.object->GetPaintMask()));
 
