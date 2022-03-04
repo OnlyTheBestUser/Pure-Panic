@@ -149,13 +149,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_ORBIS;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_ORBIS;FMOD_LIB_PATH="/app0/Plugins/FMod/PS4/api/core/lib/libfmodL.prx";FMOD_STUDIO_LIB_PATH="/app0/Plugins/FMod/PS4/api/studio/lib/libfmodstudioL.prx";</PreprocessorDefinitions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <CppLanguageStd>Cpp17</CppLanguageStd>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>CSC8503Common.a;Common.a;PlayStation4.a;libSceDbgVideoOut_stub_weak.a;libSceVideoOut_stub_weak.a;libSceGnm_debug.a;libSceGnmx_debug.a;libSceGpuAddress.a;libSceGnmDriver_stub_weak.a;libSceShaderBinary.a;libSceGnf_debug.a;libScePad_stub_weak.a;libSceUserService_stub_weak.a;libSceSysmodule_stub_weak.a;libSceNgs2_stub_weak.a;libSceAudioOut_stub_weak.a;-lSceAudio3d_stub_weak;toolkit_debug.a;libfmod_stub_weak.a;libfmodL_stub_weak.a$(GnmAdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)\Plugins\FMod\PS4\api\core\lib;$(ProjectDir)\Plugins\FMod\PS4\api\core\inc;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>CSC8503Common.a;Common.a;PlayStation4.a;libSceDbgVideoOut_stub_weak.a;libSceVideoOut_stub_weak.a;libSceGnm_debug.a;libSceGnmx_debug.a;libSceGpuAddress.a;libSceGnmDriver_stub_weak.a;libSceShaderBinary.a;libSceGnf_debug.a;libScePad_stub_weak.a;libSceUserService_stub_weak.a;libSceSysmodule_stub_weak.a;libSceNgs2_stub_weak.a;libSceAudioOut_stub_weak.a;-lSceAudio3d_stub_weak;toolkit_debug.a;libfmod_stub_weak.a;libfmodstudioL_stub_weak.a;$(GnmAdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>\app0\Plugins\FMod\PS4\api\core\lib;\app0\Plugins\FMod\PS4\api\core\inc;\app0\Plugins\FMod\PS4\api\studio\lib;\app0\Plugins\FMod\PS4\api\studio\inc;</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

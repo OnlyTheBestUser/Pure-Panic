@@ -113,8 +113,8 @@
     <LibraryPath>$(SolutionDir)\Plugins\FMod\Windows\api\core\lib\x64;$(SolutionDir)\Plugins\FMod\Windows\api\studio\lib\x64;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">
-    <IncludePath>H:\GitHub\Pure-Panic\ORBIS_Debug;$(IncludePath);$(SolutionDir)Plugins\FMod\PS4\api\core\inc\</IncludePath>
-    <LibraryPath>H:\GitHub\Pure-Panic\ORBIS_Debug;$(SolutionDir)Plugins\FMod\PS4\api\core\lib\;$(SolutionDir)Plugins\FMod\PS4\api\studio\lib\</LibraryPath>
+    <IncludePath>H:\GitHub\Pure-Panic\ORBIS_Debug;$(IncludePath);$(SolutionDir)Plugins\FMod\PS4\api\core\inc\;$(SolutionDir)Plugins\FMod\PS4\api\studio\inc\</IncludePath>
+    <LibraryPath>H:\GitHub\Pure-Panic\ORBIS_Debug;$(SolutionDir)Plugins\FMod\PS4\api\core\lib\;$(SolutionDir)Plugins\FMod\PS4\api\studio\lib\;</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(SolutionDir)\Plugins\FMod\Windows\api\core\inc;$(SolutionDir)\Plugins\FMod\PS4\api\core\inc;$(SolutionDir)\Plugins\Networking-ENet\include;$(IncludePath)</IncludePath>
@@ -149,12 +149,12 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>_DEBUG;_ORBIS;FMOD_LIB_PATH="libfmodL.prx";FMOD_STUDIO_LIB_PATH="libfmodstudioL.prx";</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_ORBIS;FMOD_LIB_PATH="/app0/libfmodL.prx";FMOD_STUDIO_LIB_PATH="/app0/libfmodstudioL.prx";</PreprocessorDefinitions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <CppLanguageStd>Cpp17</CppLanguageStd>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>%(AdditionalDependencies);fmodstudioL_stub_weak;fmodL_stub_weak;</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies);</AdditionalDependencies>
     </Lib>
     <PostBuildEvent>
       <Command>
