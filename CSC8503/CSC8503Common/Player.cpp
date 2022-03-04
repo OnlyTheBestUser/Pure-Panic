@@ -15,11 +15,20 @@ void Player::Update(float dt)
 		camera->SetPosition(GetTransform().GetPosition() + Vector3(0, 3, 0));
 		GetTransform().SetOrientation(Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)));
 	}
-	GetPhysicsObject()->AddAcceleration(force.Normalised() * speed);
-	force = Vector3(0, 0, 0);
+	
+	if (force.y == 0) GetPhysicsObject()->AddAcceleration(force.Normalised() * curSpeed * dt);
+	else GetPhysicsObject()->AddAcceleration(force.Normalised() * inAirSpeed * dt);
+
+	// For smooth jump mechanism
+	if (CheckDistToGround() < 0.5f) {
+		canJump = true;
+	}
+	else {
+		canJump = false;
+	}
 
 	// Check if grounded, if so don't apply more gravity
-	if (CheckDistToGround() < 0.01f)
+	if (CheckDistToGround() < 0.01f && force.y <= 0.0f)
 	{
 		Vector3 currentVel = GetPhysicsObject()->GetLinearVelocity();
 		GetPhysicsObject()->SetLinearVelocity(Vector3(currentVel.x, 0.0f, currentVel.z));
@@ -29,6 +38,8 @@ void Player::Update(float dt)
 	else {
 		physicsObject->SetGravity(true);
 	}
+
+	force = Vector3(0, 0, 0);
 }
 
 float Player::CheckDistToGround()

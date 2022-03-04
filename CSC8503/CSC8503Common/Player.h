@@ -40,10 +40,27 @@ namespace NCL {
 
             void SetSpawn(Vector3 l) { spawnPos = l; }
 
-			void MoveForwards() override { force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(0, 0, -1) * 100.0f; }
-			void MoveBackwards() override { force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(0, 0, 1) * 100.0f; }
-			void MoveLeft() override { force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(-1, 0, 0) * 50.0f; }
-			void MoveRight() override { force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(1, 0, 0) * 50.0f; }
+			void Move(Vector3 moveBy) override { 
+				if (camLocked)
+					force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * moveBy;// *50.0f;
+				else
+					camera->SetPosition(camera->GetPosition() + (Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * moveBy));
+			}
+			void Look(Vector2 moveBy) override {
+				camera->ChangeYaw(moveBy.x);
+				camera->ChangePitch(moveBy.y);
+			}
+
+			void Jump() override {
+				if (!camLocked)
+					camera->SetPosition(camera->GetPosition() + (Vector3(0, 1, 0) * cameraVertMult));
+				else if (canJump) force += Vector3(0, 1, 0);
+			}
+
+			void Descend() override {
+				if (!camLocked)
+					camera->SetPosition(camera->GetPosition() - (Vector3(0, 1, 0) * cameraVertMult));
+			}
 
 			void Fire() override;
 
@@ -56,6 +73,7 @@ namespace NCL {
 			}
 
 			void ChangeCamLock() { camLocked = !camLocked; }
+			bool* GetCamLock() { return &camLocked; }
 
         protected:
 			float CheckDistToGround();
@@ -68,10 +86,13 @@ namespace NCL {
             Vector3 checkpoint;
 			bool key = false;
 			float powerupTime = 0.0f;
-			float speed = 5.0f;
-			float curSpeed = 50.0f;
+			float curSpeed = 500.0f;
 			Vector3 force = Vector3(0,0,0);
 
+			float inAirSpeed = 1300.0f;
+			bool canJump;
+
+			float cameraVertMult = 0.5f;
 			Camera* camera;
 			GameWorld& gameWorld;
 			bool camLocked;
