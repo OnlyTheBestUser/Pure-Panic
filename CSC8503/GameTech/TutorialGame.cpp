@@ -19,6 +19,7 @@
 #include "../CSC8503Common/InputHandler.h"
 #include "../CSC8503Common/GameActor.h"
 #include "../CSC8503Common/Command.h"
+#include "../CSC8503Common/PowerUp.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -395,8 +396,11 @@ void TutorialGame::InitWorld() {
 	AddWallHammerToWorld(Vector3(-50, 2, 241), Vector3(10, 10, 6), 180);
 
 	//InitSphereGridWorld(10, 10, 25, 25, 2);
-	
+	PowerUp* powerup = AddPowerUpToWorld(Vector3(10, 5, 0), PowerUpType::FireRate, 5);
+
 	Player* player = AddPlayerToWorld(Vector3(0, 5, 0));
+
+	
 
 	Command* f = new MoveForwardCommand(player);
 	Command* b = new MoveBackwardCommand(player);
@@ -501,6 +505,40 @@ GameObject* TutorialGame::AddCapsuleToWorld(const Maths::Vector3& position, floa
 	world->AddGameObject(capsule);
 
 	return capsule;
+}
+
+PowerUp* TutorialGame::AddPowerUpToWorld(const Vector3& position, PowerUpType ability, float radius) {
+	PowerUp* powerup = nullptr;
+	
+	switch (ability) {
+	case(PowerUpType::FireRate):
+		powerup = new FireRate();
+		break;
+	}
+
+	if (powerup == nullptr) {
+		return powerup;
+	}
+
+	Vector3 sphereSize = Vector3(radius, radius, radius);
+	SphereVolume* volume = new SphereVolume(radius);
+	powerup->SetBoundingVolume((CollisionVolume*)volume);
+
+	powerup->GetTransform()
+		.SetScale(sphereSize)
+		.SetPosition(position);
+
+	powerup->SetRenderObject(new RenderObject(&powerup->GetTransform(), sphereMesh, basicTex, basicShader));
+	powerup->SetPhysicsObject(new PhysicsObject(&powerup->GetTransform(), powerup->GetBoundingVolume()));
+
+	powerup->GetPhysicsObject()->SetInverseMass(0);
+
+	world->AddGameObject(powerup);
+	powerup->SetDynamic(false);
+
+	powerup->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+
+	return powerup;
 }
 
 GameObject* TutorialGame::AddCubeToWorld(const Maths::Vector3& position, Maths::Vector3 dimensions, bool OBB, float inverseMass, int layer, bool isTrigger, bool dynamic) {
@@ -825,6 +863,9 @@ Player* TutorialGame::AddPlayerToWorld(const Vector3& position) {
 
 	return character;
 }
+//PowerUp* TutorialGame::AddPowerUpToWorld(const Vector3& position) {
+//
+//}
 
 /*
 

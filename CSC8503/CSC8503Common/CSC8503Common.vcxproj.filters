@@ -28,6 +28,9 @@
     <Filter Include="Input Handling">
       <UniqueIdentifier>{f1226dc9-d3d1-4557-b16d-d16067ca991a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\PowerUps">
+      <UniqueIdentifier>{1e07e52b-d791-4264-bde5-0efca8e70d97}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameWorld.h">
@@ -137,6 +140,18 @@
     </ClInclude>
     <ClInclude Include="MoveForwardCommand.h">
       <Filter>Input Handling</Filter>
+    </ClInclude>
+    <ClInclude Include="PowerUp.h">
+      <Filter>Header Files\PowerUps</Filter>
+    </ClInclude>
+    <ClInclude Include="SpeedBoost.h">
+      <Filter>Header Files\PowerUps</Filter>
+    </ClInclude>
+    <ClInclude Include="FIreRate.h">
+      <Filter>Header Files\PowerUps</Filter>
+    </ClInclude>
+    <ClInclude Include="MultipleBullets.h">
+      <Filter>Header Files\PowerUps</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -2,6 +2,8 @@
 #include "Renderer.h"
 #include "../CSC8503Common/PhysicsSystem.h"
 #include "../CSC8503Common/Player.h"
+#include "../CSC8503Common/PowerUp.h"
+#include "../CSC8503Common/FireRate.h"
 
 namespace NCL {
 	namespace PS4 {
@@ -73,6 +75,8 @@ namespace NCL {
 			void AddWallHammerToWorld(const Vector3& position, Vector3 dimensions, int rotation);
 			
 			GameObject* AddCapsuleToWorld(const Maths::Vector3& position, float halfHeight, float radius, float inverseMass = 10.0f);
+
+			PowerUp* AddPowerUpToWorld(const Vector3& position,PowerUpType ability, float radius);
 
 			Player* AddPlayerToWorld(const Vector3& position);
 

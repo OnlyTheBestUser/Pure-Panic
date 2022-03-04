@@ -35,6 +35,12 @@ namespace NCL {
 				powerupTime += duration;
 			};
 
+			void IncreaseFireRate(float increaseFireRateBy, float duration) {
+				std::cout << "Picking up the powerup" << std::endl;
+			}
+
+			
+
 			float GetSpeed() const { return curSpeed; }
 
             void SetSpawn(Vector3 l) { spawnPos = l; }
@@ -61,6 +67,8 @@ namespace NCL {
 			float curSpeed = 50.0f;
 			Vector3 force = Vector3(0,0,0);
 
+			float fireRate = 10;
+			
 			Camera* camera;
 			GameWorld& gameWorld;
 			bool camLocked;
