@@ -319,6 +319,26 @@ void Renderer::ApplyPaintToMasks() {
 	paintInstances.clear();
 }
 
+Maths::Vector2 Renderer::GetUVCoord(const RenderObject* paintable, NCL::Maths::Vector3 pos) {
+	const vector<Vector3> vertices = paintable->GetMesh()->GetPositionData();
+
+	Vector3 localPos = paintable->GetTransform()->GetMatrix().Inverse() * pos;
+	Vector3 closestDistance = Vector3(100,100,100);
+	int closestVertex = -1;
+	for (auto i = 0; i < paintable->GetMesh()->GetVertexCount(); ++i) {
+		Vector3 distance = vertices[i] - localPos;
+		if (distance.Length() < closestDistance.Length()) {
+			closestDistance = distance;
+			closestVertex = i;
+		}
+	}
+
+	if (closestVertex != -1) {
+		return paintable->GetMesh()->GetTextureCoordData()[closestVertex];
+	}
+	return Vector2();
+}
+
 Maths::Matrix4 Renderer::SetupDebugLineMatrix()	const {
 	float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
 	Matrix4 viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
