@@ -22,7 +22,7 @@ PhysicsSystem::PhysicsSystem(GameWorld& g) : gameWorld(g)	{
 	useBroadPhase	= true;	
 	dTOffset		= 0.0f;
 	globalDamping	= 0.995f;
-	SetGravity(Vector3(0.0f, -100.0f, 0.0f));
+	SetGravity(Vector3(0.0f, -19.6f, 0.0f));
 
 	// Sets the valid different collision layers here
 	/* Col Layer 1 = 1
@@ -37,6 +37,8 @@ PhysicsSystem::PhysicsSystem(GameWorld& g) : gameWorld(g)	{
 	validLayers.emplace_back(Vector2(3, 1));
 	validLayers.emplace_back(Vector2(1, 5));
 	validLayers.emplace_back(Vector2(5, 1));
+	validLayers.emplace_back(Vector2(3, 5));
+	validLayers.emplace_back(Vector2(5, 3));
 }
 
 PhysicsSystem::~PhysicsSystem()	{
@@ -156,7 +158,7 @@ void PhysicsSystem::Update(float dt) {
 	}
 
 	ClearForces();	//Once we've finished with the forces, reset them to zero
-	UpdateCollisionList(); //Remove any old collisions
+	//UpdateCollisionList(); //Remove any old collisions
 
 	t.Tick();
 	float updateTime = t.GetTimeDeltaSeconds();
