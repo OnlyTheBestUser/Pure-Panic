@@ -88,10 +88,12 @@ Projectile* Player::spawnProjectile(const float& radius, const float& height, co
 	//projectile->GetPhysicsObject()->SetFriction(1.0f);
 	//projectile->GetPhysicsObject()->SetLinearDamping(10.0f);
 	projectile->GetPhysicsObject()->InitSphereInertia();
-	projectile->GetPhysicsObject()->AddAcceleration(camForwardVector * initialSpeed + this->GetPhysicsObject()->GetLinearVelocity());
-	//projectile->GetTransform().SetOrientation(Quaternion(Matrix3::Rotation(-acos(Vector3::Dot(Vector3(0, 1, 0), camForwardVector)) * 180.0f / 3.14f, Vector3::Cross(camForwardVector, Vector3(0, 1, 0)).Normalised())));
-	Vector3 velocityDir = (projectile->GetPhysicsObject()->GetLinearVelocity()).Normalised();
-	projectile->GetTransform().SetOrientation(Quaternion(Matrix3::Rotation(-acos(Vector3::Dot(Vector3(0, 1, 0), velocityDir)) * 180.0f / 3.14f, projectile->RotationAxis)));
+
+	float velocityDueToMovement = Vector3::Dot(camForwardVector, this->GetPhysicsObject()->GetLinearVelocity());
+	if (velocityDueToMovement < 0.0f) velocityDueToMovement = 0.0f;
+	//Debug::DrawArrow(projectile->GetTransform().GetPosition(), projectile->GetTransform().GetPosition() + camForwardVector * Vector3::Dot(camForwardVector, this->GetPhysicsObject()->GetLinearVelocity()), Debug::CYAN, 1000.0f);
+	projectile->GetPhysicsObject()->AddAcceleration(camForwardVector * (initialSpeed + velocityDueToMovement));
+	projectile->GetTransform().SetOrientation(Quaternion(Matrix3::Rotation(-acos(Vector3::Dot(Vector3(0, 1, 0), camForwardVector)) * 180.0f / 3.14f, Vector3::Cross(camForwardVector, Vector3(0, 1, 0)).Normalised())));
 
 	//Debug::DrawAxisLines(projectile->GetTransform().GetMatrix(), 2.0f, 1000.0f);
 	//Debug::DrawArrow(camera->GetPosition(), (camera->GetPosition() + this->GetCamFrontVec() * 100.0f), Debug::RED, 5.0f);
