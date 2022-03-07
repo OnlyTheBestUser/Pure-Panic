@@ -58,7 +58,7 @@ void NetworkedGame::StartAsClient(char a, char b, char c, char d) {
 	//thisClient->RegisterPacketHandler(String_Message, this);
 
 	// Add one for the server
-	GameObject* serverPlayer = levelLoader->AddSphereToWorld(Vector3(5, 5, 5), 1);
+	GameObject* serverPlayer = levelLoader->AddDummyPlayerToWorld(Vector3(0, 10, 0));
 	serverPlayer->SetNetworkObject(new NetworkObject(*serverPlayer, 0));
 	serverPlayer->SetDynamic(true);
 	if (networkObjects.size() <= 0) {
@@ -93,31 +93,43 @@ void NetworkedGame::UpdateGame(float dt) {
 
 void NetworkedGame::UpdateAsServer(float dt) {
 	thisServer->UpdateServer();
-	packetsToSnapshot--;
-	if (packetsToSnapshot < 0) {
-		BroadcastSnapshot(false);
-		packetsToSnapshot = 5;
-	}
+	//packetsToSnapshot--;
+	//if (packetsToSnapshot < 0) {
+	//	BroadcastSnapshot(false);
+	//	packetsToSnapshot = 5;
+	//}
 	//else {
 	//	BroadcastSnapshot(true);
 	//}
+
+	BroadcastSnapshot(false);
 }
 
-
-// TODO reserve 65k, get guard clause to check for null instead
 void NetworkedGame::UpdateAsClient(float dt) {
 	thisClient->UpdateClient();
 
+	if (!localPlayer)
+		return;
+
 	ClientPacket newPacket;
+	newPacket.clientID = playerID;
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::SPACE)) {
 		//fire button pressed!
 		std::cout << "Fire!" << std::endl;
-		newPacket.clientID = playerID;
 		newPacket.buttonstates[0] = 1;
-		clientLastPacketID++;
-		newPacket.lastID = clientLastPacketID; //You'll need to work this out somehow...
-		thisClient->SendPacket(newPacket);
 	}
+	clientLastPacketID++;
+	newPacket.lastID = clientLastPacketID;
+	Vector3 position = localPlayer->GetTransform().GetPosition();
+	newPacket.pos[0] = position.x;
+	newPacket.pos[1] = position.y;
+	newPacket.pos[2] = position.z;
+
+	Vector3 angle = localPlayer->GetTransform().GetOrientation().ToEuler();
+	newPacket.angles[0] = angle.x;
+	newPacket.angles[1] = angle.y;
+	newPacket.angles[2] = angle.z;
+	thisClient->SendPacket(newPacket);
 }
 
 // what is happening here then?? Why not just have a list of network objects??
@@ -183,7 +195,7 @@ void NetworkedGame::UpdateMinimumState() {
 
 
 void NetworkedGame::SpawnPlayer() {
-	localPlayer = levelLoader->AddCubeToWorld(Vector3(10, 15, 10), Vector3(1, 1, 1), 10.0f);
+	localPlayer = player1;
 	localPlayer->SetNetworkObject(new NetworkObject(*localPlayer, playerID));
 	localPlayer->SetDynamic(true);
 	std::cout << "Player Spawned with Network ID: " << localPlayer->GetNetworkObject()->GetNetID() << "." << std::endl;
@@ -193,8 +205,9 @@ void NetworkedGame::SpawnPlayer() {
 	networkObjects[playerID] = (localPlayer->GetNetworkObject());
 	for (int i = 0; i < playerID; i++) {
 		if (!networkObjects[i]) {
-			GameObject* p = levelLoader->AddSphereToWorld(Vector3(10, 10, 10), 1);
+			GameObject* p = levelLoader->AddDummyPlayerToWorld(Vector3(0, 10, 0));
 			p->SetDynamic(true);
+			p->GetPhysicsObject()->SetGravity(false);
 			p->SetNetworkObject(new NetworkObject(*p, i));
 			networkObjects[i] = p->GetNetworkObject();
 		}
@@ -236,6 +249,8 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
 	else if (type == Full_State) {
 		//std::cout << "Client: Received full_state message!" << std::endl;
 		FullPacket* realPacket = (FullPacket*)payload;
+		if (realPacket->objectID == playerID)
+			return;
 		//std::cout << realPacket->objectID << ": (" << realPacket->fullState.position.x << ", " << realPacket->fullState.position.y << ", " << realPacket->fullState.position.z << ")\n";
 		if (realPacket->objectID < (int)networkObjects.size()) {
 			if (networkObjects[realPacket->objectID])
@@ -302,7 +317,9 @@ void NetworkedGame::HandleClientPacket(ClientPacket* packet)
 		if (index->second < packet->lastID) {
 			index->second = packet->lastID;
 			auto obj = serverPlayers.find(packet->clientID);
-			obj->second->GetTransform().SetPosition(obj->second->GetTransform().GetPosition() + Vector3(0, 5, 0));
+			Vector3 pos(packet->pos[0], packet->pos[1], packet->pos[2]);
+			obj->second->GetTransform().SetPosition(pos);
+			obj->second->GetTransform().SetOrientation(Quaternion::EulerAnglesToQuaternion(packet->angles[0], packet->angles[1], packet->angles[2]));
 		}
 	}
 	else {
@@ -314,9 +331,10 @@ void NetworkedGame::AddNewPlayerToServer(int clientID, int lastID)
 {
 	clientHistory.insert(std::pair<int, int>(clientID, lastID));
 
-	GameObject* client = levelLoader->AddSphereToWorld(Vector3(2,15,2), 1.0f, 10.0f);
+	GameObject* client = levelLoader->AddDummyPlayerToWorld(Vector3(0,5,0));
 	client->SetNetworkObject(new NetworkObject(*client, clientID));
 	client->SetDynamic(true);
+	client->GetPhysicsObject()->SetGravity(false);
 
 	serverPlayers.insert(std::pair<int, GameObject*>(clientID, client));
 

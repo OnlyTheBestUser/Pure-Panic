@@ -26,11 +26,14 @@ namespace NCL {
 			}
 		};
 
+		
+
 		struct ClientPacket : public GamePacket {
 			int		clientID;
 			int		lastID;
+			float	pos[3];
+			float	angles[3];
 			char	buttonstates[8];
-			//int		angles[3];
 
 			ClientPacket() {
 				type = Received_State;

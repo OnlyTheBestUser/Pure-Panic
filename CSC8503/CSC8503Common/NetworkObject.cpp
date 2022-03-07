@@ -64,6 +64,8 @@ bool NetworkObject::ReadFullPacket(FullPacket& p) {
 	}
 	lastFullState = p.fullState;
 
+	//std::cout << "FULL PACKET!" << std::endl;
+
 	object.GetTransform()
 		.SetPosition(lastFullState.position)
 		.SetOrientation(lastFullState.orientation);

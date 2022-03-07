@@ -194,6 +194,36 @@ Player* LevelLoader::AddPlayerToWorld(const Vector3& position) {
 	return character;
 }
 
+GameObject* LevelLoader::AddDummyPlayerToWorld(const Vector3& position)
+{
+	float meshSize = 3.0f;
+	float inverseMass = 0.5f;
+
+	GameObject* character = new GameObject("Dummy");
+
+	CapsuleVolume* volume = new CapsuleVolume(0.85f * meshSize, 0.3f * meshSize);
+	character->SetBoundingVolume((CollisionVolume*)volume);
+
+	character->GetTransform()
+		.SetScale(Vector3(meshSize, meshSize, meshSize))
+		.SetPosition(position);
+
+	character->SetRenderObject(new RenderObject(&character->GetTransform(), charMeshA, nullptr, basicShader));
+	character->SetPhysicsObject(new PhysicsObject(&character->GetTransform(), character->GetBoundingVolume()));
+
+	character->GetPhysicsObject()->SetInverseMass(inverseMass);
+	character->GetPhysicsObject()->SetFriction(1.0f);
+	character->GetPhysicsObject()->SetLinearDamping(10.0f);
+	character->GetPhysicsObject()->InitSphereInertia();
+	character->GetPhysicsObject()->SetShouldApplyAngular(false);
+	character->SetDynamic(true);
+	character->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
+
+	world->AddGameObject(character);
+
+	return character;
+}
+
 GameObject* LevelLoader::AddFloorToWorld(const Maths::Vector3& position) {
 	GameObject* floor = new GameObject("Floor");
 
@@ -420,6 +450,8 @@ GameObject* LevelLoader::AddSphereToWorld(const Maths::Vector3& position, float 
 		sphere->GetPhysicsObject()->SetElasticity(0.9f);
 	else
 		sphere->GetPhysicsObject()->SetElasticity(0.2f);
+
+	sphere->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 
 	world->AddGameObject(sphere);
 	sphere->SetDynamic(dynamic);

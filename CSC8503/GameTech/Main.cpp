@@ -171,7 +171,7 @@ hide or show the
 
 int main() {
 #ifdef _WIN64
-	Window* w = Window::CreateGameWindow("CSC8503 Game technology!", 1600, 900);
+	Window* w = Window::CreateGameWindow("CSC8503 Game technology!", 1280, 720);
 #endif
 #ifdef _ORBIS
 	Window* w = (PS4Window*)Window::CreateGameWindow("PS4 Example Code", 1920, 1080);
@@ -191,8 +191,8 @@ int main() {
 	float totalTime = 0.0f;
 	int totalFrames = 0;
 
-	TutorialGame* g = new TutorialGame();
-	// NetworkedGame* h = new NetworkedGame();
+	//TutorialGame* g = new TutorialGame();
+	NetworkedGame* h = new NetworkedGame();
 	// MainMenu* m = new MainMenu();
 	// PushdownMachine p = new Menu(m, g, h, g);
 	//MainMenu* m = new MainMenu();
@@ -200,6 +200,11 @@ int main() {
 	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
 	float smallestFrameRate = 144.0f;
 	while (w->UpdateWindow()) { //&& !w->GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
+#if _WIN64
+		if (w->GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE))
+			break;
+#endif
+
 		//DisplayPathfinding();
 		float dt = w->GetTimer()->GetTimeDeltaSeconds();
 		if (dt > 0.1f) {
@@ -231,7 +236,7 @@ int main() {
 			curTimeWait = avgTimeWait;
 		}
 
-		g->UpdateGame(dt);
+		h->UpdateGame(dt);
 
 		//if (!p.Update(dt)) {
 		//	return 0;

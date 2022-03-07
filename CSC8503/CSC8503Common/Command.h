@@ -2,6 +2,7 @@
 #include "GameActor.h"
 #include "PhysicsSystem.h"
 #include "InputBase.h"
+
 namespace NCL {
 	namespace CSC8503 {
 		class Command {
@@ -108,6 +109,26 @@ namespace NCL {
 			protected:
 				bool* paused;
 				bool* quit;
+		};
+
+		class ToggleMouseCommand : public Command {
+		public:
+			ToggleMouseCommand(bool* mouse) : mouse(mouse) {};
+			virtual ~ToggleMouseCommand() {};
+			void execute() {
+				if (!*mouse) {
+					Window::GetWindow()->ShowOSPointer(true);
+					Window::GetWindow()->LockMouseToWindow(false);
+					*mouse = true;
+				}
+				else {
+					Window::GetWindow()->ShowOSPointer(false);
+					Window::GetWindow()->LockMouseToWindow(true);
+					*mouse = false;
+				}
+			}
+		protected:
+			bool* mouse;
 		};
 #pragma endregion
 	}
