@@ -18,6 +18,11 @@ namespace NCL {
 			}
 
 			void Update(float dt) override;
+
+			Vector3 RotationAxis;
+			Vector3 ShootDir;
+			float InitialShootAngle;
+
 		private:
 			//Vector3 velocity;
 			GameWorld& gameWorld;

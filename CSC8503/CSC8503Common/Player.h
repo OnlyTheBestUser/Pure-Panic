@@ -91,7 +91,7 @@ namespace NCL {
 			float fireRate = 0.25f;
 			float timeSincePrevShot = 0.0f;
 			float powerupTime = 0.0f;
-			float curSpeed = 150.0f;
+			float curSpeed = 50.0f;
 			Vector3 force = Vector3(0,0,0);
 
 			float inAirSpeed = 500.0f;
