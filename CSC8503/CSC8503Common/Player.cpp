@@ -10,6 +10,7 @@ void Player::OnCollisionBegin(GameObject* other, Vector3 localA, Vector3 localB,
 
 void Player::Update(float dt)
 {
+	timeSincePrevShot += dt;
 	if (camLocked)
 	{
 		camera->SetPosition(GetTransform().GetPosition() + Vector3(0, 3, 0));
@@ -97,7 +98,11 @@ Projectile* Player::spawnProjectile(const float& radius, const float& height, co
 }
 
 void Player::Fire() {
-	spawnProjectile(0.3f, 1.0f);
+	if (timeSincePrevShot > fireRate)
+	{
+		spawnProjectile(0.3f, 1.0f);
+		timeSincePrevShot = 0.0f;
+	}
 }
 
 void Player::Reset() 
