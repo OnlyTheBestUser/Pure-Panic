@@ -38,6 +38,7 @@ namespace NCL {
 			struct PaintInstance {
 				const RenderObject* object;
 				Maths::Vector3 pos;
+				Maths::Vector2 uv;
 				float radius;
 				float hardness;
 				float strength;

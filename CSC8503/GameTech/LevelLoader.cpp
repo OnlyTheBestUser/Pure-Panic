@@ -139,6 +139,9 @@ void LevelLoader::ReadInLevelFile(std::string filename) {
 				else if (lineContents[0] == "WALL_HAMMER") {
 					AddWallHammerToWorld(Vec3FromStr(lineContents[1]), std::stoi(lineContents[2]));
 				}
+				else if (lineContents[0] == "PAINT_WALL") {
+					AddPaintWallToWorld(Vec3FromStr(lineContents[1]), Vector3(5, 5, 4), std::stoi(lineContents[2]));
+				}
 			}
 		}
 
@@ -292,6 +295,29 @@ GameObject* LevelLoader::AddLongWallToWorld(const Vector3& position, Vector3 dim
 		return physicalObject;
 	}
 	return physicalObject;
+}
+
+GameObject* LevelLoader::AddPaintWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name)
+{
+	GameObject* cube = new GameObject(name);
+	OBBVolume* volume = new OBBVolume(dimensions + Vector3(2, 10, 0));
+	cube->SetBoundingVolume((CollisionVolume*)volume);
+
+	cube->GetTransform()
+		.SetPosition(position)
+		.SetScale(dimensions * 2)
+		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
+
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, OGLTexture::RGBATextureEmpty(corridorWallAlertTex->GetHeight()/16, corridorWallAlertTex->GetWidth()/16), basicShader));
+	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
+
+	cube->GetPhysicsObject()->SetInverseMass(0.0f);
+	cube->GetPhysicsObject()->InitCubeInertia();
+
+	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	cube->SetDynamic(false);
+	world->AddGameObject(cube);
+	return cube;
 }
 
 void LevelLoader::AddCornerWallToWorld(const Vector3& position, Vector3 dimensions, int rotation)

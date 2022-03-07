@@ -23,6 +23,7 @@ namespace NCL {
 			GameObject* AddAABBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name = "AABBWall");
 			GameObject* AddOBBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name = "OBBWall");
 			GameObject* AddLongWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name = "LongWall");
+			GameObject* AddPaintWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name = "PaintWall");
 
 			void AddCornerWallToWorld(const Vector3& position, Vector3 dimensions, int rotation);
 			void AddSecurityCameraToWorld(const Vector3& position, int rotation);

@@ -268,7 +268,8 @@ void Renderer::Paint(const RenderObject* paintable, NCL::Maths::Vector3 pos, flo
 {
 	PaintInstance pi;
 	pi.object = paintable;
-	pi.pos = pos; // convert from world to UV
+	pi.pos = pos;
+	pi.uv = GetUVCoord(paintable, pos); // convert from world to UV
 	pi.radius = radius;
 	pi.hardness = hardness;
 	pi.strength = strength;
@@ -301,9 +302,13 @@ void Renderer::ApplyPaintToMasks() {
 		// Update uniforms here
 		rendererAPI->UpdateUniformMatrix4(maskShader, "modelMatrix", i.object->GetTransform()->GetMatrix());
 		rendererAPI->UpdateUniformVector3(maskShader, "painterPosition", i.pos);
-		rendererAPI->UpdateUniformFloat(maskShader, "radius", i.radius);
+		rendererAPI->UpdateUniformVector2(maskShader, "nearTexCoord", i.uv);
+		rendererAPI->UpdateUniformVector2(maskShader, "textureSize", Vector2(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight()));
+		float scale = 400.0f / (400.0f / 1.0f);
+		rendererAPI->UpdateUniformFloat(maskShader, "textureScale", scale);
+		rendererAPI->UpdateUniformFloat(maskShader, "radius", 20.0f);
 		rendererAPI->UpdateUniformFloat(maskShader, "hardness", i.hardness);
-		rendererAPI->UpdateUniformFloat(maskShader, "stregth", i.strength);
+		rendererAPI->UpdateUniformFloat(maskShader, "strength", i.strength);
 		rendererAPI->UpdateUniformVector4(maskShader, "colour", i.colour);
 
 		rendererAPI->BindFrameBuffer(maskFBO);
@@ -325,10 +330,12 @@ Maths::Vector2 Renderer::GetUVCoord(const RenderObject* paintable, NCL::Maths::V
 	const vector<Vector3> vertices = paintable->GetMesh()->GetPositionData();
 
 	Vector3 localPos = paintable->GetTransform()->GetMatrix().Inverse() * pos;
-	Vector3 closestDistance = Vector3(100,100,100);
+	Vector3 closestDistance = Vector3(10000,10000,10000);
 	int closestVertex = -1;
 	for (auto i = 0; i < paintable->GetMesh()->GetVertexCount(); ++i) {
 		Vector3 distance = vertices[i] - localPos;
+		float t1 = distance.Length();
+		float t2 = closestDistance.Length();
 		if (distance.Length() < closestDistance.Length()) {
 			closestDistance = distance;
 			closestVertex = i;
