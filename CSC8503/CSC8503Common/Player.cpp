@@ -62,15 +62,15 @@ float Player::CheckDistToGround()
 	return distToGround;
 }
 
-Projectile* Player::spawnProjectile(const float& radius, const float& height, const float& initialSpeed) {
-	float meshSize = 0.5f;
+Projectile* Player::spawnProjectile(const float& initialSpeed, const float& meshSize) {
+	//float meshSize = 0.5f;
 	float inverseMass = 5.0f;
 	//Vector3 offset = Vector3(0, 2.5f, 0);
 	Vector3 camForwardVector = this->GetCamFrontVec();
 
-	Projectile* projectile = new Projectile(gameWorld, radius, height);
+	Projectile* projectile = new Projectile(gameWorld);
 
-	SphereVolume* volume = new SphereVolume(height / 2.0f * meshSize * 1.3f);
+	SphereVolume* volume = new SphereVolume(meshSize * 1.4);// / 2.0f * meshSize * 1.3f);
 	projectile->SetBoundingVolume((CollisionVolume*)volume);
 
 	projectile->GetTransform()
@@ -106,7 +106,7 @@ Projectile* Player::spawnProjectile(const float& radius, const float& height, co
 void Player::Fire() {
 	if (timeSincePrevShot > fireRate)
 	{
-		spawnProjectile(0.3f, 4.0f);
+		spawnProjectile();
 		timeSincePrevShot = 0.0f;
 	}
 }
