@@ -198,6 +198,7 @@ void NetworkedGame::SpawnPlayer() {
 	localPlayer = player1;
 	localPlayer->SetNetworkObject(new NetworkObject(*localPlayer, playerID));
 	localPlayer->SetDynamic(true);
+	localPlayer->GetTransform().SetPosition(Vector3(playerID * 5, 10, 0));
 	std::cout << "Player Spawned with Network ID: " << localPlayer->GetNetworkObject()->GetNetID() << "." << std::endl;
 	if (!(playerID < networkObjects.size())) {
 		networkObjects.resize(playerID + 1);
@@ -205,7 +206,7 @@ void NetworkedGame::SpawnPlayer() {
 	networkObjects[playerID] = (localPlayer->GetNetworkObject());
 	for (int i = 0; i < playerID; i++) {
 		if (!networkObjects[i]) {
-			GameObject* p = levelLoader->AddDummyPlayerToWorld(Vector3(0, 10, 0));
+			GameObject* p = levelLoader->AddDummyPlayerToWorld(Vector3(i * 5, 10, 0));
 			p->SetDynamic(true);
 			p->GetPhysicsObject()->SetGravity(false);
 			p->SetNetworkObject(new NetworkObject(*p, i));
@@ -331,7 +332,7 @@ void NetworkedGame::AddNewPlayerToServer(int clientID, int lastID)
 {
 	clientHistory.insert(std::pair<int, int>(clientID, lastID));
 
-	GameObject* client = levelLoader->AddDummyPlayerToWorld(Vector3(0,5,0));
+	GameObject* client = levelLoader->AddDummyPlayerToWorld(Vector3(clientID * 5, 10, 0));
 	client->SetNetworkObject(new NetworkObject(*client, clientID));
 	client->SetDynamic(true);
 	client->GetPhysicsObject()->SetGravity(false);
