@@ -1,6 +1,6 @@
 #pragma once
 #include "GameObject.h"
-
+#include "../../Common/Vector2.h"
 namespace NCL {
 	namespace CSC8503 {
 		class GameActor : public GameObject {
@@ -9,12 +9,11 @@ namespace NCL {
 			GameActor(string name = "") : GameObject(name) {};
 			virtual ~GameActor() {};
 
-			virtual void MoveForwards()		{ std::cout << "Move Forwards!" << std::endl; }
-			virtual void MoveBackwards()	{ std::cout << "Move Backwards!" << std::endl; }
-			virtual void MoveLeft()			{ std::cout << "Move Left!" << std::endl; }
-			virtual void MoveRight()		{ std::cout << "Move Right!" << std::endl; }
-			void Jump()				{ std::cout << "Jump!" << std::endl; }
-			void Fire()				{ std::cout << "Fire!" << std::endl; }
+			virtual void Move(Vector3 moveBy) { std::cout << "MOVE" << std::endl; }
+			virtual void Look(Vector2 moveBy) { std::cout << "LOOK" << std::endl; }
+			virtual void Jump()				{ std::cout << "Jump!" << std::endl; }
+			virtual void Descend()				{ std::cout << "Descend!" << std::endl; }
+			virtual void Fire()				{ std::cout << "Fire!" << std::endl; }
 
 			/*
 			Sprint function?

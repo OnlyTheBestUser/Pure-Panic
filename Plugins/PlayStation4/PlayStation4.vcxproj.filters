@@ -60,9 +60,6 @@
     <ClCompile Include="PS4Sound.cpp">
       <Filter>Audio</Filter>
     </ClCompile>
-    <ClCompile Include="InputBase.cpp">
-      <Filter>Windowing and Input</Filter>
-    </ClCompile>
     <ClCompile Include="PS4Input.cpp">
       <Filter>Windowing and Input</Filter>
     </ClCompile>
@@ -74,6 +71,9 @@
     </ClCompile>
     <ClCompile Include="Ps4AudioSystem.cpp">
       <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="PS4UniformBuffer.cpp">
+      <Filter>Rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -110,14 +110,14 @@
     <ClInclude Include="PS4Input.h">
       <Filter>Windowing and Input</Filter>
     </ClInclude>
-    <ClInclude Include="InputBase.h">
-      <Filter>Windowing and Input</Filter>
-    </ClInclude>
     <ClInclude Include="PS4Frame.h">
       <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="Ps4AudioSystem.h">
       <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="PS4UniformBuffer.h">
+      <Filter>Rendering</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -139,6 +139,30 @@
       <Filter>Assets\Textures</Filter>
     </CustomBuild>
     <CustomBuild Include="..\..\Assets\Textures\Cubemap\skyrender0001.png">
+      <Filter>Assets\Textures</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\Corridor_Light_Colour.png">
+      <Filter>Assets\Textures</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\Corridor_Light_Normal.png">
+      <Filter>Assets\Textures</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\corridor_wall_c.png">
+      <Filter>Assets\Textures</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\corridor_wall_n.png">
+      <Filter>Assets\Textures</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\Corridor_Walls_Redux_Colour.png">
+      <Filter>Assets\Textures</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\Corridor_Walls_Redux_Metal.png">
+      <Filter>Assets\Textures</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\Corridor_Walls_Redux_Normal.png">
+      <Filter>Assets\Textures</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\Animated_Screens_A_Colour.png">
       <Filter>Assets\Textures</Filter>
     </CustomBuild>
   </ItemGroup>

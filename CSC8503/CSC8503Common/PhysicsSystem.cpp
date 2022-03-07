@@ -23,6 +23,22 @@ PhysicsSystem::PhysicsSystem(GameWorld& g) : gameWorld(g)	{
 	dTOffset		= 0.0f;
 	globalDamping	= 0.995f;
 	SetGravity(Vector3(0.0f, -19.6f, 0.0f));
+
+	// Sets the valid different collision layers here
+	/* Col Layer 1 = 1
+	Col Layer 2 = 2
+	Col Layer 3 = 4
+	Col Layer 4 = 8
+	Col Layer 5 = 16
+	Col Layer 6 = 32 
+	...so Col1 | Col3  = 5 */
+	validLayers.emplace_back(Vector2(1, 1));
+	validLayers.emplace_back(Vector2(1, 3));
+	validLayers.emplace_back(Vector2(3, 1));
+	validLayers.emplace_back(Vector2(1, 5));
+	validLayers.emplace_back(Vector2(5, 1));
+	validLayers.emplace_back(Vector2(3, 5));
+	validLayers.emplace_back(Vector2(5, 3));
 }
 
 PhysicsSystem::~PhysicsSystem()	{
@@ -142,7 +158,7 @@ void PhysicsSystem::Update(float dt) {
 	}
 
 	ClearForces();	//Once we've finished with the forces, reset them to zero
-	UpdateCollisionList(); //Remove any old collisions
+	//UpdateCollisionList(); //Remove any old collisions
 
 	t.Tick();
 	float updateTime = t.GetTimeDeltaSeconds();
@@ -179,23 +195,28 @@ From this simple mechanism, we we build up gameplay interactions inside the
 OnCollisionBegin / OnCollisionEnd functions (removing health when hit by a 
 rocket launcher, gaining a point when the player hits the gold coin, and so on).
 */
-void PhysicsSystem::UpdateCollisionList() {
-	for (std::set<CollisionDetection::CollisionInfo>::iterator i = allCollisions.begin(); i != allCollisions.end(); ) {
-		if ((*i).framesLeft == numCollisionFrames) {
-			i->a->OnCollisionBegin(i->b, i->point.localA, i->point.localB, i->point.normal);
-			i->b->OnCollisionBegin(i->a, i->point.localB, i->point.localA, -i->point.normal);
-		}
-		(*i).framesLeft = (*i).framesLeft - 1;
-		if ((*i).framesLeft < 0) {
-			i->a->OnCollisionEnd(i->b);
-			i->b->OnCollisionEnd(i->a);
-			i = allCollisions.erase(i);
-		}
-		else {
-			++i;
-		}
-	}
-}
+//void PhysicsSystem::UpdateCollisionList() {
+//	for (std::set<CollisionDetection::CollisionInfo>::iterator i = allCollisions.begin(); i != allCollisions.end(); ) {
+//		/*if (i->a == nullptr || i->b == nullptr)
+//		{
+//			i = allCollisions.erase(i);
+//			continue;
+//		}*/
+//		if ((*i).framesLeft == numCollisionFrames) {
+//			i->a->OnCollisionBegin(i->b, i->point.localA, i->point.localB, i->point.normal);
+//			i->b->OnCollisionBegin(i->a, i->point.localB, i->point.localA, -i->point.normal);
+//		}
+//		(*i).framesLeft = (*i).framesLeft - 1;
+//		if ((*i).framesLeft < 0) {
+//			i->a->OnCollisionEnd(i->b);
+//			i->b->OnCollisionEnd(i->a);
+//			i = allCollisions.erase(i);
+//		}
+//		else {
+//			++i;
+//		}
+//	}
+//}
 
 void PhysicsSystem::UpdateObjectAABBs() {
 	gameWorld.OperateOnContents(
@@ -279,7 +300,6 @@ void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, Collis
 
 void PhysicsSystem::ResolveSpringCollision(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p) const
 {
-
 	PhysicsObject* physA = a.GetPhysicsObject();
 	PhysicsObject* physB = b.GetPhysicsObject();
 
@@ -300,7 +320,6 @@ void PhysicsSystem::ResolveSpringCollision(GameObject& a, GameObject& b, Collisi
 	//Debug::DrawLine(b.GetTransform().GetPosition(), b.GetTransform().GetPosition() + (force.Normalised() * 10), Debug::RED);
 	//Debug::DrawLine(b.GetTransform().GetPosition(), b.GetTransform().GetPosition() + Vector3(10,0,0), Debug::BLUE);
 	//Debug::DrawLine(a.GetTransform().GetPosition(), a.GetTransform().GetPosition() + Vector3(20,0,0), Debug::GREEN);
-
 }
 
 /*
@@ -337,7 +356,7 @@ void PhysicsSystem::BroadPhase() {
 			for (auto j = list.begin(); j != list.end(); j++) {
 				info.a = std::min((*i).object, (*j).object);
 				info.b = std::max((*i).object, (*j).object);
-				if ((info.a->GetCollisionLayers() & info.b->GetCollisionLayers()) != 0) {
+				if (ValidCollisionLayers(info.a->GetCollisionLayers(), info.b->GetCollisionLayers())) {
 					broadphaseCollisions.insert(info);
 				}
 			}
@@ -357,7 +376,7 @@ void PhysicsSystem::BroadPhase() {
 				info.a = std::min((*i).object, (*j).object);
 				info.b = std::max((*i).object, (*j).object);
 #endif
-				if (((info.a->GetCollisionLayers() & info.b->GetCollisionLayers()) != 0) && !(!info.a->IsDynamic() && !info.b->IsDynamic())) {
+				if (ValidCollisionLayers(info.a->GetCollisionLayers(), info.b->GetCollisionLayers()) && !(!info.a->IsDynamic() && !info.b->IsDynamic())) {
 					broadphaseCollisions.insert(info);
 				}
 			}
@@ -400,6 +419,11 @@ void PhysicsSystem::CheckToWake(PhysicsObject* object)
 
 void PhysicsSystem::CheckToSleep(PhysicsObject* object)
 {
+	if (!object->CheckCanSleep())
+	{
+		return;
+	}
+
 	const int maxQueueSize = 6;
 	const float bounceTolerance = 0.5;
 
@@ -497,14 +521,17 @@ void PhysicsSystem::IntegrateAccel(float dt, GameObject* gobj) {
 	object->SetLinearVelocity(linearVel);
 
 	// Angular Stuff
-	Vector3 torque = object->GetTorque();
-	Vector3 angVel = object->GetAngularVelocity();
+	if (object->ShouldApplyAngular())
+	{
+		Vector3 torque = object->GetTorque();
+		Vector3 angVel = object->GetAngularVelocity();
 
-	object->UpdateInertiaTensor();
+		object->UpdateInertiaTensor();
 
-	Vector3 angAccel = object->GetInertiaTensor() * torque;
-	angVel += angAccel * dt;
-	object->SetAngularVelocity(angVel);	
+		Vector3 angAccel = object->GetInertiaTensor() * torque;
+		angVel += angAccel * dt;
+		object->SetAngularVelocity(angVel);
+	}
 }
 
 /*
@@ -530,18 +557,21 @@ void PhysicsSystem::IntegrateVelocity(float dt, PhysicsObject* object, Transform
 	object->SetLinearVelocity(linearVel);
 
 	// Orientation Stuff
-	Quaternion orientation = transform.GetOrientation();
-	Vector3 angVel = object->GetAngularVelocity();
+	if (object->ShouldApplyAngular())
+	{
+		Quaternion orientation = transform.GetOrientation();
+		Vector3 angVel = object->GetAngularVelocity();
 
-	orientation = orientation + (Quaternion(angVel * dt * 0.5f, 0.0f) * orientation);
-	orientation.Normalise();
+		orientation = orientation + (Quaternion(angVel * dt * 0.5f, 0.0f) * orientation);
+		orientation.Normalise();
 
-	transform.SetOrientation(orientation);
+		transform.SetOrientation(orientation);
 
-	// Damp the angular velocity too
-	float frameAngularDamping = 1.0f - (0.4f * dt);
-	angVel = angVel * frameAngularDamping;
-	object->SetAngularVelocity(angVel);	
+		// Damp the angular velocity too
+		float frameAngularDamping = 1.0f - (0.4f * dt);
+		angVel = angVel * frameAngularDamping;
+		object->SetAngularVelocity(angVel);
+	}
 }
 
 /*
@@ -571,4 +601,14 @@ void PhysicsSystem::UpdateConstraints(float dt) {
 	for (auto i = first; i != last; ++i) {
 		(*i)->UpdateConstraint(dt);
 	}
+}
+
+bool PhysicsSystem::ValidCollisionLayers(int aLayers, int bLayers)
+{
+	for (auto v : validLayers)
+	{
+		if (aLayers == v.x && bLayers == v.y)
+			return true;
+	}
+	return false;
 }

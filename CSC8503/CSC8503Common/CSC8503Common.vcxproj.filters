@@ -126,6 +126,9 @@
     <ClInclude Include="Player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+	<ClInclude Include="Projectile.h">
+      <Filter>Header Files</Filter>
+	</ClInclude>
     <ClInclude Include="Octree.h">
       <Filter>CollisionDetection</Filter>
     </ClInclude>
@@ -138,7 +141,10 @@
     <ClInclude Include="InputHandler.h">
       <Filter>Input Handling</Filter>
     </ClInclude>
-    <ClInclude Include="MoveForwardCommand.h">
+    <ClInclude Include="PCInput.h">
+      <Filter>Input Handling</Filter>
+    </ClInclude>
+    <ClInclude Include="InputBase.h">
       <Filter>Input Handling</Filter>
     </ClInclude>
     <ClInclude Include="PowerUp.h">
@@ -152,6 +158,11 @@
     </ClInclude>
     <ClInclude Include="MultipleBullets.h">
       <Filter>Header Files\PowerUps</Filter>
+    <ClInclude Include="InputList.h">
+      <Filter>Input Handling</Filter>
+    </ClInclude>
+    <ClInclude Include="PaintManager.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -204,9 +215,18 @@
       <Filter>CollisionDetection</Filter>
     </ClCompile>
     <ClCompile Include="InputHandler.cpp">
+      <Filter>Input Handling</Filter>
+    </ClCompile>
+    <ClCompile Include="InputBase.cpp">
+      <Filter>Input Handling</Filter>
+    </ClCompile>
+    <ClCompile Include="PCInput.cpp">
+      <Filter>Input Handling</Filter>
+    </ClCompile>
+    <ClCompile Include="PaintManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MoveForwardCommand.cpp">
+    <ClCompile Include="Projectile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
