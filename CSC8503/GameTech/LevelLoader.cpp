@@ -131,6 +131,16 @@ void LevelLoader::ReadInLevelFile(std::string filename) {
 				else if (lineContents[0] == "WALL_HAMMER") {
 					AddWallHammerToWorld(Vec3FromStr(lineContents[1]), std::stoi(lineContents[2]));
 				}
+				else if (lineContents[0] == "SPHERE") {
+					AddSphereToWorld(Vec3FromStr(lineContents[1]), std::stof(lineContents[2]), std::stof(lineContents[3]), BoolFromStr(lineContents[4]), BoolFromStr(lineContents[5]), BoolFromStr(lineContents[6]));
+				}
+				else if (lineContents[0] == "CUBE") {
+					AddCubeToWorld(Vec3FromStr(lineContents[1]), Vec3FromStr(lineContents[2]), BoolFromStr(lineContents[3]), std::stof(lineContents[4]), std::stoi(lineContents[5]), BoolFromStr(lineContents[6]), BoolFromStr(lineContents[7]));
+				}
+				else if (lineContents[0] == "CAPSULE") {
+					AddCapsuleToWorld(Vec3FromStr(lineContents[1]), std::stof(lineContents[2]), std::stof(lineContents[3]), std::stof(lineContents[4]));
+				}
+
 			}
 		}
 
@@ -155,6 +165,15 @@ Vector3 LevelLoader::Vec3FromStr(std::string input) {
 	SplitStringOnDelimiter(input, ',', values);
 
 	return Vector3(std::stof(values[0]), std::stof(values[1]), std::stof(values[2]));
+}
+
+bool LevelLoader::BoolFromStr(std::string input) {
+	if (input == "TRUE") {
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 Player* LevelLoader::AddPlayerToWorld(const Vector3& position) {

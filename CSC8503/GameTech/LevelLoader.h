@@ -32,6 +32,7 @@ namespace NCL {
 
 			void SplitStringOnDelimiter(const std::string& s, char delim, vector<std::string>& result);
 			Vector3 Vec3FromStr(std::string input);
+			bool BoolFromStr(std::string input);
 
 			GameWorld*     world;
 			PhysicsSystem* physics;
