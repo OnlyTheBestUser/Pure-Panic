@@ -123,6 +123,9 @@ namespace NCL {
 			void SetCollisionLayers(int layers) { collisionLayers = layers; }
 			int	GetCollisionLayers() const { return collisionLayers; }
 
+			bool IsDynamic() const { return dynamic; }
+			void SetDynamic(bool k) { dynamic = k; }
+
 		protected:
 			const CollisionVolume* volume;
 			Transform*		transform;
@@ -135,6 +138,7 @@ namespace NCL {
 			std::queue<float> previousVelocityDotProducts;
 			std::queue<float> previousPositions;
 
+			bool dynamic = false;
 			bool useGravity = true;
 			bool useFriction = true;
 

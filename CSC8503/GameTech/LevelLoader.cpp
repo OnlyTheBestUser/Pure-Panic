@@ -186,7 +186,7 @@ Player* LevelLoader::AddPlayerToWorld(const Vector3& position) {
 	character->GetPhysicsObject()->SetLinearDamping(10.0f);
 	character->GetPhysicsObject()->InitSphereInertia();
 	character->GetPhysicsObject()->SetShouldApplyAngular(false);
-	character->SetDynamic(true);
+	character->GetPhysicsObject()->SetDynamic(true);
 	character->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
 
 	world->AddGameObject(character);
@@ -211,7 +211,7 @@ GameObject* LevelLoader::AddFloorToWorld(const Maths::Vector3& position) {
 	floor->GetPhysicsObject()->InitCubeInertia();
 
 	floor->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	floor->SetDynamic(false);
+	floor->GetPhysicsObject()->SetDynamic(false);
 	world->AddGameObject(floor);
 	return floor;
 }
@@ -233,7 +233,7 @@ GameObject* LevelLoader::AddAABBWallToWorld(const Vector3& position, Vector3 dim
 	cube->GetPhysicsObject()->InitCubeInertia();
 
 	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	cube->SetDynamic(false);
+	cube->GetPhysicsObject()->SetDynamic(false);
 	world->AddGameObject(cube);
 	return cube;
 }
@@ -255,7 +255,7 @@ GameObject* LevelLoader::AddOBBWallToWorld(const Vector3& position, Vector3 dime
 	cube->GetPhysicsObject()->InitCubeInertia();
 
 	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	cube->SetDynamic(false);
+	cube->GetPhysicsObject()->SetDynamic(false);
 	world->AddGameObject(cube);
 	return cube;
 }
@@ -391,7 +391,6 @@ GameObject* LevelLoader::AddRenderPartToWorld(const Vector3& position, Vector3 d
 #endif
 	cube->SetPhysicsObject(nullptr);
 
-	cube->SetDynamic(false);
 	world->AddGameObject(cube);
 	return cube;
 }
@@ -422,7 +421,7 @@ GameObject* LevelLoader::AddSphereToWorld(const Maths::Vector3& position, float 
 		sphere->GetPhysicsObject()->SetElasticity(0.2f);
 
 	world->AddGameObject(sphere);
-	sphere->SetDynamic(dynamic);
+	sphere->GetPhysicsObject()->SetDynamic(dynamic);
 	return sphere;
 }
 
@@ -466,7 +465,7 @@ GameObject* LevelLoader::AddCubeToWorld(const Maths::Vector3& position, Maths::V
 		break;
 	}
 	cube->SetTrigger(isTrigger);
-	cube->SetDynamic(dynamic);
+	cube->GetPhysicsObject()->SetDynamic(dynamic);
 	return cube;
 }
 

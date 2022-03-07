@@ -88,7 +88,7 @@ Projectile* Player::spawnProjectile(const float& radius, const float& height, co
 	projectile->GetTransform().SetOrientation(Quaternion(Matrix3::Rotation(-acos(Vector3::Dot(Vector3(0, 1, 0), camForwardVector)) * 180.0f / 3.14f, Vector3::Cross(camForwardVector, Vector3(0, 1, 0)).Normalised())));
 	//Debug::DrawAxisLines(projectile->GetTransform().GetMatrix(), 2.0f, 1000.0f);
 	//Debug::DrawArrow(camera->GetPosition(), (camera->GetPosition() + this->GetCamFrontVec() * 100.0f), Debug::RED, 5.0f);
-	projectile->SetDynamic(true);
+	projectile->GetPhysicsObject()->SetDynamic(true);
 	projectile->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
 
 	gameWorld.AddGameObject(projectile);

@@ -82,9 +82,6 @@ namespace NCL {
 			void SetTrigger(bool x) { isTrigger = x; }
 			bool IsTrigger() const { return isTrigger; }
 
-			bool IsDynamic() const { return dynamic; }
-			void SetDynamic(bool k) { dynamic = k; }
-
 		protected:
 			Transform			transform;
 
@@ -96,7 +93,6 @@ namespace NCL {
 			int		worldID;
 			string	name;
 
-			bool dynamic = false;
 			int collisionLayers = CollisionLayer::LAYER_ONE;
 			bool isTrigger = false;
 
