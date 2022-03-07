@@ -31,6 +31,9 @@ namespace NCL {
 
 			bool HasKey() const { return key; }
 
+			/* TODO: 
+			Change it so it doesnt increase the strength of the powerup every frame while increasing duration aswell. 
+			Also thought powerups were simply going to be a multiplier */
 			void IncreaseSpeed(float speedIncrease, float duration) {
 				curSpeed += speedIncrease;
 				powerupTime += duration;
@@ -85,11 +88,13 @@ namespace NCL {
             Vector3 spawnPos;
             Vector3 checkpoint;
 			bool key = false;
+			float fireRate = 0.25f;
+			float timeSincePrevShot = 0.0f;
 			float powerupTime = 0.0f;
-			float curSpeed = 500.0f;
+			float curSpeed = 150.0f;
 			Vector3 force = Vector3(0,0,0);
 
-			float inAirSpeed = 1300.0f;
+			float inAirSpeed = 500.0f;
 			bool canJump;
 
 			float cameraVertMult = 0.5f;

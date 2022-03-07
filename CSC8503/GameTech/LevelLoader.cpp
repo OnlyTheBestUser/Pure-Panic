@@ -167,7 +167,7 @@ Vector3 LevelLoader::Vec3FromStr(std::string input) {
 
 Player* LevelLoader::AddPlayerToWorld(const Vector3& position) {
 	float meshSize = 3.0f;
-	float inverseMass = 0.5f;
+	float inverseMass = 5.0f;
 
 	Player* character = new Player(world->GetMainCamera(), *world, capsuleMesh, basicShader, "Player");
 
@@ -182,8 +182,7 @@ Player* LevelLoader::AddPlayerToWorld(const Vector3& position) {
 	character->SetPhysicsObject(new PhysicsObject(&character->GetTransform(), character->GetBoundingVolume()));
 
 	character->GetPhysicsObject()->SetInverseMass(inverseMass);
-	character->GetPhysicsObject()->SetFriction(1.0f);
-	character->GetPhysicsObject()->SetLinearDamping(10.0f);
+	character->GetPhysicsObject()->SetLinearDamping(3.0f);
 	character->GetPhysicsObject()->InitSphereInertia();
 	character->GetPhysicsObject()->SetShouldApplyAngular(false);
 	character->SetDynamic(true);
