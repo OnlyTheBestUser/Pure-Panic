@@ -73,10 +73,13 @@ TutorialGame::TutorialGame()	{
 	Command* toggleGrav = new ToggleGravityCommand(physics);
 	Command* toggleDebug = new ToggleBoolCommand(&debugDraw);
 	Command* togglePause = new ToggleBoolCommand(&pause);
+	Command* resetWorld = new ResetWorldCommand(&state);
 	Command* quitCommand = new QuitCommand(&quit, &pause);
+
 	inputHandler->BindButton(TOGGLE_GRAV, toggleGrav);
 	inputHandler->BindButton(TOGGLE_DEBUG, toggleDebug);
 	inputHandler->BindButton(TOGGLE_PAUSE, togglePause);
+	inputHandler->BindButton(RESET_WORLD, resetWorld);
 	inputHandler->BindButton(QUIT, quitCommand);
 
 #pragma endregion
@@ -112,6 +115,7 @@ void TutorialGame::UpdateGame(float dt) {
 		InitCamera();
 		InitWorld();
 		selectionObject = nullptr;
+		state = PLAY;
 		break;
 	}
 	}
