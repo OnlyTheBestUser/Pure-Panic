@@ -88,10 +88,10 @@ namespace NCL {
             Vector3 spawnPos;
             Vector3 checkpoint;
 			bool key = false;
-			float fireRate = 0.25f;
+			float fireRate = 0.2f;
 			float timeSincePrevShot = 0.0f;
 			float powerupTime = 0.0f;
-			float curSpeed = 150.0f;
+			float curSpeed = 50.0f;
 			Vector3 force = Vector3(0,0,0);
 
 			float inAirSpeed = 500.0f;
