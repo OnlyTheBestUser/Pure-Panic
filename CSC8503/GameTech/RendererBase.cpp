@@ -97,7 +97,7 @@ void RendererBase::DrawDebugData() {
 	if (debugStrings.empty() && debugLines.empty()) {
 		return; //don't mess with OGL state if there's no point!
 	}
-	rendererAPI->BindShader(debugShader);
+	debugShader->BindShader();
 
 	if (forceValidDebugState) {
 		rendererAPI->SetBlend(true);
@@ -106,19 +106,19 @@ void RendererBase::DrawDebugData() {
 
 	Matrix4 pMat;
 
-	rendererAPI->BindTexture(font->GetTexture(), "mainTex", 0);
+	font->GetTexture()->Bind(0);
 
 	if (debugLines.size() > 0) {
 		pMat = SetupDebugLineMatrix();
-		rendererAPI->UpdateUniformMatrix4(debugShader, "viewProjMatrix", pMat);
-		rendererAPI->UpdateUniformInt(debugShader, "useTexture", 0);
+		debugShader->UpdateUniformMatrix4("viewProjMatrix", pMat);
+		debugShader->UpdateUniformInt("useTexture", 0);
 		DrawDebugLines();
 	}
 
 	if (debugStrings.size() > 0) {
 		pMat = SetupDebugStringMatrix();
-		rendererAPI->UpdateUniformMatrix4(debugShader, "viewProjMatrix", pMat);
-		rendererAPI->UpdateUniformInt(debugShader, "useTexture", 1);
+		debugShader->UpdateUniformMatrix4("viewProjMatrix", pMat);
+		debugShader->UpdateUniformInt("useTexture", 1);
 		DrawDebugStrings();
 	}
 

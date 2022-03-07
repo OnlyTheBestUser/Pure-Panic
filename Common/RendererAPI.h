@@ -48,17 +48,8 @@ namespace NCL {
 			virtual void DrawMesh(MeshGeometry* mesh) = 0;
 			virtual void DrawMeshAndSubMesh(MeshGeometry* mesh) = 0;
 
-			virtual void BindShader(ShaderBase* shader) = 0;
-			virtual void BindTexture(const TextureBase* tex, std::string uniform, int texSlot) = 0;
-			virtual void BindCubemap(const TextureBase* tex, std::string uniform, int texSlot) = 0;
 			virtual void BindFrameBuffer() = 0;
 			virtual void BindFrameBuffer(const FrameBufferBase* fbo) = 0;
-
-			virtual void UpdateUniformInt(ShaderBase* shader, std::string uniform, const int i) = 0;
-			virtual void UpdateUniformFloat(ShaderBase* shader, std::string uniform, const float f) = 0;
-			virtual void UpdateUniformVector3(ShaderBase* shader, std::string uniform, const Maths::Vector3 vec) = 0;
-			virtual void UpdateUniformVector4(ShaderBase* shader, std::string uniform, const Maths::Vector4 vec) = 0;
-			virtual void UpdateUniformMatrix4(ShaderBase* shader, std::string uniform, const Maths::Matrix4 matrix) = 0;
 
 			virtual void SetDepth(bool depth) = 0;
 			virtual void SetBlend(bool blend) = 0;

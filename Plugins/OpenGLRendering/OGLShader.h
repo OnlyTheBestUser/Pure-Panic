@@ -32,6 +32,13 @@ namespace NCL {
 			static void	PrintCompileLog(GLuint object);
 			static void	PrintLinkLog(GLuint program);
 
+			virtual void BindShader() override;
+			virtual void UpdateUniformInt(std::string uniform, const int i) override;
+			virtual void UpdateUniformFloat(std::string uniform, const float f) override;
+			virtual void UpdateUniformVector3(std::string uniform, const Maths::Vector3 vec) override;
+			virtual void UpdateUniformVector4(std::string uniform, const Maths::Vector4 vec) override;
+			virtual void UpdateUniformMatrix4(std::string uniform, const Maths::Matrix4 matrix) override;
+
 		protected:
 			void	DeleteIDs();
 
