@@ -106,7 +106,7 @@ namespace NCL {
 			MeshGeometry* projectileMesh;
 
 		private:
-			Projectile* spawnProjectile(const float& radius, const float& height, const float& initialSpeed = 25.0f);
+			Projectile* spawnProjectile(const float& initialSpeed = 25.0f, const float& meshSize = 0.5f);
         };
     }
 }
