@@ -123,6 +123,9 @@
     <ClInclude Include="Player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+	<ClInclude Include="Projectile.h">
+      <Filter>Header Files</Filter>
+	</ClInclude>
     <ClInclude Include="Octree.h">
       <Filter>CollisionDetection</Filter>
     </ClInclude>
@@ -138,7 +141,6 @@
     <ClInclude Include="PCInput.h">
       <Filter>Input Handling</Filter>
     </ClInclude>
-    <ClInclude Include="Projectile.h">
     <ClInclude Include="InputBase.h">
       <Filter>Input Handling</Filter>
     </ClInclude>
