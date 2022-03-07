@@ -189,6 +189,7 @@
     <ClCompile Include="PS4Sound.cpp" />
     <ClCompile Include="Ps4AudioSystem.cpp" />
     <ClCompile Include="PS4Texture.cpp" />
+    <ClCompile Include="PS4UniformBuffer.cpp" />
     <ClCompile Include="PS4Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -204,6 +205,7 @@
     <ClInclude Include="PS4Sound.h" />
     <ClInclude Include="Ps4AudioSystem.h" />
     <ClInclude Include="PS4Texture.h" />
+    <ClInclude Include="PS4UniformBuffer.h" />
     <ClInclude Include="PS4Window.h" />
   </ItemGroup>
   <ItemGroup>

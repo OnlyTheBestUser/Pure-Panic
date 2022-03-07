@@ -1,8 +1,10 @@
 #pragma once
 #include "Renderer.h"
+#include "../CSC8503Common/PaintManager.h"
 #include "LevelLoader.h"
 #include "../CSC8503Common/PhysicsSystem.h"
 #include "../CSC8503Common/Player.h"
+//#include "../CSC8503Common/Projectile.h"
 
 namespace NCL {
 	namespace PS4 {
@@ -61,6 +63,7 @@ namespace NCL {
 	
 			bool SelectObject();
 			void MoveSelectedObject(float dt);
+			void PaintSelectedObject();
 			void DebugObjectMovement();
 			void DebugDrawCollider(const CollisionVolume* c, Transform* worldTransform);
 			void DebugDrawVelocity(const Vector3& vel, Transform* worldTransform);
@@ -68,6 +71,7 @@ namespace NCL {
 
 			StateGameObject* testStateObject;
 
+			PaintManager* paintManager;
 			Renderer*			renderer;
 			PhysicsSystem*		physics;
 			GameWorld*			world;

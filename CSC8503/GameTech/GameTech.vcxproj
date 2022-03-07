@@ -205,7 +205,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="LevelLoader.cpp" />
-    <ClCompile Include="PS4GameRenderer.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="Renderer.cpp" />
@@ -214,7 +213,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LevelLoader.h" />
-    <ClInclude Include="PS4GameRenderer.h" />
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RendererBase.h" />

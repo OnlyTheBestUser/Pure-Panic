@@ -13,7 +13,7 @@ namespace NCL {
 			virtual void Look(Vector2 moveBy) { std::cout << "LOOK" << std::endl; }
 			virtual void Jump()				{ std::cout << "Jump!" << std::endl; }
 			virtual void Descend()				{ std::cout << "Descend!" << std::endl; }
-			void Fire()				{ std::cout << "Fire!" << std::endl; }
+			virtual void Fire()				{ std::cout << "Fire!" << std::endl; }
 
 			/*
 			Sprint function?

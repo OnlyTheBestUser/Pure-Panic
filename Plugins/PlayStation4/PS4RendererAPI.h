@@ -43,9 +43,11 @@ namespace NCL::PS4 {
 	class PS4Shader;
 	class PS4Mesh;
 
+
 	class PS4RendererAPI :
 		public RendererAPI, public PS4MemoryAware
 	{
+	friend class PS4UniformBuffer;
 	public:
 		PS4RendererAPI(Window& window);
 		~PS4RendererAPI();
