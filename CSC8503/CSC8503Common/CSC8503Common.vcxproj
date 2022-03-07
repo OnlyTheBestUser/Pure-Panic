@@ -113,8 +113,8 @@
     <LibraryPath>$(SolutionDir)\Plugins\FMod\Windows\api\core\lib\x64;$(SolutionDir)\Plugins\FMod\Windows\api\studio\lib\x64;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">
-    <IncludePath>H:\GitHub\Pure-Panic\ORBIS_Debug;$(IncludePath);$(SolutionDir)Plugins\FMod\PS4\api\core\inc\;$(SolutionDir)Plugins\FMod\PS4\api\studio\inc\</IncludePath>
-    <LibraryPath>H:\GitHub\Pure-Panic\ORBIS_Debug;$(SolutionDir)Plugins\FMod\PS4\api\core\lib\;$(SolutionDir)Plugins\FMod\PS4\api\studio\lib\;</LibraryPath>
+    <IncludePath>$(SolutionDir)ORBIS_Debug;$(IncludePath);$(SolutionDir)Plugins\FMod\PS4\api\core\inc\;$(SolutionDir)Plugins\FMod\PS4\api\studio\inc\</IncludePath>
+    <LibraryPath>$(SolutionDir)ORBIS_Debug;$(SolutionDir)Plugins\FMod\PS4\api\core\lib\;$(SolutionDir)Plugins\FMod\PS4\api\studio\lib\;</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(SolutionDir)\Plugins\FMod\Windows\api\core\inc;$(SolutionDir)\Plugins\FMod\PS4\api\core\inc;$(SolutionDir)\Plugins\Networking-ENet\include;$(IncludePath)</IncludePath>
