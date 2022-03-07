@@ -69,9 +69,6 @@ Projectile* Player::spawnProjectile(const float& radius, const float& height, co
 	Vector3 camForwardVector = this->GetCamFrontVec();
 
 	Projectile* projectile = new Projectile(gameWorld, radius, height);
-	projectile->ShootDir = camForwardVector;
-	projectile->InitialShootAngle = acos(Vector3::Dot(Vector3(0.0f, 1.0f, 0.0f), camForwardVector)) * 180/3.14;
-	projectile->RotationAxis = Vector3::Cross(camForwardVector, Vector3(0, 1, 0)).Normalised();
 
 	SphereVolume* volume = new SphereVolume(height / 2.0f * meshSize * 1.3f);
 	projectile->SetBoundingVolume((CollisionVolume*)volume);
