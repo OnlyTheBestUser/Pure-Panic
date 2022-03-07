@@ -44,6 +44,15 @@ void GameWorld::AddGameObject(GameObject* o) {
 
 void GameWorld::RemoveGameObject(GameObject* o, bool andDelete) {
 	toRemoveGameObjects.emplace_back(o);
+
+	// Check if object is already added to vector, sometimes gets double added
+	for (auto obj : toRemoveGameObjects)
+	{
+		if (o->GetWorldID() == obj->GetWorldID())
+		{
+			return;
+		}
+	}
 	if (andDelete) {
 		toDeleteGameObjects.emplace_back(o);
 	}
