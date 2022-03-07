@@ -37,6 +37,8 @@ PhysicsSystem::PhysicsSystem(GameWorld& g) : gameWorld(g)	{
 	validLayers.emplace_back(Vector2(3, 1));
 	validLayers.emplace_back(Vector2(1, 5));
 	validLayers.emplace_back(Vector2(5, 1));
+	validLayers.emplace_back(Vector2(3, 5));
+	validLayers.emplace_back(Vector2(5, 3));
 }
 
 PhysicsSystem::~PhysicsSystem()	{
@@ -156,7 +158,7 @@ void PhysicsSystem::Update(float dt) {
 	}
 
 	ClearForces();	//Once we've finished with the forces, reset them to zero
-	UpdateCollisionList(); //Remove any old collisions
+	//UpdateCollisionList(); //Remove any old collisions
 
 	t.Tick();
 	float updateTime = t.GetTimeDeltaSeconds();
@@ -193,28 +195,28 @@ From this simple mechanism, we we build up gameplay interactions inside the
 OnCollisionBegin / OnCollisionEnd functions (removing health when hit by a 
 rocket launcher, gaining a point when the player hits the gold coin, and so on).
 */
-void PhysicsSystem::UpdateCollisionList() {
-	for (std::set<CollisionDetection::CollisionInfo>::iterator i = allCollisions.begin(); i != allCollisions.end(); ) {
-		/*if (i->a == nullptr || i->b == nullptr)
-		{
-			i = allCollisions.erase(i);
-			continue;
-		}*/
-		if ((*i).framesLeft == numCollisionFrames) {
-			i->a->OnCollisionBegin(i->b, i->point.localA, i->point.localB, i->point.normal);
-			i->b->OnCollisionBegin(i->a, i->point.localB, i->point.localA, -i->point.normal);
-		}
-		(*i).framesLeft = (*i).framesLeft - 1;
-		if ((*i).framesLeft < 0) {
-			i->a->OnCollisionEnd(i->b);
-			i->b->OnCollisionEnd(i->a);
-			i = allCollisions.erase(i);
-		}
-		else {
-			++i;
-		}
-	}
-}
+//void PhysicsSystem::UpdateCollisionList() {
+//	for (std::set<CollisionDetection::CollisionInfo>::iterator i = allCollisions.begin(); i != allCollisions.end(); ) {
+//		/*if (i->a == nullptr || i->b == nullptr)
+//		{
+//			i = allCollisions.erase(i);
+//			continue;
+//		}*/
+//		if ((*i).framesLeft == numCollisionFrames) {
+//			i->a->OnCollisionBegin(i->b, i->point.localA, i->point.localB, i->point.normal);
+//			i->b->OnCollisionBegin(i->a, i->point.localB, i->point.localA, -i->point.normal);
+//		}
+//		(*i).framesLeft = (*i).framesLeft - 1;
+//		if ((*i).framesLeft < 0) {
+//			i->a->OnCollisionEnd(i->b);
+//			i->b->OnCollisionEnd(i->a);
+//			i = allCollisions.erase(i);
+//		}
+//		else {
+//			++i;
+//		}
+//	}
+//}
 
 void PhysicsSystem::UpdateObjectAABBs() {
 	gameWorld.OperateOnContents(

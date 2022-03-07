@@ -146,6 +146,7 @@
     </ClInclude>
     <ClInclude Include="BGMManager.h">
       <Filter>Audio</Filter>
+    <ClInclude Include="Projectile.h">
     <ClInclude Include="InputBase.h">
       <Filter>Input Handling</Filter>
     </ClInclude>
@@ -222,6 +223,8 @@
     </ClCompile>
     <ClCompile Include="BGMManager.cpp">
       <Filter>Audio</Filter>
+    <ClCompile Include="Projectile.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

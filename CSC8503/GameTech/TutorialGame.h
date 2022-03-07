@@ -6,6 +6,7 @@
 #include "../CSC8503Common/Player.h"
 #include "../CSC8503Common/AudioManager.h"
 #include "../CSC8503Common/BGMManager.h"
+//#include "../CSC8503Common/Projectile.h"
 
 namespace NCL {
 	namespace PS4 {
