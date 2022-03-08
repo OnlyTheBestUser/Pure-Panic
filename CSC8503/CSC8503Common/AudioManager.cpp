@@ -1,5 +1,7 @@
 #include "AudioManager.h"
 #include <iostream>
+#ifndef _ORBIS
+
 using namespace NCL;
 using namespace NCL::CSC8503;
 using namespace FMOD;
@@ -198,3 +200,4 @@ bool AudioManager::IsErroneous(FMOD_RESULT result) {
 	}
 	return true;
 }
+#endif // !_ORBIS
