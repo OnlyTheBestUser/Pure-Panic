@@ -126,6 +126,9 @@
     <ClInclude Include="Player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+	<ClInclude Include="Projectile.h">
+      <Filter>Header Files</Filter>
+	</ClInclude>
     <ClInclude Include="Octree.h">
       <Filter>CollisionDetection</Filter>
     </ClInclude>
@@ -240,6 +243,9 @@
     </ClCompile>
     <ClCompile Include="NetworkState.cpp">
       <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="Projectile.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
