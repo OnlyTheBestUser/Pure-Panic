@@ -7,7 +7,7 @@ namespace NCL {
 	namespace CSC8503 {
 		class FireRate : public PowerUp {
 		public:
-			FireRate(GameWorld& gw, const float& increaseFireRateBy = 0.5f) : PowerUp(PowerUpType::FireRate, gw),FireRateIncrease(increaseFireRateBy){}
+			FireRate(GameWorld& gw, const float& increaseFireRateFactor = 2.0f) : PowerUp(PowerUpType::FireRate, gw),FireRateIncrease(increaseFireRateFactor){}
 			~FireRate() {}
 
 			void OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vector3 localB, Vector3 normal) override {
