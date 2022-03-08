@@ -15,6 +15,7 @@ namespace NCL {
 
 		private:
 			void* data;
+			Gnm::Buffer constantBuffer;
 		};
 	}
 }

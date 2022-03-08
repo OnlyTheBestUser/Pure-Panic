@@ -194,12 +194,7 @@ void Renderer::RenderSkybox() {
 
 	skyboxShader->BindShader();
 
-	float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
-	Matrix4 viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
-	Matrix4 projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);
-	skyboxShader->UpdateUniformMatrix4("projMatrix", projMatrix);
-	skyboxShader->UpdateUniformMatrix4("viewMatrix", viewMatrix);
-	skyboxShader->UpdateUniformMatrix4("invProjMatrix", projMatrix.Inverse());
+	skyboxShader->UpdateUniformMatrix4("invProjMatrix", camMatrix.projMatrix.Inverse());
 
 	skyboxTex->Bind(0);
 
@@ -213,18 +208,12 @@ void Renderer::RenderSkybox() {
 void Renderer::RenderObjects() {
 	ShaderBase* activeShader = nullptr;
 
-	float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
-	Matrix4 viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
-	Matrix4 projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);
-
 	for (const auto& i : activeObjects) {
 		ShaderBase* shader = (*i).GetShader();
 
 		if (activeShader != shader) {
 			shader->BindShader();
 
-			shader->UpdateUniformMatrix4("viewProjMatrix", camMatrix.projMatrix * camMatrix.viewMatrix);
-			shader->UpdateUniformMatrix4("invProjMatrix", camMatrix.projMatrix.Inverse());
 			shader->UpdateUniformMatrix4("viewProjMatrix", camMatrix.projMatrix * camMatrix.viewMatrix);
 			shader->UpdateUniformMatrix4("invProjMatrix", camMatrix.projMatrix.Inverse());
 			shader->UpdateUniformVector3("cameraPos", gameWorld.GetMainCamera()->GetPosition());
