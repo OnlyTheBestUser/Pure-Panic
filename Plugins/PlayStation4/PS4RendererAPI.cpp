@@ -315,15 +315,6 @@ void NCL::PS4::PS4RendererAPI::DrawMeshAndSubMesh(MeshGeometry* mesh)
 	ps4Mesh->SubmitDraw(*currentGFXContext, Gnm::ShaderStage::kShaderStageVs);
 }
 
-void NCL::PS4::PS4RendererAPI::BindShader(ShaderBase* shader) {
-	PS4Shader* ps4Shader = static_cast<PS4Shader*>(shader);
-	if (!ps4Shader) {
-		return;
-	}
-
-	ps4Shader->SubmitShaderSwitch(*currentGFXContext);
-}
-
 void NCL::PS4::PS4RendererAPI::BindTexture(const TextureBase* tex, std::string uniform, int texSlot) {
 	const PS4Texture* ps4Tex = static_cast<const PS4Texture*>(tex);
 	if (!ps4Tex) {
@@ -359,77 +350,6 @@ void NCL::PS4::PS4RendererAPI::BindFrameBuffer()
 void NCL::PS4::PS4RendererAPI::BindFrameBuffer(const FrameBufferBase* fbo)
 {
 
-}
-
-void NCL::PS4::PS4RendererAPI::UpdateUniformInt(ShaderBase* shader, std::string uniform, const int f)
-{
-
-}
-
-void NCL::PS4::PS4RendererAPI::UpdateUniformFloat(ShaderBase* shader, std::string uniform, float f) {
-	PS4Shader* ps4Shader = static_cast<PS4Shader*>(shader);
-	if (!ps4Shader) {
-		return;
-	}
-
-	float* uniformFloat = (float*)currentGFXContext->allocateFromCommandBuffer(sizeof(float), Gnm::kEmbeddedDataAlignment4);
-	*uniformFloat = f;
-
-	Gnm::Buffer constantBuffer;
-	constantBuffer.initAsConstantBuffer(uniformFloat, sizeof(float));
-	constantBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
-
-	UpdateAllUniform(ps4Shader, uniform, constantBuffer);
-}
-
-void NCL::PS4::PS4RendererAPI::UpdateUniformVector3(ShaderBase* shader, std::string uniform, const Maths::Vector3 vec)
-{
-	PS4Shader* ps4Shader = static_cast<PS4Shader*>(shader);
-	if (!ps4Shader) {
-		return;
-	}
-
-	Vector3* modelData = (Vector3*)currentGFXContext->allocateFromCommandBuffer(sizeof(Vector3), Gnm::kEmbeddedDataAlignment4);
-	*modelData = vec;
-
-	Gnm::Buffer constantBuffer;
-	constantBuffer.initAsConstantBuffer(modelData, sizeof(Vector3));
-	constantBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
-
-	UpdateAllUniform(ps4Shader, uniform, constantBuffer);
-}
-
-void NCL::PS4::PS4RendererAPI::UpdateUniformVector4(ShaderBase* shader, std::string uniform, const Maths::Vector4 vec)
-{
-	PS4Shader* ps4Shader = static_cast<PS4Shader*>(shader);
-	if (!ps4Shader) {
-		return;
-	}
-
-	Vector4* modelData = (Vector4*)currentGFXContext->allocateFromCommandBuffer(sizeof(Vector4), Gnm::kEmbeddedDataAlignment4);
-	*modelData = vec;
-
-	Gnm::Buffer constantBuffer;
-	constantBuffer.initAsConstantBuffer(modelData, sizeof(Vector4));
-	constantBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
-
-	UpdateAllUniform(ps4Shader, uniform, constantBuffer);
-}
-
-void NCL::PS4::PS4RendererAPI::UpdateUniformMatrix4(ShaderBase* shader, std::string uniform, Maths::Matrix4 matrix) {
-	PS4Shader* ps4Shader = static_cast<PS4Shader*>(shader);
-	if (!ps4Shader) {
-		return;
-	}
-
-	Matrix4* modelData = (Matrix4*)currentGFXContext->allocateFromCommandBuffer(sizeof(Matrix4), Gnm::kEmbeddedDataAlignment4);
-	*modelData = matrix;
-
-	Gnm::Buffer constantBuffer;
-	constantBuffer.initAsConstantBuffer(modelData, sizeof(Matrix4));
-	constantBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
-
-	UpdateAllUniform(ps4Shader, uniform, constantBuffer);
 }
 
 void NCL::PS4::PS4RendererAPI::SetDepth(bool d) {
@@ -470,21 +390,5 @@ void NCL::PS4::PS4RendererAPI::SetCullType(CULL_TYPE type)
 void NCL::PS4::PS4RendererAPI::SetViewportSize(int x, int y)
 {
 
-}
-
-void NCL::PS4::PS4RendererAPI::UpdateAllUniform(PS4Shader* shader, std::string uniform, Gnm::Buffer buffer) {
-	PS4Shader* ps4Shader = static_cast<PS4Shader*>(shader);
-	if (!ps4Shader) {
-		return;
-	}
-
-	int vsIndex = ps4Shader->GetConstantBufferIndex(Gnm::kShaderStageVs, uniform.c_str());
-	if (vsIndex != -1) {
-		currentGFXContext->setConstantBuffers(Gnm::kShaderStageVs, vsIndex, 1, &buffer);
-	}
-	int psIndex = ps4Shader->GetConstantBufferIndex(Gnm::kShaderStagePs, uniform.c_str());
-	if (psIndex != -1) {
-		currentGFXContext->setConstantBuffers(Gnm::kShaderStagePs, psIndex, 1, &buffer);
-	}
 }
 #endif

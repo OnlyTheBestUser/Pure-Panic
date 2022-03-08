@@ -28,6 +28,15 @@ namespace NCL::PS4 {
 		int		GetConstantBufferIndex(const Gnm::ShaderStage stage, const string& name);
 		void	SubmitShaderSwitch(Gnmx::GnmxGfxContext& cmdList);
 
+		virtual void BindShader() override;
+		virtual void UpdateUniformInt(std::string uniform, const int i) override;
+		virtual void UpdateUniformFloat(std::string uniform, const float f) override;
+		virtual void UpdateUniformVector3(std::string uniform, const Maths::Vector3 vec) override;
+		virtual void UpdateUniformVector4(std::string uniform, const Maths::Vector4 vec) override;
+		virtual void UpdateUniformMatrix4(std::string uniform, const Maths::Matrix4 matrix) override;
+
+		void UpdateAllUniform(std::string uniform, Gnm::Buffer buffer);
+
 	protected:
 		PS4Shader();
 
@@ -47,7 +56,6 @@ namespace NCL::PS4 {
 
 		bool ShaderIsBinary(const string& name);
 
-	protected:
 		void* fetchShader;
 
 		sce::Shader::Binary::Program	vertexBinary;

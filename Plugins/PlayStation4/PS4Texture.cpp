@@ -6,6 +6,9 @@
 #include <.\graphics\api_gnm\toolkit\allocators.h>
 #include <.\graphics\api_gnm\toolkit\stack_allocator.h>
 
+#include "../../CSC8503/GameTech/RendererBase.h"
+#include "PS4RendererAPI.h"
+
 using namespace sce;
 using namespace NCL::PS4;
 PS4Texture::PS4Texture()
@@ -15,6 +18,15 @@ PS4Texture::PS4Texture()
 
 PS4Texture::~PS4Texture()
 {
+}
+
+void PS4Texture::Bind(int slot = 0) const {
+	Gnm::Sampler trilinearSampler;
+	trilinearSampler.init();
+	trilinearSampler.setMipFilterMode(Gnm::kMipFilterModeLinear);
+
+	((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->setTextures(Gnm::kShaderStagePs, 0, 1, &GetAPITexture());
+	((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->setSamplers(Gnm::kShaderStagePs, 0, 1, &trilinearSampler);
 }
 
 PS4Texture* PS4Texture::LoadTextureFromFile(const std::string& filename) {

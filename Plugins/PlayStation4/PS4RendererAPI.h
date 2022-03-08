@@ -48,6 +48,8 @@ namespace NCL::PS4 {
 		public RendererAPI, public PS4MemoryAware
 	{
 	friend class PS4UniformBuffer;
+	friend class PS4Shader;
+	friend class PS4Texture;
 	public:
 		PS4RendererAPI(Window& window);
 		~PS4RendererAPI();
@@ -63,8 +65,6 @@ namespace NCL::PS4 {
 		void	SwapCommandBuffer();
 		void	SetRenderBuffer(PS4ScreenBuffer*buffer, bool clearColour, bool clearDepth, bool clearStencil);
 		PS4ScreenBuffer* GenerateScreenBuffer(uint width, uint height, bool colour = true, bool depth = true, bool stencil = false);
-
-		void UpdateAllUniform(PS4Shader* shader, std::string uniform, Gnm::Buffer buffer);
 
 		//Render commands
 		void DrawMesh(MeshGeometry* mesh) override;

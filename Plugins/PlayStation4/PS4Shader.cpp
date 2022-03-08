@@ -6,6 +6,8 @@
 #include <gnmx\shader_parser.h>
 #include <..\samples\sample_code\graphics\api_gnm\toolkit\shader_loader.h>
 
+#include "../../CSC8503/GameTech/RendererBase.h"
+#include "PS4RendererAPI.h"
 using std::ifstream;
 
 using namespace NCL;
@@ -29,6 +31,79 @@ PS4Shader* PS4Shader::GenerateShader(const string& vertex,const string& pixel) {
 
 PS4Shader::~PS4Shader()
 {
+}
+
+void PS4Shader::BindShader() {
+	this->SubmitShaderSwitch(*((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext);
+}
+
+void NCL::PS4::PS4Shader::UpdateUniformInt(std::string uniform, const int f)
+{
+	float* uniformFloat = (float*)((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->allocateFromCommandBuffer(sizeof(float), Gnm::kEmbeddedDataAlignment4);
+	*uniformFloat = f;
+
+	Gnm::Buffer constantBuffer;
+	constantBuffer.initAsConstantBuffer(uniformFloat, sizeof(float));
+	constantBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
+
+	UpdateAllUniform(uniform, constantBuffer);
+}
+
+void NCL::PS4::PS4Shader::UpdateUniformFloat(std::string uniform, float f) {
+	float* uniformFloat = (float*)((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->allocateFromCommandBuffer(sizeof(float), Gnm::kEmbeddedDataAlignment4);
+	*uniformFloat = f;
+
+	Gnm::Buffer constantBuffer;
+	constantBuffer.initAsConstantBuffer(uniformFloat, sizeof(float));
+	constantBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
+
+	UpdateAllUniform(uniform, constantBuffer);
+}
+
+void NCL::PS4::PS4Shader::UpdateUniformVector3(std::string uniform, const Maths::Vector3 vec)
+{
+	Vector3* modelData = (Vector3*)((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->allocateFromCommandBuffer(sizeof(Vector3), Gnm::kEmbeddedDataAlignment4);
+	*modelData = vec;
+
+	Gnm::Buffer constantBuffer;
+	constantBuffer.initAsConstantBuffer(modelData, sizeof(Vector3));
+	constantBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
+
+	UpdateAllUniform(uniform, constantBuffer);
+}
+
+void NCL::PS4::PS4Shader::UpdateUniformVector4(std::string uniform, const Maths::Vector4 vec)
+{
+	Vector4* modelData = (Vector4*)((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->allocateFromCommandBuffer(sizeof(Vector4), Gnm::kEmbeddedDataAlignment4);
+	*modelData = vec;
+
+	Gnm::Buffer constantBuffer;
+	constantBuffer.initAsConstantBuffer(modelData, sizeof(Vector4));
+	constantBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
+
+	UpdateAllUniform(uniform, constantBuffer);
+}
+
+void NCL::PS4::PS4Shader::UpdateUniformMatrix4(std::string uniform, Maths::Matrix4 matrix) {
+	Matrix4* modelData = (Matrix4*)((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->allocateFromCommandBuffer(sizeof(Matrix4), Gnm::kEmbeddedDataAlignment4);
+	*modelData = matrix;
+
+	Gnm::Buffer constantBuffer;
+	constantBuffer.initAsConstantBuffer(modelData, sizeof(Matrix4));
+	constantBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
+
+	UpdateAllUniform(uniform, constantBuffer);
+}
+
+void NCL::PS4::PS4Shader::UpdateAllUniform(std::string uniform, Gnm::Buffer buffer) {
+	int vsIndex = this->GetConstantBufferIndex(Gnm::kShaderStageVs, uniform.c_str());
+	if (vsIndex != -1) {
+		((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->setConstantBuffers(Gnm::kShaderStageVs, vsIndex, 1, &buffer);
+	}
+	int psIndex = this->GetConstantBufferIndex(Gnm::kShaderStagePs, uniform.c_str());
+	if (psIndex != -1) {
+		((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->setConstantBuffers(Gnm::kShaderStagePs, psIndex, 1, &buffer);
+	}
 }
 
 void PS4Shader::GenerateVertexShader(const string&name, bool makeFetch) {
