@@ -3,15 +3,11 @@
 #ifdef _ORBIS
 #include "../../Plugins/FMod/PS4/api/studio/inc/fmod_studio.hpp"
 #include "../../Plugins/FMod/PS4/api/studio/inc/fmod_studio_common.h"
-#include "fmod.h"
-#include "fmod_common.h"
 #endif
 
 #ifdef _WIN64
 #include "../../Plugins/FMod/Windows/api/studio/inc/fmod_studio.hpp"
 #include "../../Plugins/FMod/Windows/api/studio/inc/fmod_studio_common.h"
-#include "../../Plugins/FMod/PS4/api/core/inc/fmod_common.h"
-
 #endif
 
 #include "../../Common/Vector3.h"
@@ -19,10 +15,6 @@
 #include <map>
 #include <functional>
 #include "../../Common/Quaternion.h"
-
-
-//Not Currently working on PS4, PRX Include Issues
-#ifndef _ORBIS
 
 using namespace NCL::Maths;
 
@@ -77,7 +69,5 @@ namespace NCL {
 		};
 	}
 }
-
-#endif //Not On PS4
 
 

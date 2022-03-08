@@ -1,7 +1,6 @@
 #include "BGMManager.h"
 #include "AudioManager.h"
 
-#ifndef _ORBIS
 using namespace NCL;
 using namespace CSC8503;
 
@@ -23,4 +22,3 @@ void BGMManager::StopMusic() {
 		audioManager->StopChannel(curSongChannel);
 	}
 }
-#endif // !_ORBIS
