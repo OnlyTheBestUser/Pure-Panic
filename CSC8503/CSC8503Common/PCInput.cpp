@@ -43,6 +43,7 @@ void PCInput::Poll()
 	buttons[JUMP] = Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::SPACE) ? 1.0f : 0.0f;
 	buttons[DESCEND] = Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::SHIFT) ? 1.0f : 0.0f;
 	buttons[FIRE] = Window::GetMouse()->ButtonDown(MouseButtons::LEFT) ? 1.0f : 0.0f;
+	//buttons[FIRE] = Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::V) ? 1.0f : 0.0f;
 	buttons[TOGGLE_GRAV] = Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::G) ? 1.0f : 0.0f;
 	buttons[TOGGLE_DEBUG] = Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::J) ? 1.0f : 0.0f;
 	buttons[LOCK] = Window::GetKeyboard()->KeyPressed(NCL::KeyboardKeys::L) ? 1.0f : 0.0f;

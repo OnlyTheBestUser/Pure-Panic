@@ -33,7 +33,8 @@ namespace NCL {
 			int		lastID;
 			float	pos[3];
 			float	angles[3];
-			char	buttonstates[8];
+			bool	firing;
+			//char	buttonstates[8];
 
 			ClientPacket() {
 				type = Received_State;

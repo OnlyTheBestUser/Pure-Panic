@@ -3,8 +3,12 @@
 #include "../CSC8503Common/GameServer.h"
 #include "../CSC8503Common/GameClient.h"
 #include "../GameTech/LevelLoader.h"
+#include "../CSC8503Common/InputHandler.h"
 
 #define COLLISION_MSG 30
+
+using namespace NCL;
+using namespace CSC8503;
 
 struct MessagePacket : public GamePacket {
 	short playerID;
@@ -113,13 +117,9 @@ void NetworkedGame::UpdateAsClient(float dt) {
 
 	ClientPacket newPacket;
 	newPacket.clientID = playerID;
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::SPACE)) {
-		//fire button pressed!
-		std::cout << "Fire!" << std::endl;
-		newPacket.buttonstates[0] = 1;
-	}
 	clientLastPacketID++;
 	newPacket.lastID = clientLastPacketID;
+
 	Vector3 position = localPlayer->GetTransform().GetPosition();
 	newPacket.pos[0] = position.x;
 	newPacket.pos[1] = position.y;
@@ -129,6 +129,11 @@ void NetworkedGame::UpdateAsClient(float dt) {
 	newPacket.angles[0] = angle.x;
 	newPacket.angles[1] = angle.y;
 	newPacket.angles[2] = angle.z;
+
+	newPacket.firing = inputHandler->commandExecuted(Input::FIRE);
+	if (newPacket.firing)
+		std::cout << "FIRING" << std::endl;
+
 	thisClient->SendPacket(newPacket);
 }
 
