@@ -5,20 +5,20 @@
 
 namespace NCL {
 	namespace CSC8503 {
-		class MultipleBullets : public PowerUp {
+		class Heal : public PowerUp {
 		public:
-			MultipleBullets(GameWorld& gw, const float& increaseBulletsBy = 10.0f) : PowerUp(PowerUpType::MuiltipleBullets, gw), BulletsPerShot(increaseBulletsBy) {}
+			Heal(GameWorld& gw, const float& HealthCure = 10.0f) : PowerUp(PowerUpType::Heal, gw), HealthTake(HealthCure) {}
 
 			void OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vector3 localB, Vector3 normal) override {
-				std::cout << "Weapons Freeeee" << std::endl;
+				std::cout << "Ahhh thats good" << std::endl;
 				/*if (otherObject->GetName() == "Player") {
-					((Player*)otherObject)->IncreaseFireRate(BulletsIncrease, powerupDuration);
+					((Player*)otherObject)->IncreaseFireRate(FireRateIncrease, powerupDuration);
 					gameWorld.RemoveGameObject(this, true);
 				}*/
 			}
 
 		private:
-			float BulletsPerShot;
+			float HealthTake;
 		};
 	}
 }

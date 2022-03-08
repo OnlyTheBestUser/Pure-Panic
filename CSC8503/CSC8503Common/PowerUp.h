@@ -8,7 +8,8 @@ enum PowerUpType
 {
 	SpeedBoost,
 	FireRate,
-	MuiltipleBullets
+	MuiltipleBullets,
+	Heal
 };
 
 namespace NCL {

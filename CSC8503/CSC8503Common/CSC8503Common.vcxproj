@@ -200,6 +200,7 @@
     <ClInclude Include="Command.h" />
     <ClInclude Include="FIreRate.h" />
     <ClInclude Include="GameActor.h" />
+    <ClInclude Include="Heal.h" />
     <ClInclude Include="InputBase.h" />
     <ClInclude Include="InputHandler.h" />
     <ClInclude Include="MoveForwardCommand.h" />
