@@ -12,6 +12,8 @@ namespace NCL {
 			void OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vector3 localB, Vector3 normal) override {
 				std::cout << "Ahhh thats good" << std::endl;
 				if (otherObject->GetName() == "Player") {
+					Player* player = ((Player*)otherObject);
+					if (player->GetCurrentPowerup() != PowerUpType::None) return;
 					((Player*)otherObject)->IncreaseHealth(healthTake);
 					gameWorld.RemoveGameObject(this, true);
 				}

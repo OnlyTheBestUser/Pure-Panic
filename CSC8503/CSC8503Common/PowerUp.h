@@ -9,7 +9,8 @@ enum PowerUpType
 	SpeedBoost,
 	FireRate,
 	MultipleBullets,
-	Heal
+	Heal,
+	None,
 };
 
 namespace NCL {
@@ -23,7 +24,7 @@ namespace NCL {
 		protected:
 			
 			PowerUp(PowerUpType powerType, GameWorld& gw) : GameObject("PowerUp"), powerUpType(powerType), gameWorld(gw) {
-				powerupDuration = 3.0f;
+				powerupDuration = 5.0f;
 			}
 
 			PowerUpType powerUpType;

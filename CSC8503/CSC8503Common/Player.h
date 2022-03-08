@@ -3,6 +3,7 @@
 #include "GameWorld.h"
 #include "../../Common/Vector3.h"
 #include "../../Common/Camera.h"
+#include"../CSC8503Common/PowerUp.h"
 #include "Projectile.h"
 #include <chrono>
 
@@ -43,18 +44,21 @@ namespace NCL {
 				if (increaseFireRateFactor <= 0 || duration <= 0) return;
 				fireRate /= increaseFireRateFactor;
 				powerupTime = duration;
+				currentPowerUp = PowerUpType::FireRate;
 				std::cout << "Picked up the firerate powerup" << std::endl;
 			}
 
 			void IncreaseHealth(const float& increaseHealthBy) {
 				if (increaseHealthBy <= 0) return;
 				health = std::min(health + increaseHealthBy, maxHealth);
+				currentPowerUp = PowerUpType::Heal;
 			}
 			
 			void ResetPowerUps()
 			{
 				fireRate = defaultFireRate;
 				curSpeed = defaultCurSpeed;
+				currentPowerUp = PowerUpType::None;
 			}
 
 			float GetSpeed() const { return curSpeed; }
@@ -93,6 +97,10 @@ namespace NCL {
 				return ( Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Matrix4::Rotation(camera->GetPitch(), Vector3(1, 0, 0)) * Vector3(0, 0, -1)).Normalised();
 			}
 
+			PowerUpType GetCurrentPowerup () const {
+				return currentPowerUp;
+			}
+
 			void ChangeCamLock() { camLocked = !camLocked; }
 			bool* GetCamLock() { return &camLocked; }
 
@@ -119,6 +127,8 @@ namespace NCL {
 
 			const float maxHealth = 100.0f;
 			float health = 90.0f;
+
+			PowerUpType currentPowerUp = PowerUpType::None;
 
 			float cameraVertMult = 0.5f;
 			Camera* camera;
