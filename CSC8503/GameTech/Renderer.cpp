@@ -72,7 +72,7 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 
 	skyboxTex = PS4::PS4Texture::LoadSkyboxFromFile(NCL::Assets::TEXTUREDIR + "Cubemap/cubemap.gnf");
 
-	//camBuffer = new PS4::PS4UniformBuffer(sizeof(CameraMatrix));
+	camBuffer = new PS4::PS4UniformBuffer(sizeof(CameraMatrix));
 #endif
 
 	//Set up the light properties
@@ -144,10 +144,10 @@ void Renderer::RenderScene() {
 	RenderShadows();
 #endif
 	// Set scene uniform buffers
-	//float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
-	//camMatrix.projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);
-	//camMatrix.viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
-	//camBuffer->SetData(&camMatrix, sizeof(CameraMatrix));
+	float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
+	camMatrix.projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);
+	camMatrix.viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
+	camBuffer->SetData(&camMatrix, sizeof(CameraMatrix));
 
 	RenderSkybox();
 	RenderObjects();

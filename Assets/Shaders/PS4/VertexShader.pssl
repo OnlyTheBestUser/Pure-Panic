@@ -1,7 +1,11 @@
-ConstantBuffer cameraMatrix
+ConstantBuffer projMatrix
 {
-	column_major matrix projMatrix;
-	column_major matrix viewMatrix;
+	column_major matrix projMatrix;;
+}
+
+ConstantBuffer viewMatrix
+{
+	column_major matrix viewMatrix;;
 }
 
 ConstantBuffer viewProjMatrix{
