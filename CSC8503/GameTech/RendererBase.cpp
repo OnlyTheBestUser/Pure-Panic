@@ -14,6 +14,8 @@
 using namespace NCL;
 using namespace Rendering;
 
+RendererAPI* RendererBase::rendererAPI = nullptr;
+
 RendererBase::RendererBase() {
 #ifdef _WIN64
 	rendererAPI = new OGLRendererAPI(*Window::GetWindow());
@@ -58,7 +60,6 @@ RendererBase::RendererBase() {
 
 
 #endif
-
 	debugTextMesh->UploadToGPU(rendererAPI);
 	debugLinesMesh->UploadToGPU(rendererAPI);
 

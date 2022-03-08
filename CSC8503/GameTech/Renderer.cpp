@@ -67,9 +67,6 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 	);
 
 	skyboxTex = PS4::PS4Texture::LoadSkyboxFromFile(NCL::Assets::TEXTUREDIR + "Cubemap/cubemap.gnf");
-	PS4::PS4UniformBuffer test((PS4::PS4RendererAPI*)rendererAPI, (uint32_t)sizeof(CamMatrix));
-	CamMatrix* cam = new CamMatrix();
-	test.SetData(cam, (uint32_t)sizeof(CamMatrix), 0);
 #endif
 
 	//Set up the light properties

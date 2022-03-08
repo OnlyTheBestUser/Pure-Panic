@@ -3,11 +3,23 @@
 #include <vector>
 
 namespace NCL {
+	namespace PS4 {
+		class PS4UniformBuffer;
+		class PS4Texture;
+		class PS4FrameBuffer;
+		class PS4Shader;
+	}
 	namespace Rendering {
 		class SimpleFont;
 
 		class RendererBase
 		{
+#ifdef _ORBIS
+		friend class NCL::PS4::PS4UniformBuffer;
+		friend class NCL::PS4::PS4Texture;
+		friend class NCL::PS4::PS4FrameBuffer;
+		friend class NCL::PS4::PS4Shader;
+#endif
 		public:
 			RendererBase();
 			~RendererBase();
@@ -34,7 +46,7 @@ namespace NCL {
 			void DrawDebugStrings();
 
 		protected:
-			RendererAPI* rendererAPI;
+			static RendererAPI* rendererAPI;
 
 			NCL::Rendering::SimpleFont* font;
 			MeshGeometry* debugTextMesh;
