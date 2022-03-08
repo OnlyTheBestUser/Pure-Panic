@@ -16,6 +16,7 @@ using NCL::Camera;
 using namespace NCL::Maths;
 using namespace NCL::CSC8503;
 namespace NCL {
+	class MeshGeometry;
 	class CollisionDetection
 	{
 	public:
@@ -25,6 +26,12 @@ namespace NCL {
 			Vector3 normal;
 			float	penetration;
 		};
+		struct Triangle {
+			Vector3 pos_a;
+			Vector3 pos_b;
+			Vector3 pos_c;
+		};
+
 		struct CollisionInfo {
 			GameObject* a;
 			GameObject* b;		
@@ -105,6 +112,7 @@ namespace NCL {
 
 
 		static bool RayPlaneIntersection(const Ray&r, const Plane&p, RayCollision& collisions);
+		static bool RayTriangleIntersection(const Ray&r, const Triangle&t, const Vector3&norm, RayCollision& collisions);
 
 		static bool	AABBTest(const Vector3& posA, const Vector3& posB, const Vector3& halfSizeA, const Vector3& halfSizeB);
 
@@ -129,6 +137,7 @@ namespace NCL {
 		static Vector3		UnprojectScreenPosition(Vector3 position, float aspect, float fov, const Camera &c);
 		static Matrix4		GenerateInverseProjection(float aspect, float fov, float nearPlane, float farPlane);
 		static Matrix4		GenerateInverseView(const Camera &c);
+		static Vector2		GetUVFromRay(Ray ray, RenderObject obj);
 
 	protected:
 	

@@ -6,6 +6,8 @@
 #include "../../Common/Vector2.h"
 #include "../../Common/Window.h"
 #include "../../Common/Maths.h"
+#include "../../OpenGLRendering/OGLMesh.h"
+#include "../../PlayStation4/PS4Mesh.h"
 #include "Debug.h"
 
 #include <list>
@@ -28,6 +30,25 @@ bool CollisionDetection::RayPlaneIntersection(const Ray&r, const Plane&p, RayCol
 	collisions.collidedAt = r.GetPosition() + (r.GetDirection() * d);
 
 	return true;
+}
+
+bool CollisionDetection::RayTriangleIntersection(const Ray& r, const Triangle& t, const Vector3& norm,  RayCollision& collision)
+{
+	Plane p0 = Plane::PlaneFromTri(t.pos_a, t.pos_b, t.pos_c);
+	Plane p1 = Plane::PlaneFromTri(t.pos_a, t.pos_b, t.pos_b + norm); //= new Plane(Vector3::Cross((t.pos_c - t.pos_a), t.pos_c - norm));
+	Plane p2 = Plane::PlaneFromTri(t.pos_b, t.pos_c, t.pos_c + norm);
+	Plane p3 = Plane::PlaneFromTri(t.pos_c, t.pos_a, t.pos_a + norm);
+
+
+	if (RayPlaneIntersection(r, p0, collision)) {
+		if (p1.PointInPlane(collision.collidedAt) && p2.PointInPlane(collision.collidedAt) && p3.PointInPlane(collision.collidedAt)) {
+			//Debug::DrawLine(t.pos_a, t.pos_b, Vector4(0,1,0,1), 3);
+			//Debug::DrawLine(t.pos_b, t.pos_c, Vector4(0,1,0,1), 3);
+			//Debug::DrawLine(t.pos_c, t.pos_a, Vector4(0,1,0,1), 3);
+			return true;
+		}
+	}
+	return false;
 }
 
 bool CollisionDetection::RayIntersection(const Ray& r,GameObject& object, RayCollision& collision) {
@@ -288,6 +309,56 @@ Matrix4::Rotation(yaw, Vector3(0, 1, 0)) *
 Matrix4::Rotation(pitch, Vector3(1, 0, 0));
 
 return iview;
+}
+
+Vector2 CollisionDetection::GetUVFromRay(Ray ray, RenderObject obj)
+{
+	Quaternion orientation = obj.GetTransform()->GetOrientation();
+	Vector3 position = obj.GetTransform()->GetPosition();
+
+	Matrix3 transform = Matrix3(orientation);
+	Matrix3 invTransform = Matrix3(orientation.Conjugate());
+
+	// Ray to local space
+	Vector3 localRayPos = ray.GetPosition() - position;
+	Ray tempRay(invTransform * localRayPos, invTransform * ray.GetDirection());
+
+	// closest triangle
+	Triangle closest;
+
+#ifdef _WIN64
+	OGLMesh mesh = ((OGLMesh&)*obj.GetMesh());
+
+	vector<unsigned int> indicies = mesh.GetIndexData();
+
+	for (int i = 0; i < (indicies.size()) / 3; i++) {
+
+		Triangle tri;
+
+		mesh.GetTriangle(i, tri.pos_a, tri.pos_b, tri.pos_c);
+
+		RayCollision collision;
+		Vector3 norm;
+
+		mesh.GetNormalForTri(i, norm);
+
+		//sort to find the nearest
+
+		RayTriangleIntersection(tempRay, tri, norm, collision);
+	}
+
+#endif 
+
+#ifdef _ORBIS
+	PS4Mesh mesh = ((PS4Mesh&)*obj.GetMesh());
+#endif 
+
+
+	// Make ray triangle intersection
+	// loop through every triangle in the mesh and for each triangle do a ray triangle intersection, Find closest collision point to ray origin. 
+	// using that point we know what triangle its a part of, now just find out where ray hits on the trinalgle. do baryocentric to get pos then interpolate between UV on the triangle.
+
+	return Vector2();
 }
 
 /*

@@ -29,7 +29,6 @@ float mask(vec3 _position, vec3 _center, float _radius, float _hardness){
 void main(void)	{
 // This world possition is the position of verticies not fragments.
 
-
     vec2 fragCoordScaled = (gl_FragCoord.xy/textureSize.x);
     vec3 fragWorldPos = (modelMatrix * vec4(-fragCoordScaled.x, painterPosition.y , -fragCoordScaled.y, 1.0)).xyz;
     //float f = mask(fragWorldPos, (painterPosition-(vec3(textureSize.x, 0, textureSize.y)/2)) - vec3(radius, 0 , radius), radius, hardness);
