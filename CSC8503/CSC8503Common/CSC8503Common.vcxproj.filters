@@ -138,6 +138,7 @@
     <ClInclude Include="PCInput.h">
       <Filter>Input Handling</Filter>
     </ClInclude>
+    <ClInclude Include="Projectile.h">
     <ClInclude Include="InputBase.h">
       <Filter>Input Handling</Filter>
     </ClInclude>
@@ -207,6 +208,9 @@
       <Filter>Input Handling</Filter>
     </ClCompile>
     <ClCompile Include="PaintManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Projectile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

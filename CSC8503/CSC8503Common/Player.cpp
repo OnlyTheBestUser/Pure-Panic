@@ -61,6 +61,45 @@ float Player::CheckDistToGround()
 	return distToGround;
 }
 
+Projectile* Player::spawnProjectile(const float& radius, const float& height, const float& initialSpeed) {
+	float meshSize = 0.5f;
+	float inverseMass = 5.0f;
+	//Vector3 offset = Vector3(0, 2.5f, 0);
+	Vector3 camForwardVector = this->GetCamFrontVec();
+
+	Projectile* projectile = new Projectile(gameWorld, radius, height);
+
+	SphereVolume* volume = new SphereVolume(height / 2.0f * meshSize * 1.3f);
+	projectile->SetBoundingVolume((CollisionVolume*)volume);
+
+	projectile->GetTransform()
+		.SetScale(Vector3(meshSize, meshSize, meshSize))
+		//.SetOrientation(Quaternion(Matrix3::Rotation(camera->GetPitch() + 90, Vector3(0, 0, 1))) * Quaternion(Matrix3::Rotation(camera->GetYaw() + 90, Vector3(1, 0, 0))))
+		.SetPosition(camera->GetPosition() + camForwardVector * 5.0f); //+ offset);
+
+	projectile->SetRenderObject(new RenderObject(&projectile->GetTransform(), projectileMesh, nullptr, basicShader));
+	projectile->SetPhysicsObject(new PhysicsObject(&projectile->GetTransform(), projectile->GetBoundingVolume()));
+
+	projectile->GetPhysicsObject()->SetInverseMass(inverseMass);
+	//projectile->GetPhysicsObject()->SetFriction(1.0f);
+	//projectile->GetPhysicsObject()->SetLinearDamping(10.0f);
+	projectile->GetPhysicsObject()->InitSphereInertia();
+	projectile->GetPhysicsObject()->AddAcceleration(camForwardVector * initialSpeed);
+	projectile->GetTransform().SetOrientation(Quaternion(Matrix3::Rotation(-acos(Vector3::Dot(Vector3(0, 1, 0), camForwardVector)) * 180.0f / 3.14f, Vector3::Cross(camForwardVector, Vector3(0, 1, 0)).Normalised())));
+	//Debug::DrawAxisLines(projectile->GetTransform().GetMatrix(), 2.0f, 1000.0f);
+	//Debug::DrawArrow(camera->GetPosition(), (camera->GetPosition() + this->GetCamFrontVec() * 100.0f), Debug::RED, 5.0f);
+	projectile->GetPhysicsObject()->SetDynamic(true);
+	projectile->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
+
+	gameWorld.AddGameObject(projectile);
+
+	return projectile;
+}
+
+void Player::Fire() {
+	spawnProjectile(0.3f, 1.0f);
+}
+
 void Player::Reset() 
 {
 

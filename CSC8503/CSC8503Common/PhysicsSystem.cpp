@@ -22,7 +22,7 @@ PhysicsSystem::PhysicsSystem(GameWorld& g) : gameWorld(g)	{
 	useBroadPhase	= true;	
 	dTOffset		= 0.0f;
 	globalDamping	= 0.995f;
-	SetGravity(Vector3(0.0f, -100.0f, 0.0f));
+	SetGravity(Vector3(0.0f, -19.6f, 0.0f));
 
 	// Sets the valid different collision layers here
 	/* Col Layer 1 = 1
@@ -37,6 +37,8 @@ PhysicsSystem::PhysicsSystem(GameWorld& g) : gameWorld(g)	{
 	validLayers.emplace_back(Vector2(3, 1));
 	validLayers.emplace_back(Vector2(1, 5));
 	validLayers.emplace_back(Vector2(5, 1));
+	validLayers.emplace_back(Vector2(3, 5));
+	validLayers.emplace_back(Vector2(5, 3));
 }
 
 PhysicsSystem::~PhysicsSystem()	{
@@ -57,7 +59,7 @@ void PhysicsSystem::BuildStaticList()
 	for (auto i = first; i != last; ++i) {
 		(*i)->UpdateBroadphaseAABB(); // Force update
 		Vector3 halfSizes;
-		if (!(*i)->GetBroadphaseAABB(halfSizes) || (*i)->IsDynamic())
+		if (!(*i)->GetBroadphaseAABB(halfSizes) || (*i)->GetPhysicsObject()->IsDynamic())
 			continue;
 		Vector3 pos = (*i)->GetTransform().GetPosition();
 		staticTree->Insert(*i, pos, halfSizes, (*i)->GetName());
@@ -156,7 +158,7 @@ void PhysicsSystem::Update(float dt) {
 	}
 
 	ClearForces();	//Once we've finished with the forces, reset them to zero
-	UpdateCollisionList(); //Remove any old collisions
+	//UpdateCollisionList(); //Remove any old collisions
 
 	t.Tick();
 	float updateTime = t.GetTimeDeltaSeconds();
@@ -335,7 +337,7 @@ void PhysicsSystem::BroadPhase() {
 
 	for (auto i = first; i != last; ++i) {
 		Vector3 halfSizes;
-		if (!(*i)->GetBroadphaseAABB(halfSizes) || !(*i)->IsDynamic()) {
+		if (!(*i)->GetBroadphaseAABB(halfSizes) || !(*i)->GetPhysicsObject()->IsDynamic()) {
 				continue;
 		}
 
@@ -374,7 +376,7 @@ void PhysicsSystem::BroadPhase() {
 				info.a = std::min((*i).object, (*j).object);
 				info.b = std::max((*i).object, (*j).object);
 #endif
-				if (ValidCollisionLayers(info.a->GetCollisionLayers(), info.b->GetCollisionLayers()) && !(!info.a->IsDynamic() && !info.b->IsDynamic())) {
+				if (ValidCollisionLayers(info.a->GetCollisionLayers(), info.b->GetCollisionLayers()) && !(!info.a->GetPhysicsObject()->IsDynamic() && !info.b->GetPhysicsObject()->IsDynamic())) {
 					broadphaseCollisions.insert(info);
 				}
 			}
@@ -506,7 +508,7 @@ void PhysicsSystem::IntegrateAccel(float dt, GameObject* gobj) {
 	Vector3 force = object->GetForce();
 	Vector3 accel = force * inverseMass;
 	
-	if (applyGravity && inverseMass > 0 && object->UsesGravity() && gobj->IsDynamic()) {
+	if (applyGravity && inverseMass > 0 && object->UsesGravity() && object->IsDynamic()) {
 		accel += gravity;
 	}
 	

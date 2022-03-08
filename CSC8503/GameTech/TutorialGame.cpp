@@ -319,12 +319,17 @@ void TutorialGame::InitWorld() {
 	Command* d = new DescendCommand(player);
 	inputHandler->BindButton(DESCEND, d);
 
-	//GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
-	//cap1->SetDynamic(true);
-	
-	//cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
+	Command* f = new FireCommand(player);
+	inputHandler->BindButton(FIRE, f);
+
+	/*GameObject* cap1 = levelLoader->AddCapsuleToWorld(Vector3(15, 15, 0), 3.0f, 1.5f);
+	cap1->GetPhysicsObject()->SetDynamic(true);
+	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);*/
+
 	player->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	player1 = player;
+
+	//Projectile* spit = AddProjectileToWorld(Vector3(5, 5, 0), 0.3f, 1.0f);
 
 	physics->BuildStaticList();
 }
