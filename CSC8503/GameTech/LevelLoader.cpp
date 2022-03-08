@@ -533,7 +533,7 @@ PowerUp* LevelLoader::AddPowerUpToWorld(const Vector3& position, const PowerUpTy
 	world->AddGameObject(powerup);
 	powerup->SetDynamic(false);
 
-	powerup->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	powerup->SetCollisionLayers(CollisionLayer::LAYER_FOUR);
 
 	return powerup;
 }

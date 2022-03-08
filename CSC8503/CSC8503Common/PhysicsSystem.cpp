@@ -39,6 +39,16 @@ PhysicsSystem::PhysicsSystem(GameWorld& g) : gameWorld(g)	{
 	validLayers.emplace_back(Vector2(5, 1));
 	validLayers.emplace_back(Vector2(3, 5));
 	validLayers.emplace_back(Vector2(5, 3));
+
+	//Powerups
+	validLayers.emplace_back(Vector2(5, 8));
+	validLayers.emplace_back(Vector2(8, 5));
+
+	//Projectiles
+	validLayers.emplace_back(Vector2(16, 1));
+	validLayers.emplace_back(Vector2(1, 16));
+	validLayers.emplace_back(Vector2(16, 5));
+	validLayers.emplace_back(Vector2(5, 16));
 }
 
 PhysicsSystem::~PhysicsSystem()	{
