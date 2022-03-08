@@ -8,7 +8,7 @@ enum PowerUpType
 {
 	SpeedBoost,
 	FireRate,
-	MuiltipleBullets,
+	MultipleBullets,
 	Heal
 };
 

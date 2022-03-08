@@ -499,6 +499,12 @@ PowerUp* LevelLoader::AddPowerUpToWorld(const Vector3& position, const PowerUpTy
 	case(PowerUpType::FireRate):
 		powerup = new FireRate(*world);
 		break;
+	case(PowerUpType::MultipleBullets):
+		powerup = new MultipleBullets(*world);
+		break;
+	case(PowerUpType::Heal):
+		powerup = new Heal(*world);
+		break;
 	}
 
 	if (powerup == nullptr) {
