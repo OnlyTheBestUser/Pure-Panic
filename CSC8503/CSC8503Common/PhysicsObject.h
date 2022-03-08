@@ -104,8 +104,6 @@ namespace NCL {
 
 			inline void Wake() { sleeping = false; }
 			inline void Sleep() { sleeping = true; }
-			inline void SetCanSleep(bool ableTo) { canSleep = ableTo; }
-			inline bool CheckCanSleep() const { return canSleep; }
 			inline bool isSleeping() const { return sleeping; }
 			
 			VolumeType GetVolumeType() const;
@@ -133,7 +131,6 @@ namespace NCL {
 			float elasticity;
 			float friction;
 
-			bool canSleep = true;
 			bool sleeping = false;
 			std::queue<float> previousVelocityDotProducts;
 			std::queue<float> previousPositions;

@@ -419,11 +419,6 @@ void PhysicsSystem::CheckToWake(PhysicsObject* object)
 
 void PhysicsSystem::CheckToSleep(PhysicsObject* object)
 {
-	if (!object->CheckCanSleep())
-	{
-		return;
-	}
-
 	const int maxQueueSize = 6;
 	const float bounceTolerance = 0.5;
 

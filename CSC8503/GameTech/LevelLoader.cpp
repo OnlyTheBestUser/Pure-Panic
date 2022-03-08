@@ -184,9 +184,7 @@ Player* LevelLoader::AddPlayerToWorld(const Vector3& position) {
 	character->GetPhysicsObject()->SetInverseMass(inverseMass);
 	character->GetPhysicsObject()->SetLinearDamping(3.0f);
 	character->GetPhysicsObject()->InitSphereInertia();
-	character->GetPhysicsObject()->SetFriction(false);
 	character->GetPhysicsObject()->SetShouldApplyAngular(false);
-	character->GetPhysicsObject()->SetCanSleep(false);
 	character->SetDynamic(true);
 	character->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
 

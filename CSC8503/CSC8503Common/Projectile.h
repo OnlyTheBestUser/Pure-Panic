@@ -9,7 +9,7 @@ namespace NCL {
 		class Projectile : public GameObject
 		{
 		public:
-			Projectile(GameWorld& gWorld): GameObject("projectile"), gameWorld(gWorld) {
+			Projectile(GameWorld& gWorld, float capsuleRadius, float capsuleHeight): GameObject("projectile"), gameWorld(gWorld), radius(capsuleRadius), height(capsuleHeight) {
 			};
 			~Projectile() {}
 
@@ -18,10 +18,11 @@ namespace NCL {
 			}
 
 			void Update(float dt) override;
-
 		private:
 			//Vector3 velocity;
 			GameWorld& gameWorld;
+			float radius;
+			float height;
 		};
 	}
 }
