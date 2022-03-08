@@ -20,13 +20,13 @@ PS4Texture::~PS4Texture()
 {
 }
 
-void PS4Texture::Bind(int slot = 0) const {
+void PS4Texture::Bind(int slot) const {
 	Gnm::Sampler trilinearSampler;
 	trilinearSampler.init();
 	trilinearSampler.setMipFilterMode(Gnm::kMipFilterModeLinear);
 
-	((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->setTextures(Gnm::kShaderStagePs, 0, 1, &GetAPITexture());
-	((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->setSamplers(Gnm::kShaderStagePs, 0, 1, &trilinearSampler);
+	((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->setTextures(Gnm::kShaderStagePs, slot, 1, &GetAPITexture());
+	((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->setSamplers(Gnm::kShaderStagePs, slot, 1, &trilinearSampler);
 }
 
 PS4Texture* PS4Texture::LoadTextureFromFile(const std::string& filename) {

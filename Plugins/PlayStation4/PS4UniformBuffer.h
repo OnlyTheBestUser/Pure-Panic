@@ -3,7 +3,7 @@
 #include "PS4RendererAPI.h"
 namespace NCL {
 	namespace PS4 {
-		class PS4UniformBuffer : NCL::Rendering::UniformBuffer
+		class PS4UniformBuffer : public NCL::Rendering::UniformBuffer
 		{
 		friend class PS4RendererAPI;
 		public:

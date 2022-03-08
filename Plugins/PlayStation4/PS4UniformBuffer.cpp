@@ -10,6 +10,8 @@ PS4UniformBuffer::PS4UniformBuffer(uint32_t size) {
 	Gnm::Buffer constantBuffer;
 	constantBuffer.initAsConstantBuffer(data, size);
 	constantBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
+
+	((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->setConstantBuffers(Gnm::kShaderStageVs, 0, 1, &constantBuffer);
 }
 
 PS4UniformBuffer::~PS4UniformBuffer() {

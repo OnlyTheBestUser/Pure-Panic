@@ -315,33 +315,6 @@ void NCL::PS4::PS4RendererAPI::DrawMeshAndSubMesh(MeshGeometry* mesh)
 	ps4Mesh->SubmitDraw(*currentGFXContext, Gnm::ShaderStage::kShaderStageVs);
 }
 
-void NCL::PS4::PS4RendererAPI::BindTexture(const TextureBase* tex, std::string uniform, int texSlot) {
-	const PS4Texture* ps4Tex = static_cast<const PS4Texture*>(tex);
-	if (!ps4Tex) {
-		return;
-	}
-	Gnm::Sampler trilinearSampler;
-	trilinearSampler.init();
-	trilinearSampler.setMipFilterMode(Gnm::kMipFilterModeLinear);
-
-	currentGFXContext->setTextures(Gnm::kShaderStagePs, 0, 1, &ps4Tex->GetAPITexture());
-	currentGFXContext->setSamplers(Gnm::kShaderStagePs, 0, 1, &trilinearSampler);
-}
-
-void NCL::PS4::PS4RendererAPI::BindCubemap(const TextureBase* tex, std::string uniform, int texSlot)
-{
-	const PS4Texture* ps4Tex = static_cast<const PS4Texture*>(tex);
-	if (!ps4Tex) {
-		return;
-	}
-	Gnm::Sampler trilinearSampler;
-	trilinearSampler.init();
-	trilinearSampler.setMipFilterMode(Gnm::kMipFilterModeLinear);
-
-	currentGFXContext->setTextures(Gnm::kShaderStagePs, 0, 1, &ps4Tex->GetAPITexture());
-	currentGFXContext->setSamplers(Gnm::kShaderStagePs, 0, 1, &trilinearSampler);
-}
-
 void NCL::PS4::PS4RendererAPI::BindFrameBuffer()
 {
 
