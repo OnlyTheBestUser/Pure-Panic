@@ -12,19 +12,19 @@ https://research.ncl.ac.uk/game/
 namespace NCL {
 	namespace Assets {
 #ifdef _WIN64
-		const std::string AUDIODIR("../../Assets/Audio/");
 		const std::string SHADERDIR("../../Assets/Shaders/");
 		const std::string MESHDIR("../../Assets/Meshes/");
 		const std::string TEXTUREDIR("../../Assets/Textures/");
+		const std::string SOUNDSDIR("../../Assets/Sounds/");
 		const std::string FONTSSDIR("../../Assets/Fonts/");
 		const std::string DATADIR("../../Assets/Data/");
 		const std::string MAPDIR("../../Assets/Maps/");
 #endif
 #ifdef _ORBIS
-		const std::string AUDIODIR("/app0/Assets/Audio/");
 		const std::string SHADERDIR("/app0/Assets/Shaders/");
 		const std::string MESHDIR("/app0/Assets/Meshes/");
 		const std::string TEXTUREDIR("/app0/Assets/Textures/");
+		const std::string SOUNDSDIR("/app0/Assets/Sounds/");
 		const std::string FONTSSDIR("/app0/Assets/Fonts/");
 		const std::string DATADIR("/app0/Assets/Data/");
 		const std::string MAPDIR("/app0/Assets/Maps/");
