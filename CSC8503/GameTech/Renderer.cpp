@@ -17,6 +17,7 @@
 #include "../../Plugins/OpenGLRendering/OGLShader.h"
 #include "../../Plugins/OpenGLRendering/OGLMesh.h"
 #include "../../Plugins/OpenGLRendering/OGLTexture.h"
+#include "../../Plugins/OpenGLRendering/OGLUniformBuffer.h"
 using namespace NCL;
 using namespace Rendering;
 using namespace CSC8503;
@@ -56,6 +57,9 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 	//maskFBO->AddTexture(2048 / 4, 2048 / 4);
 	maskShader = new OGLShader("MaskVertex.glsl", "MaskFragment.glsl");
 
+	// Uniform block bindings
+	camBuffer = new OGLUniformBuffer(sizeof(CameraMatrix), 0);
+
 #endif
 #ifdef _ORBIS
 	skyboxMesh = PS4::PS4Mesh::GenerateQuad();
@@ -79,6 +83,8 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 }
 
 Renderer::~Renderer() {
+	delete camBuffer;
+
 	delete shadowFBO;
 	delete shadowShader;
 
@@ -97,15 +103,11 @@ void Renderer::Update(float dt) {
 void Renderer::Render() {
 	rendererAPI->BeginFrame();
 
-
 	rendererAPI->SetCullFace(true);
 	rendererAPI->SetClearColour(1, 1, 1, 1);
 	BuildObjectList();
 	SortObjectList();
 
-	for (const auto& i : activeObjects) {
-		Paint(i, Vector3(0, 0, 0), 1.0f, 1.0f, 1.0f, Vector4(1, 0, 0, 1));
-	}
 #ifdef _WIN64
 	ApplyPaintToMasks();
 #endif
@@ -142,6 +144,12 @@ void Renderer::RenderScene() {
 #ifdef _WIN64
 	RenderShadows();
 #endif
+	// Set scene uniform buffers
+	float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
+	camMatrix.projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);
+	camMatrix.viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
+	camBuffer->SetData(&camMatrix, sizeof(CameraMatrix));
+
 	RenderSkybox();
 	RenderObjects();
 }
@@ -185,15 +193,9 @@ void Renderer::RenderSkybox() {
 	rendererAPI->SetBlend(false);
 	rendererAPI->SetDepth(false);
 
-	float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
-	Matrix4 viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
-	Matrix4 projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);
-
 	skyboxShader->BindShader();
 
-	skyboxShader->UpdateUniformMatrix4("projMatrix", projMatrix);
-	skyboxShader->UpdateUniformMatrix4("viewMatrix", viewMatrix);
-	skyboxShader->UpdateUniformMatrix4("invProjMatrix", projMatrix.Inverse());
+	skyboxShader->UpdateUniformMatrix4("invProjMatrix", camMatrix.projMatrix.Inverse());
 
 	skyboxTex->Bind(0);
 
@@ -207,20 +209,14 @@ void Renderer::RenderSkybox() {
 void Renderer::RenderObjects() {
 	ShaderBase* activeShader = nullptr;
 
-	float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
-	Matrix4 viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
-	Matrix4 projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);
-
 	for (const auto& i : activeObjects) {
 		ShaderBase* shader = (*i).GetShader();
 
 		if (activeShader != shader) {
 			shader->BindShader();
 
-			shader->UpdateUniformMatrix4("projMatrix", projMatrix);
-			shader->UpdateUniformMatrix4("viewMatrix", viewMatrix);
-			shader->UpdateUniformMatrix4("viewProjMatrix", projMatrix * viewMatrix);
-			shader->UpdateUniformMatrix4("invProjMatrix", projMatrix.Inverse());
+			shader->UpdateUniformMatrix4("viewProjMatrix", camMatrix.projMatrix * camMatrix.viewMatrix);
+			shader->UpdateUniformMatrix4("invProjMatrix", camMatrix.projMatrix.Inverse());
 			shader->UpdateUniformVector3("cameraPos", gameWorld.GetMainCamera()->GetPosition());
 
 			shader->UpdateUniformVector4("lightColour", lightColour);
@@ -233,11 +229,9 @@ void Renderer::RenderObjects() {
 		if ((*i).GetDefaultTexture()) (*i).GetDefaultTexture()->Bind(0);
 		shader->UpdateUniformInt("hasTexture", (*i).GetDefaultTexture() ? 1 : 0);
 #ifdef _WIN64
-		if (shadowFBO->GetTexture()) {
-			shadowFBO->GetTexture()->Bind(1);
-		}
-		//rendererAPI->BindTexture(i->GetPaintMask(), "paintMaskTex", 2);
-		//rendererAPI->UpdateUniformInt(shader, "hasPaintMask", (*i).GetPaintMask() ? 1 : 0);
+		if (shadowFBO->GetTexture()) shadowFBO->GetTexture()->Bind(1);
+		//if ((*i).GetPaintMask()) (*i).GetPaintMask()->Bind(2);
+		//shader->UpdateUniformInt("hasPaintMask", (*i).GetPaintMask() ? 1 : 0);
 #endif
 
 		Matrix4 modelMatrix = (*i).GetTransform()->GetMatrix();
@@ -255,12 +249,6 @@ void Renderer::RenderObjects() {
 
 		rendererAPI->DrawMeshAndSubMesh((*i).GetMesh());
 	}
-
-	/* 
-	* Go through all paint instances <- struct of all information from paint method
-	* bind paint shader 
-	* draw each object that is part
-	*/
 }
 
 void Renderer::Paint(const RenderObject* paintable, NCL::Maths::Vector3 pos, float radius, float hardness, float strength, NCL::Maths::Vector4 colour)

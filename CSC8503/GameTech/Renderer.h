@@ -4,9 +4,11 @@
 namespace NCL {
 	namespace Rendering {
 		class SimpleFont;
+		class UniformBuffer;
 
-		struct CamMatrix {
-			Vector3 viewMatrix;
+		struct CameraMatrix {
+			Matrix4 projMatrix;
+			Matrix4 viewMatrix;
 		};
 
 		class Renderer : public RendererBase
@@ -42,6 +44,9 @@ namespace NCL {
 				float strength;
 				Vector4 colour;
 			};
+
+			CameraMatrix camMatrix;
+			UniformBuffer* camBuffer;
 
 			CSC8503::GameWorld& gameWorld;
 			vector<const RenderObject*> activeObjects;
