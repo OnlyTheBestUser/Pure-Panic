@@ -41,6 +41,8 @@ void Player::Update(float dt)
 	}
 
 	force = Vector3(0, 0, 0);
+
+	Debug::Print("Health: " + std::to_string(health), { 50.0f,90.0f });
 }
 
 float Player::CheckDistToGround()

@@ -34,15 +34,21 @@ namespace NCL {
 			/* TODO: 
 			Change it so it doesnt increase the strength of the powerup every frame while increasing duration aswell. 
 			Also thought powerups were simply going to be a multiplier */
-			void IncreaseSpeed(float speedIncrease, float duration) {
+			void IncreaseSpeed(const float& speedIncrease, const float& duration) {
 				curSpeed += speedIncrease;
 				powerupTime += duration;
 			};
 
-			void IncreaseFireRate(float increaseFireRateBy, float duration) {
+			void IncreaseFireRate(const float& increaseFireRateBy, const float& duration) {
+				if (increaseFireRateBy <= 0 || duration <= 0) return;
 				fireRate += increaseFireRateBy;
 				powerupTime = duration;
 				std::cout << "Picked up the firerate powerup" << std::endl;
+			}
+
+			void IncreaseHealth(const float& increaseHealthBy) {
+				if (increaseHealthBy <= 0) return;
+				health = std::min(health + increaseHealthBy, maxHealth);
 			}
 
 			
@@ -104,6 +110,9 @@ namespace NCL {
 
 			float inAirSpeed = 500.0f;
 			bool canJump;
+
+			const float maxHealth = 100.0f;
+			float health = 90.0f;
 
 			float cameraVertMult = 0.5f;
 			Camera* camera;
