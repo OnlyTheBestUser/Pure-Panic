@@ -529,6 +529,7 @@ PowerUp* LevelLoader::AddPowerUpToWorld(const Vector3& position, const PowerUpTy
 	powerup->SetPhysicsObject(new PhysicsObject(&powerup->GetTransform(), powerup->GetBoundingVolume()));
 
 	powerup->GetPhysicsObject()->SetInverseMass(0);
+	powerup->SetTrigger(true);
 
 	world->AddGameObject(powerup);
 	powerup->SetDynamic(true);
