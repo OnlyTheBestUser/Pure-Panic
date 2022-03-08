@@ -36,16 +36,20 @@ namespace NCL {
 			Also thought powerups were simply going to be a multiplier */
 			void IncreaseSpeed(float speedIncrease, float duration) {
 				curSpeed += speedIncrease;
-				powerupTime += duration;
+				powerupTime = duration;
 			};
 
 			void IncreaseFireRate(float increaseFireRateBy, float duration) {
-				fireRate += increaseFireRateBy;
+				fireRate *= increaseFireRateBy;
 				powerupTime = duration;
 				std::cout << "Picked up the firerate powerup" << std::endl;
 			}
 
-			
+			void ResetPowerUps()
+			{
+				fireRate = defaultFireRate;
+				curSpeed = defaultCurSpeed;
+			}
 
 			float GetSpeed() const { return curSpeed; }
 
@@ -96,6 +100,8 @@ namespace NCL {
             Vector3 spawnPos;
             Vector3 checkpoint;
 			bool key = false;
+			float defaultFireRate = 0.2f;
+			float defaultCurSpeed = 50.0f;
 			float fireRate = 0.2f;
 			float timeSincePrevShot = 0.0f;
 			float powerupTime = 0.0f;

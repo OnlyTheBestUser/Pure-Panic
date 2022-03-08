@@ -11,6 +11,12 @@ void Player::OnCollisionBegin(GameObject* other, Vector3 localA, Vector3 localB,
 void Player::Update(float dt)
 {
 	timeSincePrevShot += dt;
+	powerupTime -= dt;
+	if (powerupTime <= 0.0f)
+	{
+		ResetPowerUps();
+	}
+
 	if (camLocked)
 	{
 		camera->SetPosition(GetTransform().GetPosition() + Vector3(0, 3, 0));
@@ -39,6 +45,8 @@ void Player::Update(float dt)
 	else {
 		physicsObject->SetGravity(true);
 	}
+
+
 
 	force = Vector3(0, 0, 0);
 }
