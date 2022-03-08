@@ -23,7 +23,7 @@ namespace NCL {
 		protected:
 			
 			PowerUp(PowerUpType powerType, GameWorld& gw) : GameObject("PowerUp"), powerUpType(powerType), gameWorld(gw) {
-				powerupDuration = 10.0f;
+				powerupDuration = 3.0f;
 			}
 
 			PowerUpType powerUpType;
