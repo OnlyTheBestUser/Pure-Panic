@@ -281,7 +281,7 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
 		// Broadcast to everyone
 
 		if (realPacket->playerID != playerID) {
-			GameObject* newPlayer = levelLoader->AddSphereToWorld(Vector3(10, 15, 10), 1, 10.0f);
+			GameObject* newPlayer = levelLoader->AddDummyPlayerToWorld(Vector3(10, 15, 10));
 			newPlayer->SetNetworkObject(new NetworkObject(*newPlayer, realPacket->playerID));
 			newPlayer->SetDynamic(true);
 			std::cout << "Player Spawned with Network ID: " << newPlayer->GetNetworkObject()->GetNetID() << "." << std::endl;
