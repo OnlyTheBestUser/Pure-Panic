@@ -21,12 +21,13 @@ namespace NCL {
 			//virtual void GetAbility() const = 0;
 		protected:
 			
-			PowerUp(PowerUpType powerType) : GameObject("PowerUp"), powerUpType(powerType) {
+			PowerUp(PowerUpType powerType, GameWorld& gw) : GameObject("PowerUp"), powerUpType(powerType), gameWorld(gw) {
 				powerupDuration = 10.0f;
 			}
 
 			PowerUpType powerUpType;
 			float powerupDuration;
+			GameWorld& gameWorld;
 
 		};
 	}

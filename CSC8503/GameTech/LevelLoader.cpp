@@ -491,3 +491,37 @@ GameObject* LevelLoader::AddCapsuleToWorld(const Maths::Vector3& position, float
 
 	return capsule;
 }
+
+PowerUp* LevelLoader::AddPowerUpToWorld(const Vector3& position, const PowerUpType& ability, const float& radius) {
+	PowerUp* powerup = nullptr;
+
+	switch (ability) {
+	case(PowerUpType::FireRate):
+		powerup = new FireRate(*world);
+		break;
+	}
+
+	if (powerup == nullptr) {
+		return powerup;
+	}
+
+	Vector3 sphereSize = Vector3(radius, radius, radius);
+	SphereVolume* volume = new SphereVolume(radius);
+	powerup->SetBoundingVolume((CollisionVolume*)volume);
+
+	powerup->GetTransform()
+		.SetScale(sphereSize)
+		.SetPosition(position);
+
+	powerup->SetRenderObject(new RenderObject(&powerup->GetTransform(), sphereMesh, basicTex, basicShader));
+	powerup->SetPhysicsObject(new PhysicsObject(&powerup->GetTransform(), powerup->GetBoundingVolume()));
+
+	powerup->GetPhysicsObject()->SetInverseMass(0);
+
+	world->AddGameObject(powerup);
+	powerup->SetDynamic(false);
+
+	powerup->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+
+	return powerup;
+}

@@ -40,7 +40,9 @@ namespace NCL {
 			};
 
 			void IncreaseFireRate(float increaseFireRateBy, float duration) {
-				std::cout << "Picking up the powerup" << std::endl;
+				fireRate += increaseFireRateBy;
+				powerupTime = duration;
+				std::cout << "Picked up the firerate powerup" << std::endl;
 			}
 
 			

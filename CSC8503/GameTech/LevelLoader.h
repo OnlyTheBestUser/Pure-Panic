@@ -2,6 +2,8 @@
 #include "Renderer.h"
 #include "../CSC8503Common/PhysicsSystem.h"
 #include "../CSC8503Common/Player.h"
+#include "../CSC8503Common/PowerUp.h"
+#include "../CSC8503Common/FireRate.h"
 
 namespace NCL {
 	namespace CSC8503 {
@@ -13,6 +15,8 @@ namespace NCL {
 			void ReadInLevelFile(std::string filename);
 
 			Player* AddPlayerToWorld(const Vector3& position);
+
+			PowerUp* AddPowerUpToWorld(const Vector3& position, const PowerUpType& ability, const float& radius = 1.0f);
 
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f, bool rubber = false, bool hollow = false, bool dynamic = false);
 			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, bool OBB = false, float inverseMass = 10.0f, int layer = 1, bool isTrigger = false, bool dynamic = false);
