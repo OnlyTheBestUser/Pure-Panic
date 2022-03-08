@@ -12,7 +12,6 @@ namespace NCL {
 
 			void OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vector3 localB, Vector3 normal) override {
 				if (otherObject->GetName() == "Player") {
-					//std::cout << "so manyyy" << std::endl;
 					((Player*)otherObject)->IncreaseFireRate(FireRateIncrease, powerupDuration);
 					gameWorld.RemoveGameObject(this, true);
 				}
