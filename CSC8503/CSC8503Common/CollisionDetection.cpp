@@ -325,19 +325,19 @@ Vector2 CollisionDetection::GetUVFromRay(Ray ray, RenderObject obj)
 	float distance = FLT_MAX;
 
 #ifdef _WIN64
-	OGLMesh mesh = ((OGLMesh&)*obj.GetMesh());
+	const MeshGeometry* mesh = obj.GetMesh();
 
-	vector<unsigned int> indicies = mesh.GetIndexData();
+	const vector<unsigned int> indicies = mesh->GetIndexData();
 
 	for (int i = 0; i < (indicies.size()) / 3; i++) {
 
 		Triangle tri;
-		mesh.GetTriangle(i, tri.pos_a, tri.pos_b, tri.pos_c);
+		mesh->GetTriangle(i, tri.pos_a, tri.pos_b, tri.pos_c);
 
 		RayCollision collision;
 		Vector3 norm;
 
-		mesh.GetNormalForTri(i, norm);
+		mesh->GetNormalForTri(i, norm);
 
 		RayTriangleIntersection(tempRay, tri, norm, collision);
 
@@ -351,6 +351,7 @@ Vector2 CollisionDetection::GetUVFromRay(Ray ray, RenderObject obj)
 			distance = (localRayPos - invTransform * collision.collidedAt).LengthSquared();
 		}
 
+		std::cout << closest.pos_a << std::endl;
 	}
 
 	//Debug::DrawLine(transform * closest.pos_a, transform * closest.pos_b, Vector4(0,1,0,1), 2.0f);
