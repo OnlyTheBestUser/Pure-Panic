@@ -172,8 +172,27 @@ void OGLRendererAPI::SetDepth(bool d) {
 	d ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST);
 }
 
-void OGLRendererAPI::SetBlend(bool b) {
+void OGLRendererAPI::SetBlend(bool b, RendererAPI::BlendType srcFunc, BlendType dstFunc) {
 	b ? glEnable(GL_BLEND) : glDisable(GL_BLEND);
+
+	auto toGLenum = [](const BlendType func)->GLenum {
+		switch (func)
+		{
+		case BlendType::NONE:
+			return GL_NONE;
+			break;
+		case BlendType::ONE:
+			return GL_ONE;
+			break;
+		case BlendType::ALPHA:
+			return GL_SRC_ALPHA;
+			break;
+		default:
+			break;
+		}
+	};
+
+	glBlendFunc(toGLenum(srcFunc), toGLenum(dstFunc));
 }
 
 void OGLRendererAPI::SetCullFace(bool b) {

@@ -266,7 +266,7 @@ void Renderer::Paint(const RenderObject* paintable, NCL::Maths::Vector3 pos, flo
 void Renderer::ApplyPaintToMasks() {
 #ifdef _WIN64
 	rendererAPI->SetDepth(false);
-	rendererAPI->SetBlend(true);
+	rendererAPI->SetBlend(true, RendererAPI::BlendType::ONE, RendererAPI::BlendType::ALPHA);
 	glBlendFunc(GL_ONE, GL_SRC_ALPHA);
 
 	maskShader->BindShader();
@@ -291,8 +291,7 @@ void Renderer::ApplyPaintToMasks() {
 		rendererAPI->DrawMesh(skyboxMesh);
 		delete maskFBO;
 	}
-	glBlendFunc(GL_ONE, GL_NONE);
-	rendererAPI->SetBlend(false);
+	rendererAPI->SetBlend(false, RendererAPI::BlendType::ONE, RendererAPI::BlendType::NONE);
 	rendererAPI->SetDepth(true);
 	rendererAPI->SetViewportSize(rendererAPI->GetCurrentWidth(), rendererAPI->GetCurrentHeight());
 	rendererAPI->ClearBuffer(true, true, true);

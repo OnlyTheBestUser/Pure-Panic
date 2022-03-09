@@ -52,7 +52,13 @@ namespace NCL {
 			virtual void BindFrameBuffer(const FrameBufferBase* fbo) = 0;
 
 			virtual void SetDepth(bool depth) = 0;
-			virtual void SetBlend(bool blend) = 0;
+
+			enum class BlendType {
+				NONE,
+				ONE,
+				ALPHA,
+			};
+			virtual void SetBlend(bool blend, BlendType srcFunc = BlendType::ONE, BlendType dstFunc = BlendType::NONE) = 0;
 
 			enum CULL_TYPE {
 				FRONT,

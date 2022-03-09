@@ -331,13 +331,30 @@ void NCL::PS4::PS4RendererAPI::SetDepth(bool d) {
 	//currentGFXContext->setDepthEqaaControl();
 }
 
-void NCL::PS4::PS4RendererAPI::SetBlend(bool b) {
-	/*sce::Gnm::BlendControl blend;
+void NCL::PS4::PS4RendererAPI::SetBlend(bool b, BlendType srcFunc, BlendType dstFunc) {
+
+	auto toPSenum = [](const BlendType func)->Gnm::BlendMultiplier {
+		switch (func)
+		{
+		case BlendType::NONE:
+			return Gnm::BlendMultiplier::kBlendMultiplierOne;
+			break;
+		case BlendType::ONE:
+			return Gnm::BlendMultiplier::kBlendMultiplierZero;
+			break;
+		case BlendType::ALPHA:
+			return Gnm::BlendMultiplier::kBlendMultiplierSrcAlpha;
+			break;
+		default:
+			break;
+		}
+	};
+
+	sce::Gnm::BlendControl blend;
 	blend.init();
 	blend.setBlendEnable(b);
-	blend.setAlphaEquation(Gnm::BlendMultiplier::kBlendMultiplierOne, Gnm::BlendFunc::kBlendFuncAdd, Gnm::BlendMultiplier::kBlendMultiplierOne);
+	blend.setAlphaEquation(toPSenum(srcFunc), Gnm::BlendFunc::kBlendFuncAdd, toPSenum(dstFunc));
 	currentGFXContext->setBlendControl(currentGPUBuffer, blend);
-	*/
 }
 
 void NCL::PS4::PS4RendererAPI::SetCullFace(bool cull)

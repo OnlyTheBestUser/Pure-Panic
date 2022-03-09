@@ -74,7 +74,7 @@ namespace NCL::PS4 {
 		void BindFrameBuffer(const FrameBufferBase* fbo) override;
 
 		void SetDepth(bool depth) override;
-		void SetBlend(bool blend) override;
+		void SetBlend(bool blend, BlendType srcFunc = BlendType::ONE, BlendType dstFunc = BlendType::NONE) override;
 
 		void SetCullFace(bool cull) override;
 		void SetCullType(CULL_TYPE type) override;
