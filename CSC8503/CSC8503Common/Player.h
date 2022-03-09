@@ -3,6 +3,7 @@
 #include "GameWorld.h"
 #include "../../Common/Vector3.h"
 #include "../../Common/Camera.h"
+#include"../CSC8503Common/PowerUp.h"
 #include "Projectile.h"
 #include <chrono>
 
@@ -34,10 +35,31 @@ namespace NCL {
 			/* TODO: 
 			Change it so it doesnt increase the strength of the powerup every frame while increasing duration aswell. 
 			Also thought powerups were simply going to be a multiplier */
-			void IncreaseSpeed(float speedIncrease, float duration) {
+			void IncreaseSpeed(const float& speedIncrease, const float& duration) {
 				curSpeed += speedIncrease;
-				powerupTime += duration;
+				powerupTime = duration;
 			};
+
+			void IncreaseFireRate(const float& increaseFireRateFactor, const float& duration) {
+				if (increaseFireRateFactor <= 0 || duration <= 0) return;
+				fireRate /= increaseFireRateFactor;
+				powerupTime = duration;
+				currentPowerUp = PowerUpType::FireRate;
+				std::cout << "Picked up the firerate powerup" << std::endl;
+			}
+
+			void IncreaseHealth(const float& increaseHealthBy) {
+				if (increaseHealthBy <= 0) return;
+				health = std::min(health + increaseHealthBy, maxHealth);
+				currentPowerUp = PowerUpType::Heal;
+			}
+			
+			void ResetPowerUps()
+			{
+				fireRate = defaultFireRate;
+				curSpeed = defaultCurSpeed;
+				currentPowerUp = PowerUpType::None;
+			}
 
 			float GetSpeed() const { return curSpeed; }
 
@@ -75,6 +97,10 @@ namespace NCL {
 				return ( Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Matrix4::Rotation(camera->GetPitch(), Vector3(1, 0, 0)) * Vector3(0, 0, -1)).Normalised();
 			}
 
+			PowerUpType GetCurrentPowerup () const {
+				return currentPowerUp;
+			}
+
 			void ChangeCamLock() { camLocked = !camLocked; }
 			bool* GetCamLock() { return &camLocked; }
 
@@ -88,6 +114,8 @@ namespace NCL {
             Vector3 spawnPos;
             Vector3 checkpoint;
 			bool key = false;
+			float defaultFireRate = 0.2f;
+			float defaultCurSpeed = 50.0f;
 			float fireRate = 0.2f;
 			float timeSincePrevShot = 0.0f;
 			float powerupTime = 0.0f;
@@ -96,6 +124,11 @@ namespace NCL {
 
 			float inAirSpeed = 500.0f;
 			bool canJump;
+
+			const float maxHealth = 100.0f;
+			float health = 90.0f;
+
+			PowerUpType currentPowerUp = PowerUpType::None;
 
 			float cameraVertMult = 0.5f;
 			Camera* camera;

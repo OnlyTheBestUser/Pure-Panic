@@ -491,3 +491,50 @@ GameObject* LevelLoader::AddCapsuleToWorld(const Maths::Vector3& position, float
 
 	return capsule;
 }
+
+PowerUp* LevelLoader::AddPowerUpToWorld(const Vector3& position, const PowerUpType& ability, const float& radius) {
+	PowerUp* powerup = nullptr;
+	Vector4 colour;
+
+	switch (ability) {
+	case(PowerUpType::FireRate):
+		powerup = new FireRate(*world);
+		colour = Debug::YELLOW;
+		break;
+	case(PowerUpType::MultipleBullets):
+		powerup = new MultipleBullets(*world);
+		colour = Debug::GREEN;
+		break;
+	case(PowerUpType::Heal):
+		powerup = new Heal(*world);
+		colour = Debug::RED;
+		break;
+	}
+
+	if (powerup == nullptr) {
+		return powerup;
+	}
+
+	Vector3 sphereSize = Vector3(radius, radius, radius);
+	SphereVolume* volume = new SphereVolume(radius);
+	powerup->SetBoundingVolume((CollisionVolume*)volume);
+
+	powerup->GetTransform()
+		.SetScale(sphereSize)
+		.SetPosition(position);
+
+	powerup->SetRenderObject(new RenderObject(&powerup->GetTransform(), sphereMesh, basicTex, basicShader));
+	powerup->GetRenderObject()->SetColour(colour);
+
+	powerup->SetPhysicsObject(new PhysicsObject(&powerup->GetTransform(), powerup->GetBoundingVolume()));
+
+	powerup->GetPhysicsObject()->SetInverseMass(0);
+	powerup->SetTrigger(true);
+
+	world->AddGameObject(powerup);
+	powerup->SetDynamic(true);
+
+	powerup->SetCollisionLayers(CollisionLayer::LAYER_FOUR);
+
+	return powerup;
+}

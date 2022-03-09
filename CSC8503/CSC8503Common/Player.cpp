@@ -11,6 +11,15 @@ void Player::OnCollisionBegin(GameObject* other, Vector3 localA, Vector3 localB,
 void Player::Update(float dt)
 {
 	timeSincePrevShot += dt;
+
+	if (currentPowerUp != PowerUpType::None) {
+		powerupTime -= dt;
+		if (powerupTime <= 0.0f)
+		{
+			ResetPowerUps();
+		}
+	}
+
 	if (camLocked)
 	{
 		camera->SetPosition(GetTransform().GetPosition() + Vector3(0, 3, 0));
@@ -40,7 +49,11 @@ void Player::Update(float dt)
 		physicsObject->SetGravity(true);
 	}
 
+
+
 	force = Vector3(0, 0, 0);
+
+	Debug::Print("Health: " + std::to_string(health), { 50.0f,90.0f });
 }
 
 float Player::CheckDistToGround()
@@ -96,7 +109,7 @@ Projectile* Player::spawnProjectile(const float& initialSpeed, const float& mesh
 	//Debug::DrawArrow(camera->GetPosition(), (camera->GetPosition() + this->GetCamFrontVec() * 100.0f), Debug::RED, 5.0f);
 	projectile->GetPhysicsObject()->SetLinearDamping(this->GetPhysicsObject()->GetLinearDamping() * 0.4);
 	projectile->SetDynamic(true);
-	projectile->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
+	projectile->SetCollisionLayers(CollisionLayer::LAYER_FIVE);
 
 	gameWorld.AddGameObject(projectile);
 

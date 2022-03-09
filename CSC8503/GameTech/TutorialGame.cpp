@@ -144,11 +144,6 @@ void TutorialGame::UpdateGame(float dt) {
 
 void TutorialGame::UpdateGameWorld(float dt)
 {
-#ifndef _ORBIS
-	audio->Update();
-	audio->UpdateAudioListener(0, player1->GetTransform().GetPosition(), player1->GetTransform().GetOrientation());
-#endif // !_ORBIS
-
 	if (!inSelectionMode) {
 		world->GetMainCamera()->UpdateCamera(dt);
 	}
@@ -295,7 +290,6 @@ void TutorialGame::DebugObjectMovement() {
 			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, -10, 0));
 		}
 	}
-
 }
 
 void TutorialGame::InitCamera() {
@@ -312,6 +306,8 @@ void TutorialGame::InitWorld() {
 
 	levelLoader->ReadInLevelFile(NCL::Assets::DATADIR + "../../Assets/Maps/map1.txt");
 	Player* player = levelLoader->AddPlayerToWorld(Vector3(0, 5, 0));
+	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 20), PowerUpType::FireRate);
+	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 30), PowerUpType::Heal);
 
 	//Command* f = new MoveForwardCommand(player);
 	//Command* b = new MoveBackwardCommand(player);
@@ -341,15 +337,17 @@ void TutorialGame::InitWorld() {
 
 	//GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
 	//cap1->SetDynamic(true);
-
-	//cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
-	player->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	
+	//cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO); 
 	player1 = player;
 
 	//Projectile* spit = AddProjectileToWorld(Vector3(5, 5, 0), 0.3f, 1.0f);
 
 	physics->BuildStaticList();
 }
+//PowerUp* TutorialGame::AddPowerUpToWorld(const Vector3& position) {
+//
+//}
 
 /*
 
@@ -434,9 +432,6 @@ void TutorialGame::MoveSelectedObject(float dt) {
 		if (world->Raycast(ray, closestCollision, true)) {
 			if (closestCollision.node == selectionObject) {
 				selectionObject->GetPhysicsObject()->AddForceAtPosition(ray.GetDirection() * forceMagnitude, closestCollision.collidedAt);
-#ifndef _ORBIS
-				audio->StartPlayingSound(Assets::AUDIODIR + "splat_neutral_01.ogg", selectionObject->GetTransform().GetPosition(), 1.0f);
-#endif // !_ORBIS
 			}
 		}
 	}
