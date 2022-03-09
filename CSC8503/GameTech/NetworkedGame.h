@@ -50,8 +50,8 @@ namespace NCL {
 			std::map<int, int> clientHistory;
 
 			// client IDs, GameObjects
-			std::map<int, GameObject*> serverPlayers;
-			GameObject* localPlayer;
+			std::map<int, Player*> serverPlayers;
+			Player* localPlayer;
 
 			// Packet Handling Functions
 			void HandleClientPacket(ClientPacket* packet);

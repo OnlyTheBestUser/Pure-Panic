@@ -7,6 +7,7 @@ using namespace CSC8503;
 
 void InputHandler::HandleInput()
 {
+	inputBase->ResetInput();
 	inputBase->Poll();
 
 	for (int i = 0; i < 127; i++) {
@@ -19,9 +20,5 @@ void InputHandler::HandleInput()
 			axisCommands[i]->execute(inputBase->GetAxis(i));
 		}
 	}
-
-	
-
-	inputBase->ResetInput();
 }
 

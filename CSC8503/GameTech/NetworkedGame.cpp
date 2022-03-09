@@ -125,14 +125,10 @@ void NetworkedGame::UpdateAsClient(float dt) {
 	newPacket.pos[1] = position.y;
 	newPacket.pos[2] = position.z;
 
-	Vector3 angle = localPlayer->GetTransform().GetOrientation().ToEuler();
-	newPacket.angles[0] = angle.x;
-	newPacket.angles[1] = angle.y;
-	newPacket.angles[2] = angle.z;
+	newPacket.yaw = localPlayer->GetTransform().GetOrientation().ToEuler().y;
+	newPacket.pitch = localPlayer->GetCam()->GetPitch();
 
-	newPacket.firing = inputHandler->commandExecuted(Input::FIRE);
-	if (newPacket.firing)
-		std::cout << "FIRING" << std::endl;
+	newPacket.firing = localPlayer->IsFiring();
 
 	thisClient->SendPacket(newPacket);
 }
@@ -325,7 +321,9 @@ void NetworkedGame::HandleClientPacket(ClientPacket* packet)
 			auto obj = serverPlayers.find(packet->clientID);
 			Vector3 pos(packet->pos[0], packet->pos[1], packet->pos[2]);
 			obj->second->GetTransform().SetPosition(pos);
-			obj->second->GetTransform().SetOrientation(Quaternion::EulerAnglesToQuaternion(packet->angles[0], packet->angles[1], packet->angles[2]));
+			obj->second->GetTransform().SetOrientation(Quaternion::EulerAnglesToQuaternion(0, packet->yaw, 0));
+			if (packet->firing)
+				levelLoader->SpawnProjectile((GameObject*)obj->second, packet->pitch);
 		}
 	}
 	else {
@@ -342,7 +340,7 @@ void NetworkedGame::AddNewPlayerToServer(int clientID, int lastID)
 	client->SetDynamic(true);
 	client->GetPhysicsObject()->SetGravity(false);
 
-	serverPlayers.insert(std::pair<int, GameObject*>(clientID, client));
+	serverPlayers.insert(std::pair<int, Player*>(clientID, (Player*)client));
 
 	if (!(clientID < networkObjects.size()))
 		networkObjects.resize(clientID + 1);

@@ -32,7 +32,7 @@ namespace NCL {
 			int		clientID;
 			int		lastID;
 			float	pos[3];
-			float	angles[3];
+			float	pitch, yaw;
 			bool	firing;
 			//char	buttonstates[8];
 

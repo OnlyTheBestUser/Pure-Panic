@@ -169,7 +169,7 @@ Player* LevelLoader::AddPlayerToWorld(const Vector3& position) {
 	float meshSize = 3.0f;
 	float inverseMass = 5.0f;
 
-	Player* character = new Player(world->GetMainCamera(), *world, capsuleMesh, basicShader, "Player");
+	Player* character = new Player(world->GetMainCamera(), this, world, "Player");
 
 	CapsuleVolume* volume = new CapsuleVolume(0.85f * meshSize, 0.3f * meshSize);
 	character->SetBoundingVolume((CollisionVolume*)volume);
@@ -522,4 +522,50 @@ GameObject* LevelLoader::AddCapsuleToWorld(const Maths::Vector3& position, float
 	world->AddGameObject(capsule);
 
 	return capsule;
+}
+
+// TODO make this for dummy
+
+Projectile* LevelLoader::SpawnProjectile(Player* owner, const float& initialSpeed, const float& meshSize) {
+	return SpawnProjectile((GameObject*)owner, owner->GetCam()->GetPitch(), initialSpeed, meshSize);
+}
+
+Projectile* LevelLoader::SpawnProjectile(GameObject* owner, float pitch, const float& initialSpeed, const float& meshSize)
+{
+	float inverseMass = 1.0f;
+	//Vector3 camForwardVector = owner->GetCamFrontVec();
+	//Vector3 GetCamFrontVec() {
+	//	return (Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Matrix4::Rotation(camera->GetPitch(), Vector3(1, 0, 0)) * Vector3(0, 0, -1)).Normalised();
+	//}
+	Vector3 ownerRot = owner->GetTransform().GetOrientation().ToEuler();
+
+	Vector3 camForwardVector = (Matrix4::Rotation(ownerRot.y, Vector3(0,1,0)) * Matrix4::Rotation(pitch, Vector3(1,0,0)) * Vector3(0,0,-1)).Normalised();
+
+	Projectile* projectile = new Projectile(*world);
+
+	SphereVolume* volume = new SphereVolume(meshSize * 1.4);// / 2.0f * meshSize * 1.3f);
+	projectile->SetBoundingVolume((CollisionVolume*)volume);
+
+	projectile->GetTransform()
+		.SetScale(Vector3(meshSize, meshSize, meshSize))
+		.SetPosition((owner->GetTransform().GetPosition() + Vector3(0, 2.5f, 0)) + camForwardVector * 5.0f); //+ offset);
+
+	projectile->SetRenderObject(new RenderObject(&projectile->GetTransform(), capsuleMesh, nullptr, basicShader));
+	projectile->SetPhysicsObject(new PhysicsObject(&projectile->GetTransform(), projectile->GetBoundingVolume()));
+
+	projectile->GetPhysicsObject()->SetInverseMass(inverseMass);
+	projectile->GetPhysicsObject()->InitSphereInertia();
+
+	float velocityDueToMovement = Vector3::Dot(camForwardVector, owner->GetPhysicsObject()->GetLinearVelocity());
+	if (velocityDueToMovement < 0.0f) velocityDueToMovement = 0.0f;
+	projectile->GetPhysicsObject()->AddAcceleration(camForwardVector * (initialSpeed + velocityDueToMovement));
+	projectile->GetTransform().SetOrientation(Quaternion(Matrix3::Rotation(-acos(Vector3::Dot(Vector3(0, 1, 0), camForwardVector)) * 180.0f / 3.14f, Vector3::Cross(camForwardVector, Vector3(0, 1, 0)).Normalised())));
+
+	projectile->GetPhysicsObject()->SetLinearDamping(0.1f);
+	projectile->SetDynamic(true);
+	projectile->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
+
+	world->AddGameObject(projectile);
+
+	return projectile;
 }
