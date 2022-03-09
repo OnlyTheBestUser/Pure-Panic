@@ -27,6 +27,9 @@ namespace NCL {
 			float	penetration;
 		};
 		struct Triangle {
+			int ind_a;
+			int ind_b;
+			int ind_c;
 			Vector3 pos_a;
 			Vector3 pos_b;
 			Vector3 pos_c;

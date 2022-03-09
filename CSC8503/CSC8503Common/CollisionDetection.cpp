@@ -341,6 +341,8 @@ Vector2 CollisionDetection::GetUVFromRay(Ray ray, RenderObject obj)
 
 		// Triangle needs to store vertex indices 
 		Triangle tri;
+
+		mesh->GetTriangleIndices(i, tri.ind_a, tri.ind_b, tri.ind_c);
 		mesh->GetTriangle(i, tri.pos_a, tri.pos_b, tri.pos_c);
 
 		RayCollision collision;

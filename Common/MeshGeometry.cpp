@@ -206,6 +206,19 @@ bool MeshGeometry::GetTriangle(unsigned int i, Vector3& va, Vector3& vb, Vector3
 	return true;
 }
 
+bool MeshGeometry::GetTriangleIndices(unsigned int i, int& ia, int& ib, int& ic) const {
+	bool hasTri = false;
+	unsigned int a, b, c;
+	hasTri = GetVertexIndicesForTri(i, a, b, c);
+	if (!hasTri) {
+		return false;
+	}
+	ia = a;
+	ib = b;
+	ic = c;
+	return true;
+}
+
 
 bool MeshGeometry::GetNormalForTri(unsigned int i, Vector3& n) const {
 	Vector3 a, b, c;
