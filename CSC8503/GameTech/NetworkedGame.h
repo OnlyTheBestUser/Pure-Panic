@@ -56,6 +56,7 @@ namespace NCL {
 			// Packet Handling Functions
 			void HandleClientPacket(ClientPacket* packet);
 			void AddNewPlayerToServer(int clientID, int lastID);
+			void Fire(GameObject* owner, float pitch, int clientID);
 		};
 	}
 }

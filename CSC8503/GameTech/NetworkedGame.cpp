@@ -56,6 +56,7 @@ void NetworkedGame::StartAsClient(char a, char b, char c, char d) {
 
 	thisClient->RegisterPacketHandler(Delta_State, this);
 	thisClient->RegisterPacketHandler(Full_State, this);
+	thisClient->RegisterPacketHandler(Fire_State, this);
 	thisClient->RegisterPacketHandler(Player_Connected, this);
 	thisClient->RegisterPacketHandler(Player_Disconnected, this);
 	thisClient->RegisterPacketHandler(Assign_ID, this);
@@ -105,6 +106,14 @@ void NetworkedGame::UpdateAsServer(float dt) {
 	//else {
 	//	BroadcastSnapshot(true);
 	//}
+
+	if (localPlayer->IsFiring()) {
+		FirePacket* newPacket = new FirePacket();
+		newPacket->clientID = localPlayer->GetNetworkObject()->GetNetID();
+		newPacket->pitch = localPlayer->GetCam()->GetPitch();
+		thisServer->SendGlobalPacket(*newPacket);
+		delete newPacket;
+	}
 
 	BroadcastSnapshot(false);
 }
@@ -160,6 +169,7 @@ void NetworkedGame::BroadcastSnapshot(bool deltaFrame) {
 		// TODO For the time being, just send full packets.
 
 		int playerState = 0;
+
 		GamePacket* newPacket = nullptr;
 		if (o->WritePacket(&newPacket, deltaFrame, playerState)) {
 			thisServer->SendGlobalPacket(*newPacket);
@@ -221,6 +231,7 @@ void NetworkedGame::StartLevel() {
 }
 
 void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
+
 	//SERVER version of the game will receive these from the clients
 	if (type == Received_State) {
 		ClientPacket* realPacket = (ClientPacket*)payload;
@@ -260,6 +271,17 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
 			else
 				std::cout << "Doesn't exist!" << std::endl;
 		}
+	}
+	else if (type == Fire_State) {
+		FirePacket* realPacket = (FirePacket*)payload;
+		if (realPacket->clientID == playerID)
+			return;
+		auto obj = networkObjects[realPacket->clientID];
+		if(obj)
+			levelLoader->SpawnProjectile(&obj->object, realPacket->pitch);
+	}
+	else if (type == String_Message) {
+		bool a = true;
 	}
 	else if (type == Message) {
 		MessagePacket* realPacket = (MessagePacket*)payload;
@@ -322,8 +344,9 @@ void NetworkedGame::HandleClientPacket(ClientPacket* packet)
 			Vector3 pos(packet->pos[0], packet->pos[1], packet->pos[2]);
 			obj->second->GetTransform().SetPosition(pos);
 			obj->second->GetTransform().SetOrientation(Quaternion::EulerAnglesToQuaternion(0, packet->yaw, 0));
-			if (packet->firing)
-				levelLoader->SpawnProjectile((GameObject*)obj->second, packet->pitch);
+			if (packet->firing) {
+				Fire(obj->second, packet->pitch, packet->clientID);
+			}
 		}
 	}
 	else {
@@ -346,4 +369,13 @@ void NetworkedGame::AddNewPlayerToServer(int clientID, int lastID)
 		networkObjects.resize(clientID + 1);
 	networkObjects[clientID] = client->GetNetworkObject();
 	std::cout << "New player added to server: ClientID (" << clientID << "), LastID(" << lastID << ")\n";
+}
+
+void NetworkedGame::Fire(GameObject* owner, float pitch, int clientID)
+{
+	levelLoader->SpawnProjectile(owner, pitch);
+	FirePacket newPacket;
+	newPacket.clientID = clientID;
+	newPacket.pitch = pitch;
+	thisServer->SendGlobalPacket(newPacket); 
 }

@@ -26,7 +26,27 @@ namespace NCL {
 			}
 		};
 
-		
+		//struct ServerPacket : public GamePacket {
+		//	int		objectID;
+		//	bool	firing;
+		//	float	yaw, pitch;
+		//	float	pos[3];
+
+		//	ServerPacket() {
+		//		type = Server_State;
+		//		size = sizeof(ServerPacket);
+		//	}
+		//};
+
+		struct FirePacket : public GamePacket {
+			int		clientID;
+			float	pitch;
+
+			FirePacket() {
+				type = Fire_State;
+				size = sizeof(FirePacket);
+			}
+		};
 
 		struct ClientPacket : public GamePacket {
 			int		clientID;
@@ -56,6 +76,8 @@ namespace NCL {
 
 			int GetNetID() { return networkID; }
 
+			GameObject& object;
+
 		protected:
 
 			NetworkState& GetLatestNetworkState();
@@ -67,8 +89,6 @@ namespace NCL {
 
 			virtual bool WriteDeltaPacket(GamePacket** p, int stateID);
 			virtual bool WriteFullPacket(GamePacket** p);
-
-			GameObject& object;
 
 			NetworkState lastFullState;
 

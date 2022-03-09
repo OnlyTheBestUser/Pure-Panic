@@ -415,7 +415,7 @@ GameObject* LevelLoader::AddRenderPartToWorld(const Vector3& position, Vector3 d
 		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
 
 #ifdef _WIN64
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, OGLTexture::RGBATextureEmpty(texture->GetWidth(),texture->GetHeight()), basicShader));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, OGLTexture::RGBATextureEmpty(texture->GetWidth()/16,texture->GetHeight()/16), basicShader));
 #endif
 #ifdef _ORBIS
 	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, basicShader));
