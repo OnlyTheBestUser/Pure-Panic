@@ -107,8 +107,9 @@ Projectile* Player::spawnProjectile(const float& initialSpeed, const float& mesh
 
 	//Debug::DrawAxisLines(projectile->GetTransform().GetMatrix(), 2.0f, 1000.0f);
 	//Debug::DrawArrow(camera->GetPosition(), (camera->GetPosition() + this->GetCamFrontVec() * 100.0f), Debug::RED, 5.0f);
+
+	projectile->GetPhysicsObject()->SetDynamic(true);
 	projectile->GetPhysicsObject()->SetLinearDamping(this->GetPhysicsObject()->GetLinearDamping() * 0.4);
-	projectile->SetDynamic(true);
 	projectile->SetCollisionLayers(CollisionLayer::LAYER_FIVE);
 
 	gameWorld.AddGameObject(projectile);
