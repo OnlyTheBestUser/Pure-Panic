@@ -42,9 +42,6 @@ bool CollisionDetection::RayTriangleIntersection(const Ray& r, const Triangle& t
 
 	if (RayPlaneIntersection(r, p0, collision)) {
 		if (p1.PointInPlane(collision.collidedAt) && p2.PointInPlane(collision.collidedAt) && p3.PointInPlane(collision.collidedAt)) {
-			//Debug::DrawLine(t.pos_a, t.pos_b, Vector4(0,1,0,1), 3);
-			//Debug::DrawLine(t.pos_b, t.pos_c, Vector4(0,1,0,1), 3);
-			//Debug::DrawLine(t.pos_c, t.pos_a, Vector4(0,1,0,1), 3);
 			return true;
 		}
 	}
@@ -325,6 +322,7 @@ Vector2 CollisionDetection::GetUVFromRay(Ray ray, RenderObject obj)
 
 	// closest triangle
 	Triangle closest;
+	float distance = FLT_MAX;
 
 #ifdef _WIN64
 	OGLMesh mesh = ((OGLMesh&)*obj.GetMesh());
@@ -334,7 +332,6 @@ Vector2 CollisionDetection::GetUVFromRay(Ray ray, RenderObject obj)
 	for (int i = 0; i < (indicies.size()) / 3; i++) {
 
 		Triangle tri;
-
 		mesh.GetTriangle(i, tri.pos_a, tri.pos_b, tri.pos_c);
 
 		RayCollision collision;
@@ -342,10 +339,23 @@ Vector2 CollisionDetection::GetUVFromRay(Ray ray, RenderObject obj)
 
 		mesh.GetNormalForTri(i, norm);
 
-		//sort to find the nearest
-
 		RayTriangleIntersection(tempRay, tri, norm, collision);
+
+		//sort to find the nearest
+		if (i == 0) {
+			closest = tri;
+			distance = (localRayPos - invTransform * collision.collidedAt).LengthSquared();
+		}
+		if (distance > (localRayPos - invTransform * collision.collidedAt).LengthSquared()) {
+			closest = tri;
+			distance = (localRayPos - invTransform * collision.collidedAt).LengthSquared();
+		}
+
 	}
+
+	//Debug::DrawLine(transform * closest.pos_a, transform * closest.pos_b, Vector4(0,1,0,1), 2.0f);
+	//Debug::DrawLine(transform * closest.pos_b, transform * closest.pos_c, Vector4(0,1,0,1), 2.0f);
+	//Debug::DrawLine(transform * closest.pos_c, transform * closest.pos_a, Vector4(0,1,0,1), 2.0f);
 
 #endif 
 

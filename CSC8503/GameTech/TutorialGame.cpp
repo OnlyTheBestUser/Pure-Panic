@@ -474,7 +474,9 @@ void TutorialGame::PaintObject() {
 		//Debug::DrawLine(ray.GetPosition(), ray.GetPosition() * ray.GetDirection());
 		Debug::DrawSphere(closestCollision.collidedAt, 0.5, Vector4(1,0,0,1), 0.f);
 		if (test) {
+			
 			CollisionDetection::GetUVFromRay(ray, *test);
+			
 			// Get the uv from the ray
 			renderer->Paint(test, closestCollision.collidedAt, 1, 0.5, 0.5, Vector4(0.3, 0, 0.5, 1));
 		}
