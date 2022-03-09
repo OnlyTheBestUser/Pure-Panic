@@ -130,7 +130,7 @@ PS4ScreenBuffer*	PS4RendererAPI::GenerateScreenBuffer(uint width, uint height, b
 		int32_t success = buffer->colourTarget.init(&spec);
 
 		if (success != SCE_GNM_OK) {
-			bool a = true;
+			//bool a = true;
 		}
 
 		const Gnm::SizeAlign colourAlign = buffer->colourTarget.getColorSizeAlign();
@@ -159,7 +159,7 @@ PS4ScreenBuffer*	PS4RendererAPI::GenerateScreenBuffer(uint width, uint height, b
 		int32_t success = buffer->depthTarget.init(&spec);
 
 		if (success != SCE_GNM_OK) {
-			bool a = true;
+			//bool a = true;
 		}
 
 		void *depthMemory = stackAllocators[MEMORY_GARLIC].allocate(buffer->depthTarget.getZSizeAlign());
@@ -337,10 +337,10 @@ void NCL::PS4::PS4RendererAPI::SetBlend(bool b, BlendType srcFunc, BlendType dst
 		switch (func)
 		{
 		case BlendType::NONE:
-			return Gnm::BlendMultiplier::kBlendMultiplierOne;
+			return Gnm::BlendMultiplier::kBlendMultiplierZero;
 			break;
 		case BlendType::ONE:
-			return Gnm::BlendMultiplier::kBlendMultiplierZero;
+			return Gnm::BlendMultiplier::kBlendMultiplierOne;
 			break;
 		case BlendType::ALPHA:
 			return Gnm::BlendMultiplier::kBlendMultiplierSrcAlpha;
@@ -353,22 +353,23 @@ void NCL::PS4::PS4RendererAPI::SetBlend(bool b, BlendType srcFunc, BlendType dst
 	sce::Gnm::BlendControl blend;
 	blend.init();
 	blend.setBlendEnable(b);
-	blend.setAlphaEquation(toPSenum(srcFunc), Gnm::BlendFunc::kBlendFuncAdd, toPSenum(dstFunc));
-	currentGFXContext->setBlendControl(currentGPUBuffer, blend);
+	blend.setColorEquation(toPSenum(srcFunc), Gnm::BlendFunc::kBlendFuncAdd, toPSenum(dstFunc));
+	blend.setAlphaEquation(toPSenum(BlendType::ONE), Gnm::BlendFunc::kBlendFuncAdd, toPSenum(BlendType::NONE));
+	blend.setSeparateAlphaEnable(true);
+	currentGFXContext->setBlendControl(0, blend);
 }
 
 void NCL::PS4::PS4RendererAPI::SetCullFace(bool cull)
 {
 	Gnm::PrimitiveSetup primitiveSetup;
 	primitiveSetup.init();
+	primitiveSetup.setFrontFace(Gnm::kPrimitiveSetupFrontFaceCcw);
 	if (cull) {
 		primitiveSetup.setCullFace(Gnm::kPrimitiveSetupCullFaceBack);
 	}
 	else {
 		primitiveSetup.setCullFace(Gnm::kPrimitiveSetupCullFaceNone);
 	}
-	primitiveSetup.setFrontFace(Gnm::kPrimitiveSetupFrontFaceCcw);
-	//primitiveSetup.setPolygonMode()
 	currentGFXContext->setPrimitiveSetup(primitiveSetup);
 }
 
