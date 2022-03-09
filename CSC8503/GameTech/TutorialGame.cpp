@@ -15,10 +15,10 @@
 using namespace NCL;
 using namespace CSC8503;
 
-TutorialGame::TutorialGame()	{
-	world		= new GameWorld();
-	renderer	= new Renderer(*world);
-	physics		= new PhysicsSystem(*world);
+TutorialGame::TutorialGame() {
+	world = new GameWorld();
+	renderer = new Renderer(*world);
+	physics = new PhysicsSystem(*world);
 
 #ifndef _ORBIS
 	audio = audio->GetInstance();
@@ -31,11 +31,11 @@ TutorialGame::TutorialGame()	{
 	bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 3.0f);
 #endif
 
-	paintManager	= PaintManager::GetInstance();
+	paintManager = PaintManager::GetInstance();
 	levelLoader = new LevelLoader(world, physics);
 
-	forceMagnitude	= 30.0f;
-	useGravity		= true;
+	forceMagnitude = 30.0f;
+	useGravity = true;
 	physics->UseGravity(useGravity);
 
 	inSelectionMode = false;
@@ -67,15 +67,15 @@ TutorialGame::TutorialGame()	{
 		InputHandler.h:
 			This is where keys are assigned, each key you want to assign is made as a Command* pointer variable. The handleInputs method
 			is called every frame, it will loop through each of the keys, see if they are assigned to a command, if so it checks if the key is
-			pressed and executes accordingly. 
+			pressed and executes accordingly.
 
-		Basically, all this means is that the hard coding of key checking is done in a separate file, and commands are kept in their own file, 
-		so everything is organised and neat. 
+		Basically, all this means is that the hard coding of key checking is done in a separate file, and commands are kept in their own file,
+		so everything is organised and neat.
 
 		To use this, as shown in the example below, you need to instantiate an input handler and some commands, and bind the commands to the buttons.
 		It makes it very easy and readable to change which keys do what. If there is a specific gameobject you wish to register inputs for, you need
 		to instantiate a GameActor and pass it into the Commands accordingly.
-			
+
 	*/
 
 	// Character movement Go to Line 395
@@ -97,7 +97,7 @@ TutorialGame::TutorialGame()	{
 }
 /*
 
-Each of the little demo scenarios used in the game uses the same 2 meshes, 
+Each of the little demo scenarios used in the game uses the same 2 meshes,
 and the same texture and shader. There's no need to ever load in anything else
 for this module, even in the coursework, but you can add it if you like!
 
@@ -234,7 +234,7 @@ void TutorialGame::UpdateKeys() {
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F2)) {
 		InitCamera(); //F2 will reset the camera to a specific default place
 	}
-	
+
 	//Running certain physics updates in a consistent order might cause some
 	//bias in the calculations - the same objects might keep 'winning' the constraint
 	//allowing the other one to stretch too much etc. Shuffling the order so that it
@@ -260,7 +260,7 @@ void TutorialGame::UpdateKeys() {
 }
 
 void TutorialGame::DebugObjectMovement() {
-//If we've selected an object, we can manipulate it with some key presses
+	//If we've selected an object, we can manipulate it with some key presses
 	if (inSelectionMode && selectionObject) {
 		//Twist the selected object!
 		//if (Window::GetKeyboard()->KeyDown(KeyboardKeys::LEFT)) {
@@ -341,7 +341,7 @@ void TutorialGame::InitWorld() {
 
 	//GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
 	//cap1->SetDynamic(true);
-	
+
 	//cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
 	player->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	player1 = player;
@@ -354,9 +354,9 @@ void TutorialGame::InitWorld() {
 /*
 
 Every frame, this code will let you perform a raycast, to see if there's an object
-underneath the cursor, and if so 'select it' into a pointer, so that it can be 
+underneath the cursor, and if so 'select it' into a pointer, so that it can be
 manipulated later. Pressing Q will let you toggle between this behaviour and instead
-letting you move the camera around. 
+letting you move the camera around.
 
 */
 bool TutorialGame::SelectObject() {
@@ -505,7 +505,7 @@ void TutorialGame::UpdateBGM() {
 		break;
 	}
 
-	#endif // !_ORBIS
+#endif // !_ORBIS
 }
 
 void TutorialGame::PaintSelectedObject() {

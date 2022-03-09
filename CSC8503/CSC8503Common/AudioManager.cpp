@@ -45,7 +45,7 @@ void AudioManager::Update() {
 	//TODO erase channels that aren't playing anything anymore & release sounds
 
 	//TODO update 3d listener position
-	
+
 	studioSystem->update();
 }
 
@@ -73,7 +73,7 @@ void AudioManager::LoadSound(const std::string& soundName, bool threeDimensional
 
 	FMOD::Sound* newSound = nullptr;
 	IsErroneous(system->createSound(soundName.c_str(), mode, nullptr, &newSound));
-	
+
 	if (newSound) { sounds[soundName] = newSound; };
 }
 
@@ -145,7 +145,7 @@ AudioManager& AudioManager::SetChannelVolume(int channelID, const float& volPerc
 	}
 	return *inst;
 }
-AudioManager& AudioManager::SetChannelPitch(int channelID, const float& pitch){
+AudioManager& AudioManager::SetChannelPitch(int channelID, const float& pitch) {
 	Channel* channel = FindChannel(channelID);
 	if (channel != nullptr) {
 		IsErroneous(channel->setPitch(pitch));
