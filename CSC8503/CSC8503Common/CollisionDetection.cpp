@@ -339,7 +339,7 @@ Vector2 CollisionDetection::GetUVFromRay(Ray ray, RenderObject obj)
 
 	for (int i = 0; i < (indicies.size()) / 3; i++) {
 
-		// Triangle needs to store verticie indexs 
+		// Triangle needs to store vertex indices 
 		Triangle tri;
 		mesh->GetTriangle(i, tri.pos_a, tri.pos_b, tri.pos_c);
 
@@ -352,52 +352,37 @@ Vector2 CollisionDetection::GetUVFromRay(Ray ray, RenderObject obj)
 		tri.pos_b = obj.GetTransform()->GetMatrix() * tri.pos_b;
 		tri.pos_c = obj.GetTransform()->GetMatrix() * tri.pos_c;
 
-		RayTriangleIntersection(ray, tri, norm, collision, obj.GetTransform()->GetMatrix());
+		if (RayTriangleIntersection(ray, tri, norm, collision, obj.GetTransform()->GetMatrix())) {
+			float rayDist = (ray.GetPosition() - collision.collidedAt).Length();
 
-		//sort to find the nearest
-		if (i == 0) {
-			closest = tri;
-			closestnorm = norm;
-			distance = (ray.GetPosition() - collision.collidedAt).LengthSquared();
+			//sort to find the nearest
+			if (i == 0) {
+				closest = tri;
+				closestnorm = norm;
+				distance = rayDist;
+			}
+			else if (rayDist < distance) {
+				closest = tri;
+				closestnorm = norm;
+				distance = rayDist;
+			}
 		}
-		if (distance > (ray.GetPosition() - collision.collidedAt).LengthSquared()) {
-			closest = tri;
-			closestnorm = norm;
-			distance = (ray.GetPosition() - collision.collidedAt).LengthSquared();
-		}
-
-
 	}
 
 	Debug::DrawTriangle(closest.pos_a,closest.pos_b, closest.pos_c);
-
-	//Debug::DrawTriangle(closest.pos_a, closest.pos_b, closest.pos_a + closestnorm * 10, Vector4(1,0,0,1));
-	//Debug::DrawTriangle(closest.pos_b, closest.pos_c, closest.pos_b + closestnorm * 10, Vector4(0,1,0,1));
-	//Debug::DrawTriangle(closest.pos_c, closest.pos_a, closest.pos_c + closestnorm * 10, Vector4(0,0,1,1));
 
 	Plane p1 = Plane::PlaneFromTri(closest.pos_a, closest.pos_b, closest.pos_a + closestnorm);
 	Plane p2 = Plane::PlaneFromTri(closest.pos_b, closest.pos_c, closest.pos_b + closestnorm);
 	Plane p3 = Plane::PlaneFromTri(closest.pos_c, closest.pos_a, closest.pos_c + closestnorm);
 
-	Debug::DrawPlane(closest.pos_a, p1.GetNormal(), 5, Vector4(1,0,0,1));
-	Debug::DrawPlane(closest.pos_b, p2.GetNormal(), 5, Vector4(1,0,1,1));
-	Debug::DrawPlane(closest.pos_c, p3.GetNormal(), 5, Vector4(0,0,1,1));
+	//Debug::DrawPlane(closest.pos_a, p1.GetNormal(), 5, Vector4(1,0,0,1));
+	//Debug::DrawPlane(closest.pos_b, p2.GetNormal(), 5, Vector4(1,0,1,1));
+	//Debug::DrawPlane(closest.pos_c, p3.GetNormal(), 5, Vector4(0,0,1,1));
 
 	Plane test = Plane::PlaneFromTri(Vector3(0, 0, 1), Vector3(1, 0, 0), Vector3(0, 0, 0));
 	
-
-
-
 	// Clockwise = Normal up
 	Debug::DrawLine(test.GetPointOnPlane(), test.GetPointOnPlane() + test.GetNormal(), Vector4(1,1,0,1), 2.0f);
-
-	Debug::DrawLine(Vector3(0, 0, 1), Vector3(1, 0, 0), Vector4(1, 0, 0, 1), 2.0f);
-	Debug::DrawLine(Vector3(1, 0, 0), Vector3(0, 0, 0), Vector4(0, 1, 0, 1), 2.0f);
-	Debug::DrawLine(Vector3(0, 0, 0), Vector3(0, 0, 1), Vector4(0, 0, 1, 1), 2.0f);
-
-	//Debug::DrawLine(closest.pos_a, closest.pos_b, Vector4(0,1,0,1), 0.5f);
-	//Debug::DrawLine(closest.pos_b, closest.pos_c, Vector4(0,1,0,1), 0.5f);
-	//Debug::DrawLine(closest.pos_c, closest.pos_a, Vector4(0,1,0,1), 0.5f);
 
 
 
