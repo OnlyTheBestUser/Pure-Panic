@@ -15,10 +15,10 @@
 using namespace NCL;
 using namespace CSC8503;
 
-TutorialGame::TutorialGame() {
-	world = new GameWorld();
-	renderer = new Renderer(*world);
-	physics = new PhysicsSystem(*world);
+TutorialGame::TutorialGame()	{
+	world		= new GameWorld();
+	renderer	= new Renderer(*world);
+	physics		= new PhysicsSystem(*world);
 
 #ifndef _ORBIS
 	audio = audio->GetInstance();
@@ -144,6 +144,11 @@ void TutorialGame::UpdateGame(float dt) {
 
 void TutorialGame::UpdateGameWorld(float dt)
 {
+#ifndef _ORBIS
+	audio->Update();
+	audio->UpdateAudioListener(0, player1->GetTransform().GetPosition(), player1->GetTransform().GetOrientation());
+#endif // !_ORBIS
+
 	if (!inSelectionMode) {
 		world->GetMainCamera()->UpdateCamera(dt);
 	}
@@ -432,6 +437,9 @@ void TutorialGame::MoveSelectedObject(float dt) {
 		if (world->Raycast(ray, closestCollision, true)) {
 			if (closestCollision.node == selectionObject) {
 				selectionObject->GetPhysicsObject()->AddForceAtPosition(ray.GetDirection() * forceMagnitude, closestCollision.collidedAt);
+#ifndef _ORBIS
+				audio->StartPlayingSound(Assets::AUDIODIR + "splat_neutral_01.ogg", selectionObject->GetTransform().GetPosition(), 1.0f);
+#endif // !_ORBIS
 			}
 		}
 	}
