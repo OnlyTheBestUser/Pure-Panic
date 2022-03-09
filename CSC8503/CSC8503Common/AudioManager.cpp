@@ -1,5 +1,7 @@
 #include "AudioManager.h"
 #include <iostream>
+#ifndef _ORBIS
+
 using namespace NCL;
 using namespace NCL::CSC8503;
 using namespace FMOD;
@@ -43,7 +45,7 @@ void AudioManager::Update() {
 	//TODO erase channels that aren't playing anything anymore & release sounds
 
 	//TODO update 3d listener position
-	
+
 	studioSystem->update();
 }
 
@@ -71,7 +73,7 @@ void AudioManager::LoadSound(const std::string& soundName, bool threeDimensional
 
 	FMOD::Sound* newSound = nullptr;
 	IsErroneous(system->createSound(soundName.c_str(), mode, nullptr, &newSound));
-	
+
 	if (newSound) { sounds[soundName] = newSound; };
 }
 
@@ -143,7 +145,7 @@ AudioManager& AudioManager::SetChannelVolume(int channelID, const float& volPerc
 	}
 	return *inst;
 }
-AudioManager& AudioManager::SetChannelPitch(int channelID, const float& pitch){
+AudioManager& AudioManager::SetChannelPitch(int channelID, const float& pitch) {
 	Channel* channel = FindChannel(channelID);
 	if (channel != nullptr) {
 		IsErroneous(channel->setPitch(pitch));
@@ -198,3 +200,4 @@ bool AudioManager::IsErroneous(FMOD_RESULT result) {
 	}
 	return true;
 }
+#endif // !_ORBIS
