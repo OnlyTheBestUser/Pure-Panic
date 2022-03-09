@@ -10,6 +10,16 @@ void Player::OnCollisionBegin(GameObject* other, Vector3 localA, Vector3 localB,
 
 void Player::Update(float dt)
 {
+	timeSincePrevShot += dt;
+
+	if (currentPowerUp != PowerUpType::None) {
+		powerupTime -= dt;
+		if (powerupTime <= 0.0f)
+		{
+			ResetPowerUps();
+		}
+	}
+
 	if (camLocked)
 	{
 		camera->SetPosition(GetTransform().GetPosition() + Vector3(0, 3, 0));
@@ -39,7 +49,11 @@ void Player::Update(float dt)
 		physicsObject->SetGravity(true);
 	}
 
+
+
 	force = Vector3(0, 0, 0);
+
+	Debug::Print("Health: " + std::to_string(health), { 50.0f,90.0f });
 }
 
 float Player::CheckDistToGround()
@@ -61,15 +75,15 @@ float Player::CheckDistToGround()
 	return distToGround;
 }
 
-Projectile* Player::spawnProjectile(const float& radius, const float& height, const float& initialSpeed) {
-	float meshSize = 0.5f;
+Projectile* Player::spawnProjectile(const float& initialSpeed, const float& meshSize) {
+	//float meshSize = 0.5f;
 	float inverseMass = 5.0f;
 	//Vector3 offset = Vector3(0, 2.5f, 0);
 	Vector3 camForwardVector = this->GetCamFrontVec();
 
-	Projectile* projectile = new Projectile(gameWorld, radius, height);
+	Projectile* projectile = new Projectile(gameWorld);
 
-	SphereVolume* volume = new SphereVolume(height / 2.0f * meshSize * 1.3f);
+	SphereVolume* volume = new SphereVolume(meshSize * 1.4);// / 2.0f * meshSize * 1.3f);
 	projectile->SetBoundingVolume((CollisionVolume*)volume);
 
 	projectile->GetTransform()
@@ -84,12 +98,19 @@ Projectile* Player::spawnProjectile(const float& radius, const float& height, co
 	//projectile->GetPhysicsObject()->SetFriction(1.0f);
 	//projectile->GetPhysicsObject()->SetLinearDamping(10.0f);
 	projectile->GetPhysicsObject()->InitSphereInertia();
-	projectile->GetPhysicsObject()->AddAcceleration(camForwardVector * initialSpeed);
+
+	float velocityDueToMovement = Vector3::Dot(camForwardVector, this->GetPhysicsObject()->GetLinearVelocity());
+	if (velocityDueToMovement < 0.0f) velocityDueToMovement = 0.0f;
+	//Debug::DrawArrow(projectile->GetTransform().GetPosition(), projectile->GetTransform().GetPosition() + camForwardVector * Vector3::Dot(camForwardVector, this->GetPhysicsObject()->GetLinearVelocity()), Debug::CYAN, 1000.0f);
+	projectile->GetPhysicsObject()->AddAcceleration(camForwardVector * (initialSpeed + velocityDueToMovement));
 	projectile->GetTransform().SetOrientation(Quaternion(Matrix3::Rotation(-acos(Vector3::Dot(Vector3(0, 1, 0), camForwardVector)) * 180.0f / 3.14f, Vector3::Cross(camForwardVector, Vector3(0, 1, 0)).Normalised())));
+
 	//Debug::DrawAxisLines(projectile->GetTransform().GetMatrix(), 2.0f, 1000.0f);
 	//Debug::DrawArrow(camera->GetPosition(), (camera->GetPosition() + this->GetCamFrontVec() * 100.0f), Debug::RED, 5.0f);
+
 	projectile->GetPhysicsObject()->SetDynamic(true);
-	projectile->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
+	projectile->GetPhysicsObject()->SetLinearDamping(this->GetPhysicsObject()->GetLinearDamping() * 0.4);
+	projectile->SetCollisionLayers(CollisionLayer::LAYER_FIVE);
 
 	gameWorld.AddGameObject(projectile);
 
@@ -97,7 +118,11 @@ Projectile* Player::spawnProjectile(const float& radius, const float& height, co
 }
 
 void Player::Fire() {
-	spawnProjectile(0.3f, 1.0f);
+	if (timeSincePrevShot > fireRate)
+	{
+		spawnProjectile();
+		timeSincePrevShot = 0.0f;
+	}
 }
 
 void Player::Reset() 
