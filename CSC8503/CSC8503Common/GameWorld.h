@@ -4,6 +4,7 @@
 #include "CollisionDetection.h"
 #include "Octree.h"
 #include "NavigationGrid.h"
+#include "Timer.h"
 namespace NCL {
 		class Camera;
 		using Maths::Ray;
@@ -72,6 +73,8 @@ namespace NCL {
 			bool	shuffleConstraints;
 			bool	shuffleObjects;
 			int		worldIDCounter;
+
+			Timer* timer;
 		};
 	}
 }
