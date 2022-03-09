@@ -112,7 +112,7 @@ namespace NCL {
 
 
 		static bool RayPlaneIntersection(const Ray&r, const Plane&p, RayCollision& collisions);
-		static bool RayTriangleIntersection(const Ray&r, const Triangle&t, const Vector3&norm, RayCollision& collisions);
+		static bool RayTriangleIntersection(const Ray&r, const Triangle&t, const Vector3&norm, RayCollision& collisions, Matrix4 transform);
 
 		static bool	AABBTest(const Vector3& posA, const Vector3& posB, const Vector3& halfSizeA, const Vector3& halfSizeB);
 

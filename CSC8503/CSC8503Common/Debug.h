@@ -18,6 +18,7 @@ namespace NCL {
 		static void DrawCircle(const Vector3& centre, const float& radius, const Quaternion& rotation = Quaternion(0,0,0,0), const Vector4& colour = Vector4(1, 1, 1, 1), float time = 0.0f);
 		static void DrawCapsule(const Vector3& centre, const float& radius, const float& height, const Quaternion& rotation = Quaternion(0,0,0,0), const Vector4& colour = Vector4(1, 1, 1, 1), float time = 0.0f);
 		static void DrawAxisLines(const Matrix4 &modelMatrix, float scaleBoost = 1.0f, float time = 0.0f);
+		static void DrawTriangle(const Vector3& pos_a, const Vector3& pos_b, const Vector3& pos_c, const Vector4& colour = Vector4(1, 1, 1, 1), float time = 0.0f);
 
 		static void SetRenderer(RendererBase* r) {
 			renderer = r;
