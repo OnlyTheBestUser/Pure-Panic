@@ -78,7 +78,11 @@ namespace NCL {
 			void ChangeCamLock() { camLocked = !camLocked; }
 			bool* GetCamLock() { return &camLocked; }
 
-			bool IsFiring() { return fired; }
+			bool IsFiring() { 
+				bool ret = fired;
+				fired = false;
+				return ret;
+			}
 
 			Camera* GetCam() { return camera; }
 
