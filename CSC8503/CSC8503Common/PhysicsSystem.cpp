@@ -12,11 +12,6 @@
 using namespace NCL;
 using namespace CSC8503;
 
-/*
-These two variables help define the relationship between positions
-and the forces that are added to objects to change those positions
-*/
-
 PhysicsSystem::PhysicsSystem(GameWorld& g) : gameWorld(g)	{
 	applyGravity	= false;
 	useBroadPhase	= true;	
@@ -101,19 +96,6 @@ int realHZ		= idealHZ;
 float realDT	= idealDT;
 
 void PhysicsSystem::Update(float dt) {	
-	/*if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::B)) {
-		useBroadPhase = !useBroadPhase;
-		std::cout << "Setting broadphase to " << useBroadPhase << std::endl;
-	}
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::I)) {
-		constraintIterationCount--;
-		std::cout << "Setting constraint iterations to " << constraintIterationCount << std::endl;
-	}
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::O)) {
-		constraintIterationCount++;
-		std::cout << "Setting constraint iterations to " << constraintIterationCount << std::endl;
-	}*/
-
 	dTOffset += dt; //We accumulate time delta here - there might be remainders from previous frame!
 
 	GameTimer t;
