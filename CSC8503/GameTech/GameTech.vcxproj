@@ -112,6 +112,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">
     <LibraryPath>$(SCE_ORBIS_SAMPLE_DIR)\sample_code\graphics\api_gnm\toolkit;$(SolutionDir)$(Platform)_$(Configuration)\;$(LibraryPath)</LibraryPath>
     <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(SCE_ORBIS_SAMPLE_DIR)\sample_code\graphics\api_gnm\toolkit;$(SolutionDir)$(Platform)_$(Configuration)\;$(LibraryPath);$(SolutionDir)\Plugins\FMod\PS4\api\studio\lib\;$(SolutionDir)\Plugins\FMod\PS4\api\core\lib\</LibraryPath>
+    <IncludePath>$(IncludePath);$(SolutionDir)\Plugins\FMod\PS4\api\core\inc\;</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LibraryPath>$(SolutionDir)$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
