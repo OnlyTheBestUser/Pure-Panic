@@ -18,6 +18,7 @@ namespace NCL {
 			void ReadInLevelFile(std::string filename);
 
 			Player* AddPlayerToWorld(const Vector3& position);
+			GameObject* AddDummyPlayerToWorld(const Vector3& position);
 
 			PowerUp* AddPowerUpToWorld(const Vector3& position, const PowerUpType& ability, const float& radius = 1.0f);
 
@@ -26,6 +27,9 @@ namespace NCL {
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f, bool rubber = false, bool hollow = false, bool dynamic = false);
 			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, bool OBB = false, float inverseMass = 10.0f, int layer = 1, bool isTrigger = false, bool dynamic = false);
 			GameObject* AddCapsuleToWorld(const Maths::Vector3& position, float halfHeight, float radius, float inverseMass = 10.0f);
+			
+			Projectile* SpawnProjectile(Player* owner, const float& initialSpeed = 70.0f, const float& meshSize = 0.5f);
+			Projectile* SpawnProjectile(GameObject* owner, float pitch, const float& initialSpeed = 70.0f, const float& meshSize = 0.5f);
 
 		protected:
 			GameObject* AddFloorToWorld(const Vector3& position);

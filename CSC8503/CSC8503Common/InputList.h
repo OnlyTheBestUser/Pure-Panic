@@ -10,6 +10,7 @@ namespace NCL {
 			LOCK,
 			QUIT,
 			DESCEND,
+			TOGGLE_MOUSE,
 			START_TIMER
 		};
 }

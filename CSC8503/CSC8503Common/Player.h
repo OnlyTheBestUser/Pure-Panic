@@ -6,15 +6,16 @@
 #include"../CSC8503Common/PowerUp.h"
 #include "Projectile.h"
 #include <chrono>
+#include <algorithm>
 
 namespace NCL {
     using namespace Maths;
     namespace CSC8503 {
-
+		class LevelLoader;
         class Player : public GameActor
         {
         public:
-			Player(Camera* camera, GameWorld& g, MeshGeometry* pm, ShaderBase* shd, string name = "", Vector3 ch = Vector3(0, 2, 0)) : GameActor(name), checkpoint(ch), spawnPos(ch), gameWorld(g), projectileMesh(pm), basicShader(shd) {
+			Player(Camera* camera, LevelLoader* lvlLoader, GameWorld* world, string name = "", Vector3 ch = Vector3(0, 2, 0)) : GameActor(name), checkpoint(ch), spawnPos(ch), levelLoader(lvlLoader), world(world){
 				this->camera = camera;
 				camLocked = true;
 			};
@@ -53,7 +54,10 @@ namespace NCL {
 
 			void IncreaseHealth(const float& increaseHealthBy) {
 				if (increaseHealthBy <= 0) return;
-				health = std::min(health + increaseHealthBy, maxHealth);
+
+				health += increaseHealthBy;
+				if (health > maxHealth) health = maxHealth;
+
 				currentPowerUp = PowerUpType::Heal;
 			}
 			
@@ -105,11 +109,20 @@ namespace NCL {
 			}
 
 			void DealDamage(float damageAmount) {
-				health = std::max(0.0f, health - abs(damageAmount));
+				health -= damageAmount;
+				if (health < 0) health = 0;
 			}
 
 			void ChangeCamLock() { camLocked = !camLocked; }
 			bool* GetCamLock() { return &camLocked; }
+
+			bool IsFiring() { 
+				bool ret = fired;
+				fired = false;
+				return ret;
+			}
+
+			Camera* GetCam() { return camera; }
 
         protected:
 			float CheckDistToGround();
@@ -141,12 +154,12 @@ namespace NCL {
 
 			float cameraVertMult = 0.5f;
 			Camera* camera;
-			GameWorld& gameWorld;
+			GameWorld* world;
 			bool camLocked;
 			
-			ShaderBase* basicShader;
-			MeshGeometry* projectileMesh;
+			bool fired = false;
 
+			LevelLoader* levelLoader;
 		private:
 			Projectile* spawnProjectile(const float& initialSpeed = 25.0f, const float& meshSize = 0.5f);
 			

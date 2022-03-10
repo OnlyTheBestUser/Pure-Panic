@@ -16,9 +16,11 @@ using namespace NCL;
 using namespace CSC8503;
 
 TutorialGame::TutorialGame()	{
-	world		= new GameWorld();
-	renderer	= new Renderer(*world);
-	physics		= new PhysicsSystem(*world);
+	world			= new GameWorld();
+	renderer		= new Renderer(*world);
+	physics			= new PhysicsSystem(*world);
+	paintManager	= PaintManager::GetInstance();
+	levelLoader		= new LevelLoader(world, physics);
 
 #ifndef _ORBIS
 	audio = audio->GetInstance();
@@ -87,12 +89,14 @@ TutorialGame::TutorialGame()	{
 	Command* toggleGrav = new ToggleGravityCommand(physics);
 	Command* toggleDebug = new ToggleBoolCommand(&debugDraw);
 	Command* togglePause = new ToggleBoolCommand(&pause);
+	Command* toggleMouse = new ToggleMouseCommand(&inSelectionMode);
 	Command* quitCommand = new QuitCommand(&quit, &pause);
 	Command* startTimer = new StartTimerCommand(timer);
 	inputHandler->BindButton(TOGGLE_GRAV, toggleGrav);
 	inputHandler->BindButton(TOGGLE_DEBUG, toggleDebug);
 	inputHandler->BindButton(TOGGLE_PAUSE, togglePause);
 	inputHandler->BindButton(QUIT, quitCommand);
+	inputHandler->BindButton(TOGGLE_MOUSE, toggleMouse);
 	inputHandler->BindButton(START_TIMER, startTimer);
 
 #pragma endregion
@@ -133,12 +137,6 @@ void TutorialGame::UpdateGame(float dt) {
 	}
 
 	inputHandler->HandleInput();
-
-	//Debug::DrawLine(Vector3(), Vector3(0, 20, 0), Debug::RED);
-	//Debug::DrawLine(Vector3(), Vector3(360, 0, 0), Debug::RED);
-	//Debug::DrawLine(Vector3(360, 0, 0), Vector3(360, 0, 360), Debug::RED);
-	//Debug::DrawLine(Vector3(360, 0, 360), Vector3(0, 0, 360), Debug::RED);
-	//Debug::DrawLine(Vector3(0, 0, 360), Vector3(0, 0, 0), Debug::RED);
 
 	renderer->Update(dt);
 
