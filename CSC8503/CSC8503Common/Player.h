@@ -26,7 +26,10 @@ namespace NCL {
             float GetTimeTaken() const { return timeTaken; }
             int GetScore() const { return score; }
             Vector3 GetCheckpoint() const { return checkpoint; }
-
+			
+			bool IsDead();
+			void Respawn();
+			
             bool Win() const { return finish; }
             void Reset();
 
@@ -140,6 +143,7 @@ namespace NCL {
 
 		private:
 			Projectile* spawnProjectile(const float& initialSpeed = 25.0f, const float& meshSize = 0.5f);
+			
         };
     }
 }

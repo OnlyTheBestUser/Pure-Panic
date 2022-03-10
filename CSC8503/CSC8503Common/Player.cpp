@@ -49,9 +49,12 @@ void Player::Update(float dt)
 		physicsObject->SetGravity(true);
 	}
 
-
-
+	
 	force = Vector3(0, 0, 0);
+	
+	if (IsDead()) {
+		Respawn();
+	}
 
 	Debug::Print("Health: " + std::to_string(health), { 50.0f,90.0f });
 }
@@ -123,6 +126,19 @@ void Player::Fire() {
 		spawnProjectile();
 		timeSincePrevShot = 0.0f;
 	}
+}
+
+bool Player::IsDead(){
+	if (health <= 0.0f) {
+		std::cout << "I'm Dead" << std::endl;
+		return true;
+	}
+	return false;
+}
+
+void Player::Respawn(){
+	GetTransform().SetPosition(spawnPos);
+	health = maxHealth;
 }
 
 void Player::Reset() 
