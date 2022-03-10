@@ -23,7 +23,7 @@
 using namespace NCL;
 using namespace CSC8503;
 
-LevelLoader::LevelLoader(GameWorld* world, PhysicsSystem* physics) : world(world), physics(physics) {
+LevelLoader::LevelLoader(GameWorld* world, PhysicsSystem* physics, Renderer* renderer) : world(world), physics(physics), renderer(renderer) {
 	auto loadFunc = [](const string& name, MeshGeometry** into) {
 #ifdef _ORBIS
 		* into = new PS4::PS4Mesh(name);
@@ -139,6 +139,9 @@ void LevelLoader::ReadInLevelFile(std::string filename) {
 				else if (lineContents[0] == "WALL_HAMMER") {
 					AddWallHammerToWorld(Vec3FromStr(lineContents[1]), std::stoi(lineContents[2]));
 				}
+				else if (lineContents[0] == "PAINT_WALL") {
+					AddPaintWallToWorld(Vec3FromStr(lineContents[1]), Vector3(5, 5, 4), std::stoi(lineContents[2]));
+				}
 			}
 		}
 
@@ -169,7 +172,7 @@ Player* LevelLoader::AddPlayerToWorld(const Vector3& position) {
 	float meshSize = 3.0f;
 	float inverseMass = 5.0f;
 
-	Player* character = new Player(world->GetMainCamera(), *world, capsuleMesh, basicShader, "Player");
+	Player* character = new Player(world->GetMainCamera(), this, world, "Player");
 
 	CapsuleVolume* volume = new CapsuleVolume(0.85f * meshSize, 0.3f * meshSize);
 	character->SetBoundingVolume((CollisionVolume*)volume);
@@ -197,6 +200,36 @@ Player* LevelLoader::AddPlayerToWorld(const Vector3& position) {
 	return character;
 }
 
+GameObject* LevelLoader::AddDummyPlayerToWorld(const Vector3& position)
+{
+	float meshSize = 3.0f;
+	float inverseMass = 0.5f;
+
+	GameObject* character = new GameObject("Dummy");
+
+	CapsuleVolume* volume = new CapsuleVolume(0.85f * meshSize, 0.3f * meshSize);
+	character->SetBoundingVolume((CollisionVolume*)volume);
+
+	character->GetTransform()
+		.SetScale(Vector3(meshSize, meshSize, meshSize))
+		.SetPosition(position);
+
+	character->SetRenderObject(new RenderObject(&character->GetTransform(), charMeshA, nullptr, basicShader));
+	character->SetPhysicsObject(new PhysicsObject(&character->GetTransform(), character->GetBoundingVolume()));
+
+	character->GetPhysicsObject()->SetInverseMass(inverseMass);
+	character->GetPhysicsObject()->SetFriction(1.0f);
+	character->GetPhysicsObject()->SetLinearDamping(10.0f);
+	character->GetPhysicsObject()->InitSphereInertia();
+	character->GetPhysicsObject()->SetShouldApplyAngular(false);
+	character->GetPhysicsObject()->SetDynamic(true);
+	character->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
+
+	world->AddGameObject(character);
+
+	return character;
+}
+
 GameObject* LevelLoader::AddFloorToWorld(const Maths::Vector3& position) {
 	GameObject* floor = new GameObject("Floor");
 
@@ -207,7 +240,7 @@ GameObject* LevelLoader::AddFloorToWorld(const Maths::Vector3& position) {
 		.SetScale(floorSize * 2)
 		.SetPosition(position);
 
-	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
+	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, OGLTexture::RGBATextureEmpty(basicTex->GetWidth(), basicTex->GetHeight()), basicShader));
 	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume()));
 
 	floor->GetPhysicsObject()->SetInverseMass(0);
@@ -295,6 +328,29 @@ GameObject* LevelLoader::AddLongWallToWorld(const Vector3& position, Vector3 dim
 		return physicalObject;
 	}
 	return physicalObject;
+}
+
+GameObject* LevelLoader::AddPaintWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name)
+{
+	GameObject* cube = new GameObject(name);
+	OBBVolume* volume = new OBBVolume(dimensions + Vector3(2, 10, 0));
+	cube->SetBoundingVolume((CollisionVolume*)volume);
+
+	cube->GetTransform()
+		.SetPosition(position)
+		.SetScale(dimensions * 2)
+		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
+
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, OGLTexture::RGBATextureEmpty(corridorWallAlertTex->GetHeight()/16, corridorWallAlertTex->GetWidth()/16), basicShader));
+	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
+
+	cube->GetPhysicsObject()->SetInverseMass(0.0f);
+	cube->GetPhysicsObject()->InitCubeInertia();
+
+	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	cube->GetPhysicsObject()->SetDynamic(false);
+	world->AddGameObject(cube);
+	return cube;
 }
 
 void LevelLoader::AddCornerWallToWorld(const Vector3& position, Vector3 dimensions, int rotation)
@@ -423,6 +479,8 @@ GameObject* LevelLoader::AddSphereToWorld(const Maths::Vector3& position, float 
 	else
 		sphere->GetPhysicsObject()->SetElasticity(0.2f);
 
+	sphere->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+
 	world->AddGameObject(sphere);
 	sphere->GetPhysicsObject()->SetDynamic(dynamic);
 	return sphere;
@@ -491,6 +549,47 @@ GameObject* LevelLoader::AddCapsuleToWorld(const Maths::Vector3& position, float
 	world->AddGameObject(capsule);
 
 	return capsule;
+}
+
+Projectile* LevelLoader::SpawnProjectile(Player* owner, const float& initialSpeed, const float& meshSize) {
+	return SpawnProjectile((GameObject*)owner, owner->GetCam()->GetPitch(), initialSpeed, meshSize);
+}
+
+Projectile* LevelLoader::SpawnProjectile(GameObject* owner, float pitch, const float& initialSpeed, const float& meshSize)
+{
+	float inverseMass = 1.0f;
+
+	Vector3 ownerRot = owner->GetTransform().GetOrientation().ToEuler();
+
+	Vector3 camForwardVector = (Matrix4::Rotation(ownerRot.y, Vector3(0,1,0)) * Matrix4::Rotation(pitch, Vector3(1,0,0)) * Vector3(0,0,-1)).Normalised();
+
+	Projectile* projectile = new Projectile(*world, renderer);
+
+	SphereVolume* volume = new SphereVolume(meshSize * 1.4);// / 2.0f * meshSize * 1.3f);
+	projectile->SetBoundingVolume((CollisionVolume*)volume);
+
+	projectile->GetTransform()
+		.SetScale(Vector3(meshSize, meshSize, meshSize))
+		.SetPosition((owner->GetTransform().GetPosition() + Vector3(0, 2.5f, 0)) + camForwardVector * 5.0f); //+ offset);
+
+	projectile->SetRenderObject(new RenderObject(&projectile->GetTransform(), capsuleMesh, nullptr, basicShader));
+	projectile->SetPhysicsObject(new PhysicsObject(&projectile->GetTransform(), projectile->GetBoundingVolume()));
+
+	projectile->GetPhysicsObject()->SetInverseMass(inverseMass);
+	projectile->GetPhysicsObject()->InitSphereInertia();
+
+	float velocityDueToMovement = Vector3::Dot(camForwardVector, owner->GetPhysicsObject()->GetLinearVelocity());
+	if (velocityDueToMovement < 0.0f) velocityDueToMovement = 0.0f;
+	projectile->GetPhysicsObject()->AddAcceleration(camForwardVector * (initialSpeed + velocityDueToMovement));
+	projectile->GetTransform().SetOrientation(Quaternion(Matrix3::Rotation(-acos(Vector3::Dot(Vector3(0, 1, 0), camForwardVector)) * 180.0f / 3.14f, Vector3::Cross(camForwardVector, Vector3(0, 1, 0)).Normalised())));
+
+	projectile->GetPhysicsObject()->SetLinearDamping(0.1f);
+	projectile->GetPhysicsObject()->SetDynamic(true);
+	projectile->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
+
+	world->AddGameObject(projectile);
+
+	return projectile;
 }
 
 PowerUp* LevelLoader::AddPowerUpToWorld(const Vector3& position, const PowerUpType& ability, const float& radius) {

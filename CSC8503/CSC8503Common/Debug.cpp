@@ -125,6 +125,21 @@ void Debug::DrawAxisLines(const Matrix4& modelMatrix, float scaleBoost, float ti
 	DrawLine(worldPos, worldPos + (fwd * scaleBoost)	, Debug::BLUE, time);
 }
 
+void Debug::DrawTriangle(const Vector3& pos_a, const Vector3& pos_b, const Vector3& pos_c, const Vector4& colour, float time) {
+	DrawLine(pos_a, pos_b, colour, time);
+	DrawLine(pos_b, pos_c, colour, time);
+	DrawLine(pos_c, pos_a, colour, time);
+}
+
+void Debug::DrawPlane(const Vector3& originPoint, const Vector3& normal, const float size, const Vector4& colour, float time) {
+	Vector3 perpDir1 = Vector3(normal.z, normal.x, normal.y).Normalised() * size;
+	Vector3 perpDir2 = Vector3::Cross(perpDir1, normal).Normalised() * size;
+	perpDir1 = Vector3::Cross(perpDir2, normal).Normalised() * size;
+	DrawLine(originPoint - perpDir1, originPoint + perpDir1, colour, time);
+	DrawLine(originPoint - perpDir2, originPoint + perpDir2, colour, time);
+	DrawLine(originPoint, originPoint + normal*(size/2), Vector4(0,1,0,1), time);
+}
+
 
 void Debug::FlushRenderables(float dt) {
 	if (!renderer) {

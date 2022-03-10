@@ -2,6 +2,10 @@
 #include "GameActor.h"
 #include "PhysicsSystem.h"
 #include "InputBase.h"
+#include "../GameTech/TutorialGame.h"
+
+#include "Timer.h"
+
 namespace NCL {
 	namespace CSC8503 {
 		class Command {
@@ -70,8 +74,22 @@ namespace NCL {
 			GameActor* actor;
 		};
 
-		class FireCommand : public Command {
+		class PaintFireCommand : public Command {
 		public:
+			PaintFireCommand(TutorialGame* game) : game(game) {};
+			virtual ~PaintFireCommand() {};
+
+			void execute() {
+				game->PaintObject();
+			}
+
+		protected:
+			TutorialGame* game;
+		};
+
+
+		class FireCommand : public Command {
+		public:	
 			FireCommand(GameActor* actor) : actor(actor) {};
 			virtual ~FireCommand() {};
 			void execute() {
@@ -110,6 +128,17 @@ namespace NCL {
 			bool* toggleVar;
 		};
 
+		class StartTimerCommand : public Command {
+		public:
+			StartTimerCommand(Timer* timer) : timerVar(timer) {};
+			virtual ~StartTimerCommand() {};
+			void execute() {
+				timerVar->StartTimer();
+			}
+		protected:
+			Timer* timerVar;
+		};
+
 		class QuitCommand : public Command {
 			public:
 				QuitCommand(bool* quit, bool* paused) : paused(paused), quit(quit) {};
@@ -121,6 +150,26 @@ namespace NCL {
 			protected:
 				bool* paused;
 				bool* quit;
+		};
+
+		class ToggleMouseCommand : public Command {
+		public:
+			ToggleMouseCommand(bool* mouse) : mouse(mouse) {};
+			virtual ~ToggleMouseCommand() {};
+			void execute() {
+				if (!*mouse) {
+					Window::GetWindow()->ShowOSPointer(true);
+					Window::GetWindow()->LockMouseToWindow(false);
+					*mouse = true;
+				}
+				else {
+					Window::GetWindow()->ShowOSPointer(false);
+					Window::GetWindow()->LockMouseToWindow(true);
+					*mouse = false;
+				}
+			}
+		protected:
+			bool* mouse;
 		};
 #pragma endregion
 	}

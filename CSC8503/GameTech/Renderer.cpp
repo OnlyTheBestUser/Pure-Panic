@@ -103,9 +103,6 @@ void Renderer::Render() {
 	BuildObjectList();
 	SortObjectList();
 
-	for (const auto& i : activeObjects) {
-		Paint(i, Vector3(0, 0, 0), 1.0f, 1.0f, 1.0f, Vector4(1, 0, 0, 1));
-	}
 #ifdef _WIN64
 	ApplyPaintToMasks();
 #endif
@@ -234,8 +231,8 @@ void Renderer::RenderObjects() {
 		rendererAPI->UpdateUniformInt(shader, "hasTexture", (*i).GetDefaultTexture() ? 1 : 0);
 #ifdef _WIN64
 		rendererAPI->BindTexture(shadowFBO->GetTexture(), "shadowTex", 1);
-		//rendererAPI->BindTexture(i->GetPaintMask(), "paintMaskTex", 2);
-		//rendererAPI->UpdateUniformInt(shader, "hasPaintMask", (*i).GetPaintMask() ? 1 : 0);
+		rendererAPI->BindTexture(i->GetPaintMask(), "paintMaskTex", 2);
+		rendererAPI->UpdateUniformInt(shader, "hasPaintMask", (*i).GetPaintMask() ? 1 : 0);
 #endif
 
 		Matrix4 modelMatrix = (*i).GetTransform()->GetMatrix();
@@ -261,11 +258,15 @@ void Renderer::RenderObjects() {
 	*/
 }
 
-void Renderer::Paint(const RenderObject* paintable, NCL::Maths::Vector3 pos, float radius, float hardness, float strength, NCL::Maths::Vector4 colour)
+void Renderer::Paint(const RenderObject* paintable, Vector3& barycentric, Vector3& colpos, Vector2& texUV_a, Vector2& texUV_b, Vector2& texUV_c, float radius, float hardness, float strength, NCL::Maths::Vector4 colour)
 {
 	PaintInstance pi;
 	pi.object = paintable;
-	pi.pos = pos;
+	pi.barycentric = barycentric;
+	pi.colPoint = colpos;
+	pi.texUV_a = texUV_a;
+	pi.texUV_b = texUV_b;
+	pi.texUV_c = texUV_c;
 	pi.radius = radius;
 	pi.hardness = hardness;
 	pi.strength = strength;
@@ -284,7 +285,9 @@ void Renderer::ApplyPaintToMasks() {
 
 	Vector2 currentSize;
 	for (const auto& i : paintInstances) {
-		if (i.object->GetPaintMask() == 0) continue;
+		if (i.object->GetPaintMask() == nullptr) {
+			continue;
+		}
 		maskFBO = new OGLFrameBuffer();
 		maskFBO->AddTexture((OGLTexture*)(i.object->GetPaintMask()));
 
@@ -293,9 +296,28 @@ void Renderer::ApplyPaintToMasks() {
 			rendererAPI->SetViewportSize(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight());
 		}
 
-		rendererAPI->UpdateUniformMatrix4(maskShader, "modelMatrix", i.object->GetTransform()->GetMatrix());
-
 		// Update uniforms here
+		rendererAPI->UpdateUniformMatrix4(maskShader, "modelMatrix", i.object->GetTransform()->GetMatrix());
+		rendererAPI->UpdateUniformVector3(maskShader, "barycentricCoord", i.barycentric);
+		rendererAPI->UpdateUniformVector3(maskShader, "collisionPoint", i.colPoint);
+		rendererAPI->UpdateUniformVector2(maskShader, "nearTexCoord_a", i.texUV_a);
+		rendererAPI->UpdateUniformVector2(maskShader, "nearTexCoord_b", i.texUV_b);
+		rendererAPI->UpdateUniformVector2(maskShader, "nearTexCoord_c", i.texUV_c);
+
+		Vector2 pos = i.texUV_a * i.barycentric.x 
+			+ i.texUV_b * i.barycentric.y 
+			+ i.texUV_c * i.barycentric.z;
+		rendererAPI->UpdateUniformVector2(maskShader, "uvHitPoint", pos);
+
+		rendererAPI->UpdateUniformVector2(maskShader, "viewport", Vector2(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight()));
+
+		rendererAPI->UpdateUniformVector2(maskShader, "textureSize", Vector2(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight()));
+		float scale = 400.0f / (400.0f / 1.0f);
+		rendererAPI->UpdateUniformVector3(maskShader, "textureScale", i.object->GetTransform()->GetScale());
+		rendererAPI->UpdateUniformFloat(maskShader, "radius", 5.0f);
+		rendererAPI->UpdateUniformFloat(maskShader, "hardness", i.hardness);
+		rendererAPI->UpdateUniformFloat(maskShader, "strength", i.strength);
+		rendererAPI->UpdateUniformVector4(maskShader, "colour", i.colour);
 
 		rendererAPI->BindFrameBuffer(maskFBO);
 
@@ -310,6 +332,28 @@ void Renderer::ApplyPaintToMasks() {
 	rendererAPI->BindFrameBuffer();
 #endif
 	paintInstances.clear();
+}
+
+Maths::Vector2 Renderer::GetUVCoord(const RenderObject* paintable, NCL::Maths::Vector3 pos) {
+	const vector<Vector3> vertices = paintable->GetMesh()->GetPositionData();
+
+	Vector3 localPos = paintable->GetTransform()->GetMatrix().Inverse() * pos;
+	Vector3 closestDistance = Vector3(10000,10000,10000);
+	int closestVertex = -1;
+	for (auto i = 0; i < paintable->GetMesh()->GetVertexCount(); ++i) {
+		Vector3 distance = vertices[i] - localPos;
+		float t1 = distance.Length();
+		float t2 = closestDistance.Length();
+		if (distance.Length() < closestDistance.Length()) {
+			closestDistance = distance;
+			closestVertex = i;
+		}
+	}
+
+	if (closestVertex != -1) {
+		return paintable->GetMesh()->GetTextureCoordData()[closestVertex];
+	}
+	return Vector2();
 }
 
 Maths::Matrix4 Renderer::SetupDebugLineMatrix()	const {
