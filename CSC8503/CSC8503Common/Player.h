@@ -38,7 +38,6 @@ namespace NCL {
 
 			void IncreaseSpeed(const float& speedIncrease, const float& duration) {
 				if (speedIncrease <= 0 || duration <= 0) return;
-				std::cout << "Increase Speed" << std::endl;
 				curSpeed *= speedIncrease;
 				powerupTime = duration;
 				currentPowerUp = PowerUpType::SpeedBoost;
@@ -46,7 +45,6 @@ namespace NCL {
 
 			void IncreaseFireRate(const float& increaseFireRateFactor, const float& duration) {
 				if (increaseFireRateFactor <= 0 || duration <= 0) return;
-				std::cout << "Increase Fire Rate" << std::endl;
 				fireRate *= increaseFireRateFactor;
 				powerupTime = duration;
 				currentPowerUp = PowerUpType::FireRate;
@@ -54,7 +52,6 @@ namespace NCL {
 
 			void IncreaseHealth(const float& increaseHealthBy) {
 				if (increaseHealthBy <= 0) return;
-
 				health += increaseHealthBy;
 				if (health > maxHealth) health = maxHealth;
 
@@ -63,7 +60,6 @@ namespace NCL {
 			
 			void ResetPowerUps()
 			{
-				std::cout << "Reset PowerUps" << std::endl;
 				fireRate = defaultFireRate;
 				curSpeed = defaultCurSpeed;
 				currentPowerUp = PowerUpType::None;
@@ -138,11 +134,11 @@ namespace NCL {
             Vector3 checkpoint;
 			bool key = false;
 			float defaultFireRate = 0.2f;
-			float defaultCurSpeed = 50.0f;
+			float defaultCurSpeed = 80.0f;
 			float fireRate = 0.2f;
 			float timeSincePrevShot = 0.0f;
 			float powerupTime = 0.0f;
-			float curSpeed = 50.0f;
+			float curSpeed = 80.0f;
 			Vector3 force = Vector3(0,0,0);
 
 			float inAirSpeed = 500.0f;
