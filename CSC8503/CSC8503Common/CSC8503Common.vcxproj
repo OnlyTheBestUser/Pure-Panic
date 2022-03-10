@@ -229,7 +229,6 @@
     <ClInclude Include="InputBase.h" />
     <ClInclude Include="InputHandler.h" />
     <ClInclude Include="MoveForwardCommand.h" />
-    <ClInclude Include="MultipleBullets.h" />
     <ClInclude Include="InputList.h" />
     <ClInclude Include="NavigationGrid.h" />
     <ClInclude Include="NavigationMap.h" />

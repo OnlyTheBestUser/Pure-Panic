@@ -8,7 +8,6 @@ enum PowerUpType
 {
 	SpeedBoost,
 	FireRate,
-	MultipleBullets,
 	Heal,
 	None,
 };
@@ -20,9 +19,7 @@ namespace NCL {
 		public:
 			~PowerUp() {}
 
-			//virtual void GetAbility() const = 0;
 		protected:
-			
 			PowerUp(PowerUpType powerType, GameWorld& gw) : GameObject("PowerUp"), powerUpType(powerType), gameWorld(gw) {
 				powerupDuration = 5.0f;
 			}
