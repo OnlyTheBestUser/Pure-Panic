@@ -15,11 +15,10 @@ void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vecto
 	if (gameWorld.RaycastIgnoreObject(this, ray, closestCollision, true)) {
 		RenderObject* test = ((GameObject*)closestCollision.node)->GetRenderObject();
 		
-		if (test->GetPaintMask() != nullptr) {
-
 			//Debug::DrawLine(ray.GetPosition(), ray.GetPosition() * ray.GetDirection());
 			//Debug::DrawSphere(closestCollision.collidedAt, 0.5, Vector4(1, 0, 0, 1), 0.f);
 			if (test) {
+				if (test->GetPaintMask() != nullptr) {
 
 				Vector2 texUV_a, texUV_b, texUV_c;
 				Vector3 collisionPoint;
