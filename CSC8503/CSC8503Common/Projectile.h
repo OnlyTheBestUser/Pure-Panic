@@ -20,7 +20,7 @@ namespace NCL {
 			void Update(float dt) override;
 
 		private:
-			//Vector3 velocity;
+			float lifeSpan = 5.0f;
 			GameWorld& gameWorld;
 		};
 	}

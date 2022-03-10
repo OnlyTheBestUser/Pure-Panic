@@ -32,30 +32,32 @@ namespace NCL {
 
 			bool HasKey() const { return key; }
 
-			/* TODO: 
-			Change it so it doesnt increase the strength of the powerup every frame while increasing duration aswell. 
-			Also thought powerups were simply going to be a multiplier */
 			void IncreaseSpeed(const float& speedIncrease, const float& duration) {
-				curSpeed += speedIncrease;
+				if (speedIncrease <= 0 || duration <= 0) return;
+				std::cout << "Increase Speed" << std::endl;
+				curSpeed *= speedIncrease;
 				powerupTime = duration;
+				currentPowerUp = PowerUpType::SpeedBoost;
 			};
 
 			void IncreaseFireRate(const float& increaseFireRateFactor, const float& duration) {
 				if (increaseFireRateFactor <= 0 || duration <= 0) return;
-				fireRate /= increaseFireRateFactor;
+				std::cout << "Increase Fire Rate" << std::endl;
+				fireRate *= increaseFireRateFactor;
 				powerupTime = duration;
 				currentPowerUp = PowerUpType::FireRate;
-				std::cout << "Picked up the firerate powerup" << std::endl;
 			}
 
 			void IncreaseHealth(const float& increaseHealthBy) {
 				if (increaseHealthBy <= 0) return;
+				std::cout << "Add Health" << std::endl;
 				health = std::min(health + increaseHealthBy, maxHealth);
 				currentPowerUp = PowerUpType::Heal;
 			}
 			
 			void ResetPowerUps()
 			{
+				std::cout << "Reset PowerUps" << std::endl;
 				fireRate = defaultFireRate;
 				curSpeed = defaultCurSpeed;
 				currentPowerUp = PowerUpType::None;

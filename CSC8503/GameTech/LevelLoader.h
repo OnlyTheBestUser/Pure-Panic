@@ -4,8 +4,8 @@
 #include "../CSC8503Common/Player.h"
 #include "../CSC8503Common/PowerUp.h"
 #include "../CSC8503Common/FireRate.h"
-#include "../CSC8503Common/MultipleBullets.h"
 #include "../CSC8503Common/Heal.h"
+#include "../CSC8503Common/SpeedBoost.h"
 
 
 namespace NCL {

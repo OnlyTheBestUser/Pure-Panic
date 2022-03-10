@@ -502,13 +502,13 @@ PowerUp* LevelLoader::AddPowerUpToWorld(const Vector3& position, const PowerUpTy
 		powerup = new FireRate(*world);
 		colour = Debug::YELLOW;
 		break;
-	case(PowerUpType::MultipleBullets):
-		powerup = new MultipleBullets(*world);
-		colour = Debug::GREEN;
-		break;
 	case(PowerUpType::Heal):
 		powerup = new Heal(*world);
 		colour = Debug::RED;
+		break;
+	case(PowerUpType::SpeedBoost):
+		powerup = new SpeedBoost(*world);
+		colour = Debug::CYAN;
 		break;
 	}
 
