@@ -313,6 +313,7 @@ void TutorialGame::InitWorld() {
 	Player* player = levelLoader->AddPlayerToWorld(Vector3(0, 5, 0));
 	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 20), PowerUpType::SpeedBoost);
 	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 30), PowerUpType::FireRate);
+	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 40), PowerUpType::Heal);
 
 	//Command* f = new MoveForwardCommand(player);
 	//Command* b = new MoveBackwardCommand(player);
