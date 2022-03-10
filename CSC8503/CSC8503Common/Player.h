@@ -3,6 +3,8 @@
 #include "GameWorld.h"
 #include "../../Common/Vector3.h"
 #include "../../Common/Camera.h"
+#include"../CSC8503Common/PowerUp.h"
+#include "Projectile.h"
 #include <chrono>
 
 namespace NCL {
@@ -12,7 +14,7 @@ namespace NCL {
         class Player : public GameActor
         {
         public:
-			Player(Camera* camera, GameWorld& g, string name = "", Vector3 ch = Vector3(0, 2, 0)) : GameActor(name), checkpoint(ch), spawnPos(ch), gameWorld(g) {
+			Player(Camera* camera, GameWorld& g, MeshGeometry* pm, ShaderBase* shd, string name = "", Vector3 ch = Vector3(0, 2, 0)) : GameActor(name), checkpoint(ch), spawnPos(ch), gameWorld(g), projectileMesh(pm), basicShader(shd) {
 				this->camera = camera;
 				camLocked = true;
 			};
@@ -24,16 +26,43 @@ namespace NCL {
             float GetTimeTaken() const { return timeTaken; }
             int GetScore() const { return score; }
             Vector3 GetCheckpoint() const { return checkpoint; }
-
+			
+			bool IsDead();
+			void Respawn();
+			
             bool Win() const { return finish; }
             void Reset();
 
 			bool HasKey() const { return key; }
 
-			void IncreaseSpeed(float speedIncrease, float duration) {
+			/* TODO: 
+			Change it so it doesnt increase the strength of the powerup every frame while increasing duration aswell. 
+			Also thought powerups were simply going to be a multiplier */
+			void IncreaseSpeed(const float& speedIncrease, const float& duration) {
 				curSpeed += speedIncrease;
-				powerupTime += duration;
+				powerupTime = duration;
 			};
+
+			void IncreaseFireRate(const float& increaseFireRateFactor, const float& duration) {
+				if (increaseFireRateFactor <= 0 || duration <= 0) return;
+				fireRate /= increaseFireRateFactor;
+				powerupTime = duration;
+				currentPowerUp = PowerUpType::FireRate;
+				std::cout << "Picked up the firerate powerup" << std::endl;
+			}
+
+			void IncreaseHealth(const float& increaseHealthBy) {
+				if (increaseHealthBy <= 0) return;
+				health = std::min(health + increaseHealthBy, maxHealth);
+				currentPowerUp = PowerUpType::Heal;
+			}
+			
+			void ResetPowerUps()
+			{
+				fireRate = defaultFireRate;
+				curSpeed = defaultCurSpeed;
+				currentPowerUp = PowerUpType::None;
+			}
 
 			float GetSpeed() const { return curSpeed; }
 
@@ -41,7 +70,7 @@ namespace NCL {
 
 			void Move(Vector3 moveBy) override { 
 				if (camLocked)
-					force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * moveBy * 50.0f;
+					force += Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * moveBy;// *50.0f;
 				else
 					camera->SetPosition(camera->GetPosition() + (Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * moveBy));
 			}
@@ -53,11 +82,26 @@ namespace NCL {
 			void Jump() override {
 				if (!camLocked)
 					camera->SetPosition(camera->GetPosition() + (Vector3(0, 1, 0) * cameraVertMult));
+				else if (canJump) force += Vector3(0, 1, 0);
 			}
 
 			void Descend() override {
 				if (!camLocked)
 					camera->SetPosition(camera->GetPosition() - (Vector3(0, 1, 0) * cameraVertMult));
+			}
+
+			void Fire() override;
+
+			Vector3 GetForwardVector() {
+				return (Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Vector3(0, 0, -1)).Normalised();
+			}
+
+			Vector3 GetCamFrontVec() {
+				return ( Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Matrix4::Rotation(camera->GetPitch(), Vector3(1, 0, 0)) * Vector3(0, 0, -1)).Normalised();
+			}
+
+			PowerUpType GetCurrentPowerup () const {
+				return currentPowerUp;
 			}
 
 			void ChangeCamLock() { camLocked = !camLocked; }
@@ -73,15 +117,33 @@ namespace NCL {
             Vector3 spawnPos;
             Vector3 checkpoint;
 			bool key = false;
+			float defaultFireRate = 0.2f;
+			float defaultCurSpeed = 50.0f;
+			float fireRate = 0.2f;
+			float timeSincePrevShot = 0.0f;
 			float powerupTime = 0.0f;
-			float speed = 5.0f;
 			float curSpeed = 50.0f;
 			Vector3 force = Vector3(0,0,0);
+
+			float inAirSpeed = 500.0f;
+			bool canJump;
+
+			const float maxHealth = 100.0f;
+			float health = 90.0f;
+
+			PowerUpType currentPowerUp = PowerUpType::None;
 
 			float cameraVertMult = 0.5f;
 			Camera* camera;
 			GameWorld& gameWorld;
 			bool camLocked;
+			
+			ShaderBase* basicShader;
+			MeshGeometry* projectileMesh;
+
+		private:
+			Projectile* spawnProjectile(const float& initialSpeed = 25.0f, const float& meshSize = 0.5f);
+			
         };
     }
 }

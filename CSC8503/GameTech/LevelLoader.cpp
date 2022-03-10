@@ -170,9 +170,9 @@ Vector3 LevelLoader::Vec3FromStr(std::string input) {
 
 Player* LevelLoader::AddPlayerToWorld(const Vector3& position) {
 	float meshSize = 3.0f;
-	float inverseMass = 0.5f;
+	float inverseMass = 5.0f;
 
-	Player* character = new Player(world->GetMainCamera(), *world, "Player");
+	Player* character = new Player(world->GetMainCamera(), *world, capsuleMesh, basicShader, "Player");
 
 	CapsuleVolume* volume = new CapsuleVolume(0.85f * meshSize, 0.3f * meshSize);
 	character->SetBoundingVolume((CollisionVolume*)volume);
@@ -185,11 +185,14 @@ Player* LevelLoader::AddPlayerToWorld(const Vector3& position) {
 	character->SetPhysicsObject(new PhysicsObject(&character->GetTransform(), character->GetBoundingVolume()));
 
 	character->GetPhysicsObject()->SetInverseMass(inverseMass);
-	character->GetPhysicsObject()->SetFriction(1.0f);
-	character->GetPhysicsObject()->SetLinearDamping(10.0f);
+	character->GetPhysicsObject()->SetLinearDamping(3.0f);
 	character->GetPhysicsObject()->InitSphereInertia();
+	character->GetPhysicsObject()->SetFriction(false);
 	character->GetPhysicsObject()->SetShouldApplyAngular(false);
-	character->SetDynamic(true);
+
+	character->GetPhysicsObject()->SetDynamic(true);
+	character->GetPhysicsObject()->SetCanSleep(false);
+
 	character->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
 
 	world->AddGameObject(character);
@@ -214,7 +217,7 @@ GameObject* LevelLoader::AddFloorToWorld(const Maths::Vector3& position) {
 	floor->GetPhysicsObject()->InitCubeInertia();
 
 	floor->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	floor->SetDynamic(false);
+	floor->GetPhysicsObject()->SetDynamic(false);
 	world->AddGameObject(floor);
 	return floor;
 }
@@ -236,7 +239,7 @@ GameObject* LevelLoader::AddAABBWallToWorld(const Vector3& position, Vector3 dim
 	cube->GetPhysicsObject()->InitCubeInertia();
 
 	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	cube->SetDynamic(false);
+	cube->GetPhysicsObject()->SetDynamic(false);
 	world->AddGameObject(cube);
 	return cube;
 }
@@ -258,7 +261,7 @@ GameObject* LevelLoader::AddOBBWallToWorld(const Vector3& position, Vector3 dime
 	cube->GetPhysicsObject()->InitCubeInertia();
 
 	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	cube->SetDynamic(false);
+	cube->GetPhysicsObject()->SetDynamic(false);
 	world->AddGameObject(cube);
 	return cube;
 }
@@ -410,14 +413,13 @@ GameObject* LevelLoader::AddRenderPartToWorld(const Vector3& position, Vector3 d
 		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
 
 #ifdef _WIN64
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, OGLTexture::RGBATextureEmpty(texture->GetWidth(),texture->GetHeight()), basicShader));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, OGLTexture::RGBATextureEmpty(texture->GetWidth()/16,texture->GetHeight()/16), basicShader));
 #endif
 #ifdef _ORBIS
 	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, basicShader));
 #endif
 	cube->SetPhysicsObject(nullptr);
 
-	cube->SetDynamic(false);
 	world->AddGameObject(cube);
 	return cube;
 }
@@ -448,7 +450,7 @@ GameObject* LevelLoader::AddSphereToWorld(const Maths::Vector3& position, float 
 		sphere->GetPhysicsObject()->SetElasticity(0.2f);
 
 	world->AddGameObject(sphere);
-	sphere->SetDynamic(dynamic);
+	sphere->GetPhysicsObject()->SetDynamic(dynamic);
 	return sphere;
 }
 
@@ -492,7 +494,7 @@ GameObject* LevelLoader::AddCubeToWorld(const Maths::Vector3& position, Maths::V
 		break;
 	}
 	cube->SetTrigger(isTrigger);
-	cube->SetDynamic(dynamic);
+	cube->GetPhysicsObject()->SetDynamic(dynamic);
 	return cube;
 }
 
@@ -515,4 +517,51 @@ GameObject* LevelLoader::AddCapsuleToWorld(const Maths::Vector3& position, float
 	world->AddGameObject(capsule);
 
 	return capsule;
+}
+
+PowerUp* LevelLoader::AddPowerUpToWorld(const Vector3& position, const PowerUpType& ability, const float& radius) {
+	PowerUp* powerup = nullptr;
+	Vector4 colour;
+
+	switch (ability) {
+	case(PowerUpType::FireRate):
+		powerup = new FireRate(*world);
+		colour = Debug::YELLOW;
+		break;
+	case(PowerUpType::MultipleBullets):
+		powerup = new MultipleBullets(*world);
+		colour = Debug::GREEN;
+		break;
+	case(PowerUpType::Heal):
+		powerup = new Heal(*world);
+		colour = Debug::RED;
+		break;
+	}
+
+	if (powerup == nullptr) {
+		return powerup;
+	}
+
+	Vector3 sphereSize = Vector3(radius, radius, radius);
+	SphereVolume* volume = new SphereVolume(radius);
+	powerup->SetBoundingVolume((CollisionVolume*)volume);
+
+	powerup->GetTransform()
+		.SetScale(sphereSize)
+		.SetPosition(position);
+
+	powerup->SetRenderObject(new RenderObject(&powerup->GetTransform(), sphereMesh, basicTex, basicShader));
+	powerup->GetRenderObject()->SetColour(colour);
+
+	powerup->SetPhysicsObject(new PhysicsObject(&powerup->GetTransform(), powerup->GetBoundingVolume()));
+
+	powerup->GetPhysicsObject()->SetInverseMass(0);
+	powerup->GetPhysicsObject()->SetDynamic(true);
+	powerup->SetTrigger(true);
+
+	world->AddGameObject(powerup);
+
+	powerup->SetCollisionLayers(CollisionLayer::LAYER_FOUR);
+
+	return powerup;
 }

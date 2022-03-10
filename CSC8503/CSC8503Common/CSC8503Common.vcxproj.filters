@@ -1,6 +1,83 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <ClCompile Include="CollisionDetection.cpp" />
+    <ClCompile Include="Debug.cpp" />
+    <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="GameWorld.cpp" />
+    <ClCompile Include="InputBase.cpp" />
+    <ClCompile Include="InputHandler.cpp" />
+    <ClCompile Include="NavigationGrid.cpp" />
+    <ClCompile Include="NavigationMesh.cpp" />
+    <ClCompile Include="PaintManager.cpp" />
+    <ClCompile Include="PCInput.cpp" />
+    <ClCompile Include="PhysicsObject.cpp" />
+    <ClCompile Include="PhysicsSystem.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Projectile.cpp" />
+    <ClCompile Include="PushdownMachine.cpp" />
+    <ClCompile Include="PushdownState.cpp" />
+    <ClCompile Include="Octree.cpp" />
+    <ClCompile Include="RenderObject.cpp" />
+    <ClCompile Include="StateMachine.cpp" />
+    <ClCompile Include="StateTransition.cpp" />
+    <ClCompile Include="Transform.cpp" />
+    <ClCompile Include="Timer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AABBVolume.h" />
+    <ClInclude Include="BehaviourAction.h" />
+    <ClInclude Include="BehaviourNode.h" />
+    <ClInclude Include="BehaviourNodeWithChildren.h" />
+    <ClInclude Include="BehaviourSelector.h" />
+    <ClInclude Include="BehaviourSequence.h" />
+    <ClInclude Include="CapsuleVolume.h" />
+    <ClInclude Include="Command.h" />
+    <ClInclude Include="FIreRate.h" />
+    <ClInclude Include="GameActor.h" />
+    <ClInclude Include="InputBase.h" />
+    <ClInclude Include="InputHandler.h" />
+    <ClInclude Include="MoveForwardCommand.h" />
+    <ClInclude Include="MultipleBullets.h" />
+    <ClInclude Include="InputList.h" />
+    <ClInclude Include="NavigationGrid.h" />
+    <ClInclude Include="NavigationMap.h" />
+    <ClInclude Include="NavigationMesh.h" />
+    <ClInclude Include="NavigationPath.h" />
+    <ClInclude Include="OBBVolume.h" />
+    <ClInclude Include="PaintManager.h" />
+    <ClInclude Include="PCInput.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="PowerUp.h" />
+    <ClInclude Include="SpeedBoost.h" />
+    <ClInclude Include="Projectile.h" />
+    <ClInclude Include="SphereVolume.h" />
+    <ClInclude Include="CollisionVolume.h" />
+    <ClInclude Include="CollisionDetection.h" />
+    <ClInclude Include="Constraint.h" />
+    <ClInclude Include="Debug.h" />
+    <ClInclude Include="GameObject.h" />
+    <ClInclude Include="GameWorld.h" />
+    <ClInclude Include="PhysicsObject.h" />
+    <ClInclude Include="PhysicsSystem.h" />
+    <ClInclude Include="PushdownMachine.h" />
+    <ClInclude Include="PushdownState.h" />
+    <ClInclude Include="Octree.h" />
+    <ClInclude Include="Ray.h" />
+    <ClInclude Include="RenderObject.h" />
+    <ClInclude Include="Spring.h" />
+    <ClInclude Include="State.h" />
+    <ClInclude Include="StateMachine.h" />
+    <ClInclude Include="StateTransition.h" />
+    <ClInclude Include="Transform.h" />
+    <ClInclude Include="Heal.h" />
+    <ClInclude Include="Timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
     <Filter Include="Source Files">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
@@ -27,6 +104,9 @@
     </Filter>
     <Filter Include="Input Handling">
       <UniqueIdentifier>{f1226dc9-d3d1-4557-b16d-d16067ca991a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Audio">
+      <UniqueIdentifier>{f5f0b303-de1d-4ab0-b4c8-f5bbe3ef593c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -138,6 +218,15 @@
     <ClInclude Include="PCInput.h">
       <Filter>Input Handling</Filter>
     </ClInclude>
+    <ClInclude Include="AudioManager.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="BGMManager.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Projectile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="InputBase.h">
       <Filter>Input Handling</Filter>
     </ClInclude>
@@ -207,6 +296,15 @@
       <Filter>Input Handling</Filter>
     </ClCompile>
     <ClCompile Include="PaintManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioManager.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="BGMManager.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="Projectile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

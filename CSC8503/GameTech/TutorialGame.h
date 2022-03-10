@@ -4,6 +4,10 @@
 #include "LevelLoader.h"
 #include "../CSC8503Common/PhysicsSystem.h"
 #include "../CSC8503Common/Player.h"
+#include "../CSC8503Common/AudioManager.h"
+#include "../CSC8503Common/BGMManager.h"
+#include "..//CSC8503Common/Timer.h"
+//#include "../CSC8503Common/Projectile.h"
 
 namespace NCL {
 	namespace PS4 {
@@ -26,7 +30,12 @@ namespace NCL {
 			virtual ~TutorialGame();
 
 			virtual void UpdateGame(float dt);
-			void SetState(GameState s) { state = s; }
+
+			void SetState(GameState s) { 
+				state = s; 
+				UpdateBGM(); 
+			}
+
 			void ResetGame() {
 				state = RESET;
 				quit = false;
@@ -68,6 +77,7 @@ namespace NCL {
 			void DebugDrawCollider(const CollisionVolume* c, Transform* worldTransform);
 			void DebugDrawVelocity(const Vector3& vel, Transform* worldTransform);
 			void DebugDrawObjectInfo(const GameObject* obj);
+			void UpdateBGM();
 
 			StateGameObject* testStateObject;
 
@@ -75,6 +85,8 @@ namespace NCL {
 			Renderer*			renderer;
 			PhysicsSystem*		physics;
 			GameWorld*			world;
+			AudioManager*		audio;
+			BGMManager*	bgm;
 			LevelLoader*		levelLoader;
 
 			GameState state;
@@ -95,6 +107,8 @@ namespace NCL {
 
 			bool won = false;
 			Player* player1 = nullptr;
+
+			Timer* timer;
 		};
 	}
 }

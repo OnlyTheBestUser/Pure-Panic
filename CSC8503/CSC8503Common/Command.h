@@ -4,6 +4,7 @@
 #include "InputBase.h"
 #include "../GameTech/TutorialGame.h"
 
+#include "Timer.h"
 namespace NCL {
 	namespace CSC8503 {
 		class Command {
@@ -72,10 +73,10 @@ namespace NCL {
 			GameActor* actor;
 		};
 
-		class FireCommand : public Command {
+		class PaintFireCommand : public Command {
 		public:
-			FireCommand(TutorialGame* game) : game(game) {};
-			virtual ~FireCommand() {};
+			PaintFireCommand(TutorialGame* game) : game(game) {};
+			virtual ~PaintFireCommand() {};
 
 			void execute() {
 				game->PaintObject();
@@ -85,6 +86,18 @@ namespace NCL {
 			TutorialGame* game;
 		};
 
+
+		class FireCommand : public Command {
+		public:	
+			FireCommand(GameActor* actor) : actor(actor) {};
+			virtual ~FireCommand() {};
+			void execute() {
+				actor->Fire();
+			}
+
+		protected:
+			GameActor* actor;
+		};
 
 #pragma endregion
 
@@ -112,6 +125,17 @@ namespace NCL {
 			}
 		protected:
 			bool* toggleVar;
+		};
+
+		class StartTimerCommand : public Command {
+		public:
+			StartTimerCommand(Timer* timer) : timerVar(timer) {};
+			virtual ~StartTimerCommand() {};
+			void execute() {
+				timerVar->StartTimer();
+			}
+		protected:
+			Timer* timerVar;
 		};
 
 		class QuitCommand : public Command {

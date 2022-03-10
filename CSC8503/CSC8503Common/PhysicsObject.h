@@ -104,6 +104,8 @@ namespace NCL {
 
 			inline void Wake() { sleeping = false; }
 			inline void Sleep() { sleeping = true; }
+			inline void SetCanSleep(bool ableTo) { canSleep = ableTo; }
+			inline bool CheckCanSleep() const { return canSleep; }
 			inline bool isSleeping() const { return sleeping; }
 			
 			VolumeType GetVolumeType() const;
@@ -123,6 +125,9 @@ namespace NCL {
 			void SetCollisionLayers(int layers) { collisionLayers = layers; }
 			int	GetCollisionLayers() const { return collisionLayers; }
 
+			bool IsDynamic() const { return dynamic; }
+			void SetDynamic(bool k) { dynamic = k; }
+
 		protected:
 			const CollisionVolume* volume;
 			Transform*		transform;
@@ -131,10 +136,12 @@ namespace NCL {
 			float elasticity;
 			float friction;
 
+			bool canSleep = true;
 			bool sleeping = false;
 			std::queue<float> previousVelocityDotProducts;
 			std::queue<float> previousPositions;
 
+			bool dynamic = false;
 			bool useGravity = true;
 			bool useFriction = true;
 

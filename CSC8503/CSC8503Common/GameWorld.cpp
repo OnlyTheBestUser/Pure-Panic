@@ -43,6 +43,14 @@ void GameWorld::AddGameObject(GameObject* o) {
 }
 
 void GameWorld::RemoveGameObject(GameObject* o, bool andDelete) {
+	// Check if object is already added to vector, sometimes gets double added
+	for (auto obj : toRemoveGameObjects)
+	{
+		if (o->GetWorldID() == obj->GetWorldID())
+		{
+			return;
+		}
+	}
 	toRemoveGameObjects.emplace_back(o);
 	if (andDelete) {
 		toDeleteGameObjects.emplace_back(o);
@@ -56,7 +64,13 @@ void GameWorld::RemoveGameObjectsFromWorld()
 void GameWorld::DeleteGameObjectsFromWorld()
 {
 	for (auto o : toDeleteGameObjects)
-		delete o;
+	{
+		if (o != nullptr)
+		{
+			delete o;
+			o = nullptr;
+		}
+	}
 }
 
 void GameWorld::GetObjectIterators(
@@ -85,11 +99,12 @@ void GameWorld::UpdateWorld(float dt) {
 	for (auto x : gameObjects) {
 		x->Update(dt);
 	}
-
+	
 	RemoveGameObjectsFromWorld();
 	DeleteGameObjectsFromWorld();
 	toRemoveGameObjects.clear();
 	toDeleteGameObjects.clear();
+
 }
 
 bool GameWorld::Raycast(Ray& r, RayCollision& closestCollision, bool closestObject) const {
