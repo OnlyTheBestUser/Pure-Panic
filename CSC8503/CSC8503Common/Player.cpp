@@ -5,7 +5,12 @@ using namespace CSC8503;
 
 void Player::OnCollisionBegin(GameObject* other, Vector3 localA, Vector3 localB, Vector3 normal)
 {
-
+	if (other->GetName() == "projectile") {
+		Projectile* projectile = ((Projectile*)other);
+		if (projectile->GetOwnerPlayerID() != playerID) {
+			DealDamage(projectile->GetDamage());
+		}
+	}
 }
 
 void Player::Update(float dt)

@@ -9,7 +9,7 @@ namespace NCL {
 		class Projectile : public GameObject
 		{
 		public:
-			Projectile(GameWorld& gWorld): GameObject("projectile"), gameWorld(gWorld) {
+			Projectile(GameWorld& gWorld, const float& damageValue = 10.0f, const int& playerID = 0): GameObject("projectile"), gameWorld(gWorld), damagePerShot(damageValue), ownerPlayerID(playerID) {
 			};
 			~Projectile() {}
 
@@ -17,11 +17,17 @@ namespace NCL {
 				gameWorld.RemoveGameObject(this, true);
 			}
 
+			float GetDamage() const { return damagePerShot; }
+
+			int GetOwnerPlayerID() const { return ownerPlayerID; }
+
 			void Update(float dt) override;
 
 		private:
 			//Vector3 velocity;
 			GameWorld& gameWorld;
+			int ownerPlayerID;
+			float damagePerShot;
 		};
 	}
 }

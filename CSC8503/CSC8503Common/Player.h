@@ -104,11 +104,17 @@ namespace NCL {
 				return currentPowerUp;
 			}
 
+			void DealDamage(float damageAmount) {
+				health = std::max(0.0f, health - abs(damageAmount));
+			}
+
 			void ChangeCamLock() { camLocked = !camLocked; }
 			bool* GetCamLock() { return &camLocked; }
 
         protected:
 			float CheckDistToGround();
+
+			int playerID;
 
             bool start = false;
             bool finish = false;
