@@ -45,6 +45,7 @@ namespace NCL {
 			}
 
 			bool Raycast(Ray& r, RayCollision& closestCollision, bool closestObject = false) const;
+			bool RaycastIgnoreObject(GameObject* obj, Ray& r, RayCollision& closestCollision, bool closestObject = false) const;
 
 			virtual void UpdateWorld(float dt);
 

@@ -8,24 +8,27 @@ void Projectile::Update(float dt) {
 
 void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vector3 localB, Vector3 normal) {
 
-	Ray ray(this->GetTransform().GetPosition(), -this->GetPhysicsObject()->GetLinearVelocity() * 10);
+	Ray ray(this->GetTransform().GetPosition(), -this->GetPhysicsObject()->GetLinearVelocity());
+	ray.SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	//Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
 	RayCollision closestCollision;
-	//Debug::DrawArrow(this->GetTransform().GetPosition(), this->GetTransform().GetPosition() - this->GetPhysicsObject()->GetLinearVelocity(), Vector4(1, 1, 1, 1), 100.0f);
-	if (gameWorld.Raycast(ray, closestCollision, true)) {
-		auto test = ((GameObject*)closestCollision.node)->GetRenderObject();
+	if (gameWorld.RaycastIgnoreObject(this, ray, closestCollision, true)) {
+		RenderObject* test = ((GameObject*)closestCollision.node)->GetRenderObject();
+		
+		if (test->GetPaintMask() != nullptr) {
 
-		//Debug::DrawLine(ray.GetPosition(), ray.GetPosition() * ray.GetDirection());
-		Debug::DrawSphere(closestCollision.collidedAt, 0.5, Vector4(1, 0, 0, 1), 0.f);
-		if (test) {
+			//Debug::DrawLine(ray.GetPosition(), ray.GetPosition() * ray.GetDirection());
+			//Debug::DrawSphere(closestCollision.collidedAt, 0.5, Vector4(1, 0, 0, 1), 0.f);
+			if (test) {
 
-			Vector2 texUV_a, texUV_b, texUV_c;
-			Vector3 collisionPoint;
-			Vector3 barycentric;
-			CollisionDetection::GetBarycentricFromRay(ray, *test, texUV_a, texUV_b, texUV_c, barycentric, collisionPoint);
+				Vector2 texUV_a, texUV_b, texUV_c;
+				Vector3 collisionPoint;
+				Vector3 barycentric;
+				CollisionDetection::GetBarycentricFromRay(ray, *test, texUV_a, texUV_b, texUV_c, barycentric, collisionPoint);
 
-			// Get the uv from the ray
-			//renderInst->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, 1, 0.2, 0.2, Vector4(0.3, 0, 0.5, 1));
+				// Get the uv from the ray
+				renderInst->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, 1, 0.3, 0.5, Vector4(0.3, 0, 0.5, 1));
+			}
 		}
 	}
 
