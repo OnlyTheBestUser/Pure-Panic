@@ -26,11 +26,17 @@ namespace NCL {
 
 			void OnPlayerCollision(NetworkPlayer* a, NetworkPlayer* b);
 
+			void RemovePlayerFromServer(int clientID);
+
+			static NetworkedGame* GetInstance() { return instance; }
+
 		protected:
 			void UpdateAsServer(float dt);
 			void UpdateAsClient(float dt);
 
 			void BroadcastSnapshot();
+
+			static NetworkedGame* instance;
 			std::map<int, int> stateIDs;
 
 			GameServer* thisServer;

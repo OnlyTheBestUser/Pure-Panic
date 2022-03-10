@@ -1,5 +1,6 @@
 #include "GameServer.h"
 #include "GameWorld.h"
+#include "../GameTech/NetworkedGame.h"
 #include <iostream>
 
 using namespace NCL;
@@ -81,8 +82,6 @@ bool GameServer::SendPacketToPeer(ENetPeer* peer, GamePacket& packet)
 	return true;
 }
 
-
-
 void GameServer::UpdateServer() {
 	if (!netHandle) {
 		return;
@@ -110,6 +109,8 @@ void GameServer::UpdateServer() {
 			PlayerDisconnectPacket player(playerID);
 			SendGlobalPacket(player);
 			connectedClients.erase(peer);
+
+			NetworkedGame::GetInstance()->RemovePlayerFromServer(playerID);
 		}
 		else if (type == ENetEventType::ENET_EVENT_TYPE_RECEIVE) {
 			GamePacket* packet = (GamePacket*)event.packet->data;

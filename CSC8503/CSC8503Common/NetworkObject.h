@@ -2,6 +2,8 @@
 #include "GameObject.h"
 #include "NetworkBase.h"
 #include "NetworkState.h"
+#include "GameWorld.h"
+
 namespace NCL {
 	namespace CSC8503 {
 		struct FullPacket : public IDPacket {
@@ -37,8 +39,11 @@ namespace NCL {
 
 		class NetworkObject {
 		public:
-			NetworkObject(GameObject& o, int id);
-			virtual ~NetworkObject();
+			NetworkObject(GameObject& o, int id, GameWorld* world);
+			virtual ~NetworkObject() {
+				object.SetNetworkObject(nullptr);
+				world->RemoveGameObject(&object);
+			}
 
 			//Called by clients
 			virtual bool ReadPacket(GamePacket& p);
@@ -68,6 +73,8 @@ namespace NCL {
 			int fullErrors;
 
 			int networkID;
+
+			GameWorld* world;
 		};
 	}
 }

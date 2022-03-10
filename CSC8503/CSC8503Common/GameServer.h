@@ -32,7 +32,7 @@ namespace NCL {
 			int			port;
 			int			clientMax;
 			int			clientCount;
-			GameWorld* gameWorld;
+			GameWorld*  gameWorld;
 
 			//std::atomic<bool> threadAlive;
 

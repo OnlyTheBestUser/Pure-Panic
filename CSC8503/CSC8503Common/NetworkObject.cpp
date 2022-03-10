@@ -3,13 +3,9 @@
 using namespace NCL;
 using namespace CSC8503;
 
-NetworkObject::NetworkObject(GameObject& o, int id) : object(o) {
+NetworkObject::NetworkObject(GameObject& o, int id, GameWorld* world) : object(o), world(world), networkID(id) {
 	deltaErrors = 0;
 	fullErrors = 0;
-	networkID = id;
-}
-
-NetworkObject::~NetworkObject() {
 }
 
 bool NetworkObject::ReadPacket(GamePacket& p) {
