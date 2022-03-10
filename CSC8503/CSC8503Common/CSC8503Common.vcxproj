@@ -223,6 +223,8 @@
     <ClInclude Include="Command.h" />
     <ClInclude Include="FIreRate.h" />
     <ClInclude Include="GameActor.h" />
+    <ClInclude Include="GameClient.h" />
+    <ClInclude Include="GameServer.h" />
     <ClInclude Include="Heal.h" />
     <ClInclude Include="InputBase.h" />
     <ClInclude Include="InputHandler.h" />
@@ -233,6 +235,9 @@
     <ClInclude Include="NavigationMap.h" />
     <ClInclude Include="NavigationMesh.h" />
     <ClInclude Include="NavigationPath.h" />
+    <ClInclude Include="NetworkBase.h" />
+    <ClInclude Include="NetworkObject.h" />
+    <ClInclude Include="NetworkState.h" />
     <ClInclude Include="OBBVolume.h" />
     <ClInclude Include="PaintManager.h" />
     <ClInclude Include="PCInput.h" />
@@ -268,12 +273,17 @@
     <ClCompile Include="BGMManager.cpp" />
     <ClCompile Include="CollisionDetection.cpp" />
     <ClCompile Include="Debug.cpp" />
+    <ClCompile Include="GameClient.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="GameServer.cpp" />
     <ClCompile Include="GameWorld.cpp" />
     <ClCompile Include="InputBase.cpp" />
     <ClCompile Include="InputHandler.cpp" />
     <ClCompile Include="NavigationGrid.cpp" />
     <ClCompile Include="NavigationMesh.cpp" />
+    <ClCompile Include="NetworkBase.cpp" />
+    <ClCompile Include="NetworkObject.cpp" />
+    <ClCompile Include="NetworkState.cpp" />
     <ClCompile Include="PaintManager.cpp" />
     <ClCompile Include="PCInput.cpp" />
     <ClCompile Include="PhysicsObject.cpp" />

@@ -210,6 +210,8 @@
     <ClCompile Include="LevelLoader.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainMenu.cpp" />
+    <ClCompile Include="NetworkedGame.cpp" />
+    <ClCompile Include="NetworkedPlayer.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RendererBase.cpp" />
     <ClCompile Include="TutorialGame.cpp" />
@@ -217,6 +219,8 @@
   <ItemGroup>
     <ClInclude Include="LevelLoader.h" />
     <ClInclude Include="MainMenu.h" />
+    <ClInclude Include="NetworkedGame.h" />
+    <ClInclude Include="NetworkedPlayer.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RendererBase.h" />
     <ClInclude Include="TutorialGame.h" />

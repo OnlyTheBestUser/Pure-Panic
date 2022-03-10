@@ -11,7 +11,7 @@ using std::vector;
 
 namespace NCL {
 	namespace CSC8503 {
-
+		class NetworkObject;
 		class GameObject	{
 		public:
 			GameObject(string name = "");
@@ -34,6 +34,10 @@ namespace NCL {
 				return transform;
 			}
 
+			NetworkObject* GetNetworkObject() const {
+				return networkObject;
+			}
+
 			RenderObject* GetRenderObject() const {
 				return renderObject;
 			}
@@ -48,6 +52,10 @@ namespace NCL {
 
 			void SetPhysicsObject(PhysicsObject* newObject) {
 				physicsObject = newObject;
+			}
+
+			void SetNetworkObject(NetworkObject* newObject) {
+				networkObject = newObject;
 			}
 
 			const string& GetName() const {
@@ -88,6 +96,7 @@ namespace NCL {
 			CollisionVolume*	boundingVolume;
 			PhysicsObject*		physicsObject;
 			RenderObject*		renderObject;
+			NetworkObject*		networkObject;
 
 			bool	isActive;
 			int		worldID;

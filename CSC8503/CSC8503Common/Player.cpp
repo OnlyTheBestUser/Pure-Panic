@@ -1,11 +1,17 @@
 #include "Player.h"
+#include "../GameTech/LevelLoader.h"
 
 using namespace NCL;
 using namespace CSC8503;
 
 void Player::OnCollisionBegin(GameObject* other, Vector3 localA, Vector3 localB, Vector3 normal)
 {
-
+	if (other->GetName() == "projectile") {
+		Projectile* projectile = ((Projectile*)other);
+		if (projectile->GetOwnerPlayerID() != playerID) {
+			DealDamage(projectile->GetDamage());
+		}
+	}
 }
 
 void Player::Update(float dt)
@@ -63,7 +69,7 @@ float Player::CheckDistToGround()
 {
 	Ray ray(GetTransform().GetPosition(), Vector3(0, -1, 0));
 	RayCollision closestCollision;
-	gameWorld.Raycast(ray, closestCollision, true);
+	world->Raycast(ray, closestCollision, true);
 	float distToGround = GetTransform().GetPosition().y - closestCollision.collidedAt.y;
 
 	const CollisionVolume* volume = GetBoundingVolume();
@@ -78,54 +84,17 @@ float Player::CheckDistToGround()
 	return distToGround;
 }
 
-Projectile* Player::spawnProjectile(const float& initialSpeed, const float& meshSize) {
-	//float meshSize = 0.5f;
-	float inverseMass = 5.0f;
-	//Vector3 offset = Vector3(0, 2.5f, 0);
-	Vector3 camForwardVector = this->GetCamFrontVec();
-
-	Projectile* projectile = new Projectile(gameWorld, nullptr);
-
-	SphereVolume* volume = new SphereVolume(meshSize * 1.4);// / 2.0f * meshSize * 1.3f);
-	projectile->SetBoundingVolume((CollisionVolume*)volume);
-
-	projectile->GetTransform()
-		.SetScale(Vector3(meshSize, meshSize, meshSize))
-		//.SetOrientation(Quaternion(Matrix3::Rotation(camera->GetPitch() + 90, Vector3(0, 0, 1))) * Quaternion(Matrix3::Rotation(camera->GetYaw() + 90, Vector3(1, 0, 0))))
-		.SetPosition(camera->GetPosition() + camForwardVector * 5.0f); //+ offset);
-
-	projectile->SetRenderObject(new RenderObject(&projectile->GetTransform(), projectileMesh, nullptr, basicShader));
-	projectile->SetPhysicsObject(new PhysicsObject(&projectile->GetTransform(), projectile->GetBoundingVolume()));
-
-	projectile->GetPhysicsObject()->SetInverseMass(inverseMass);
-	//projectile->GetPhysicsObject()->SetFriction(1.0f);
-	//projectile->GetPhysicsObject()->SetLinearDamping(10.0f);
-	projectile->GetPhysicsObject()->InitSphereInertia();
-
-	float velocityDueToMovement = Vector3::Dot(camForwardVector, this->GetPhysicsObject()->GetLinearVelocity());
-	if (velocityDueToMovement < 0.0f) velocityDueToMovement = 0.0f;
-	//Debug::DrawArrow(projectile->GetTransform().GetPosition(), projectile->GetTransform().GetPosition() + camForwardVector * Vector3::Dot(camForwardVector, this->GetPhysicsObject()->GetLinearVelocity()), Debug::CYAN, 1000.0f);
-	projectile->GetPhysicsObject()->AddAcceleration(camForwardVector * (initialSpeed + velocityDueToMovement));
-	projectile->GetTransform().SetOrientation(Quaternion(Matrix3::Rotation(-acos(Vector3::Dot(Vector3(0, 1, 0), camForwardVector)) * 180.0f / 3.14f, Vector3::Cross(camForwardVector, Vector3(0, 1, 0)).Normalised())));
-
-	//Debug::DrawAxisLines(projectile->GetTransform().GetMatrix(), 2.0f, 1000.0f);
-	//Debug::DrawArrow(camera->GetPosition(), (camera->GetPosition() + this->GetCamFrontVec() * 100.0f), Debug::RED, 5.0f);
-
-	projectile->GetPhysicsObject()->SetDynamic(true);
-	projectile->GetPhysicsObject()->SetLinearDamping(this->GetPhysicsObject()->GetLinearDamping() * 0.4);
-	projectile->SetCollisionLayers(CollisionLayer::LAYER_FIVE);
-
-	gameWorld.AddGameObject(projectile);
-
-	return projectile;
-}
-
 void Player::Fire() {
 	if (timeSincePrevShot > fireRate)
 	{
-		spawnProjectile();
+		levelLoader->SpawnProjectile(this);
 		timeSincePrevShot = 0.0f;
+		fired = true;
 	}
+	else {
+		fired = false;
+	}
+
 }
 
 bool Player::IsDead(){
