@@ -23,7 +23,7 @@
 using namespace NCL;
 using namespace CSC8503;
 
-LevelLoader::LevelLoader(GameWorld* world, PhysicsSystem* physics) : world(world), physics(physics) {
+LevelLoader::LevelLoader(GameWorld* world, PhysicsSystem* physics, Renderer* renderer) : world(world), physics(physics), renderer(renderer) {
 	auto loadFunc = [](const string& name, MeshGeometry** into) {
 #ifdef _ORBIS
 		* into = new PS4::PS4Mesh(name);
@@ -139,6 +139,9 @@ void LevelLoader::ReadInLevelFile(std::string filename) {
 				else if (lineContents[0] == "WALL_HAMMER") {
 					AddWallHammerToWorld(Vec3FromStr(lineContents[1]), std::stoi(lineContents[2]));
 				}
+				else if (lineContents[0] == "PAINT_WALL") {
+					AddPaintWallToWorld(Vec3FromStr(lineContents[1]), Vector3(5, 5, 4), std::stoi(lineContents[2]));
+				}
 			}
 		}
 
@@ -237,7 +240,7 @@ GameObject* LevelLoader::AddFloorToWorld(const Maths::Vector3& position) {
 		.SetScale(floorSize * 2)
 		.SetPosition(position);
 
-	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
+	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, OGLTexture::RGBATextureEmpty(basicTex->GetWidth(), basicTex->GetHeight()), basicShader));
 	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume()));
 
 	floor->GetPhysicsObject()->SetInverseMass(0);
@@ -325,6 +328,29 @@ GameObject* LevelLoader::AddLongWallToWorld(const Vector3& position, Vector3 dim
 		return physicalObject;
 	}
 	return physicalObject;
+}
+
+GameObject* LevelLoader::AddPaintWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name)
+{
+	GameObject* cube = new GameObject(name);
+	OBBVolume* volume = new OBBVolume(dimensions + Vector3(2, 10, 0));
+	cube->SetBoundingVolume((CollisionVolume*)volume);
+
+	cube->GetTransform()
+		.SetPosition(position)
+		.SetScale(dimensions * 2)
+		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
+
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, OGLTexture::RGBATextureEmpty(corridorWallAlertTex->GetHeight()/16, corridorWallAlertTex->GetWidth()/16), basicShader));
+	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
+
+	cube->GetPhysicsObject()->SetInverseMass(0.0f);
+	cube->GetPhysicsObject()->InitCubeInertia();
+
+	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	cube->GetPhysicsObject()->SetDynamic(false);
+	world->AddGameObject(cube);
+	return cube;
 }
 
 void LevelLoader::AddCornerWallToWorld(const Vector3& position, Vector3 dimensions, int rotation)
@@ -537,7 +563,7 @@ Projectile* LevelLoader::SpawnProjectile(GameObject* owner, float pitch, const f
 
 	Vector3 camForwardVector = (Matrix4::Rotation(ownerRot.y, Vector3(0,1,0)) * Matrix4::Rotation(pitch, Vector3(1,0,0)) * Vector3(0,0,-1)).Normalised();
 
-	Projectile* projectile = new Projectile(*world);
+	Projectile* projectile = new Projectile(*world, renderer);
 
 	SphereVolume* volume = new SphereVolume(meshSize * 1.4);// / 2.0f * meshSize * 1.3f);
 	projectile->SetBoundingVolume((CollisionVolume*)volume);

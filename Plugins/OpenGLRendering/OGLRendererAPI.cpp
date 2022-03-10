@@ -245,7 +245,17 @@ void OGLRendererAPI::UpdateUniformFloat(ShaderBase* shader, std::string uniform,
 	}
 
 	int fLoc = glGetUniformLocation(oglShader->GetProgramID(), uniform.c_str());
-	glUniform1i(fLoc, f);
+	glUniform1f(fLoc, f);
+}
+
+void OGLRendererAPI::UpdateUniformVector2(ShaderBase* shader, std::string uniform, const Maths::Vector2 vec) {
+	OGLShader* oglShader = dynamic_cast<OGLShader*>(shader);
+	if (!oglShader) {
+		return;
+	}
+
+	int vecLoc = glGetUniformLocation(oglShader->GetProgramID(), uniform.c_str());
+	glUniform2fv(vecLoc, 1, (float*)&vec);
 }
 
 void OGLRendererAPI::UpdateUniformVector3(ShaderBase* shader, std::string uniform, const Maths::Vector3 vec) {

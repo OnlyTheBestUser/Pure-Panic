@@ -12,7 +12,7 @@ namespace NCL {
 	namespace CSC8503 {
 		class LevelLoader {
 		public:
-			LevelLoader(GameWorld* world, PhysicsSystem* physics);
+			LevelLoader(GameWorld* world, PhysicsSystem* physics, Renderer* renderer);
 			~LevelLoader();
 
 			void ReadInLevelFile(std::string filename);
@@ -36,6 +36,7 @@ namespace NCL {
 			GameObject* AddAABBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name = "AABBWall");
 			GameObject* AddOBBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name = "OBBWall");
 			GameObject* AddLongWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name = "LongWall");
+			GameObject* AddPaintWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name = "PaintWall");
 
 			void AddCornerWallToWorld(const Vector3& position, Vector3 dimensions, int rotation);
 			void AddSecurityCameraToWorld(const Vector3& position, int rotation);
@@ -48,6 +49,7 @@ namespace NCL {
 
 			GameWorld*     world;
 			PhysicsSystem* physics;
+			Renderer* renderer;
 
 			ShaderBase*	  basicShader				= nullptr;
 			TextureBase*  basicTex					= nullptr;

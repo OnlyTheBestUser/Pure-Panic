@@ -2,6 +2,8 @@
 #include "GameActor.h"
 #include "PhysicsSystem.h"
 #include "InputBase.h"
+#include "../GameTech/TutorialGame.h"
+
 #include "Timer.h"
 
 namespace NCL {
@@ -72,8 +74,22 @@ namespace NCL {
 			GameActor* actor;
 		};
 
-		class FireCommand : public Command {
+		class PaintFireCommand : public Command {
 		public:
+			PaintFireCommand(TutorialGame* game) : game(game) {};
+			virtual ~PaintFireCommand() {};
+
+			void execute() {
+				game->PaintObject();
+			}
+
+		protected:
+			TutorialGame* game;
+		};
+
+
+		class FireCommand : public Command {
+		public:	
 			FireCommand(GameActor* actor) : actor(actor) {};
 			virtual ~FireCommand() {};
 			void execute() {

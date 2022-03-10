@@ -54,6 +54,8 @@ namespace NCL {
 				return quit;
 			}
 
+			void PaintObject();
+
 		protected:
 			InputHandler* inputHandler;
 
@@ -71,7 +73,6 @@ namespace NCL {
 	
 			bool SelectObject();
 			void MoveSelectedObject(float dt);
-			void PaintSelectedObject();
 			void DebugObjectMovement();
 			void DebugDrawCollider(const CollisionVolume* c, Transform* worldTransform);
 			void DebugDrawVelocity(const Vector3& vel, Transform* worldTransform);

@@ -44,6 +44,7 @@ PhysicsSystem::PhysicsSystem(GameWorld& g) : gameWorld(g)	{
 	validLayers.emplace_back(Vector2(1, 16));
 	validLayers.emplace_back(Vector2(16, 5));
 	validLayers.emplace_back(Vector2(5, 16));
+
 }
 
 PhysicsSystem::~PhysicsSystem()	{

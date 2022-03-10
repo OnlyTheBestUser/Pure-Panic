@@ -3,19 +3,19 @@
 #include "GameObject.h"
 
 namespace NCL {
-
+	namespace Rendering {
+		class Renderer;
+	}
 	namespace CSC8503 {
 
 		class Projectile : public GameObject
 		{
 		public:
-			Projectile(GameWorld& gWorld, const float& damageValue = 10.0f, const int& playerID = 0): GameObject("projectile"), gameWorld(gWorld), damagePerShot(damageValue), ownerPlayerID(playerID) {
+			Projectile(GameWorld& gWorld, Renderer* rend, const float& damageValue = 10.0f, const int& playerID = 0): GameObject("projectile"), renderInst(rend), gameWorld(gWorld), damagePerShot(damageValue), ownerPlayerID(playerID) {
 			};
 			~Projectile() {}
 
-			void OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vector3 localB, Vector3 normal) override {
-				gameWorld.RemoveGameObject(this, true);
-			}
+			void OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vector3 localB, Vector3 normal) override;
 
 			float GetDamage() const { return damagePerShot; }
 
@@ -26,6 +26,7 @@ namespace NCL {
 		private:
 			//Vector3 velocity;
 			GameWorld& gameWorld;
+			Renderer* renderInst;
 			int ownerPlayerID;
 			float damagePerShot;
 		};

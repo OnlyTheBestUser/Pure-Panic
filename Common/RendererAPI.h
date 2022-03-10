@@ -56,6 +56,7 @@ namespace NCL {
 
 			virtual void UpdateUniformInt(ShaderBase* shader, std::string uniform, const int i) = 0;
 			virtual void UpdateUniformFloat(ShaderBase* shader, std::string uniform, const float f) = 0;
+			virtual void UpdateUniformVector2(ShaderBase* shader, std::string uniform, const Maths::Vector2 vec) = 0;
 			virtual void UpdateUniformVector3(ShaderBase* shader, std::string uniform, const Maths::Vector3 vec) = 0;
 			virtual void UpdateUniformVector4(ShaderBase* shader, std::string uniform, const Maths::Vector4 vec) = 0;
 			virtual void UpdateUniformMatrix4(ShaderBase* shader, std::string uniform, const Maths::Matrix4 matrix) = 0;
