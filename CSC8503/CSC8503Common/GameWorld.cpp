@@ -16,9 +16,6 @@ GameWorld::GameWorld()	{
 	worldIDCounter		= 0;
 
 	navGrid = new NavigationGrid("TestGrid1.txt");
-
-	timer = new Timer(abs(60.0f));
-	timer->StartTimer();
 }
 
 GameWorld::~GameWorld()	{
@@ -107,8 +104,6 @@ void GameWorld::UpdateWorld(float dt) {
 	DeleteGameObjectsFromWorld();
 	toRemoveGameObjects.clear();
 	toDeleteGameObjects.clear();
-
-	timer->Update(dt);
 
 }
 

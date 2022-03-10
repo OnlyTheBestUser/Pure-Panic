@@ -44,6 +44,8 @@ TutorialGame::TutorialGame()	{
 
 	state = PLAY;
 
+	timer = new Timer(abs(60.0f));
+
 	Debug::SetRenderer(renderer);
 
 	//physics->SetGravity(Vector3(0, 9.8f, 0));
@@ -86,10 +88,12 @@ TutorialGame::TutorialGame()	{
 	Command* toggleDebug = new ToggleBoolCommand(&debugDraw);
 	Command* togglePause = new ToggleBoolCommand(&pause);
 	Command* quitCommand = new QuitCommand(&quit, &pause);
+	Command* startTimer = new StartTimerCommand(timer);
 	inputHandler->BindButton(TOGGLE_GRAV, toggleGrav);
 	inputHandler->BindButton(TOGGLE_DEBUG, toggleDebug);
 	inputHandler->BindButton(TOGGLE_PAUSE, togglePause);
 	inputHandler->BindButton(QUIT, quitCommand);
+	inputHandler->BindButton(START_TIMER, startTimer);
 
 #pragma endregion
 
@@ -179,6 +183,8 @@ void TutorialGame::UpdateGameWorld(float dt)
 	physics->Update(dt);
 
 	world->UpdateWorld(dt);
+
+	timer->Update(dt);
 }
 
 void TutorialGame::DebugDrawCollider(const CollisionVolume* c, Transform* worldTransform) {

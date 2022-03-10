@@ -2,6 +2,7 @@
 #include "GameActor.h"
 #include "PhysicsSystem.h"
 #include "InputBase.h"
+#include "Timer.h"
 namespace NCL {
 	namespace CSC8503 {
 		class Command {
@@ -108,6 +109,17 @@ namespace NCL {
 			}
 		protected:
 			bool* toggleVar;
+		};
+
+		class StartTimerCommand : public Command {
+		public:
+			StartTimerCommand(Timer* timer) : timerVar(timer) {};
+			virtual ~StartTimerCommand() {};
+			void execute() {
+				timerVar->StartTimer();
+			}
+		protected:
+			Timer* timerVar;
 		};
 
 		class QuitCommand : public Command {
