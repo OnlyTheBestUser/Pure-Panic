@@ -5,7 +5,7 @@
 #include <string>
 
 enum BasicNetworkMessages {
-	None,
+	No_Message,
 	Hello,
 	Message,
 	String_Message,
@@ -25,7 +25,7 @@ struct GamePacket {
 	short type;
 
 	GamePacket() {
-		type = BasicNetworkMessages::None;
+		type = BasicNetworkMessages::No_Message;
 		size = 0;
 	}
 

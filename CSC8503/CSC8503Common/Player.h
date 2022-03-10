@@ -6,6 +6,7 @@
 #include"../CSC8503Common/PowerUp.h"
 #include "Projectile.h"
 #include <chrono>
+#include <algorithm>
 
 namespace NCL {
     using namespace Maths;
@@ -53,7 +54,10 @@ namespace NCL {
 
 			void IncreaseHealth(const float& increaseHealthBy) {
 				if (increaseHealthBy <= 0) return;
-				health = std::min(health + increaseHealthBy, maxHealth);
+
+				health += increaseHealthBy;
+				if (health > maxHealth) health = maxHealth;
+
 				currentPowerUp = PowerUpType::Heal;
 			}
 			
@@ -105,7 +109,8 @@ namespace NCL {
 			}
 
 			void DealDamage(float damageAmount) {
-				health = std::max(0.0f, health - abs(damageAmount));
+				health -= damageAmount;
+				if (health < 0) health = 0;
 			}
 
 			void ChangeCamLock() { camLocked = !camLocked; }

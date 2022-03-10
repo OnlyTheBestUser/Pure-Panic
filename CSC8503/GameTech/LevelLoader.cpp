@@ -219,7 +219,7 @@ GameObject* LevelLoader::AddDummyPlayerToWorld(const Vector3& position)
 	character->GetPhysicsObject()->SetLinearDamping(10.0f);
 	character->GetPhysicsObject()->InitSphereInertia();
 	character->GetPhysicsObject()->SetShouldApplyAngular(false);
-	character->SetDynamic(true);
+	character->GetPhysicsObject()->SetDynamic(true);
 	character->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
 
 	world->AddGameObject(character);
@@ -558,7 +558,7 @@ Projectile* LevelLoader::SpawnProjectile(GameObject* owner, float pitch, const f
 	projectile->GetTransform().SetOrientation(Quaternion(Matrix3::Rotation(-acos(Vector3::Dot(Vector3(0, 1, 0), camForwardVector)) * 180.0f / 3.14f, Vector3::Cross(camForwardVector, Vector3(0, 1, 0)).Normalised())));
 
 	projectile->GetPhysicsObject()->SetLinearDamping(0.1f);
-	projectile->SetDynamic(true);
+	projectile->GetPhysicsObject()->SetDynamic(true);
 	projectile->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
 
 	world->AddGameObject(projectile);
