@@ -120,7 +120,7 @@ namespace NCL {
 
 		static bool RayPlaneIntersection(const Ray&r, const Plane&p, RayCollision& collisions);
 		static bool RayTriangleIntersection(const Ray&r, const Triangle&t, const Vector3&norm, RayCollision& collisions, Matrix4 transform);
-		static Vector2 CalcTriBaryCoord(const Triangle& t, const Vector3& point);
+		static Vector3 CalcTriBaryCoord(const Triangle& t, const Vector3& point);
 
 		static bool	AABBTest(const Vector3& posA, const Vector3& posB, const Vector3& halfSizeA, const Vector3& halfSizeB);
 
@@ -145,7 +145,7 @@ namespace NCL {
 		static Vector3		UnprojectScreenPosition(Vector3 position, float aspect, float fov, const Camera &c);
 		static Matrix4		GenerateInverseProjection(float aspect, float fov, float nearPlane, float farPlane);
 		static Matrix4		GenerateInverseView(const Camera &c);
-		static Vector3		GetBarycentricFromRay(Ray ray, RenderObject obj, Vector2& va, Vector2& vb, Vector2& vc, Vector3& collisionPoint);
+		static bool			GetBarycentricFromRay(const Ray ray, const RenderObject obj, Vector2& va, Vector2& vb, Vector2& vc, Vector3& barycentric, Vector3& collisionPoint);
 
 	protected:
 	

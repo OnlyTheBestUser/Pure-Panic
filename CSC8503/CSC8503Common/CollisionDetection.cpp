@@ -315,7 +315,7 @@ Matrix4::Rotation(pitch, Vector3(1, 0, 0));
 return iview;
 }
 
-Vector3 CollisionDetection::GetBarycentricFromRay(Ray ray, RenderObject obj, Vector2& va, Vector2& vb, Vector2& vc, Vector3& collisionPoint)
+bool CollisionDetection::GetBarycentricFromRay(const Ray ray, const RenderObject obj, Vector2& va, Vector2& vb, Vector2& vc, Vector3& barycentric, Vector3& collisionPoint)
 {
 	Quaternion orientation = obj.GetTransform()->GetOrientation();
 	Vector3 position = obj.GetTransform()->GetPosition();
@@ -366,27 +366,44 @@ Vector3 CollisionDetection::GetBarycentricFromRay(Ray ray, RenderObject obj, Vec
 		}
 	}
 
+	if (distance == FLT_MAX) {
+		return false;
+	}
+
 	Debug::DrawTriangle(closest.pos_a, closest.pos_b, closest.pos_c, Vector4(1,1,1,1));
 	va = closest.texUV_a;
 	vb = closest.texUV_b;
 	vc = closest.texUV_c;
 	collisionPoint = closestcollision;
-
-	return CalcTriBaryCoord(closest, closestcollision);
+	barycentric = CalcTriBaryCoord(closest, closestcollision);
+	return true;
 }
 
-Vector2 CollisionDetection::CalcTriBaryCoord(const Triangle& t, const Vector3& point) {
-	Vector3 barCoords;
-	Vector3 v0 = t.texUV_a - t.texUV_b;
-	Vector3 v1 = t.texUV_c - t.texUV_a;
-	Vector3 v2 = point - t.texUV_a;
-	float d = v0.x * v1.y - v1.x * v0.y;
+Vector3 CollisionDetection::CalcTriBaryCoord(const Triangle& t, const Vector3& point) {
+	Vector3 v0 = t.pos_b - t.pos_a, v1 = t.pos_c - t.pos_a, v2 = point - t.pos_a;
+	float d00 = Vector3::Dot(v0, v0);
+	float d01 = Vector3::Dot(v0, v1);
+	float d11 = Vector3::Dot(v1, v1);
+	float d20 = Vector3::Dot(v2, v0);
+	float d21 = Vector3::Dot(v2, v1);
+	float denom = d00 * d11 - d01 * d01;
 
-	barCoords.x = (v2.x * v1.y - v1.x * v2.y) / d;
-	barCoords.y = (v0.x * v2.y - v2.x * v0.y) / d;
-	barCoords.z = 1.0f - barCoords.x - barCoords.y;
+	float v = (d11 * d20 - d01 * d21) / denom;
+	float w = (d00 * d21 - d01 * d20) / denom;
+	float u = 1.0f - v - w;
 
-	return barCoords;
+	//Vector3 v0 = t.pos_a - t.pos_b;
+	//Vector3 v1 = t.pos_c - t.pos_a;
+	//Vector3 v2 = point - t.pos_a;
+	//float d = v0.x * v1.y - v1.y * v0.z;
+	//
+	//float barCoordsX = (v2.x * v1.y - v1.x * v2.y) / d;
+	//float barCoordsY = (v0.x * v2.y - v2.x * v0.y) / d;
+	//float barCoordsZ = 1.0f - barCoordsX - barCoordsY;
+	//
+	//auto test = Vector3(barCoordsX, barCoordsY, barCoordsZ).Length();
+	//
+	return Vector3(u, v, w);
 }
 
 /*

@@ -304,9 +304,17 @@ void Renderer::ApplyPaintToMasks() {
 		rendererAPI->UpdateUniformVector2(maskShader, "nearTexCoord_a", i.texUV_a);
 		rendererAPI->UpdateUniformVector2(maskShader, "nearTexCoord_b", i.texUV_b);
 		rendererAPI->UpdateUniformVector2(maskShader, "nearTexCoord_c", i.texUV_c);
+
+		Vector2 pos = i.texUV_a * i.barycentric.x 
+			+ i.texUV_b * i.barycentric.y 
+			+ i.texUV_c * i.barycentric.z;
+		rendererAPI->UpdateUniformVector2(maskShader, "uvHitPoint", pos);
+
+		rendererAPI->UpdateUniformVector2(maskShader, "viewport", Vector2(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight()));
+
 		rendererAPI->UpdateUniformVector2(maskShader, "textureSize", Vector2(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight()));
 		float scale = 400.0f / (400.0f / 1.0f);
-		rendererAPI->UpdateUniformFloat(maskShader, "textureScale", scale);
+		rendererAPI->UpdateUniformVector3(maskShader, "textureScale", i.object->GetTransform()->GetScale());
 		rendererAPI->UpdateUniformFloat(maskShader, "radius", 5.0f);
 		rendererAPI->UpdateUniformFloat(maskShader, "hardness", i.hardness);
 		rendererAPI->UpdateUniformFloat(maskShader, "strength", i.strength);

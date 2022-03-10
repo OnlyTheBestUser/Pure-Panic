@@ -7,9 +7,12 @@ uniform vec3  collisionPoint;
 uniform vec2  nearTexCoord_a;
 uniform vec2  nearTexCoord_b;
 uniform vec2  nearTexCoord_c;
+uniform vec2 uvHitPoint;
+
+uniform vec2 viewport;
 
 uniform vec2  textureSize;
-uniform float textureScale;
+uniform vec3 textureScale;
 uniform float radius;
 uniform float hardness;
 uniform float strength;
@@ -26,7 +29,7 @@ float lerp(float a, float b, float t){
     return (1.0f - t) * a + b * t;
 }
 
-float mask(vec3 _position, vec3 _center, float _radius, float _hardness){
+float mask(vec2 _position, vec2 _center, float _radius, float _hardness){
     float m = distance(_center, _position);
     return 1 - smoothstep(_radius * _hardness, _radius, m);    
 }
@@ -34,14 +37,9 @@ float mask(vec3 _position, vec3 _center, float _radius, float _hardness){
 void main(void)	{
 // This world possition is the position of verticies not fragments.
 
+    float avgScale = (textureScale.x + textureScale.y + textureScale.z) / 3;
 
-
-
-
-    vec2 fragCoordScaled = (gl_FragCoord.xy/textureSize.x);
-    vec3 fragWorldPos = (modelMatrix * vec4(-fragCoordScaled.x, barycentricCoord.y , -fragCoordScaled.y, 1.0)).xyz;
-    //float f = mask(fragWorldPos, (painterPosition-(vec3(textureSize.x, 0, textureSize.y)/2)) - vec3(radius, 0 , radius), radius, hardness);
-    float f = mask(fragWorldPos + vec3(textureSize.x,0,textureSize.y)/1.6, vec3(collisionPoint.x, collisionPoint.z, 1), radius, hardness);
+    float f = mask(gl_FragCoord.xy / viewport,uvHitPoint, radius/avgScale, hardness);
 
     float edge = f * strength;
 
