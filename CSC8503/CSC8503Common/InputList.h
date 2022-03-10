@@ -9,6 +9,7 @@ namespace NCL {
 			TOGGLE_PAUSE,
 			LOCK,
 			QUIT,
-			DESCEND
+			DESCEND,
+			START_TIMER
 		};
 }
