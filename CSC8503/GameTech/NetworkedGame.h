@@ -57,6 +57,12 @@ namespace NCL {
 			void HandleClientPacket(ClientPacket* packet);
 			void AddNewPlayerToServer(int clientID, int lastID);
 			void Fire(GameObject* owner, float pitch, int clientID);
+
+			void HandleFullState(FullPacket* packet);
+			void HandleFireState(FirePacket* packet);
+			void HandleAssignID(AssignIDPacket* packet);
+			void HandlePlayerConnect(NewPlayerPacket* packet);
+			void HandlePlayerDisconnect(PlayerDisconnectPacket* packet);
 		};
 	}
 }

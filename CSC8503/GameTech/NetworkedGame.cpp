@@ -43,8 +43,6 @@ void NetworkedGame::StartAsServer() {
 	thisServer = new GameServer(NetworkBase::GetDefaultPort(), 4);
 
 	thisServer->RegisterPacketHandler(Received_State, this);
-	thisServer->RegisterPacketHandler(Ack, this);
-	thisServer->SendGlobalPacket(StringPacket("Server says hello!"));
 
 	SpawnPlayer();
 	StartLevel();
@@ -210,7 +208,8 @@ void NetworkedGame::SpawnPlayer() {
 	localPlayer->SetNetworkObject(new NetworkObject(*localPlayer, playerID));
 	localPlayer->SetDynamic(true);
 	localPlayer->GetTransform().SetPosition(Vector3(playerID * 5, 10, 0));
-	std::cout << "Player Spawned with Network ID: " << localPlayer->GetNetworkObject()->GetNetID() << "." << std::endl;
+
+	// Fill
 	if (!(playerID < networkObjects.size())) {
 		networkObjects.resize(playerID + 1);
 	}
@@ -231,92 +230,30 @@ void NetworkedGame::StartLevel() {
 }
 
 void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
-
 	//SERVER version of the game will receive these from the clients
 	if (type == Received_State) {
 		ClientPacket* realPacket = (ClientPacket*)payload;
 		HandleClientPacket(realPacket);
 	}
-	else if (type == Ack) {
-		AckPacket* realPacket = (AckPacket*)payload;
-		std::cout << "Client ID: " << realPacket->clientID << "\nAck: " << realPacket->ack << "\n";
-		auto it = ackHistory.find(realPacket->clientID);
-		if (it == ackHistory.end()) {
-			std::cout << "Not here!!!" << std::endl;
-		}
-		else {
-			if (it->second < realPacket->ack) {
-				it->second = realPacket->ack;
-				std::cout << "Ack updated" << std::endl;
-			}
-		}
-	}
+
 	//CLIENT version of the game will receive these from the servers
-	else if (type == Delta_State) {
-		//std::cout << "Client: Received delta message!" << std::endl;
-		DeltaPacket* realPacket = (DeltaPacket*)payload;
-		if (realPacket->objectID < (int)networkObjects.size()) {
-			networkObjects[realPacket->objectID]->ReadPacket(*realPacket);
-		}
-	}
-	else if (type == Full_State) {
+	switch (type) {
+	case(Full_State):
 		//std::cout << "Client: Received full_state message!" << std::endl;
-		FullPacket* realPacket = (FullPacket*)payload;
-		if (realPacket->objectID == playerID)
-			return;
-		//std::cout << realPacket->objectID << ": (" << realPacket->fullState.position.x << ", " << realPacket->fullState.position.y << ", " << realPacket->fullState.position.z << ")\n";
-		if (realPacket->objectID < (int)networkObjects.size()) {
-			if (networkObjects[realPacket->objectID])
-				networkObjects[realPacket->objectID]->ReadPacket(*realPacket);
-			else
-				std::cout << "Doesn't exist!" << std::endl;
-		}
-	}
-	else if (type == Fire_State) {
-		FirePacket* realPacket = (FirePacket*)payload;
-		if (realPacket->clientID == playerID)
-			return;
-		auto obj = networkObjects[realPacket->clientID];
-		if(obj)
-			levelLoader->SpawnProjectile(&obj->object, realPacket->pitch);
-	}
-	else if (type == String_Message) {
-		bool a = true;
-	}
-	else if (type == Message) {
-		MessagePacket* realPacket = (MessagePacket*)payload;
-
-		if (realPacket->messageID == COLLISION_MSG) {
-			std::cout << "Client: Received collision message!" << std::endl;
-		}
-	}
-	else if (type == Assign_ID) {
-		AssignIDPacket* realPacket = (AssignIDPacket*)payload;
-		std::cout << "ID Assigned: " << realPacket->playerID << std::endl;
-		playerID = realPacket->playerID;
-		SpawnPlayer();
-	}
-	else if (type == Player_Connected) {
-		NewPlayerPacket* realPacket = (NewPlayerPacket*)payload;
-		std::cout << "Client: New player connected!" << std::endl;
-		std::cout << "_Player ID: " << realPacket->playerID << std::endl;
-		//playerID = realPacket->playerID;
-		// Broadcast to everyone
-
-		if (realPacket->playerID != playerID) {
-			GameObject* newPlayer = levelLoader->AddDummyPlayerToWorld(Vector3(10, 15, 10));
-			newPlayer->SetNetworkObject(new NetworkObject(*newPlayer, realPacket->playerID));
-			newPlayer->SetDynamic(true);
-			std::cout << "Player Spawned with Network ID: " << newPlayer->GetNetworkObject()->GetNetID() << "." << std::endl;
-			if (!(realPacket->playerID < networkObjects.size())) {
-				networkObjects.resize(realPacket->playerID + 1);
-			}
-			networkObjects[newPlayer->GetNetworkObject()->GetNetID()] = (newPlayer->GetNetworkObject());
-		}
-	}
-	else if (type == Player_Disconnected) {
-		PlayerDisconnectPacket* realPacket = (PlayerDisconnectPacket*)payload;
-		std::cout << "Client: Player Disconnected!" << std::endl;
+		HandleFullState((FullPacket*)payload);
+		break;
+	case(Fire_State):
+		HandleFireState((FirePacket*)payload);
+		break;
+	case(Assign_ID):
+		HandleAssignID((AssignIDPacket*)payload);
+		break;
+	case(Player_Connected):
+		HandlePlayerConnect((NewPlayerPacket*)payload);
+		break;
+	case(Player_Disconnected):
+		HandlePlayerDisconnect((PlayerDisconnectPacket*)payload);
+		break;
 	}
 }
 
@@ -378,4 +315,55 @@ void NetworkedGame::Fire(GameObject* owner, float pitch, int clientID)
 	newPacket.clientID = clientID;
 	newPacket.pitch = pitch;
 	thisServer->SendGlobalPacket(newPacket); 
+}
+
+void NetworkedGame::HandleFullState(FullPacket* packet)
+{
+	if (packet->objectID == playerID)
+		return;
+
+	if (packet->objectID < (int)networkObjects.size()) {
+		if (networkObjects[packet->objectID])
+			networkObjects[packet->objectID]->ReadPacket(*packet);
+	}
+}
+
+void NetworkedGame::HandleFireState(FirePacket* packet)
+{
+	if (packet->clientID == playerID)
+		return;
+	auto obj = networkObjects[packet->clientID];
+	if (obj)
+		levelLoader->SpawnProjectile(&obj->object, packet->pitch);
+}
+
+void NetworkedGame::HandleAssignID(AssignIDPacket* packet)
+{
+	std::cout << "ID Assigned: " << packet->playerID << std::endl;
+	playerID = packet->playerID;
+	SpawnPlayer();
+}
+
+void NetworkedGame::HandlePlayerConnect(NewPlayerPacket* packet)
+{
+	std::cout << "Client: New player connected!" << std::endl;
+	std::cout << "_Player ID: " << packet->playerID << std::endl;
+	//playerID = realPacket->playerID;
+	// Broadcast to everyone
+
+	if (packet->playerID != playerID) {
+		GameObject* newPlayer = levelLoader->AddDummyPlayerToWorld(Vector3(10, 15, 10));
+		newPlayer->SetNetworkObject(new NetworkObject(*newPlayer, packet->playerID));
+		newPlayer->SetDynamic(true);
+		std::cout << "Player Spawned with Network ID: " << newPlayer->GetNetworkObject()->GetNetID() << "." << std::endl;
+		if (!(packet->playerID < networkObjects.size())) {
+			networkObjects.resize(packet->playerID + 1);
+		}
+		networkObjects[newPlayer->GetNetworkObject()->GetNetID()] = (newPlayer->GetNetworkObject());
+	}
+}
+
+void NetworkedGame::HandlePlayerDisconnect(PlayerDisconnectPacket* packet)
+{
+	std::cout << "Client: Player Disconnected!" << std::endl;
 }
