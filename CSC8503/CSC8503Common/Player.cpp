@@ -84,7 +84,7 @@ Projectile* Player::spawnProjectile(const float& initialSpeed, const float& mesh
 	//Vector3 offset = Vector3(0, 2.5f, 0);
 	Vector3 camForwardVector = this->GetCamFrontVec();
 
-	Projectile* projectile = new Projectile(gameWorld);
+	Projectile* projectile = new Projectile(gameWorld, nullptr);
 
 	SphereVolume* volume = new SphereVolume(meshSize * 1.4);// / 2.0f * meshSize * 1.3f);
 	projectile->SetBoundingVolume((CollisionVolume*)volume);
