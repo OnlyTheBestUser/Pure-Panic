@@ -186,8 +186,10 @@ Player* LevelLoader::AddPlayerToWorld(const Vector3& position) {
 	character->GetPhysicsObject()->InitSphereInertia();
 	character->GetPhysicsObject()->SetFriction(false);
 	character->GetPhysicsObject()->SetShouldApplyAngular(false);
+
+	character->GetPhysicsObject()->SetDynamic(true);
 	character->GetPhysicsObject()->SetCanSleep(false);
-	character->SetDynamic(true);
+
 	character->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
 
 	world->AddGameObject(character);
@@ -242,7 +244,7 @@ GameObject* LevelLoader::AddFloorToWorld(const Maths::Vector3& position) {
 	floor->GetPhysicsObject()->InitCubeInertia();
 
 	floor->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	floor->SetDynamic(false);
+	floor->GetPhysicsObject()->SetDynamic(false);
 	world->AddGameObject(floor);
 	return floor;
 }
@@ -264,7 +266,7 @@ GameObject* LevelLoader::AddAABBWallToWorld(const Vector3& position, Vector3 dim
 	cube->GetPhysicsObject()->InitCubeInertia();
 
 	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	cube->SetDynamic(false);
+	cube->GetPhysicsObject()->SetDynamic(false);
 	world->AddGameObject(cube);
 	return cube;
 }
@@ -286,7 +288,7 @@ GameObject* LevelLoader::AddOBBWallToWorld(const Vector3& position, Vector3 dime
 	cube->GetPhysicsObject()->InitCubeInertia();
 
 	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	cube->SetDynamic(false);
+	cube->GetPhysicsObject()->SetDynamic(false);
 	world->AddGameObject(cube);
 	return cube;
 }
@@ -422,7 +424,6 @@ GameObject* LevelLoader::AddRenderPartToWorld(const Vector3& position, Vector3 d
 #endif
 	cube->SetPhysicsObject(nullptr);
 
-	cube->SetDynamic(false);
 	world->AddGameObject(cube);
 	return cube;
 }
@@ -455,7 +456,7 @@ GameObject* LevelLoader::AddSphereToWorld(const Maths::Vector3& position, float 
 	sphere->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 
 	world->AddGameObject(sphere);
-	sphere->SetDynamic(dynamic);
+	sphere->GetPhysicsObject()->SetDynamic(dynamic);
 	return sphere;
 }
 
@@ -499,7 +500,7 @@ GameObject* LevelLoader::AddCubeToWorld(const Maths::Vector3& position, Maths::V
 		break;
 	}
 	cube->SetTrigger(isTrigger);
-	cube->SetDynamic(dynamic);
+	cube->GetPhysicsObject()->SetDynamic(dynamic);
 	return cube;
 }
 
@@ -523,8 +524,6 @@ GameObject* LevelLoader::AddCapsuleToWorld(const Maths::Vector3& position, float
 
 	return capsule;
 }
-
-// TODO make this for dummy
 
 Projectile* LevelLoader::SpawnProjectile(Player* owner, const float& initialSpeed, const float& meshSize) {
 	return SpawnProjectile((GameObject*)owner, owner->GetCam()->GetPitch(), initialSpeed, meshSize);
@@ -565,4 +564,51 @@ Projectile* LevelLoader::SpawnProjectile(GameObject* owner, float pitch, const f
 	world->AddGameObject(projectile);
 
 	return projectile;
+}
+
+PowerUp* LevelLoader::AddPowerUpToWorld(const Vector3& position, const PowerUpType& ability, const float& radius) {
+	PowerUp* powerup = nullptr;
+	Vector4 colour;
+
+	switch (ability) {
+	case(PowerUpType::FireRate):
+		powerup = new FireRate(*world);
+		colour = Debug::YELLOW;
+		break;
+	case(PowerUpType::MultipleBullets):
+		powerup = new MultipleBullets(*world);
+		colour = Debug::GREEN;
+		break;
+	case(PowerUpType::Heal):
+		powerup = new Heal(*world);
+		colour = Debug::RED;
+		break;
+	}
+
+	if (powerup == nullptr) {
+		return powerup;
+	}
+
+	Vector3 sphereSize = Vector3(radius, radius, radius);
+	SphereVolume* volume = new SphereVolume(radius);
+	powerup->SetBoundingVolume((CollisionVolume*)volume);
+
+	powerup->GetTransform()
+		.SetScale(sphereSize)
+		.SetPosition(position);
+
+	powerup->SetRenderObject(new RenderObject(&powerup->GetTransform(), sphereMesh, basicTex, basicShader));
+	powerup->GetRenderObject()->SetColour(colour);
+
+	powerup->SetPhysicsObject(new PhysicsObject(&powerup->GetTransform(), powerup->GetBoundingVolume()));
+
+	powerup->GetPhysicsObject()->SetInverseMass(0);
+	powerup->GetPhysicsObject()->SetDynamic(true);
+	powerup->SetTrigger(true);
+
+	world->AddGameObject(powerup);
+
+	powerup->SetCollisionLayers(CollisionLayer::LAYER_FOUR);
+
+	return powerup;
 }

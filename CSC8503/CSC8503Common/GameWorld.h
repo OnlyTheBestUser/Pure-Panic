@@ -4,6 +4,7 @@
 #include "CollisionDetection.h"
 #include "Octree.h"
 #include "NavigationGrid.h"
+
 namespace NCL {
 		class Camera;
 		using Maths::Ray;

@@ -49,5 +49,7 @@ void PCInput::Poll()
 	buttons[TOGGLE_DEBUG] = Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::J) ? 1.0f : 0.0f;
 	buttons[TOGGLE_PAUSE] = Window::GetKeyboard()->KeyPressed(NCL::KeyboardKeys::P) ? 1.0f : 0.0f;
 	buttons[TOGGLE_MOUSE] = Window::GetKeyboard()->KeyPressed(NCL::KeyboardKeys::Q) ? 1.0f : 0.0f;
+	buttons[QUIT] = Window::GetKeyboard()->KeyPressed(NCL::KeyboardKeys::ESCAPE) ? 1.0f : 0.0f;
+	buttons[START_TIMER] = Window::GetKeyboard()->KeyPressed(NCL::KeyboardKeys::Q) ? 1.0f : 0.0f;
 }
 #endif

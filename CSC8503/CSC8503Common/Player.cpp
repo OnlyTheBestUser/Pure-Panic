@@ -6,12 +6,26 @@ using namespace CSC8503;
 
 void Player::OnCollisionBegin(GameObject* other, Vector3 localA, Vector3 localB, Vector3 normal)
 {
-
+	if (other->GetName() == "projectile") {
+		Projectile* projectile = ((Projectile*)other);
+		if (projectile->GetOwnerPlayerID() != playerID) {
+			DealDamage(projectile->GetDamage());
+		}
+	}
 }
 
 void Player::Update(float dt)
 {
 	timeSincePrevShot += dt;
+
+	if (currentPowerUp != PowerUpType::None) {
+		powerupTime -= dt;
+		if (powerupTime <= 0.0f)
+		{
+			ResetPowerUps();
+		}
+	}
+
 	if (camLocked)
 	{
 		camera->SetPosition(GetTransform().GetPosition() + Vector3(0, 3, 0));
@@ -41,7 +55,14 @@ void Player::Update(float dt)
 		physicsObject->SetGravity(true);
 	}
 
+	
 	force = Vector3(0, 0, 0);
+	
+	if (IsDead()) {
+		Respawn();
+	}
+
+	Debug::Print("Health: " + std::to_string(health), { 50.0f,90.0f });
 }
 
 float Player::CheckDistToGround()
@@ -63,8 +84,6 @@ float Player::CheckDistToGround()
 	return distToGround;
 }
 
-
-
 void Player::Fire() {
 	if (timeSincePrevShot > fireRate)
 	{
@@ -76,6 +95,19 @@ void Player::Fire() {
 		fired = false;
 	}
 
+}
+
+bool Player::IsDead(){
+	if (health <= 0.0f) {
+		std::cout << "I'm Dead" << std::endl;
+		return true;
+	}
+	return false;
+}
+
+void Player::Respawn(){
+	GetTransform().SetPosition(spawnPos);
+	health = maxHealth;
 }
 
 void Player::Reset() 
