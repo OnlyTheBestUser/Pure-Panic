@@ -267,7 +267,6 @@ void Renderer::Paint(const RenderObject* paintable, Vector3& barycentric, Vector
 	pi.texUV_a = texUV_a;
 	pi.texUV_b = texUV_b;
 	pi.texUV_c = texUV_c;
-	//pi.uv = GetUVCoord(paintable, pos); // convert from world to UV
 	pi.radius = radius;
 	pi.hardness = hardness;
 	pi.strength = strength;
