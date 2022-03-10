@@ -332,6 +332,7 @@ Vector2 CollisionDetection::GetUVFromRay(Ray ray, RenderObject obj)
 	Vector3 closestnorm;
 	float distance = FLT_MAX;
 
+#ifdef _WIN64
 	const MeshGeometry* mesh = obj.GetMesh();
 
 	const vector<unsigned int> indicies = mesh->GetIndexData();
@@ -385,6 +386,15 @@ Vector2 CollisionDetection::GetUVFromRay(Ray ray, RenderObject obj)
 	
 	// Clockwise = Normal up
 	Debug::DrawLine(test.GetPointOnPlane(), test.GetPointOnPlane() + test.GetNormal(), Vector4(1,1,0,1), 2.0f);
+
+
+
+#endif 
+
+#ifdef _ORBIS
+	PS4Mesh mesh = ((PS4Mesh&)*obj.GetMesh());
+#endif 
+
 
 	// Make ray triangle intersection
 	// loop through every triangle in the mesh and for each triangle do a ray triangle intersection, Find closest collision point to ray origin. 

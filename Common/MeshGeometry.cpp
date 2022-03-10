@@ -219,6 +219,19 @@ bool MeshGeometry::GetTriangleIndices(unsigned int i, int& ia, int& ib, int& ic)
 	return true;
 }
 
+bool MeshGeometry::GetTriangleUV(unsigned int i, Vector2& va, Vector2& vb, Vector2& vc) const {
+	bool hasTri = false;
+	unsigned int a, b, c;
+	hasTri = GetVertexIndicesForTri(i, a, b, c);
+	if (!hasTri) {
+		return false;
+	}
+	va = texCoords[a];
+	vb = texCoords[b];
+	vc = texCoords[c];
+	return true;
+}
+
 
 bool MeshGeometry::GetNormalForTri(unsigned int i, Vector3& n) const {
 	Vector3 a, b, c;

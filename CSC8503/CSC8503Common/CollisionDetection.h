@@ -2,6 +2,7 @@
 
 #include "../../Common/Camera.h"
 #include "../../Common/Plane.h"
+#include "../../Common/Vector2.h"
 
 #include "Transform.h"
 #include "GameObject.h"
@@ -33,6 +34,9 @@ namespace NCL {
 			Vector3 pos_a;
 			Vector3 pos_b;
 			Vector3 pos_c;
+			Vector2 texUV_a;
+			Vector2 texUV_b;
+			Vector2 texUV_c;
 		};
 
 		struct CollisionInfo {

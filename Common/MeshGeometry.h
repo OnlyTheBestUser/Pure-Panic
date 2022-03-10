@@ -88,9 +88,10 @@ namespace NCL {
 		}
 
 		void SetJointNames(std::vector < std::string > & newnames);
-
+		
 		bool GetTriangle(unsigned int i, Vector3& a, Vector3& b, Vector3& c) const;
 		bool GetTriangleIndices(unsigned int i, int& ia, int& ib, int& ic) const;
+		bool GetTriangleUV(unsigned int i, Vector2& va, Vector2& vb, Vector2& vc) const;
 		bool GetNormalForTri(unsigned int i, Vector3& n) const;
 		bool HasTriangle(unsigned int i) const;
 
