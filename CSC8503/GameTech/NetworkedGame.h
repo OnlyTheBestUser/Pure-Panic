@@ -30,8 +30,7 @@ namespace NCL {
 			void UpdateAsServer(float dt);
 			void UpdateAsClient(float dt);
 
-			void BroadcastSnapshot(bool deltaFrame);
-			void UpdateMinimumState();
+			void BroadcastSnapshot();
 			std::map<int, int> stateIDs;
 
 			GameServer* thisServer;
@@ -57,6 +56,8 @@ namespace NCL {
 			void HandleClientPacket(ClientPacket* packet);
 			void AddNewPlayerToServer(int clientID, int lastID);
 			void Fire(GameObject* owner, float pitch, int clientID);
+
+			bool CheckExists(IDPacket* packet);
 
 			void HandleFullState(FullPacket* packet);
 			void HandleFireState(FirePacket* packet);

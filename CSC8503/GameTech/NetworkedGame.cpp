@@ -27,11 +27,6 @@ NetworkedGame::NetworkedGame() {
 	NetworkBase::Initialise();
 	timeToNextPacket = 0.0f;
 	packetsToSnapshot = 0;
-
-	//for (int i = 0; i < 4; i++) {
-	//	networkObjects.push_back(0);
-	//}
-	//networkObjects.resize(4);
 }
 
 NetworkedGame::~NetworkedGame() {
@@ -58,14 +53,13 @@ void NetworkedGame::StartAsClient(char a, char b, char c, char d) {
 	thisClient->RegisterPacketHandler(Player_Connected, this);
 	thisClient->RegisterPacketHandler(Player_Disconnected, this);
 	thisClient->RegisterPacketHandler(Assign_ID, this);
-	//thisClient->RegisterPacketHandler(String_Message, this);
 
 	// Add one for the server
 	GameObject* serverPlayer = levelLoader->AddDummyPlayerToWorld(Vector3(0, 10, 0));
 	serverPlayer->SetNetworkObject(new NetworkObject(*serverPlayer, 0));
 	serverPlayer->SetDynamic(true);
 	if (networkObjects.size() <= 0) {
-		networkObjects.resize(1); // 4 max players
+		networkObjects.resize(1);
 	}
 	networkObjects[0] = (serverPlayer->GetNetworkObject());
 }
@@ -96,14 +90,6 @@ void NetworkedGame::UpdateGame(float dt) {
 
 void NetworkedGame::UpdateAsServer(float dt) {
 	thisServer->UpdateServer();
-	//packetsToSnapshot--;
-	//if (packetsToSnapshot < 0) {
-	//	BroadcastSnapshot(false);
-	//	packetsToSnapshot = 5;
-	//}
-	//else {
-	//	BroadcastSnapshot(true);
-	//}
 
 	if (localPlayer->IsFiring()) {
 		FirePacket* newPacket = new FirePacket();
@@ -113,7 +99,7 @@ void NetworkedGame::UpdateAsServer(float dt) {
 		delete newPacket;
 	}
 
-	BroadcastSnapshot(false);
+	BroadcastSnapshot();
 }
 
 void NetworkedGame::UpdateAsClient(float dt) {
@@ -140,8 +126,7 @@ void NetworkedGame::UpdateAsClient(float dt) {
 	thisClient->SendPacket(newPacket);
 }
 
-// what is happening here then?? Why not just have a list of network objects??
-void NetworkedGame::BroadcastSnapshot(bool deltaFrame) {
+void NetworkedGame::BroadcastSnapshot() {
 
 	std::vector<GameObject*>::const_iterator first;
 	std::vector<GameObject*>::const_iterator last;
@@ -153,76 +138,20 @@ void NetworkedGame::BroadcastSnapshot(bool deltaFrame) {
 		if (!o) {
 			continue;
 		}
-		//TODO - you'll need some way of determining
-		//when a player has sent the server an acknowledgement
-		//and store the lastID somewhere. A map between player
-		//and an int could work, or it could be part of a 
-		//NetworkPlayer struct.
-		//auto it = ackHistory.find(clientID);
-		//if (it == ackHistory.end())
-		//	continue;
-
-		//int playerState = it->second; // make map of clientID -> Last ACK
-
-		// TODO For the time being, just send full packets.
-
-		int playerState = 0;
 
 		GamePacket* newPacket = nullptr;
-		if (o->WritePacket(&newPacket, deltaFrame, playerState)) {
+		if (o->WritePacket(&newPacket)) {
 			thisServer->SendGlobalPacket(*newPacket);
 			delete newPacket;
 		}
 	}
 }
 
-void NetworkedGame::UpdateMinimumState() {
-	//Periodically remove old data from the server
-	int minID = INT_MAX;
-	int maxID = 0; //we could use this to see if a player is lagging behind?
-
-	for (auto i : stateIDs) {
-		minID = min(minID, i.second);
-		maxID = max(maxID, i.second);
-	}
-	//every client has acknowledged reaching at least state minID
-	//so we can get rid of any old states!
-	std::vector<GameObject*>::const_iterator first;
-	std::vector<GameObject*>::const_iterator last;
-	world->GetObjectIterators(first, last);
-
-	for (auto i = first; i != last; ++i) {
-		NetworkObject* o = (*i)->GetNetworkObject();
-		if (!o) {
-			continue;
-		}
-		o->UpdateStateHistory(minID); //clear out old states so they arent taking up memory...
-	}
-}
-
-
-
-
 void NetworkedGame::SpawnPlayer() {
 	localPlayer = player1;
 	localPlayer->SetNetworkObject(new NetworkObject(*localPlayer, playerID));
 	localPlayer->SetDynamic(true);
 	localPlayer->GetTransform().SetPosition(Vector3(playerID * 5, 10, 0));
-
-	// Fill
-	if (!(playerID < networkObjects.size())) {
-		networkObjects.resize(playerID + 1);
-	}
-	networkObjects[playerID] = (localPlayer->GetNetworkObject());
-	for (int i = 0; i < playerID; i++) {
-		if (!networkObjects[i]) {
-			GameObject* p = levelLoader->AddDummyPlayerToWorld(Vector3(i * 5, 10, 0));
-			p->SetDynamic(true);
-			p->GetPhysicsObject()->SetGravity(false);
-			p->SetNetworkObject(new NetworkObject(*p, i));
-			networkObjects[i] = p->GetNetworkObject();
-		}
-	}
 }
 
 void NetworkedGame::StartLevel() {
@@ -234,19 +163,24 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
 	if (type == Received_State) {
 		ClientPacket* realPacket = (ClientPacket*)payload;
 		HandleClientPacket(realPacket);
+		return;
 	}
+
+	if (type == Assign_ID) {
+		HandleAssignID((AssignIDPacket*)payload);
+		return;
+	}
+
+	if (!CheckExists((IDPacket*)payload))
+		return;
 
 	//CLIENT version of the game will receive these from the servers
 	switch (type) {
 	case(Full_State):
-		//std::cout << "Client: Received full_state message!" << std::endl;
 		HandleFullState((FullPacket*)payload);
 		break;
 	case(Fire_State):
 		HandleFireState((FirePacket*)payload);
-		break;
-	case(Assign_ID):
-		HandleAssignID((AssignIDPacket*)payload);
 		break;
 	case(Player_Connected):
 		HandlePlayerConnect((NewPlayerPacket*)payload);
@@ -319,13 +253,30 @@ void NetworkedGame::Fire(GameObject* owner, float pitch, int clientID)
 
 void NetworkedGame::HandleFullState(FullPacket* packet)
 {
-	if (packet->objectID == playerID)
+	if (packet->clientID == playerID)
 		return;
 
-	if (packet->objectID < (int)networkObjects.size()) {
-		if (networkObjects[packet->objectID])
-			networkObjects[packet->objectID]->ReadPacket(*packet);
+	if (packet->clientID < (int)networkObjects.size()) {
+		if (networkObjects[packet->clientID])
+			networkObjects[packet->clientID]->ReadPacket(*packet);
 	}
+}
+
+bool NCL::CSC8503::NetworkedGame::CheckExists(IDPacket* packet)
+{
+	if (packet->clientID == playerID)
+		return false;
+	if (!(packet->clientID < networkObjects.size())) {
+		networkObjects.resize(packet->clientID + 1);
+	}
+	if (!networkObjects[packet->clientID]) {
+		GameObject* p = levelLoader->AddDummyPlayerToWorld(Vector3(packet->clientID * 5, 10, 0));
+		p->SetDynamic(true);
+		p->GetPhysicsObject()->SetGravity(false);
+		p->SetNetworkObject(new NetworkObject(*p, packet->clientID));
+		networkObjects[packet->clientID] = p->GetNetworkObject();
+	}
+	return true;
 }
 
 void NetworkedGame::HandleFireState(FirePacket* packet)
@@ -339,25 +290,23 @@ void NetworkedGame::HandleFireState(FirePacket* packet)
 
 void NetworkedGame::HandleAssignID(AssignIDPacket* packet)
 {
-	std::cout << "ID Assigned: " << packet->playerID << std::endl;
-	playerID = packet->playerID;
+	std::cout << "ID Assigned: " << packet->clientID << std::endl;
+	playerID = packet->clientID;
 	SpawnPlayer();
 }
 
 void NetworkedGame::HandlePlayerConnect(NewPlayerPacket* packet)
 {
 	std::cout << "Client: New player connected!" << std::endl;
-	std::cout << "_Player ID: " << packet->playerID << std::endl;
-	//playerID = realPacket->playerID;
-	// Broadcast to everyone
+	std::cout << "_Player ID: " << packet->clientID << std::endl;
 
-	if (packet->playerID != playerID) {
+	if (packet->clientID != playerID) {
 		GameObject* newPlayer = levelLoader->AddDummyPlayerToWorld(Vector3(10, 15, 10));
-		newPlayer->SetNetworkObject(new NetworkObject(*newPlayer, packet->playerID));
+		newPlayer->SetNetworkObject(new NetworkObject(*newPlayer, packet->clientID));
 		newPlayer->SetDynamic(true);
 		std::cout << "Player Spawned with Network ID: " << newPlayer->GetNetworkObject()->GetNetID() << "." << std::endl;
-		if (!(packet->playerID < networkObjects.size())) {
-			networkObjects.resize(packet->playerID + 1);
+		if (!(packet->clientID < networkObjects.size())) {
+			networkObjects.resize(packet->clientID + 1);
 		}
 		networkObjects[newPlayer->GetNetworkObject()->GetNetID()] = (newPlayer->GetNetworkObject());
 	}

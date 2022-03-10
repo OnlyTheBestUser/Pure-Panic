@@ -38,6 +38,10 @@ struct GamePacket {
 	}
 };
 
+struct IDPacket : public GamePacket {
+	int clientID;
+};
+
 struct StringPacket : public GamePacket {
 	char	stringData[256];
 
@@ -55,42 +59,27 @@ struct StringPacket : public GamePacket {
 	}
 };
 
-struct NewPlayerPacket : public GamePacket {
-	int playerID;
+struct NewPlayerPacket : public IDPacket {
 	NewPlayerPacket(int p) {
 		type = BasicNetworkMessages::Player_Connected;
-		playerID = p;
+		clientID = p;
 		size = sizeof(int);
 	}
 };
 
-struct AssignIDPacket : public GamePacket {
-	int playerID;
+struct AssignIDPacket : public IDPacket {
 	int networkID;
 	AssignIDPacket(int p) {
 		type = BasicNetworkMessages::Assign_ID;
-		playerID = p;
+		clientID = p;
 		size = sizeof(int) * 2;
 	}
 };
 
-struct AckPacket : public GamePacket {
-	int clientID;
-	int ack;
-
-	AckPacket(int cID, int ackID) {
-		type = BasicNetworkMessages::Ack;
-		clientID = cID;
-		ack = ackID;
-		size = sizeof(int) * 2;
-	}
-};
-
-struct PlayerDisconnectPacket : public GamePacket {
-	int playerID;
+struct PlayerDisconnectPacket : public IDPacket {
 	PlayerDisconnectPacket(int p) {
 		type = BasicNetworkMessages::Player_Disconnected;
-		playerID = p;
+		clientID = p;
 		size = sizeof(int);
 	}
 };

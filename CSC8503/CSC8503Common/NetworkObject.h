@@ -4,8 +4,7 @@
 #include "NetworkState.h"
 namespace NCL {
 	namespace CSC8503 {
-		struct FullPacket : public GamePacket {
-			int		objectID = -1;
+		struct FullPacket : public IDPacket {
 			NetworkState fullState;
 
 			FullPacket() {
@@ -14,37 +13,12 @@ namespace NCL {
 			}
 		};
 
-		struct DeltaPacket : public GamePacket {
-			int		fullID = -1;
-			int		objectID = -1;
-			char	pos[3];
-			char	orientation[4];
-
-			DeltaPacket() {
-				type = Delta_State;
-				size = sizeof(DeltaPacket) - sizeof(GamePacket);
-			}
-		};
-
-		//struct ServerPacket : public GamePacket {
-		//	int		objectID;
-		//	bool	firing;
-		//	float	yaw, pitch;
-		//	float	pos[3];
-
-		//	ServerPacket() {
-		//		type = Server_State;
-		//		size = sizeof(ServerPacket);
-		//	}
-		//};
-
-		struct FirePacket : public GamePacket {
-			int		clientID;
+		struct FirePacket : public IDPacket {
 			float	pitch;
 
 			FirePacket() {
 				type = Fire_State;
-				size = sizeof(FirePacket);
+				size = sizeof(FirePacket) - sizeof(GamePacket);
 			}
 		};
 
@@ -54,7 +28,6 @@ namespace NCL {
 			float	pos[3];
 			float	pitch, yaw;
 			bool	firing;
-			//char	buttonstates[8];
 
 			ClientPacket() {
 				type = Received_State;
@@ -70,7 +43,7 @@ namespace NCL {
 			//Called by clients
 			virtual bool ReadPacket(GamePacket& p);
 			//Called by servers
-			virtual bool WritePacket(GamePacket** p, bool deltaFrame, int stateID);
+			virtual bool WritePacket(GamePacket** p);
 
 			void UpdateStateHistory(int minID);
 
@@ -84,10 +57,7 @@ namespace NCL {
 
 			bool GetNetworkState(int frameID, NetworkState& state);
 
-			virtual bool ReadDeltaPacket(DeltaPacket& p);
 			virtual bool ReadFullPacket(FullPacket& p);
-
-			virtual bool WriteDeltaPacket(GamePacket** p, int stateID);
 			virtual bool WriteFullPacket(GamePacket** p);
 
 			NetworkState lastFullState;

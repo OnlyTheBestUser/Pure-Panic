@@ -533,10 +533,7 @@ Projectile* LevelLoader::SpawnProjectile(Player* owner, const float& initialSpee
 Projectile* LevelLoader::SpawnProjectile(GameObject* owner, float pitch, const float& initialSpeed, const float& meshSize)
 {
 	float inverseMass = 1.0f;
-	//Vector3 camForwardVector = owner->GetCamFrontVec();
-	//Vector3 GetCamFrontVec() {
-	//	return (Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Matrix4::Rotation(camera->GetPitch(), Vector3(1, 0, 0)) * Vector3(0, 0, -1)).Normalised();
-	//}
+
 	Vector3 ownerRot = owner->GetTransform().GetOrientation().ToEuler();
 
 	Vector3 camForwardVector = (Matrix4::Rotation(ownerRot.y, Vector3(0,1,0)) * Matrix4::Rotation(pitch, Vector3(1,0,0)) * Vector3(0,0,-1)).Normalised();
