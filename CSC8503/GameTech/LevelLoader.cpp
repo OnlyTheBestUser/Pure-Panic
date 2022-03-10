@@ -318,7 +318,7 @@ GameObject* LevelLoader::AddPaintWallToWorld(const Vector3& position, Vector3 di
 	cube->GetPhysicsObject()->InitCubeInertia();
 
 	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	cube->SetDynamic(false);
+	cube->GetPhysicsObject()->SetDynamic(false);
 	world->AddGameObject(cube);
 	return cube;
 }

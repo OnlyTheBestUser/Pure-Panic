@@ -88,13 +88,13 @@ TutorialGame::TutorialGame()	{
 	Command* toggleDebug = new ToggleBoolCommand(&debugDraw);
 	Command* togglePause = new ToggleBoolCommand(&pause);
 	Command* quitCommand = new QuitCommand(&quit, &pause);
-	Command* paintFireCommand = new FireCommand(this);
+	//Command* paintFireCommand = new PaintFireCommand(this);
 	Command* startTimer = new StartTimerCommand(timer);
 	inputHandler->BindButton(TOGGLE_GRAV, toggleGrav);
 	inputHandler->BindButton(TOGGLE_DEBUG, toggleDebug);
 	inputHandler->BindButton(TOGGLE_PAUSE, togglePause);
 	inputHandler->BindButton(QUIT, quitCommand);
-	inputHandler->BindButton(FIRE, paintFireCommand);
+	//inputHandler->BindButton(FIRE, paintFireCommand);
 	inputHandler->BindButton(START_TIMER, startTimer);
 
 #pragma endregion
@@ -518,10 +518,6 @@ void TutorialGame::UpdateBGM() {
 
 #endif // !_ORBIS
 }
-
-void TutorialGame::PaintSelectedObject() {
-	if (!selectionObject)
-		return;
 
 void TutorialGame::PaintObject() {
 
