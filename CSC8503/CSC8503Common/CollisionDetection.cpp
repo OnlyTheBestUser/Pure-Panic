@@ -393,6 +393,20 @@ Vector2 CollisionDetection::GetUVFromRay(Ray ray, RenderObject obj)
 	return Vector2();
 }
 
+Vector2 CollisionDetection::CalcTriBaryCoord(const Triangle& t, const Vector3& point) {
+	Vector3 barCoords;
+	Vector3 v0 = t.texUV_a - t.texUV_b;
+	Vector3 v1 = t.texUV_c - t.texUV_a;
+	Vector3 v2 = point - t.texUV_a;
+	float d = v0.x * v1.y - v1.x * v0.y;
+
+	barCoords.x = (v2.x * v1.y - v1.x * v2.y) / d;
+	barCoords.y = (v0.x * v2.y - v2.x * v0.y) / d;
+	barCoords.z = 1.0f - barCoords.x - barCoords.y;
+
+	return barCoords;
+}
+
 /*
 If you've read through the Deferred Rendering tutorial you should have a pretty
 good idea what this function does. It takes a 2D position, such as the mouse
