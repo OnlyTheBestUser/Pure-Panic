@@ -210,6 +210,18 @@
     <ClInclude Include="PS4Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <WavePsslc Include="..\..\Assets\Shaders\PS4\DebugPixel.pssl">
+      <Profile Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">PS</Profile>
+      <Profile Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">PS</Profile>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">-cache</AdditionalOptions>
+      <OutputFileName Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">$(SolutionDir)Assets\Shaders\PS4\%(FileName).sb</OutputFileName>
+    </WavePsslc>
+    <WavePsslc Include="..\..\Assets\Shaders\PS4\DebugVertex.pssl">
+      <Profile Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">VSVS</Profile>
+      <Profile Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">VSVS</Profile>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">-cache</AdditionalOptions>
+      <OutputFileName Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">$(SolutionDir)Assets\Shaders\PS4\%(FileName).sb</OutputFileName>
+    </WavePsslc>
     <WavePsslc Include="..\..\Assets\Shaders\PS4\PixelShader.pssl">
       <Profile Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">PS</Profile>
       <OutputFileName Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">$(SolutionDir)Assets\Shaders\PS4\%(FileName).sb</OutputFileName>

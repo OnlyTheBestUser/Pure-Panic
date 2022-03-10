@@ -39,11 +39,12 @@ void PS4Shader::BindShader() {
 
 void NCL::PS4::PS4Shader::UpdateUniformInt(std::string uniform, const int f)
 {
-	float* uniformFloat = (float*)((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->allocateFromCommandBuffer(sizeof(float), Gnm::kEmbeddedDataAlignment4);
-	*uniformFloat = f;
+	int* uniformInt = (int*)((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->allocateFromCommandBuffer(sizeof(int)
+		, Gnm::kEmbeddedDataAlignment16);
+	*uniformInt = f;
 
 	Gnm::Buffer constantBuffer;
-	constantBuffer.initAsConstantBuffer(uniformFloat, sizeof(float));
+	constantBuffer.initAsConstantBuffer(uniformInt, sizeof(int));
 	constantBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
 
 	UpdateAllUniform(uniform, constantBuffer);

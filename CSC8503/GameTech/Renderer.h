@@ -55,7 +55,6 @@ namespace NCL {
 			FrameBufferBase* shadowFBO;
 			ShaderBase* shadowShader;
 
-			FrameBufferBase* maskFBO;
 			ShaderBase* maskShader;
 
 			ShaderBase* skyboxShader;

@@ -91,7 +91,6 @@ Renderer::~Renderer() {
 	delete skyboxMesh;
 	delete skyboxTex;
 
-	delete maskFBO;
 	delete maskShader;
 }
 
@@ -114,9 +113,7 @@ void Renderer::Render() {
 	rendererAPI->SetCullFace(false);
 
 	rendererAPI->EndFrame();
-#ifdef _WIN64
 	DrawDebugData();
-#endif
 	rendererAPI->SwapBuffers();
 }
 
@@ -267,15 +264,14 @@ void Renderer::ApplyPaintToMasks() {
 #ifdef _WIN64
 	rendererAPI->SetDepth(false);
 	rendererAPI->SetBlend(true, RendererAPI::BlendType::ONE, RendererAPI::BlendType::ALPHA);
-	glBlendFunc(GL_ONE, GL_SRC_ALPHA);
 
 	maskShader->BindShader();
 
 	Vector2 currentSize;
 	for (const auto& i : paintInstances) {
 		if (i.object->GetPaintMask() == 0) continue;
-		maskFBO = new OGLFrameBuffer();
-		maskFBO->AddTexture((OGLTexture*)(i.object->GetPaintMask()));
+		OGLFrameBuffer maskFBO;
+		maskFBO.AddTexture((OGLTexture*)(i.object->GetPaintMask()));
 
 		if (Vector2(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight()) != currentSize) {
 			currentSize = Vector2(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight());
@@ -286,10 +282,9 @@ void Renderer::ApplyPaintToMasks() {
 
 		// Update uniforms here
 
-		rendererAPI->BindFrameBuffer(maskFBO);
+		rendererAPI->BindFrameBuffer(&maskFBO);
 
 		rendererAPI->DrawMesh(skyboxMesh);
-		delete maskFBO;
 	}
 	rendererAPI->SetBlend(false, RendererAPI::BlendType::ONE, RendererAPI::BlendType::NONE);
 	rendererAPI->SetDepth(true);

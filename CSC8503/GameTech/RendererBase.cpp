@@ -1,4 +1,6 @@
 #include "../../Plugins/PlayStation4/PS4RendererAPI.h"
+#include "../../Plugins/PlayStation4/PS4Shader.h"
+#include "../../Plugins/PlayStation4/PS4Mesh.h"
 #include "RendererBase.h"
 #include "../../Plugins/OpenGLRendering/OGLRendererAPI.h"
 #include "../../Plugins/OpenGLRendering/OGLFrameBuffer.h"
@@ -10,7 +12,8 @@
 #include "../../Common/TextureLoader.h"
 
 #include "../../Common/MeshGeometry.h"
-#include "../../Plugins/PlayStation4/PS4Mesh.h"
+#include "../../Common/Assets.h"
+
 using namespace NCL;
 using namespace Rendering;
 
@@ -55,9 +58,28 @@ RendererBase::RendererBase() {
 
 	TextureLoader::RegisterAPILoadFunction(PS4::PS4Texture::LoadTextureFromFile);
 
-	debugLinesMesh = PS4::PS4Mesh::GenerateQuad();
-	debugTextMesh = PS4::PS4Mesh::GenerateQuad();
+	font = new SimpleFont("PressStart2P.fnt", "PressStart2P.gnf");
 
+	debugShader = PS4::PS4Shader::GenerateShader(
+		Assets::SHADERDIR + "PS4/DebugVertex.sb",
+		Assets::SHADERDIR + "PS4/DebugPixel.sb"
+	);
+
+	debugLinesMesh = new PS4::PS4Mesh();
+	debugTextMesh = new PS4::PS4Mesh();
+
+	int test = 72;
+	debugLinesMesh->SetVertexPositions(std::vector<Vector3>(test, Vector3()));
+	debugLinesMesh->SetVertexColours(std::vector<Vector4>(test, Vector4()));
+	debugLinesMesh->SetVertexTextureCoords(std::vector<Vector2>(test, Vector2()));
+	debugLinesMesh->SetVertexNormals(std::vector<Vector3>(test, Vector3()));
+	debugLinesMesh->SetVertexTangents(std::vector<Vector4>(test, Vector4()));
+
+	debugTextMesh->SetVertexPositions(std::vector<Vector3>(test, Vector3()));
+	debugTextMesh->SetVertexColours(std::vector<Vector4>(test, Vector4()));
+	debugTextMesh->SetVertexTextureCoords(std::vector<Vector2>(test, Vector2()));
+	debugTextMesh->SetVertexNormals(std::vector<Vector3>(test, Vector3()));
+	debugTextMesh->SetVertexTangents(std::vector<Vector4>(test, Vector4()));
 
 #endif
 	debugTextMesh->UploadToGPU(rendererAPI);
@@ -75,7 +97,6 @@ RendererBase::~RendererBase() {
 
 	delete debugShader;
 }
-
 
 void RendererBase::DrawString(const std::string& text, const Maths::Vector2& pos, const Maths::Vector4& colour, float size) {
 	DebugString s;
@@ -95,6 +116,7 @@ void RendererBase::DrawLine(const Maths::Vector3& start, const Maths::Vector3& e
 }
 
 void RendererBase::DrawDebugData() {
+
 	if (debugStrings.empty() && debugLines.empty()) {
 		return; //don't mess with OGL state if there's no point!
 	}
@@ -107,7 +129,7 @@ void RendererBase::DrawDebugData() {
 
 	Matrix4 pMat;
 
-	font->GetTexture()->Bind(0);
+	font->GetTexture()->Bind(10);
 
 	if (debugLines.size() > 0) {
 		pMat = SetupDebugLineMatrix();
@@ -133,20 +155,26 @@ void RendererBase::DrawDebugStrings() {
 	vector<Vector3> vertPos;
 	vector<Vector2> vertTex;
 	vector<Vector4> vertColours;
+	vector<unsigned int> vertIndices;
 
 	if (debugStrings.size() > 100) {
 		bool a = true;
 	}
 
+
 	for (DebugString& s : debugStrings) {
 		font->BuildVerticesForString(s.text, s.pos, s.colour, s.size, vertPos, vertTex, vertColours);
 	}
 
+	for (int i = 0; i < debugTextMesh->GetVertexCount(); ++i) {
+		vertIndices.emplace_back(i);
+	}
+
 	debugTextMesh->SetVertexPositions(vertPos);
 	debugTextMesh->SetVertexTextureCoords(vertTex);
+	//debugTextMesh->SetVertexIndices(vertIndices);
 	debugTextMesh->SetVertexColours(vertColours);
 	debugTextMesh->UpdateGPUBuffers(0, vertPos.size());
-
 
 	rendererAPI->DrawMesh(debugTextMesh);
 
@@ -156,10 +184,15 @@ void RendererBase::DrawDebugStrings() {
 void RendererBase::DrawDebugLines() {
 	vector<Vector3> vertPos;
 	vector<Vector4> vertCol;
+	vector<unsigned int> vertIndices;
 
+	int indices = 0;
 	for (DebugLine& s : debugLines) {
 		vertPos.emplace_back(s.start);
 		vertPos.emplace_back(s.end);
+
+		vertIndices.emplace_back(++indices);
+		vertIndices.emplace_back(++indices);
 
 		vertCol.emplace_back(s.colour);
 		vertCol.emplace_back(s.colour);
@@ -167,6 +200,7 @@ void RendererBase::DrawDebugLines() {
 
 	debugLinesMesh->SetVertexPositions(vertPos);
 	debugLinesMesh->SetVertexColours(vertCol);
+	debugLinesMesh->SetVertexIndices(vertIndices);
 	debugLinesMesh->UpdateGPUBuffers(0, vertPos.size());
 
 	rendererAPI->DrawMesh(debugLinesMesh);
