@@ -1,9 +1,14 @@
 #version 330 core
 
-uniform  mat4  modelMatrix;
-uniform vec3  painterPosition;
-uniform vec2 nearTexCoord;
-uniform vec2 textureSize;
+uniform mat4  modelMatrix;
+
+uniform vec3  barycentricCoord;
+uniform vec3  collisionPoint;
+uniform vec2  nearTexCoord_a;
+uniform vec2  nearTexCoord_b;
+uniform vec2  nearTexCoord_c;
+
+uniform vec2  textureSize;
 uniform float textureScale;
 uniform float radius;
 uniform float hardness;
@@ -29,10 +34,14 @@ float mask(vec3 _position, vec3 _center, float _radius, float _hardness){
 void main(void)	{
 // This world possition is the position of verticies not fragments.
 
+
+
+
+
     vec2 fragCoordScaled = (gl_FragCoord.xy/textureSize.x);
-    vec3 fragWorldPos = (modelMatrix * vec4(-fragCoordScaled.x, painterPosition.y , -fragCoordScaled.y, 1.0)).xyz;
+    vec3 fragWorldPos = (modelMatrix * vec4(-fragCoordScaled.x, barycentricCoord.y , -fragCoordScaled.y, 1.0)).xyz;
     //float f = mask(fragWorldPos, (painterPosition-(vec3(textureSize.x, 0, textureSize.y)/2)) - vec3(radius, 0 , radius), radius, hardness);
-    float f = mask(fragWorldPos + vec3(textureSize.x,0,textureSize.y)/1.6, painterPosition, radius, hardness);
+    float f = mask(fragWorldPos + vec3(textureSize.x,0,textureSize.y)/1.6, vec3(collisionPoint.x, collisionPoint.z, 1), radius, hardness);
 
     float edge = f * strength;
 

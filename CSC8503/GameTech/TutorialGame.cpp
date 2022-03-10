@@ -475,10 +475,12 @@ void TutorialGame::PaintObject() {
 		Debug::DrawSphere(closestCollision.collidedAt, 0.5, Vector4(1,0,0,1), 0.f);
 		if (test) {
 			
-			CollisionDetection::GetUVFromRay(ray, *test);
+			Vector2 texUV_a, texUV_b, texUV_c;
+			Vector3 collisionPoint;
+			Vector3 Barycentric = CollisionDetection::GetBarycentricFromRay(ray, *test, texUV_a, texUV_b, texUV_c, collisionPoint);
 			
 			// Get the uv from the ray
-			renderer->Paint(test, closestCollision.collidedAt, 1, 0.5, 0.5, Vector4(0.3, 0, 0.5, 1));
+			renderer->Paint(test, Barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, 1, 0.5, 0.5, Vector4(0.3, 0, 0.5, 1));
 		}
 	}
 }

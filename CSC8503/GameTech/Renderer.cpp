@@ -258,12 +258,16 @@ void Renderer::RenderObjects() {
 	*/
 }
 
-void Renderer::Paint(const RenderObject* paintable, NCL::Maths::Vector3 pos, float radius, float hardness, float strength, NCL::Maths::Vector4 colour)
+void Renderer::Paint(const RenderObject* paintable, Vector3& barycentric, Vector3& colpos, Vector2& texUV_a, Vector2& texUV_b, Vector2& texUV_c, float radius, float hardness, float strength, NCL::Maths::Vector4 colour)
 {
 	PaintInstance pi;
 	pi.object = paintable;
-	pi.pos = pos;
-	pi.uv = GetUVCoord(paintable, pos); // convert from world to UV
+	pi.barycentric = barycentric;
+	pi.colPoint = colpos;
+	pi.texUV_a = texUV_a;
+	pi.texUV_b = texUV_b;
+	pi.texUV_c = texUV_c;
+	//pi.uv = GetUVCoord(paintable, pos); // convert from world to UV
 	pi.radius = radius;
 	pi.hardness = hardness;
 	pi.strength = strength;
@@ -295,12 +299,15 @@ void Renderer::ApplyPaintToMasks() {
 
 		// Update uniforms here
 		rendererAPI->UpdateUniformMatrix4(maskShader, "modelMatrix", i.object->GetTransform()->GetMatrix());
-		rendererAPI->UpdateUniformVector3(maskShader, "painterPosition", i.pos);
-		rendererAPI->UpdateUniformVector2(maskShader, "nearTexCoord", i.uv);
+		rendererAPI->UpdateUniformVector3(maskShader, "barycentricCoord", i.barycentric);
+		rendererAPI->UpdateUniformVector3(maskShader, "collisionPoint", i.colPoint);
+		rendererAPI->UpdateUniformVector2(maskShader, "nearTexCoord_a", i.texUV_a);
+		rendererAPI->UpdateUniformVector2(maskShader, "nearTexCoord_b", i.texUV_b);
+		rendererAPI->UpdateUniformVector2(maskShader, "nearTexCoord_c", i.texUV_c);
 		rendererAPI->UpdateUniformVector2(maskShader, "textureSize", Vector2(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight()));
 		float scale = 400.0f / (400.0f / 1.0f);
 		rendererAPI->UpdateUniformFloat(maskShader, "textureScale", scale);
-		rendererAPI->UpdateUniformFloat(maskShader, "radius", 20.0f);
+		rendererAPI->UpdateUniformFloat(maskShader, "radius", 5.0f);
 		rendererAPI->UpdateUniformFloat(maskShader, "hardness", i.hardness);
 		rendererAPI->UpdateUniformFloat(maskShader, "strength", i.strength);
 		rendererAPI->UpdateUniformVector4(maskShader, "colour", i.colour);

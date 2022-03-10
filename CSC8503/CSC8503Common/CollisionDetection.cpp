@@ -315,25 +315,18 @@ Matrix4::Rotation(pitch, Vector3(1, 0, 0));
 return iview;
 }
 
-Vector2 CollisionDetection::GetUVFromRay(Ray ray, RenderObject obj)
+Vector3 CollisionDetection::GetBarycentricFromRay(Ray ray, RenderObject obj, Vector2& va, Vector2& vb, Vector2& vc, Vector3& collisionPoint)
 {
 	Quaternion orientation = obj.GetTransform()->GetOrientation();
 	Vector3 position = obj.GetTransform()->GetPosition();
 
-	Matrix3 transform = Matrix3(orientation);
-	Matrix3 invTransform = Matrix3(orientation.Conjugate());
+	Triangle	closest;
+	Vector3		closestnorm;
+	Vector3		closestcollision;
 
-	// Ray to local space
-	Vector3 localRayPos = ray.GetPosition() - position;
-	Ray tempRay(invTransform * localRayPos, invTransform * ray.GetDirection());
-
-	// closest triangle
-	Triangle closest;
-	Vector3 closestnorm;
 	float distance = FLT_MAX;
-
+	
 	const MeshGeometry* mesh = obj.GetMesh();
-
 	const vector<unsigned int> indicies = mesh->GetIndexData();
 
 	for (int i = 0; i < (indicies.size()) / 3; i++) {
@@ -345,8 +338,8 @@ Vector2 CollisionDetection::GetUVFromRay(Ray ray, RenderObject obj)
 		mesh->GetTriangleIndices(i, tri.ind_a, tri.ind_b, tri.ind_c);
 		mesh->GetTriangleUV(i, tri.texUV_a, tri.texUV_b, tri.texUV_c);
 		
-		RayCollision collision;
 		Vector3 norm;
+		RayCollision collision;
 
 		mesh->GetNormalForTri(i, norm);
 
@@ -361,36 +354,25 @@ Vector2 CollisionDetection::GetUVFromRay(Ray ray, RenderObject obj)
 			if (i == 0) {
 				closest = tri;
 				closestnorm = norm;
+				closestcollision = collision.collidedAt;
 				distance = rayDist;
 			}
 			else if (rayDist < distance) {
 				closest = tri;
 				closestnorm = norm;
+				closestcollision = collision.collidedAt;
 				distance = rayDist;
 			}
 		}
 	}
 
-	Debug::DrawTriangle(closest.pos_a,closest.pos_b, closest.pos_c);
+	Debug::DrawTriangle(closest.pos_a, closest.pos_b, closest.pos_c, Vector4(1,1,1,1));
+	va = closest.texUV_a;
+	vb = closest.texUV_b;
+	vc = closest.texUV_c;
+	collisionPoint = closestcollision;
 
-	Plane p1 = Plane::PlaneFromTri(closest.pos_a, closest.pos_b, closest.pos_a + closestnorm);
-	Plane p2 = Plane::PlaneFromTri(closest.pos_b, closest.pos_c, closest.pos_b + closestnorm);
-	Plane p3 = Plane::PlaneFromTri(closest.pos_c, closest.pos_a, closest.pos_c + closestnorm);
-
-	//Debug::DrawPlane(closest.pos_a, p1.GetNormal(), 5, Vector4(1,0,0,1));
-	//Debug::DrawPlane(closest.pos_b, p2.GetNormal(), 5, Vector4(1,0,1,1));
-	//Debug::DrawPlane(closest.pos_c, p3.GetNormal(), 5, Vector4(0,0,1,1));
-
-	Plane test = Plane::PlaneFromTri(Vector3(0, 0, 1), Vector3(1, 0, 0), Vector3(0, 0, 0));
-	
-	// Clockwise = Normal up
-	Debug::DrawLine(test.GetPointOnPlane(), test.GetPointOnPlane() + test.GetNormal(), Vector4(1,1,0,1), 2.0f);
-
-	// Make ray triangle intersection
-	// loop through every triangle in the mesh and for each triangle do a ray triangle intersection, Find closest collision point to ray origin. 
-	// using that point we know what triangle its a part of, now just find out where ray hits on the trinalgle. do baryocentric to get pos then interpolate between UV on the triangle.
-
-	return Vector2();
+	return CalcTriBaryCoord(closest, closestcollision);
 }
 
 Vector2 CollisionDetection::CalcTriBaryCoord(const Triangle& t, const Vector3& point) {

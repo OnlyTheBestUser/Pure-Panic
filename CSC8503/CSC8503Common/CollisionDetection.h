@@ -145,7 +145,7 @@ namespace NCL {
 		static Vector3		UnprojectScreenPosition(Vector3 position, float aspect, float fov, const Camera &c);
 		static Matrix4		GenerateInverseProjection(float aspect, float fov, float nearPlane, float farPlane);
 		static Matrix4		GenerateInverseView(const Camera &c);
-		static Vector2		GetUVFromRay(Ray ray, RenderObject obj);
+		static Vector3		GetBarycentricFromRay(Ray ray, RenderObject obj, Vector2& va, Vector2& vb, Vector2& vc, Vector3& collisionPoint);
 
 	protected:
 	
