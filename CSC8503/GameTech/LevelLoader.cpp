@@ -23,7 +23,7 @@
 using namespace NCL;
 using namespace CSC8503;
 
-LevelLoader::LevelLoader(GameWorld* world, PhysicsSystem* physics) : world(world), physics(physics) {
+LevelLoader::LevelLoader(GameWorld* world, PhysicsSystem* physics, Renderer* renderer) : world(world), physics(physics), renderer(renderer) {
 	auto loadFunc = [](const string& name, MeshGeometry** into) {
 #ifdef _ORBIS
 		* into = new PS4::PS4Mesh(name);

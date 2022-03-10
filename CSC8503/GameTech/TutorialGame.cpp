@@ -32,7 +32,7 @@ TutorialGame::TutorialGame()	{
 #endif
 
 	paintManager = PaintManager::GetInstance();
-	levelLoader = new LevelLoader(world, physics);
+	levelLoader = new LevelLoader(world, physics, renderer);
 
 	forceMagnitude = 30.0f;
 	useGravity = true;

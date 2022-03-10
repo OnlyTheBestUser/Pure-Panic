@@ -12,7 +12,7 @@ namespace NCL {
 	namespace CSC8503 {
 		class LevelLoader {
 		public:
-			LevelLoader(GameWorld* world, PhysicsSystem* physics);
+			LevelLoader(GameWorld* world, PhysicsSystem* physics, Renderer* renderer);
 			~LevelLoader();
 
 			void ReadInLevelFile(std::string filename);
@@ -45,6 +45,7 @@ namespace NCL {
 
 			GameWorld*     world;
 			PhysicsSystem* physics;
+			Renderer* renderer;
 
 			ShaderBase*	  basicShader				= nullptr;
 			TextureBase*  basicTex					= nullptr;
