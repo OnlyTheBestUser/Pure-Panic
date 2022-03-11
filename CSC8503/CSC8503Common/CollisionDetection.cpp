@@ -6,8 +6,7 @@
 #include "../../Common/Vector2.h"
 #include "../../Common/Window.h"
 #include "../../Common/Maths.h"
-#include "../../OpenGLRendering/OGLMesh.h"
-#include "../../PlayStation4/PS4Mesh.h"
+#include "../../Common/MeshGeometry.h"
 #include "Debug.h"
 
 #include <list>

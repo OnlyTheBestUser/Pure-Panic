@@ -3,11 +3,11 @@
 #include "PS4RendererAPI.h"
 namespace NCL {
 	namespace PS4 {
-		class PS4UniformBuffer : NCL::Rendering::UniformBuffer
+		class PS4UniformBuffer : public NCL::Rendering::UniformBuffer
 		{
 		friend class PS4RendererAPI;
 		public:
-			PS4UniformBuffer(PS4RendererAPI* renderer, uint32_t size);
+			PS4UniformBuffer(uint32_t size);
 			virtual ~PS4UniformBuffer();
 
 
@@ -15,7 +15,7 @@ namespace NCL {
 
 		private:
 			void* data;
-			PS4RendererAPI* renderer;
+			Gnm::Buffer constantBuffer;
 		};
 	}
 }

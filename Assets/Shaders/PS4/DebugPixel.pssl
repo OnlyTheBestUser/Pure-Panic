@@ -1,0 +1,31 @@
+ConstantBuffer useTexture
+{
+	int m_UseTexture;
+};
+
+SamplerState samp0 : register(s10);
+
+Texture2D debugTex : register( t10 );
+
+struct VS_OUTPUT
+{
+	float4 Position		: S_POSITION;
+	float3 Color		: TEXCOORD0;
+	float2 UV			: TEXCOORD1;
+};
+
+float4 main(VS_OUTPUT In) : S_TARGET_OUTPUT
+{
+	if (m_UseTexture == 0){
+		return float4(In.Color,1.0);
+	} else {
+		float alpha = debugTex.Sample(samp0, In.UV).r;
+
+		if (alpha < 0.0001f){
+			discard;
+		}
+
+		return float4(In.Color,1.0) * float4(1.0,1.0,1.0,alpha);
+	
+	}
+}

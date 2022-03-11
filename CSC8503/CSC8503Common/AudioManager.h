@@ -27,7 +27,6 @@
 using namespace NCL::Maths;
 
 namespace NCL {
-	namespace CSC8503 {
 		class AudioManager
 		{
 			//Singleton AudioManager, should be called by anything that wants
@@ -76,7 +75,6 @@ namespace NCL {
 			FMOD_VECTOR*			VectorToFMODVector(const Vector3& v);
 		};
 	}
-}
 
 #endif //Not On PS4
 

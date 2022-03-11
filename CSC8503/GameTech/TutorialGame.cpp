@@ -4,6 +4,8 @@
 #include "../../Common/MeshGeometry.h"
 
 #include "../../Common/Quaternion.h"
+#include "../CSC8503Common/CollisionDetection.h"
+#include "../CSC8503Common/Timer.h"
 
 #include "../CSC8503Common/InputHandler.h"
 #include "../CSC8503Common/GameActor.h"
@@ -22,7 +24,7 @@ TutorialGame::TutorialGame()	{
 	levelLoader		= new LevelLoader(world, physics, renderer);
 
 #ifndef _ORBIS
-	audio = audio->GetInstance();
+	audio = NCL::AudioManager::GetInstance();
 	audio->Initialize();
 	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_01.ogg", true, false, false);
 	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_02.ogg", true, false, false);
