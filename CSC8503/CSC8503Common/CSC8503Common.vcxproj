@@ -238,7 +238,6 @@
     <ClInclude Include="NetworkObject.h" />
     <ClInclude Include="NetworkState.h" />
     <ClInclude Include="OBBVolume.h" />
-    <ClInclude Include="PaintManager.h" />
     <ClInclude Include="PCInput.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PowerUp.h" />
@@ -283,7 +282,6 @@
     <ClCompile Include="NetworkBase.cpp" />
     <ClCompile Include="NetworkObject.cpp" />
     <ClCompile Include="NetworkState.cpp" />
-    <ClCompile Include="PaintManager.cpp" />
     <ClCompile Include="PCInput.cpp" />
     <ClCompile Include="PhysicsObject.cpp" />
     <ClCompile Include="PhysicsSystem.cpp" />

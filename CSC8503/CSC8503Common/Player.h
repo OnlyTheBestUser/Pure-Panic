@@ -157,7 +157,6 @@ namespace NCL {
 			bool fired = false;
 
 			LevelLoader* levelLoader;
-			
         };
     }
 }
