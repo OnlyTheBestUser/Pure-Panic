@@ -24,7 +24,7 @@ TutorialGame::TutorialGame()	{
 	paintManager	= PaintManager::GetInstance();
 
 #ifndef _ORBIS
-	audio = audio->GetInstance();
+	audio = NCL::AudioManager::GetInstance();
 	audio->Initialize();
 	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_01.ogg", true, false, false);
 	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_02.ogg", true, false, false);

@@ -1,5 +1,8 @@
 #include "Projectile.h"
 #include "../GameTech/Renderer.h"
+#include "../CSC8503Common/AudioManager.h"
+#include "../../Common/Assets.h"
+
 
 void Projectile::Update(float dt) {
 	Vector3 velocityDir = (this->GetPhysicsObject()->GetLinearVelocity()).Normalised();
@@ -13,6 +16,11 @@ void Projectile::Update(float dt) {
 }
 
 void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vector3 localB, Vector3 normal) {
+#ifndef _ORBIS
+	int soundToPlay = rand() % 2;
+	NCL::AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + (soundToPlay == 0 ? "splat_neutral_01.ogg" : "splat_neutral_02.ogg"), this->GetTransform().GetPosition());
+#endif // !_ORBIS
+
 	Ray ray(this->GetTransform().GetPosition(), -this->GetPhysicsObject()->GetLinearVelocity());
 	ray.SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
 	//Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
