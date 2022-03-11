@@ -585,7 +585,7 @@ Projectile* LevelLoader::SpawnProjectile(GameObject* owner, float pitch, const f
 
 	projectile->GetPhysicsObject()->SetLinearDamping(0.1f);
 	projectile->GetPhysicsObject()->SetDynamic(true);
-	projectile->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
+	projectile->SetCollisionLayers(CollisionLayer::LAYER_FIVE);
 
 	world->AddGameObject(projectile);
 

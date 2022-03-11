@@ -13,12 +13,11 @@ void Projectile::Update(float dt) {
 }
 
 void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vector3 localB, Vector3 normal) {
-
 	Ray ray(this->GetTransform().GetPosition(), -this->GetPhysicsObject()->GetLinearVelocity());
-	ray.SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	ray.SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
 	//Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
 	RayCollision closestCollision;
-	if (gameWorld.RaycastIgnoreObject(this, ray, closestCollision, true)) {
+	if (gameWorld.Raycast(ray, closestCollision, true)) {
 		RenderObject* test = ((GameObject*)closestCollision.node)->GetRenderObject();
 		
 			//Debug::DrawLine(ray.GetPosition(), ray.GetPosition() * ray.GetDirection());

@@ -21,8 +21,6 @@ using namespace NCL;
 using namespace Rendering;
 using namespace CSC8503;
 
-
-
 Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 #ifdef _WIN64
 
@@ -250,12 +248,6 @@ void Renderer::RenderObjects() {
 
 		rendererAPI->DrawMeshAndSubMesh((*i).GetMesh());
 	}
-
-	/* 
-	* Go through all paint instances <- struct of all information from paint method
-	* bind paint shader 
-	* draw each object that is part
-	*/
 }
 
 void Renderer::Paint(const RenderObject* paintable, Vector3& barycentric, Vector3& colpos, Vector2& texUV_a, Vector2& texUV_b, Vector2& texUV_c, float radius, float hardness, float strength, NCL::Maths::Vector4 colour)

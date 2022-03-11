@@ -20,7 +20,6 @@ TutorialGame::TutorialGame()	{
 	renderer		= new Renderer(*world);
 	physics			= new PhysicsSystem(*world);
 	paintManager	= PaintManager::GetInstance();
-	levelLoader		= new LevelLoader(world, physics, renderer);
 
 #ifndef _ORBIS
 	audio = audio->GetInstance();

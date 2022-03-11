@@ -370,7 +370,7 @@ bool CollisionDetection::GetBarycentricFromRay(const Ray ray, const RenderObject
 		return false;
 	}
 
-	Debug::DrawTriangle(closest.pos_a, closest.pos_b, closest.pos_c, Vector4(1,1,1,1));
+	//Debug::DrawTriangle(closest.pos_a, closest.pos_b, closest.pos_c, Vector4(1,1,1,1));
 	va = closest.texUV_a;
 	vb = closest.texUV_b;
 	vc = closest.texUV_c;
