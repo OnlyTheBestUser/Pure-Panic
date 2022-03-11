@@ -68,7 +68,7 @@ RendererBase::RendererBase() {
 	debugLinesMesh = new PS4::PS4Mesh();
 	debugTextMesh = new PS4::PS4Mesh();
 
-	int test = 72;
+	int test = 5000;
 	debugLinesMesh->SetVertexPositions(std::vector<Vector3>(test, Vector3()));
 	debugLinesMesh->SetVertexColours(std::vector<Vector4>(test, Vector4()));
 	debugLinesMesh->SetVertexTextureCoords(std::vector<Vector2>(test, Vector2()));
@@ -155,26 +155,17 @@ void RendererBase::DrawDebugStrings() {
 	vector<Vector3> vertPos;
 	vector<Vector2> vertTex;
 	vector<Vector4> vertColours;
-	vector<unsigned int> vertIndices;
 
 	if (debugStrings.size() > 100) {
 		bool a = true;
 	}
 
-
 	for (DebugString& s : debugStrings) {
 		font->BuildVerticesForString(s.text, s.pos, s.colour, s.size, vertPos, vertTex, vertColours);
 	}
 
-	for (int i = 0; i < debugTextMesh->GetVertexCount(); ++i) {
-		vertIndices.emplace_back(i);
-	}
-
 	debugTextMesh->SetVertexPositions(vertPos);
 	debugTextMesh->SetVertexTextureCoords(vertTex);
-#ifdef _ORBIS
-	//debugTextMesh->SetVertexIndices(vertIndices);
-#endif
 	debugTextMesh->SetVertexColours(vertColours);
 	debugTextMesh->UpdateGPUBuffers(0, vertPos.size());
 
@@ -186,15 +177,12 @@ void RendererBase::DrawDebugStrings() {
 void RendererBase::DrawDebugLines() {
 	vector<Vector3> vertPos;
 	vector<Vector4> vertCol;
-	vector<unsigned int> vertIndices;
 
 	int indices = 0;
 	for (DebugLine& s : debugLines) {
 		vertPos.emplace_back(s.start);
 		vertPos.emplace_back(s.end);
 
-		vertIndices.emplace_back(indices++);
-		vertIndices.emplace_back(indices++);
 
 		vertCol.emplace_back(s.colour);
 		vertCol.emplace_back(s.colour);
@@ -202,9 +190,6 @@ void RendererBase::DrawDebugLines() {
 
 	debugLinesMesh->SetVertexPositions(vertPos);
 	debugLinesMesh->SetVertexColours(vertCol);
-#ifdef _ORBIS
-	debugLinesMesh->SetVertexIndices(vertIndices);
-#endif
 	
 	debugLinesMesh->UpdateGPUBuffers(0, vertPos.size());
 

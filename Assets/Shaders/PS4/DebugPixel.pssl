@@ -3,9 +3,9 @@ ConstantBuffer useTexture
 	int m_UseTexture;
 };
 
-SamplerState samp0 : register(s10);
+SamplerState samp0 : register(s0);
 
-Texture2D debugTex : register( t10 );
+Texture2D debugTex : register( t0 );
 
 struct VS_OUTPUT
 {

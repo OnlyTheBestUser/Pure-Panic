@@ -87,10 +87,26 @@ void	PS4Mesh::UploadToGPU(Rendering::RendererAPI* renderer) {
 	vertexDataSize = GetVertexCount() * sizeof(MeshVertex);
 	indexDataSize  = GetIndexCount() * sizeof(int);
 
-	indexBuffer = static_cast<int*>			(garlicAllocator->allocate(indexDataSize, Gnm::kAlignmentOfBufferInBytes));
+	if (GetIndexCount() > 0) {
+		indexBuffer = static_cast<int*>			(garlicAllocator->allocate(indexDataSize, Gnm::kAlignmentOfBufferInBytes));
+	}
 	vertexBuffer = static_cast<MeshVertex*>	(garlicAllocator->allocate(vertexDataSize, Gnm::kAlignmentOfBufferInBytes));
 
-	Gnm::registerResource(nullptr, ownerHandle, indexBuffer , indexDataSize , "IndexData" , Gnm::kResourceTypeIndexBufferBaseAddress, 0);
+	//switch (GetPrimitiveType())
+	//{
+	//default:
+	//	break;
+	//case NCL::GeometryPrimitive::Triangles:
+	//	primitiveType = Gnm::kPrimitiveTypeTriList;
+	//	break;
+	//case NCL::GeometryPrimitive::Lines:
+	//	primitiveType = Gnm::kPrimitiveTypeLineList;
+	//	break;
+	//}
+
+	if (GetIndexCount() > 0) {
+		Gnm::registerResource(nullptr, ownerHandle, indexBuffer, indexDataSize, "IndexData", Gnm::kResourceTypeIndexBufferBaseAddress, 0);
+	}
 	Gnm::registerResource(nullptr, ownerHandle, vertexBuffer, vertexDataSize, "VertexData", Gnm::kResourceTypeIndexBufferBaseAddress, 0);
 
 	for (int i = 0; i < GetVertexCount(); ++i) {
@@ -101,9 +117,11 @@ void	PS4Mesh::UploadToGPU(Rendering::RendererAPI* renderer) {
 		//memcpy(&vertexBuffer[i].colour,		  &colours[i], sizeof(float) * 4);
 	}
 
-	for (int i = 0; i < GetIndexCount(); ++i) { //Our index buffer might not have the same data size as the source indices?
-		indexBuffer[i] = indices[i];
-	}	
+	if (GetIndexCount() > 0) {
+		for (int i = 0; i < GetIndexCount(); ++i) { //Our index buffer might not have the same data size as the source indices?
+			indexBuffer[i] = indices[i];
+		}
+	}
 
 	attributeCount		= 4;
 	attributeBuffers	= new sce::Gnm::Buffer[4];
@@ -124,11 +142,20 @@ void PS4Mesh::SubmitDraw(Gnmx::GnmxGfxContext& cmdList, Gnm::ShaderStage stage) 
 	cmdList.setVertexBuffers(stage, 0, attributeCount, attributeBuffers);
 	cmdList.setPrimitiveType(primitiveType);
 	cmdList.setIndexSize(indexType);
-	cmdList.drawIndex(GetIndexCount(), indexBuffer);
+
+	if (GetIndexCount() != 0) {
+ 		cmdList.drawIndex(GetIndexCount(), indexBuffer);
+	}
+	else
+	{
+		cmdList.drawIndexAuto(GetVertexCount());
+		cmdList.setIndexSize(indexType);
+	}
 } 
 
 void PS4Mesh::UpdateGPUBuffers(unsigned int startVertex, unsigned int vertexCount) {
 	delete[] attributeBuffers;
+	Gnm::unregisterAllResourcesForOwner(ownerHandle);
 
 	UploadToGPU(nullptr);
 }
