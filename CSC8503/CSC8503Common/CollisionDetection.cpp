@@ -331,7 +331,6 @@ bool CollisionDetection::GetBarycentricFromRay(const Ray ray, const RenderObject
 
 	for (int i = 0; i < (indicies.size()) / 3; i++) {
 
-		// Triangle needs to store vertex indices 
 		Triangle tri;
 
 		mesh->GetTriangle(i, tri.pos_a, tri.pos_b, tri.pos_c);
@@ -370,7 +369,7 @@ bool CollisionDetection::GetBarycentricFromRay(const Ray ray, const RenderObject
 		return false;
 	}
 
-	Debug::DrawTriangle(closest.pos_a, closest.pos_b, closest.pos_c, Vector4(1,1,1,1));
+	//Debug::DrawTriangle(closest.pos_a, closest.pos_b, closest.pos_c, Vector4(1,1,1,1));
 	va = closest.texUV_a;
 	vb = closest.texUV_b;
 	vc = closest.texUV_c;
