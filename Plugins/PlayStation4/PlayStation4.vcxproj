@@ -291,6 +291,12 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
     </CustomBuild>
   </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\Assets\Textures\PressStart2P.png">
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
+    </CustomBuild>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
