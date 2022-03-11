@@ -340,5 +340,10 @@ void NetworkedGame::RemovePlayerFromServer(int clientID) {
 	if (index != clientHistory.end()) {
 		clientHistory.erase(index);
 	}
+
+	auto sInd = serverPlayers.find(clientID);
+	if (sInd != serverPlayers.end()) {
+		serverPlayers.erase(sInd);
+	}
 }
 #endif
