@@ -1,8 +1,13 @@
-#version 330 core
+#version 420 core
+
+layout(std140, binding = 0) uniform cameraMatrix
+{
+    mat4 projMatrix;
+	mat4 viewMatrix;
+};
 
 uniform mat4 modelMatrix;
-uniform mat4 viewMatrix;
-uniform mat4 projMatrix;
+uniform mat4 invProjMatrix;
 
 in  vec3 position;
 
@@ -12,8 +17,7 @@ out Vertex {
 
 void main(void)		{
 	vec3 pos = position;
-	mat4 invproj  = inverse(projMatrix);
-	pos.xy	  *= vec2(invproj[0][0],invproj[1][1]);
+	pos.xy	  *= vec2(invProjMatrix[0][0],invProjMatrix[1][1]);
 	pos.z 	= -1.0f;
 
 	OUT.viewDir		= transpose(mat3(viewMatrix)) * normalize(pos);

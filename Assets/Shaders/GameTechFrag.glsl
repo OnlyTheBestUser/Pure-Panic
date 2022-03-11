@@ -1,9 +1,9 @@
-#version 400 core
+#version 420 core
 
 uniform vec4 		objectColour;
-uniform sampler2D 	mainTex;
-uniform sampler2D	paintMaskTex;
-uniform sampler2DShadow shadowTex;
+layout (binding = 0) uniform sampler2D mainTex;
+layout (binding = 2) uniform sampler2D paintMaskTex;
+layout (binding = 1) uniform sampler2DShadow shadowTex;
 
 uniform vec3	lightPos;
 uniform float	lightRadius;

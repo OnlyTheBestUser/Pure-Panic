@@ -1,3 +1,4 @@
+#ifndef _ORBIS
 #include "GameClient.h"
 #include <iostream>
 #include <string>
@@ -63,3 +64,4 @@ void GameClient::SendPacket(GamePacket& payload) {
 //		UpdateClient();
 //	}
 //}
+#endif

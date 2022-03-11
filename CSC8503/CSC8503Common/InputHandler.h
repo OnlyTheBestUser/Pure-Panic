@@ -42,8 +42,8 @@ namespace NCL {
 
 		private:
 
-			Command* commands[127];
-			AxisCommand* axisCommands[127];
+			Command* commands[127] = {nullptr};
+			AxisCommand* axisCommands[127] = {nullptr};
 			InputBase* inputBase;
 			vector<int> commandsExecuted;
 

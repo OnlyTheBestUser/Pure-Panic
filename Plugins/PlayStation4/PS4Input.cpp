@@ -95,6 +95,7 @@ void PS4Input::Poll() {
 			buttons[DESCEND]			= ((data.buttons & SCE_PAD_BUTTON_CIRCLE) ? 1.0f : 0.0f);
 			buttons[LOCK]			= ((data.buttons & SCE_PAD_BUTTON_TRIANGLE) ? 1.0f : 0.0f);
 			buttons[TOGGLE_PAUSE]	= ((data.buttons & SCE_PAD_BUTTON_START) ? 1.0f : 0.0f);
+			buttons[TOGGLE_DEBUG] = ((data.buttons & SCE_PAD_BUTTON_SQUARE) ? 1.0f : 0.0f);
 			//buttons[FORWARD]	= ((data.leftStick.y / 255.0f) * 2) - 1.0f;
 			//buttons[BACK]		= ((data.leftStick.y / 255.0f) * 2) - 1.0f;
 			//buttons[LEFT]		= ((((data.leftStick.x / 255.0f) * 2) - 1.0f) > 0.1f) ? 0.0f : 1.0f;

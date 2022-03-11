@@ -4,6 +4,8 @@
 #include "../../Common/MeshGeometry.h"
 
 #include "../../Common/Quaternion.h"
+#include "../CSC8503Common/CollisionDetection.h"
+#include "../CSC8503Common/Timer.h"
 
 #include "../CSC8503Common/InputHandler.h"
 #include "../CSC8503Common/GameActor.h"

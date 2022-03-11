@@ -1,8 +1,11 @@
-#version 400 core
+#version 420 core
 
+layout(std140, binding = 0) uniform cameraMatrix
+{
+    mat4 projMatrix;
+	mat4 viewMatrix;
+};
 uniform mat4 modelMatrix 	= mat4(1.0f);
-uniform mat4 viewMatrix 	= mat4(1.0f);
-uniform mat4 projMatrix 	= mat4(1.0f);
 uniform mat4 shadowMatrix 	= mat4(1.0f);
 
 layout(location = 0) in vec3 position;
