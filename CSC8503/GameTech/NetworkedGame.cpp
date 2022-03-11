@@ -167,7 +167,8 @@ void NetworkedGame::SpawnPlayer() {
 }
 
 void NetworkedGame::StartLevel() {
-
+	// Reset the level
+	// Start timer
 }
 #ifndef _ORBIS
 void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
@@ -178,27 +179,29 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
 		return;
 	}
 
-	if (type == Assign_ID) {
-		HandleAssignID((AssignIDPacket*)payload);
-		return;
-	}
-
-	if (!CheckExists((IDPacket*)payload))
-		return;
-
 	//CLIENT version of the game will receive these from the servers
+	// Connection / Initialisation packets
 	switch (type) {
-	case(Full_State):
-		HandleFullState((FullPacket*)payload);
-		break;
-	case(Fire_State):
-		HandleFireState((FirePacket*)payload);
+	case(Assign_ID):
+		HandleAssignID((AssignIDPacket*)payload);
 		break;
 	case(Player_Connected):
 		HandlePlayerConnect((NewPlayerPacket*)payload);
 		break;
 	case(Player_Disconnected):
 		HandlePlayerDisconnect((PlayerDisconnectPacket*)payload);
+		break;
+	}
+
+	if (!CheckExists((IDPacket*)payload))
+		return;
+
+	switch (type) {
+	case(Full_State):
+		HandleFullState((FullPacket*)payload);
+		break;
+	case(Fire_State):
+		HandleFireState((FirePacket*)payload);
 		break;
 	}
 }
