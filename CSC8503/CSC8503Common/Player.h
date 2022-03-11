@@ -18,6 +18,7 @@ namespace NCL {
 			Player(Camera* camera, LevelLoader* lvlLoader, GameWorld* world, string name = "", Vector3 ch = Vector3(0, 2, 0)) : GameActor(name), checkpoint(ch), spawnPos(ch), levelLoader(lvlLoader), world(world){
 				this->camera = camera;
 				camLocked = true;
+				playerID = 0;
 			};
             ~Player() {};
 
@@ -120,6 +121,9 @@ namespace NCL {
 			}
 
 			Camera* GetCam() { return camera; }
+
+			int GetPlayerID() const { return playerID; }
+			void SetPlayerID(int x) { playerID = x; }
 
         protected:
 			float CheckDistToGround();

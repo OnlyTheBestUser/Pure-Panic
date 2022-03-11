@@ -184,13 +184,13 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
 	switch (type) {
 	case(Assign_ID):
 		HandleAssignID((AssignIDPacket*)payload);
-		break;
+		return;
 	case(Player_Connected):
 		HandlePlayerConnect((NewPlayerPacket*)payload);
-		break;
+		return;
 	case(Player_Disconnected):
 		HandlePlayerDisconnect((PlayerDisconnectPacket*)payload);
-		break;
+		return;
 	}
 
 	if (!CheckExists((IDPacket*)payload))
@@ -199,10 +199,10 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
 	switch (type) {
 	case(Full_State):
 		HandleFullState((FullPacket*)payload);
-		break;
+		return;
 	case(Fire_State):
 		HandleFireState((FirePacket*)payload);
-		break;
+		return;
 	}
 }
 
@@ -259,7 +259,7 @@ void NetworkedGame::AddNewPlayerToServer(int clientID, int lastID)
 
 void NetworkedGame::Fire(GameObject* owner, float pitch, int clientID)
 {
-	levelLoader->SpawnProjectile(owner, pitch);
+	levelLoader->SpawnProjectile(owner, pitch, clientID);
 	FirePacket newPacket;
 	newPacket.clientID = clientID;
 	newPacket.pitch = pitch;
@@ -300,13 +300,14 @@ void NetworkedGame::HandleFireState(FirePacket* packet)
 		return;
 	auto obj = networkObjects[packet->clientID];
 	if (obj)
-		levelLoader->SpawnProjectile(&obj->object, packet->pitch);
+		levelLoader->SpawnProjectile(&obj->object, packet->pitch, packet->clientID);
 }
 
 void NetworkedGame::HandleAssignID(AssignIDPacket* packet)
 {
 	std::cout << "ID Assigned: " << packet->clientID << std::endl;
 	playerID = packet->clientID;
+	localPlayer->SetPlayerID(playerID);
 	SpawnPlayer();
 }
 

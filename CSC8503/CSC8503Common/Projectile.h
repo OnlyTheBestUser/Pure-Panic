@@ -11,7 +11,7 @@ namespace NCL {
 		class Projectile : public GameObject
 		{
 		public:
-			Projectile(GameWorld& gWorld, Renderer* rend, const float& damageValue = 10.0f, const int& playerID = 0): GameObject("projectile"), renderInst(rend), gameWorld(gWorld), damagePerShot(damageValue), ownerPlayerID(playerID) {
+			Projectile(GameWorld& gWorld, Renderer* rend, const int& playerID = 0, const float& damageValue = 10.0f): GameObject("projectile"), renderInst(rend), gameWorld(gWorld), damagePerShot(damageValue), ownerPlayerID(playerID) {
 			};
 			~Projectile() {}
 

@@ -559,10 +559,10 @@ GameObject* LevelLoader::AddCapsuleToWorld(const Maths::Vector3& position, float
 }
 
 Projectile* LevelLoader::SpawnProjectile(Player* owner, const float& initialSpeed, const float& meshSize) {
-	return SpawnProjectile((GameObject*)owner, owner->GetCam()->GetPitch(), initialSpeed, meshSize);
+	return SpawnProjectile((GameObject*)owner, owner->GetCam()->GetPitch(), owner->GetPlayerID(), initialSpeed, meshSize);
 }
 
-Projectile* LevelLoader::SpawnProjectile(GameObject* owner, float pitch, const float& initialSpeed, const float& meshSize)
+Projectile* LevelLoader::SpawnProjectile(GameObject* owner, float pitch, int playerID, const float& initialSpeed, const float& meshSize)
 {
 	float inverseMass = 1.0f;
 
@@ -570,7 +570,7 @@ Projectile* LevelLoader::SpawnProjectile(GameObject* owner, float pitch, const f
 
 	Vector3 camForwardVector = (Matrix4::Rotation(ownerRot.y, Vector3(0,1,0)) * Matrix4::Rotation(pitch, Vector3(1,0,0)) * Vector3(0,0,-1)).Normalised();
 
-	Projectile* projectile = new Projectile(*world, renderer);
+	Projectile* projectile = new Projectile(*world, renderer, playerID);
 
 	SphereVolume* volume = new SphereVolume(meshSize * 1.4);// / 2.0f * meshSize * 1.3f);
 	projectile->SetBoundingVolume((CollisionVolume*)volume);
