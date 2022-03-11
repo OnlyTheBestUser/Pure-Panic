@@ -171,5 +171,8 @@
     <CustomBuild Include="..\..\Assets\Textures\Animated_Screens_A_Colour.png">
       <Filter>Assets\Textures</Filter>
     </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\PressStart2P.png">
+      <Filter>Assets\Textures</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>
