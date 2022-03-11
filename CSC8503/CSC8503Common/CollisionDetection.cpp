@@ -39,15 +39,7 @@ bool CollisionDetection::RayTriangleIntersection(const Ray& r, const Triangle& t
 	Plane p2 = Plane::PlaneFromTri(t.pos_b, t.pos_c, t.pos_b + norm);
 	Plane p3 = Plane::PlaneFromTri(t.pos_c, t.pos_a, t.pos_c + norm);
 	
-
-
-	//Debug::DrawLine(Vector3(1, 0, 0), Vector3(0, 0, 0), Vector4(0, 1, 0, 1), 2.0f);
-	//Debug::DrawLine(Vector3(0, 0, 0), Vector3(0, 0, 1), Vector4(0, 0, 1, 1), 2.0f);
-
-	
-
 	if (RayPlaneIntersection(r, p0, collision)) {
-
 		if (!p1.PointInPlane(collision.collidedAt) && !p2.PointInPlane(collision.collidedAt) && !p3.PointInPlane(collision.collidedAt)) {
 			return true;
 		}
@@ -317,14 +309,11 @@ return iview;
 
 bool CollisionDetection::GetBarycentricFromRay(const Ray ray, const RenderObject obj, Vector2& va, Vector2& vb, Vector2& vc, Vector3& barycentric, Vector3& collisionPoint)
 {
-	Quaternion orientation = obj.GetTransform()->GetOrientation();
-	Vector3 position = obj.GetTransform()->GetPosition();
 
 	Triangle	closest;
 	Vector3		closestnorm;
 	Vector3		closestcollision;
-
-	float distance = FLT_MAX;
+	float		distance = FLT_MAX;
 	
 	const MeshGeometry* mesh = obj.GetMesh();
 	const vector<unsigned int> indicies = mesh->GetIndexData();
@@ -332,14 +321,11 @@ bool CollisionDetection::GetBarycentricFromRay(const Ray ray, const RenderObject
 	for (int i = 0; i < (indicies.size()) / 3; i++) {
 
 		Triangle tri;
-
-		mesh->GetTriangle(i, tri.pos_a, tri.pos_b, tri.pos_c);
-		mesh->GetTriangleIndices(i, tri.ind_a, tri.ind_b, tri.ind_c);
-		mesh->GetTriangleUV(i, tri.texUV_a, tri.texUV_b, tri.texUV_c);
-		
 		Vector3 norm;
 		RayCollision collision;
 
+		mesh->GetTriangle(i, tri.pos_a, tri.pos_b, tri.pos_c);
+		mesh->GetTriangleUV(i, tri.texUV_a, tri.texUV_b, tri.texUV_c);
 		mesh->GetNormalForTri(i, norm);
 
 		tri.pos_a = obj.GetTransform()->GetMatrix() * tri.pos_a;
@@ -348,15 +334,7 @@ bool CollisionDetection::GetBarycentricFromRay(const Ray ray, const RenderObject
 
 		if (RayTriangleIntersection(ray, tri, norm, collision, obj.GetTransform()->GetMatrix())) {
 			float rayDist = (ray.GetPosition() - collision.collidedAt).Length();
-
-			//sort to find the nearest
-			if (i == 0) {
-				closest = tri;
-				closestnorm = norm;
-				closestcollision = collision.collidedAt;
-				distance = rayDist;
-			}
-			else if (rayDist < distance) {
+			if (rayDist < distance) {
 				closest = tri;
 				closestnorm = norm;
 				closestcollision = collision.collidedAt;
@@ -365,16 +343,20 @@ bool CollisionDetection::GetBarycentricFromRay(const Ray ray, const RenderObject
 		}
 	}
 
+	// If no mesh collided then return
 	if (distance == FLT_MAX) {
 		return false;
 	}
 
-	//Debug::DrawTriangle(closest.pos_a, closest.pos_b, closest.pos_c, Vector4(1,1,1,1));
 	va = closest.texUV_a;
 	vb = closest.texUV_b;
 	vc = closest.texUV_c;
 	collisionPoint = closestcollision;
 	barycentric = CalcTriBaryCoord(closest, closestcollision);
+
+	// Draws collided mesh triangle 
+	//Debug::DrawTriangle(closest.pos_a, closest.pos_b, closest.pos_c, Vector4(1,1,1,1));
+
 	return true;
 }
 
@@ -391,17 +373,6 @@ Vector3 CollisionDetection::CalcTriBaryCoord(const Triangle& t, const Vector3& p
 	float w = (d00 * d21 - d01 * d20) / denom;
 	float u = 1.0f - v - w;
 
-	//Vector3 v0 = t.pos_a - t.pos_b;
-	//Vector3 v1 = t.pos_c - t.pos_a;
-	//Vector3 v2 = point - t.pos_a;
-	//float d = v0.x * v1.y - v1.y * v0.z;
-	//
-	//float barCoordsX = (v2.x * v1.y - v1.x * v2.y) / d;
-	//float barCoordsY = (v0.x * v2.y - v2.x * v0.y) / d;
-	//float barCoordsZ = 1.0f - barCoordsX - barCoordsY;
-	//
-	//auto test = Vector3(barCoordsX, barCoordsY, barCoordsZ).Length();
-	//
 	return Vector3(u, v, w);
 }
 
