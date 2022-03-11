@@ -129,7 +129,7 @@ void RendererBase::DrawDebugData() {
 
 	Matrix4 pMat;
 
-	font->GetTexture()->Bind(10);
+	font->GetTexture()->Bind(0);
 
 	if (debugLines.size() > 0) {
 		pMat = SetupDebugLineMatrix();
@@ -172,11 +172,13 @@ void RendererBase::DrawDebugStrings() {
 
 	debugTextMesh->SetVertexPositions(vertPos);
 	debugTextMesh->SetVertexTextureCoords(vertTex);
+#ifdef _ORBIS
 	//debugTextMesh->SetVertexIndices(vertIndices);
+#endif
 	debugTextMesh->SetVertexColours(vertColours);
 	debugTextMesh->UpdateGPUBuffers(0, vertPos.size());
 
-	rendererAPI->DrawMesh(debugTextMesh);
+	//rendererAPI->DrawMesh(debugTextMesh);
 
 	debugStrings.clear();
 }
@@ -200,11 +202,13 @@ void RendererBase::DrawDebugLines() {
 
 	debugLinesMesh->SetVertexPositions(vertPos);
 	debugLinesMesh->SetVertexColours(vertCol);
+#ifdef _ORBIS
 	debugLinesMesh->SetVertexIndices(vertIndices);
+#endif
 	
 	debugLinesMesh->UpdateGPUBuffers(0, vertPos.size());
 
-	rendererAPI->DrawMesh(debugLinesMesh);
+	//rendererAPI->DrawMesh(debugLinesMesh);
 
 	debugLines.clear();
 }

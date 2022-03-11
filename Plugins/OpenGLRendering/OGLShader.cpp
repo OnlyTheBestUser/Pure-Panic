@@ -138,6 +138,11 @@ void OGLShader::UpdateUniformFloat(std::string uniform, const float f) {
 	glUniform1f(fLoc, f);
 }
 
+void OGLShader::UpdateUniformVector2(std::string uniform, const Maths::Vector2 vec) {
+	int vecLoc = glGetUniformLocation(this->programID, uniform.c_str());
+	glUniform2fv(vecLoc, 1, (float*)&vec);
+}
+
 void OGLShader::UpdateUniformVector3(std::string uniform, const Maths::Vector3 vec) {
 	int vecLoc = glGetUniformLocation(this->programID, uniform.c_str());
 	glUniform3fv(vecLoc, 1, (float*)&vec);

@@ -61,6 +61,18 @@ void NCL::PS4::PS4Shader::UpdateUniformFloat(std::string uniform, float f) {
 	UpdateAllUniform(uniform, constantBuffer);
 }
 
+void NCL::PS4::PS4Shader::UpdateUniformVector2(std::string uniform, const Maths::Vector2 vec)
+{
+	Vector3* modelData = (Vector3*)((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->allocateFromCommandBuffer(sizeof(Vector3), Gnm::kEmbeddedDataAlignment4);
+	*modelData = vec;
+
+	Gnm::Buffer constantBuffer;
+	constantBuffer.initAsConstantBuffer(modelData, sizeof(Vector3));
+	constantBuffer.setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
+
+	UpdateAllUniform(uniform, constantBuffer);
+}
+
 void NCL::PS4::PS4Shader::UpdateUniformVector3(std::string uniform, const Maths::Vector3 vec)
 {
 	Vector3* modelData = (Vector3*)((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->allocateFromCommandBuffer(sizeof(Vector3), Gnm::kEmbeddedDataAlignment4);
