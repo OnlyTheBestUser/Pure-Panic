@@ -335,5 +335,10 @@ void NetworkedGame::HandlePlayerDisconnect(PlayerDisconnectPacket* packet) {
 void NetworkedGame::RemovePlayerFromServer(int clientID) {
 	delete networkObjects[clientID];
 	networkObjects[clientID] = nullptr;
+
+	auto index = clientHistory.find(clientID);
+	if (index != clientHistory.end()) {
+		clientHistory.erase(index);
+	}
 }
 #endif
