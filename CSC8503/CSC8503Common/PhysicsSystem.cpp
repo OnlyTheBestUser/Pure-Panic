@@ -386,16 +386,17 @@ void PhysicsSystem::NarrowPhase() {
 		CollisionDetection::CollisionInfo info = *i;
 		if (CollisionDetection::ObjectIntersection(info.a, info.b, info)) {
 			info.framesLeft = numCollisionFrames;
+
+			info.a->OnCollisionBegin(info.b, info.point.localA, info.point.localB, info.point.normal);
+			info.b->OnCollisionBegin(info.a, info.point.localB, info.point.localA, -info.point.normal);
+
 			if (!(info.a->IsTrigger() || info.b->IsTrigger())) {
 				if(info.a->GetPhysicsObject()->UseSpringRes() || info.b->GetPhysicsObject()->UseSpringRes())
 					ResolveSpringCollision(*info.a, *info.b, info.point);
 				else
 					ImpulseResolveCollision(*info.a, *info.b, info.point);	
 			}
-
-			info.a->OnCollisionBegin(info.b, info.point.localA, info.point.localB, info.point.normal);
-			info.b->OnCollisionBegin(info.a, info.point.localB, info.point.localA, -info.point.normal);
-
+			
 			allCollisions.insert(info); // insert into our main set
 		}
 	}

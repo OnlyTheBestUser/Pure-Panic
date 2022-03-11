@@ -14,18 +14,17 @@ void Projectile::Update(float dt) {
 
 void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vector3 localB, Vector3 normal) {
 
-	Ray ray(this->GetTransform().GetPosition(), -this->GetPhysicsObject()->GetLinearVelocity());
+	Ray ray(this->GetTransform().GetPosition(), this->GetPhysicsObject()->GetLinearVelocity());
 	ray.SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	//Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
 	RayCollision closestCollision;
 	if (gameWorld.RaycastIgnoreObject(this, ray, closestCollision, true)) {
 		RenderObject* test = ((GameObject*)closestCollision.node)->GetRenderObject();
 		
-			//Debug::DrawLine(ray.GetPosition(), ray.GetPosition() * ray.GetDirection());
-			//Debug::DrawSphere(closestCollision.collidedAt, 0.5, Vector4(1, 0, 0, 1), 0.f);
-			if (test) {
-				if (test->GetPaintMask() != nullptr) {
-
+		//Debug::DrawLine(this->GetTransform().GetPosition(), this->GetPhysicsObject()->GetLinearVelocity());
+		//Debug::DrawLine(ray.GetPosition(), ray.GetPosition() * ray.GetDirection());
+		//Debug::DrawSphere(closestCollision.collidedAt, 0.5, Vector4(1, 0, 0, 1), 0.f);
+		if (test) {
+			if (test->GetPaintMask() != nullptr) {
 				Vector2 texUV_a, texUV_b, texUV_c;
 				Vector3 collisionPoint;
 				Vector3 barycentric;

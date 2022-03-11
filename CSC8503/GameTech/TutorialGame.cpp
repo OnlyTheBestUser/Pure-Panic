@@ -357,9 +357,6 @@ void TutorialGame::InitWorld() {
 
 	physics->BuildStaticList();
 }
-//PowerUp* TutorialGame::AddPowerUpToWorld(const Vector3& position) {
-//
-//}
 
 /*
 

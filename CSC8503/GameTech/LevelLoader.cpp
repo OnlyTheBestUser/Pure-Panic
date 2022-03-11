@@ -309,31 +309,35 @@ GameObject* LevelLoader::AddLongWallToWorld(const Vector3& position, Vector3 dim
 	if (position.z > 0)
 		location += Vector3(1, 0, -2);
 
-	GameObject* physicalObject = AddAABBWallToWorld(location, dimensions, rotation, name);
-	physicalObject->GetPhysicsObject()->Sleep();
+	/*GameObject* physicalObject = AddAABBWallToWorld(location, dimensions, rotation, name);
+	physicalObject->GetPhysicsObject()->Sleep();*/
+
 	if (rotation == 90 || rotation == 270)
 	{
 		for (int i = -dimensions.z; i < dimensions.z; i += 10)
 		{
-			AddRenderPartToWorld(Vector3(position.x, position.y, position.z + i), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallAlertTex);
+			//AddRenderPartToWorld(Vector3(position.x, position.y, position.z + i), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallAlertTex);
+			AddPaintWallToWorld(Vector3(position.x, position.y, position.z + i), Vector3(5, 5, 4), rotation);
 		}
-		return physicalObject;
+		//return physicalObject;
 	}
 	if (rotation == 180 || rotation == 0)
 	{
 		for (int i = -dimensions.x; i < dimensions.x; i += 10)
 		{
-			AddRenderPartToWorld(Vector3(position.x + i, position.y, position.z), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallAlertTex);
+			//AddRenderPartToWorld(Vector3(position.x + i, position.y, position.z), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallAlertTex);
+			AddPaintWallToWorld(Vector3(position.x + i, position.y, position.z), Vector3(5, 5, 4), rotation);
 		}
-		return physicalObject;
+		//return physicalObject;
 	}
-	return physicalObject;
+	//return physicalObject;
+	return nullptr;
 }
 
 GameObject* LevelLoader::AddPaintWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name)
 {
 	GameObject* cube = new GameObject(name);
-	OBBVolume* volume = new OBBVolume(dimensions + Vector3(2, 10, 0));
+	OBBVolume* volume = new OBBVolume(dimensions + Vector3(0, 10, 1));
 	cube->SetBoundingVolume((CollisionVolume*)volume);
 
 	cube->GetTransform()
@@ -341,6 +345,15 @@ GameObject* LevelLoader::AddPaintWallToWorld(const Vector3& position, Vector3 di
 		.SetScale(dimensions * 2)
 		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
 
+	if (rotation == 0)
+		cube->GetTransform().SetOffset(Vector3(0, 14, 2.5));
+	if (rotation == 90)
+		cube->GetTransform().SetOffset(Vector3(2.5, 14, 0));
+	if (rotation == 180)
+		cube->GetTransform().SetOffset(Vector3(0, 14, -2.5));
+	if (rotation == 270)
+		cube->GetTransform().SetOffset(Vector3(-2.5, 14, 0));
+	
 	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, OGLTexture::RGBATextureEmpty(corridorWallAlertTex->GetHeight()/16, corridorWallAlertTex->GetWidth()/16), basicShader));
 	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
 
