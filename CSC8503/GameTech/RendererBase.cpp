@@ -178,7 +178,7 @@ void RendererBase::DrawDebugStrings() {
 	debugTextMesh->SetVertexColours(vertColours);
 	debugTextMesh->UpdateGPUBuffers(0, vertPos.size());
 
-	//rendererAPI->DrawMesh(debugTextMesh);
+	rendererAPI->DrawMesh(debugTextMesh);
 
 	debugStrings.clear();
 }
@@ -208,7 +208,7 @@ void RendererBase::DrawDebugLines() {
 	
 	debugLinesMesh->UpdateGPUBuffers(0, vertPos.size());
 
-	//rendererAPI->DrawMesh(debugLinesMesh);
+	rendererAPI->DrawMesh(debugLinesMesh);
 
 	debugLines.clear();
 }
