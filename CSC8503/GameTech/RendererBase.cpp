@@ -191,8 +191,8 @@ void RendererBase::DrawDebugLines() {
 		vertPos.emplace_back(s.start);
 		vertPos.emplace_back(s.end);
 
-		vertIndices.emplace_back(++indices);
-		vertIndices.emplace_back(++indices);
+		vertIndices.emplace_back(indices++);
+		vertIndices.emplace_back(indices++);
 
 		vertCol.emplace_back(s.colour);
 		vertCol.emplace_back(s.colour);
@@ -201,6 +201,7 @@ void RendererBase::DrawDebugLines() {
 	debugLinesMesh->SetVertexPositions(vertPos);
 	debugLinesMesh->SetVertexColours(vertCol);
 	debugLinesMesh->SetVertexIndices(vertIndices);
+	
 	debugLinesMesh->UpdateGPUBuffers(0, vertPos.size());
 
 	rendererAPI->DrawMesh(debugLinesMesh);

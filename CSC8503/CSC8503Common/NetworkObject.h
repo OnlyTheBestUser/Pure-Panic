@@ -1,3 +1,4 @@
+#ifndef _ORBIS
 #pragma once
 #include "GameObject.h"
 #include "NetworkBase.h"
@@ -78,4 +79,5 @@ namespace NCL {
 		};
 	}
 }
+#endif
 
