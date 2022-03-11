@@ -85,7 +85,7 @@ namespace NCL {
 			Renderer*			renderer;
 			PhysicsSystem*		physics;
 			GameWorld*			world;
-			AudioManager*		audio;
+			NCL::AudioManager*		audio;
 			BGMManager*	bgm;
 			LevelLoader*		levelLoader;
 

@@ -3,7 +3,6 @@
 #ifndef _ORBIS
 
 using namespace NCL;
-using namespace NCL::CSC8503;
 using namespace FMOD;
 
 AudioManager* AudioManager::inst = nullptr;
