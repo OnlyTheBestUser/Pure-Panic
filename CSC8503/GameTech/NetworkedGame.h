@@ -54,9 +54,6 @@ namespace NCL {
 
 			std::vector<NetworkObject*> networkObjects;
 
-			// ClientID, last ACK
-			std::map<int, int> ackHistory;
-
 			// client ID, last ID
 			std::map<int, int> clientHistory;
 
