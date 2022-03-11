@@ -307,8 +307,8 @@ void NetworkedGame::HandleAssignID(AssignIDPacket* packet)
 {
 	std::cout << "ID Assigned: " << packet->clientID << std::endl;
 	playerID = packet->clientID;
-	localPlayer->SetPlayerID(playerID);
 	SpawnPlayer();
+	localPlayer->SetPlayerID(playerID);
 }
 
 void NetworkedGame::HandlePlayerConnect(NewPlayerPacket* packet)
