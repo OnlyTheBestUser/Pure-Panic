@@ -1,4 +1,5 @@
 #pragma once
+#ifndef _ORBIS
 #include <winsock2.h>
 #include <enet/enet.h>
 #include <map>
@@ -125,3 +126,4 @@ protected:
 
 	std::multimap<int, PacketReceiver*> packetHandlers;
 };
+#endif

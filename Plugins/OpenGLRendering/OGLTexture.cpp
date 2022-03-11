@@ -28,10 +28,27 @@ OGLTexture::~OGLTexture()
 	glDeleteTextures(1, &texID);
 }
 
+void OGLTexture::Bind(int slot) const
+{
+	glActiveTexture(GL_TEXTURE0 + slot);
+	switch (type)
+	{
+	default:
+		break;
+	case TextureType::TEXTURE_2D:
+		glBindTexture(GL_TEXTURE_2D, texID);
+		break;
+	case TextureType::TEXTURE_CUBEMAP:
+		glBindTexture(GL_TEXTURE_CUBE_MAP, texID);
+		break;
+	}
+}
+
 TextureBase* OGLTexture::RGBATextureFromData(char* data, int width, int height, int channels) {
 	OGLTexture* tex = new OGLTexture();
 	tex->width = width;
 	tex->height = height;
+	tex->type = TextureType::TEXTURE_2D;
 
 	int dataSize = width * height * channels; //This always assumes data is 1 byte per channel
 
@@ -61,6 +78,7 @@ TextureBase* OGLTexture::RGBATextureFromData(char* data, int width, int height, 
 }
 
 TextureBase* OGLTexture::RGBATextureFromFilename(const std::string& name) {
+	
 	char* texData = nullptr;
 	int width = 0;
 	int height = 0;
@@ -69,7 +87,7 @@ TextureBase* OGLTexture::RGBATextureFromFilename(const std::string& name) {
 	TextureLoader::LoadTexture(name, texData, width, height, channels, flags);
 
 	TextureBase* glTex = RGBATextureFromData(texData, width, height, channels);
-
+	glTex->type = TextureType::TEXTURE_2D;
 	free(texData);
 
 	return glTex;
@@ -114,7 +132,9 @@ TextureBase* OGLTexture::RGBATextureCubemapFromFilename(const std::string& side1
 	glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-	return new OGLTexture(tex);
+	OGLTexture* cubeMap = new OGLTexture(tex);
+	cubeMap->type = TextureType::TEXTURE_CUBEMAP;
+	return cubeMap ;
 }
 
 TextureBase* OGLTexture::RGBATextureEmpty(int width, int height) {
@@ -129,6 +149,7 @@ TextureBase* OGLTexture::RGBATextureEmpty(int width, int height) {
 		GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	OGLTexture* tex = new OGLTexture(mask);
+	tex->type = TextureType::TEXTURE_2D;
 	tex->height = height;
 	tex->width = width;
 	return tex;

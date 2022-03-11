@@ -4,6 +4,8 @@
 #include "../../Common/MeshGeometry.h"
 
 #include "../../Common/Quaternion.h"
+#include "../CSC8503Common/CollisionDetection.h"
+#include "../CSC8503Common/Timer.h"
 
 #include "../CSC8503Common/InputHandler.h"
 #include "../CSC8503Common/GameActor.h"
@@ -20,7 +22,6 @@ TutorialGame::TutorialGame()	{
 	renderer		= new Renderer(*world);
 	physics			= new PhysicsSystem(*world);
 	paintManager	= PaintManager::GetInstance();
-	levelLoader		= new LevelLoader(world, physics, renderer);
 
 #ifndef _ORBIS
 	audio = NCL::AudioManager::GetInstance();

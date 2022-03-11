@@ -122,3 +122,38 @@ void	OGLShader::PrintLinkLog(GLuint program) {
 		delete tempData;
 	}
 }
+
+void OGLShader::BindShader()
+{
+	glUseProgram(this->programID);
+}
+
+void OGLShader::UpdateUniformInt(std::string uniform, const int i) {
+	int fLoc = glGetUniformLocation(this->programID, uniform.c_str());
+	glUniform1i(fLoc, i);
+}
+
+void OGLShader::UpdateUniformFloat(std::string uniform, const float f) {
+	int fLoc = glGetUniformLocation(this->programID, uniform.c_str());
+	glUniform1f(fLoc, f);
+}
+
+void OGLShader::UpdateUniformVector2(std::string uniform, const Maths::Vector2 vec) {
+	int vecLoc = glGetUniformLocation(this->programID, uniform.c_str());
+	glUniform2fv(vecLoc, 1, (float*)&vec);
+}
+
+void OGLShader::UpdateUniformVector3(std::string uniform, const Maths::Vector3 vec) {
+	int vecLoc = glGetUniformLocation(this->programID, uniform.c_str());
+	glUniform3fv(vecLoc, 1, (float*)&vec);
+}
+
+void OGLShader::UpdateUniformVector4(std::string uniform, const Maths::Vector4 vec) {
+	int vecLoc = glGetUniformLocation(this->programID, uniform.c_str());
+	glUniform4fv(vecLoc, 1, (float*)&vec);
+}
+
+void OGLShader::UpdateUniformMatrix4(std::string uniform, const Maths::Matrix4 matrix) {
+	int matLoc = glGetUniformLocation(this->programID, uniform.c_str());
+	glUniformMatrix4fv(matLoc, 1, false, (float*)&matrix);
+}
