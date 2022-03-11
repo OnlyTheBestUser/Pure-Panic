@@ -157,9 +157,6 @@ namespace NCL {
 			bool fired = false;
 
 			LevelLoader* levelLoader;
-		private:
-			Projectile* spawnProjectile(const float& initialSpeed = 25.0f, const float& meshSize = 0.5f);
-			
         };
     }
 }

@@ -19,7 +19,6 @@ TutorialGame::TutorialGame()	{
 	world			= new GameWorld();
 	renderer		= new Renderer(*world);
 	physics			= new PhysicsSystem(*world);
-	paintManager	= PaintManager::GetInstance();
 	levelLoader		= new LevelLoader(world, physics, renderer);
 
 #ifndef _ORBIS
@@ -33,7 +32,6 @@ TutorialGame::TutorialGame()	{
 	bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 3.0f);
 #endif
 
-	paintManager = PaintManager::GetInstance();
 	levelLoader = new LevelLoader(world, physics, renderer);
 
 	forceMagnitude = 30.0f;
@@ -533,6 +531,7 @@ void TutorialGame::PaintObject() {
 			Vector3 collisionPoint;
 			Vector3 barycentric;
 			CollisionDetection::GetBarycentricFromRay(ray, *test, texUV_a, texUV_b, texUV_c, barycentric, collisionPoint);
+			
 			
 			// Get the uv from the ray
 			renderer->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, 1, 0.2, 0.2, Vector4(0.3, 0, 0.5, 1));
