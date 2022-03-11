@@ -15,10 +15,11 @@
 using namespace NCL;
 using namespace CSC8503;
 
-TutorialGame::TutorialGame() {
-	world = new GameWorld();
-	renderer = new Renderer(*world);
-	physics = new PhysicsSystem(*world);
+TutorialGame::TutorialGame()	{
+	world			= new GameWorld();
+	renderer		= new Renderer(*world);
+	physics			= new PhysicsSystem(*world);
+	paintManager	= PaintManager::GetInstance();
 
 #ifndef _ORBIS
 	audio = audio->GetInstance();
@@ -32,7 +33,7 @@ TutorialGame::TutorialGame() {
 #endif
 
 	paintManager = PaintManager::GetInstance();
-	levelLoader = new LevelLoader(world, physics);
+	levelLoader = new LevelLoader(world, physics, renderer);
 
 	forceMagnitude = 30.0f;
 	useGravity = true;
@@ -43,6 +44,8 @@ TutorialGame::TutorialGame() {
 	testStateObject = nullptr;
 
 	state = PLAY;
+
+	timer = new Timer(abs(60.0f));
 
 	Debug::SetRenderer(renderer);
 
@@ -85,11 +88,17 @@ TutorialGame::TutorialGame() {
 	Command* toggleGrav = new ToggleGravityCommand(physics);
 	Command* toggleDebug = new ToggleBoolCommand(&debugDraw);
 	Command* togglePause = new ToggleBoolCommand(&pause);
+	Command* toggleMouse = new ToggleMouseCommand(&inSelectionMode);
 	Command* quitCommand = new QuitCommand(&quit, &pause);
+	//Command* paintFireCommand = new PaintFireCommand(this);
+	Command* startTimer = new StartTimerCommand(timer);
 	inputHandler->BindButton(TOGGLE_GRAV, toggleGrav);
 	inputHandler->BindButton(TOGGLE_DEBUG, toggleDebug);
 	inputHandler->BindButton(TOGGLE_PAUSE, togglePause);
 	inputHandler->BindButton(QUIT, quitCommand);
+	//inputHandler->BindButton(FIRE, paintFireCommand);
+	inputHandler->BindButton(TOGGLE_MOUSE, toggleMouse);
+	inputHandler->BindButton(START_TIMER, startTimer);
 
 #pragma endregion
 
@@ -129,12 +138,6 @@ void TutorialGame::UpdateGame(float dt) {
 	}
 
 	inputHandler->HandleInput();
-
-	//Debug::DrawLine(Vector3(), Vector3(0, 20, 0), Debug::RED);
-	//Debug::DrawLine(Vector3(), Vector3(360, 0, 0), Debug::RED);
-	//Debug::DrawLine(Vector3(360, 0, 0), Vector3(360, 0, 360), Debug::RED);
-	//Debug::DrawLine(Vector3(360, 0, 360), Vector3(0, 0, 360), Debug::RED);
-	//Debug::DrawLine(Vector3(0, 0, 360), Vector3(0, 0, 0), Debug::RED);
 
 	renderer->Update(dt);
 
@@ -179,6 +182,8 @@ void TutorialGame::UpdateGameWorld(float dt)
 	physics->Update(dt);
 
 	world->UpdateWorld(dt);
+
+	timer->Update(dt);
 }
 
 void TutorialGame::DebugDrawCollider(const CollisionVolume* c, Transform* worldTransform) {
@@ -295,7 +300,6 @@ void TutorialGame::DebugObjectMovement() {
 			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, -10, 0));
 		}
 	}
-
 }
 
 void TutorialGame::InitCamera() {
@@ -312,6 +316,9 @@ void TutorialGame::InitWorld() {
 
 	levelLoader->ReadInLevelFile(NCL::Assets::DATADIR + "../../Assets/Maps/map1.txt");
 	Player* player = levelLoader->AddPlayerToWorld(Vector3(0, 5, 0));
+	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 20), PowerUpType::SpeedBoost);
+	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 30), PowerUpType::FireRate);
+	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 40), PowerUpType::Heal);
 
 	//Command* f = new MoveForwardCommand(player);
 	//Command* b = new MoveBackwardCommand(player);
@@ -339,17 +346,19 @@ void TutorialGame::InitWorld() {
 	Command* f = new FireCommand(player);
 	inputHandler->BindButton(FIRE, f);
 
-	//GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
-	//cap1->SetDynamic(true);
+	/*GameObject* cap1 = levelLoader->AddCapsuleToWorld(Vector3(15, 15, 0), 3.0f, 1.5f);
+	cap1->GetPhysicsObject()->SetDynamic(true);
+	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);*/
 
-	//cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
-	player->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	player1 = player;
 
 	//Projectile* spit = AddProjectileToWorld(Vector3(5, 5, 0), 0.3f, 1.0f);
 
 	physics->BuildStaticList();
 }
+//PowerUp* TutorialGame::AddPowerUpToWorld(const Vector3& position) {
+//
+//}
 
 /*
 
@@ -508,19 +517,24 @@ void TutorialGame::UpdateBGM() {
 #endif // !_ORBIS
 }
 
-void TutorialGame::PaintSelectedObject() {
-	if (!selectionObject)
-		return;
+void TutorialGame::PaintObject() {
 
-	if (Window::GetMouse()->ButtonPressed(NCL::MouseButtons::RIGHT)) {
-		Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
-		RayCollision closestCollision;
-		if (world->Raycast(ray, closestCollision, true)) {
-			if (closestCollision.node == selectionObject) {
-				//Paint that node
-				selectionObject->GetPhysicsObject()->AddForceAtPosition(ray.GetDirection() * forceMagnitude, closestCollision.collidedAt);
-			}
+	Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
+	RayCollision closestCollision;
+	if (world->Raycast(ray, closestCollision, true)) {
+		auto test = ((GameObject*)closestCollision.node)->GetRenderObject();
+
+		//Debug::DrawLine(ray.GetPosition(), ray.GetPosition() * ray.GetDirection());
+		Debug::DrawSphere(closestCollision.collidedAt, 0.5, Vector4(1,0,0,1), 0.f);
+		if (test) {
+			
+			Vector2 texUV_a, texUV_b, texUV_c;
+			Vector3 collisionPoint;
+			Vector3 barycentric;
+			CollisionDetection::GetBarycentricFromRay(ray, *test, texUV_a, texUV_b, texUV_c, barycentric, collisionPoint);
+			
+			// Get the uv from the ray
+			renderer->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, 1, 0.2, 0.2, Vector4(0.3, 0, 0.5, 1));
 		}
 	}
-
 }

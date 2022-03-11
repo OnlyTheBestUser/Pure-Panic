@@ -43,8 +43,6 @@ void GameWorld::AddGameObject(GameObject* o) {
 }
 
 void GameWorld::RemoveGameObject(GameObject* o, bool andDelete) {
-	toRemoveGameObjects.emplace_back(o);
-
 	// Check if object is already added to vector, sometimes gets double added
 	for (auto obj : toRemoveGameObjects)
 	{
@@ -53,6 +51,7 @@ void GameWorld::RemoveGameObject(GameObject* o, bool andDelete) {
 			return;
 		}
 	}
+	toRemoveGameObjects.emplace_back(o);
 	if (andDelete) {
 		toDeleteGameObjects.emplace_back(o);
 	}
@@ -105,6 +104,7 @@ void GameWorld::UpdateWorld(float dt) {
 	DeleteGameObjectsFromWorld();
 	toRemoveGameObjects.clear();
 	toDeleteGameObjects.clear();
+
 }
 
 bool GameWorld::Raycast(Ray& r, RayCollision& closestCollision, bool closestObject) const {
@@ -145,6 +145,49 @@ bool GameWorld::Raycast(Ray& r, RayCollision& closestCollision, bool closestObje
 	}
 	return false;
 }
+
+bool GameWorld::RaycastIgnoreObject(GameObject* obj, Ray& r, RayCollision& closestCollision, bool closestObject) const {
+	//The simplest raycast just goes through each object and sees if there's a collision
+	RayCollision collision;
+
+	for (auto& i : gameObjects) {
+		if (i == obj) {
+			continue;
+		}
+		if (!i->GetBoundingVolume()) { //objects might not be collideable etc...
+			continue;
+		}
+		bool skip = false;
+		if (!((r.GetCollisionLayers() & i->GetCollisionLayers()) != 0)) { // check
+			skip = true;
+		}
+
+		if (!skip) {
+			RayCollision thisCollision;
+			if (CollisionDetection::RayIntersection(r, *i, thisCollision)) {
+
+				if (!closestObject) {
+					closestCollision = collision;
+					closestCollision.node = i;
+					return true;
+				}
+				else {
+					if (thisCollision.rayDistance < collision.rayDistance) {
+						thisCollision.node = i;
+						collision = thisCollision;
+					}
+				}
+			}
+		}
+	}
+	if (collision.node) {
+		closestCollision = collision;
+		closestCollision.node = collision.node;
+		return true;
+	}
+	return false;
+}
+
 
 
 /*

@@ -113,6 +113,7 @@
     <LibraryPath>$(SolutionDir)\Plugins\FMod\Windows\api\core\lib\x64;$(SolutionDir)\Plugins\FMod\Windows\api\studio\lib\x64;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">
+    <IncludePath>$(IncludePath)</IncludePath>
     <IncludePath>$(SolutionDir)ORBIS_Debug;$(IncludePath);$(SolutionDir)Plugins\FMod\PS4\api\core\inc\;$(SolutionDir)Plugins\FMod\PS4\api\studio\inc\</IncludePath>
     <LibraryPath>$(SolutionDir)ORBIS_Debug;$(SolutionDir)Plugins\FMod\PS4\api\core\lib\;$(SolutionDir)Plugins\FMod\PS4\api\studio\lib\;</LibraryPath>
   </PropertyGroup>
@@ -149,9 +150,11 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>_DEBUG;_ORBIS;FMOD_LIB_PATH="/app0/libfmodL.prx";FMOD_STUDIO_LIB_PATH="/app0/libfmodstudioL.prx";</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_ORBIS;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_ORBIS;FMOD_LIB_PATH="app0/Plugins/FMod/PS4/api/core/lib/libfmodL.prx";FMOD_STUDIO_LIB_PATH="app0/Plugins/FMod/PS4/api/studio/lib/libfmodstudioL.prx";%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <CppLanguageStd>Cpp17</CppLanguageStd>
+      <AdditionalIncludeDirectories>$(SolutionDir)Plugins\FMod\PS4\api\core\inc;$(SolutionDir)Plugins\FMod\PS4\api\studio\inc;</AdditionalIncludeDirectories>
     </ClCompile>
     <Lib>
       <AdditionalDependencies>%(AdditionalDependencies);</AdditionalDependencies>
@@ -218,18 +221,28 @@
     <ClInclude Include="BGMManager.h" />
     <ClInclude Include="CapsuleVolume.h" />
     <ClInclude Include="Command.h" />
+    <ClInclude Include="FIreRate.h" />
     <ClInclude Include="GameActor.h" />
+    <ClInclude Include="GameClient.h" />
+    <ClInclude Include="GameServer.h" />
+    <ClInclude Include="Heal.h" />
     <ClInclude Include="InputBase.h" />
     <ClInclude Include="InputHandler.h" />
+    <ClInclude Include="MoveForwardCommand.h" />
     <ClInclude Include="InputList.h" />
     <ClInclude Include="NavigationGrid.h" />
     <ClInclude Include="NavigationMap.h" />
     <ClInclude Include="NavigationMesh.h" />
     <ClInclude Include="NavigationPath.h" />
+    <ClInclude Include="NetworkBase.h" />
+    <ClInclude Include="NetworkObject.h" />
+    <ClInclude Include="NetworkState.h" />
     <ClInclude Include="OBBVolume.h" />
     <ClInclude Include="PaintManager.h" />
     <ClInclude Include="PCInput.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="PowerUp.h" />
+    <ClInclude Include="SpeedBoost.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="SphereVolume.h" />
     <ClInclude Include="CollisionVolume.h" />
@@ -249,19 +262,27 @@
     <ClInclude Include="State.h" />
     <ClInclude Include="StateMachine.h" />
     <ClInclude Include="StateTransition.h" />
+    <ClInclude Include="Timer.h" />
     <ClInclude Include="Transform.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AudioManager.cpp" />
+    <ClCompile Include="AudioManager.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(PreprocessorDefinitions);__INTELLISENSE_CPP17__=1</PreprocessorDefinitions>
+    </ClCompile>
     <ClCompile Include="BGMManager.cpp" />
     <ClCompile Include="CollisionDetection.cpp" />
     <ClCompile Include="Debug.cpp" />
+    <ClCompile Include="GameClient.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="GameServer.cpp" />
     <ClCompile Include="GameWorld.cpp" />
     <ClCompile Include="InputBase.cpp" />
     <ClCompile Include="InputHandler.cpp" />
     <ClCompile Include="NavigationGrid.cpp" />
     <ClCompile Include="NavigationMesh.cpp" />
+    <ClCompile Include="NetworkBase.cpp" />
+    <ClCompile Include="NetworkObject.cpp" />
+    <ClCompile Include="NetworkState.cpp" />
     <ClCompile Include="PaintManager.cpp" />
     <ClCompile Include="PCInput.cpp" />
     <ClCompile Include="PhysicsObject.cpp" />
@@ -274,6 +295,7 @@
     <ClCompile Include="RenderObject.cpp" />
     <ClCompile Include="StateMachine.cpp" />
     <ClCompile Include="StateTransition.cpp" />
+    <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Transform.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

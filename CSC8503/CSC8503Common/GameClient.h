@@ -14,13 +14,13 @@ namespace NCL {
 
 			bool Connect(uint8_t a, uint8_t b, uint8_t c, uint8_t d, int portNum);
 
-			void SendPacket(GamePacket&  payload);
+			void SendPacket(GamePacket& payload);
 
 			void UpdateClient();
-		protected:	
+		protected:
 			//void ThreadedUpdate();
 
-			ENetPeer*	netPeer;
+			ENetPeer* netPeer;
 			//std::atomic<bool>	threadAlive;
 			//std::thread			updateThread;
 		};

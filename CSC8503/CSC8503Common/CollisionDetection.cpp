@@ -6,6 +6,8 @@
 #include "../../Common/Vector2.h"
 #include "../../Common/Window.h"
 #include "../../Common/Maths.h"
+#include "../../OpenGLRendering/OGLMesh.h"
+#include "../../PlayStation4/PS4Mesh.h"
 #include "Debug.h"
 
 #include <list>
@@ -28,6 +30,29 @@ bool CollisionDetection::RayPlaneIntersection(const Ray&r, const Plane&p, RayCol
 	collisions.collidedAt = r.GetPosition() + (r.GetDirection() * d);
 
 	return true;
+}
+
+bool CollisionDetection::RayTriangleIntersection(const Ray& r, const Triangle& t, const Vector3& norm,  RayCollision& collision, Matrix4 mat4)
+{
+	Plane p0 = Plane::PlaneFromTri(t.pos_a, t.pos_b, t.pos_c);
+	Plane p1 = Plane::PlaneFromTri(t.pos_a, t.pos_b, t.pos_a + norm);
+	Plane p2 = Plane::PlaneFromTri(t.pos_b, t.pos_c, t.pos_b + norm);
+	Plane p3 = Plane::PlaneFromTri(t.pos_c, t.pos_a, t.pos_c + norm);
+	
+
+
+	//Debug::DrawLine(Vector3(1, 0, 0), Vector3(0, 0, 0), Vector4(0, 1, 0, 1), 2.0f);
+	//Debug::DrawLine(Vector3(0, 0, 0), Vector3(0, 0, 1), Vector4(0, 0, 1, 1), 2.0f);
+
+	
+
+	if (RayPlaneIntersection(r, p0, collision)) {
+
+		if (!p1.PointInPlane(collision.collidedAt) && !p2.PointInPlane(collision.collidedAt) && !p3.PointInPlane(collision.collidedAt)) {
+			return true;
+		}
+	}
+	return false;
 }
 
 bool CollisionDetection::RayIntersection(const Ray& r,GameObject& object, RayCollision& collision) {
@@ -288,6 +313,96 @@ Matrix4::Rotation(yaw, Vector3(0, 1, 0)) *
 Matrix4::Rotation(pitch, Vector3(1, 0, 0));
 
 return iview;
+}
+
+bool CollisionDetection::GetBarycentricFromRay(const Ray ray, const RenderObject obj, Vector2& va, Vector2& vb, Vector2& vc, Vector3& barycentric, Vector3& collisionPoint)
+{
+	Quaternion orientation = obj.GetTransform()->GetOrientation();
+	Vector3 position = obj.GetTransform()->GetPosition();
+
+	Triangle	closest;
+	Vector3		closestnorm;
+	Vector3		closestcollision;
+
+	float distance = FLT_MAX;
+	
+	const MeshGeometry* mesh = obj.GetMesh();
+	const vector<unsigned int> indicies = mesh->GetIndexData();
+
+	for (int i = 0; i < (indicies.size()) / 3; i++) {
+
+		Triangle tri;
+
+		mesh->GetTriangle(i, tri.pos_a, tri.pos_b, tri.pos_c);
+		mesh->GetTriangleIndices(i, tri.ind_a, tri.ind_b, tri.ind_c);
+		mesh->GetTriangleUV(i, tri.texUV_a, tri.texUV_b, tri.texUV_c);
+		
+		Vector3 norm;
+		RayCollision collision;
+
+		mesh->GetNormalForTri(i, norm);
+
+		tri.pos_a = obj.GetTransform()->GetMatrix() * tri.pos_a;
+		tri.pos_b = obj.GetTransform()->GetMatrix() * tri.pos_b;
+		tri.pos_c = obj.GetTransform()->GetMatrix() * tri.pos_c;
+
+		if (RayTriangleIntersection(ray, tri, norm, collision, obj.GetTransform()->GetMatrix())) {
+			float rayDist = (ray.GetPosition() - collision.collidedAt).Length();
+
+			//sort to find the nearest
+			if (i == 0) {
+				closest = tri;
+				closestnorm = norm;
+				closestcollision = collision.collidedAt;
+				distance = rayDist;
+			}
+			else if (rayDist < distance) {
+				closest = tri;
+				closestnorm = norm;
+				closestcollision = collision.collidedAt;
+				distance = rayDist;
+			}
+		}
+	}
+
+	if (distance == FLT_MAX) {
+		return false;
+	}
+
+	//Debug::DrawTriangle(closest.pos_a, closest.pos_b, closest.pos_c, Vector4(1,1,1,1));
+	va = closest.texUV_a;
+	vb = closest.texUV_b;
+	vc = closest.texUV_c;
+	collisionPoint = closestcollision;
+	barycentric = CalcTriBaryCoord(closest, closestcollision);
+	return true;
+}
+
+Vector3 CollisionDetection::CalcTriBaryCoord(const Triangle& t, const Vector3& point) {
+	Vector3 v0 = t.pos_b - t.pos_a, v1 = t.pos_c - t.pos_a, v2 = point - t.pos_a;
+	float d00 = Vector3::Dot(v0, v0);
+	float d01 = Vector3::Dot(v0, v1);
+	float d11 = Vector3::Dot(v1, v1);
+	float d20 = Vector3::Dot(v2, v0);
+	float d21 = Vector3::Dot(v2, v1);
+	float denom = d00 * d11 - d01 * d01;
+
+	float v = (d11 * d20 - d01 * d21) / denom;
+	float w = (d00 * d21 - d01 * d20) / denom;
+	float u = 1.0f - v - w;
+
+	//Vector3 v0 = t.pos_a - t.pos_b;
+	//Vector3 v1 = t.pos_c - t.pos_a;
+	//Vector3 v2 = point - t.pos_a;
+	//float d = v0.x * v1.y - v1.y * v0.z;
+	//
+	//float barCoordsX = (v2.x * v1.y - v1.x * v2.y) / d;
+	//float barCoordsY = (v0.x * v2.y - v2.x * v0.y) / d;
+	//float barCoordsZ = 1.0f - barCoordsX - barCoordsY;
+	//
+	//auto test = Vector3(barCoordsX, barCoordsY, barCoordsZ).Length();
+	//
+	return Vector3(u, v, w);
 }
 
 /*

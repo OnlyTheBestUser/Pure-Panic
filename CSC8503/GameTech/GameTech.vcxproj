@@ -110,6 +110,8 @@
     <IncludePath>$(SolutionDir)\Plugins\OpenGLRendering;$(SolutionDir)\Plugins\Networking-ENet\include;;$(SolutionDir)\Plugins\OpenGLRendering;$(SolutionDir)\Plugins\FMod\Windows\api\core\inc;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">
+    <LibraryPath>$(SCE_ORBIS_SAMPLE_DIR)\sample_code\graphics\api_gnm\toolkit;$(SolutionDir)$(Platform)_$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(IncludePath)</IncludePath>
     <LibraryPath>$(SCE_ORBIS_SAMPLE_DIR)\sample_code\graphics\api_gnm\toolkit;$(SolutionDir)$(Platform)_$(Configuration)\;$(LibraryPath);$(SolutionDir)\Plugins\FMod\PS4\api\studio\lib\;$(SolutionDir)\Plugins\FMod\PS4\api\core\lib\</LibraryPath>
     <IncludePath>$(IncludePath);$(SolutionDir)\Plugins\FMod\PS4\api\core\inc\;</IncludePath>
   </PropertyGroup>
@@ -208,6 +210,8 @@
     <ClCompile Include="LevelLoader.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainMenu.cpp" />
+    <ClCompile Include="NetworkedGame.cpp" />
+    <ClCompile Include="NetworkedPlayer.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RendererBase.cpp" />
     <ClCompile Include="TutorialGame.cpp" />
@@ -215,6 +219,8 @@
   <ItemGroup>
     <ClInclude Include="LevelLoader.h" />
     <ClInclude Include="MainMenu.h" />
+    <ClInclude Include="NetworkedGame.h" />
+    <ClInclude Include="NetworkedPlayer.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RendererBase.h" />
     <ClInclude Include="TutorialGame.h" />

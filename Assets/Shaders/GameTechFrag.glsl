@@ -58,8 +58,8 @@ void main(void)
             //float f = mask(i.worldPos, _PainterPosition, _Radius, _Hardness);
             //float edge = f * _Strength;
                //return lerp(col, _PainterColor, edge);
-			if (col.r > 0.1){
-				albedo.rgb = col;
+			if (col.r > 0.1 || col.g > 0.01 || col.b > 0.01){
+			albedo.rgb = col;
 			}
 	}
 	

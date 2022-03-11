@@ -6,6 +6,7 @@
 #include "../CSC8503Common/Player.h"
 #include "../CSC8503Common/AudioManager.h"
 #include "../CSC8503Common/BGMManager.h"
+#include "..//CSC8503Common/Timer.h"
 //#include "../CSC8503Common/Projectile.h"
 
 namespace NCL {
@@ -53,6 +54,8 @@ namespace NCL {
 				return quit;
 			}
 
+			void PaintObject();
+
 		protected:
 			InputHandler* inputHandler;
 
@@ -70,7 +73,6 @@ namespace NCL {
 	
 			bool SelectObject();
 			void MoveSelectedObject(float dt);
-			void PaintSelectedObject();
 			void DebugObjectMovement();
 			void DebugDrawCollider(const CollisionVolume* c, Transform* worldTransform);
 			void DebugDrawVelocity(const Vector3& vel, Transform* worldTransform);
@@ -105,6 +107,8 @@ namespace NCL {
 
 			bool won = false;
 			Player* player1 = nullptr;
+
+			Timer* timer;
 		};
 	}
 }

@@ -2,6 +2,7 @@
 
 #include "../../Common/Camera.h"
 #include "../../Common/Plane.h"
+#include "../../Common/Vector2.h"
 
 #include "Transform.h"
 #include "GameObject.h"
@@ -16,6 +17,7 @@ using NCL::Camera;
 using namespace NCL::Maths;
 using namespace NCL::CSC8503;
 namespace NCL {
+	class MeshGeometry;
 	class CollisionDetection
 	{
 	public:
@@ -25,6 +27,18 @@ namespace NCL {
 			Vector3 normal;
 			float	penetration;
 		};
+		struct Triangle {
+			int ind_a;
+			int ind_b;
+			int ind_c;
+			Vector3 pos_a;
+			Vector3 pos_b;
+			Vector3 pos_c;
+			Vector2 texUV_a;
+			Vector2 texUV_b;
+			Vector2 texUV_c;
+		};
+
 		struct CollisionInfo {
 			GameObject* a;
 			GameObject* b;		
@@ -105,6 +119,8 @@ namespace NCL {
 
 
 		static bool RayPlaneIntersection(const Ray&r, const Plane&p, RayCollision& collisions);
+		static bool RayTriangleIntersection(const Ray&r, const Triangle&t, const Vector3&norm, RayCollision& collisions, Matrix4 transform);
+		static Vector3 CalcTriBaryCoord(const Triangle& t, const Vector3& point);
 
 		static bool	AABBTest(const Vector3& posA, const Vector3& posB, const Vector3& halfSizeA, const Vector3& halfSizeB);
 
@@ -129,6 +145,7 @@ namespace NCL {
 		static Vector3		UnprojectScreenPosition(Vector3 position, float aspect, float fov, const Camera &c);
 		static Matrix4		GenerateInverseProjection(float aspect, float fov, float nearPlane, float farPlane);
 		static Matrix4		GenerateInverseView(const Camera &c);
+		static bool			GetBarycentricFromRay(const Ray ray, const RenderObject obj, Vector2& va, Vector2& vb, Vector2& vc, Vector3& barycentric, Vector3& collisionPoint);
 
 	protected:
 	
