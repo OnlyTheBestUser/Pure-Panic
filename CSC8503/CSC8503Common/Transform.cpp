@@ -5,6 +5,7 @@ using namespace NCL::CSC8503;
 Transform::Transform()
 {
 	scale	= Vector3(1, 1, 1);
+	offset = Vector3(0, 0, 0);
 }
 
 Transform::~Transform()
@@ -20,8 +21,12 @@ void Transform::UpdateMatrix() {
 }
 
 Transform& Transform::SetPosition(const Vector3& worldPos) {
-	position = worldPos;
+	position = worldPos - offset;
 	UpdateMatrix();
+	return *this;
+}
+Transform& Transform::SetOffset(const Vector3& worldOffset) {
+	offset = worldOffset;
 	return *this;
 }
 
