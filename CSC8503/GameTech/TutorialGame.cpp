@@ -22,7 +22,7 @@ TutorialGame::TutorialGame()	{
 	renderer		= new Renderer(*world);
 	physics			= new PhysicsSystem(*world);
 	levelLoader		= new LevelLoader(world, physics, renderer);
-
+	gameManager		= new GameManager();
 #ifndef _ORBIS
 	audio = NCL::AudioManager::GetInstance();
 	audio->Initialize();
@@ -45,8 +45,6 @@ TutorialGame::TutorialGame()	{
 	testStateObject = nullptr;
 
 	state = PLAY;
-
-	timer = new Timer(abs(60.0f));
 
 	Debug::SetRenderer(renderer);
 
@@ -92,7 +90,7 @@ TutorialGame::TutorialGame()	{
 	Command* toggleMouse = new ToggleMouseCommand(&inSelectionMode);
 	Command* quitCommand = new QuitCommand(&quit, &pause);
 	//Command* paintFireCommand = new PaintFireCommand(this);
-	Command* startTimer = new StartTimerCommand(timer);
+	Command* startTimer = new StartTimerCommand(gameManager->GetTimer());
 	inputHandler->BindButton(TOGGLE_GRAV, toggleGrav);
 	inputHandler->BindButton(TOGGLE_DEBUG, toggleDebug);
 	inputHandler->BindButton(TOGGLE_PAUSE, togglePause);
@@ -184,7 +182,7 @@ void TutorialGame::UpdateGameWorld(float dt)
 
 	world->UpdateWorld(dt);
 
-	timer->Update(dt);
+	gameManager->Update(dt);
 }
 
 void TutorialGame::DebugDrawCollider(const CollisionVolume* c, Transform* worldTransform) {

@@ -20,6 +20,9 @@ namespace NCL {
 			float GetTime() const {
 				return timeLeft;
 			}
+			TimerStates GetState() const {
+				return state;
+			}
 		private:
 			float timeLeft;
 			TimerStates state = TimerStates::NotStarted;
