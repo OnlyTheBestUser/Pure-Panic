@@ -27,7 +27,6 @@ Transform& Transform::SetPosition(const Vector3& worldPos) {
 }
 Transform& Transform::SetOffset(const Vector3& worldOffset) {
 	offset = worldOffset;
-	UpdateMatrix();
 	return *this;
 }
 
