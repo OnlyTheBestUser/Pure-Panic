@@ -36,6 +36,10 @@ namespace NCL {
 				return timer;
 			}
 
+			void UpdateTeamScore(const float& score, const TeamTypes& t) {
+				Teams[t].Score = score;
+			}
+
 			void AddPlayerToTeam(Player* player,const TeamTypes& t) {
 				Teams[t].TeamPlayers.push_back(player);
 			}
