@@ -43,15 +43,6 @@ RendererBase::RendererBase() {
 
 	debugLinesMesh = new OGLMesh();
 	debugTextMesh = new OGLMesh();
-
-	debugLinesMesh->SetVertexPositions(std::vector<Vector3>(5000, Vector3()));
-	debugLinesMesh->SetVertexColours(std::vector<Vector4>(5000, Vector3()));
-
-	debugTextMesh->SetVertexPositions(std::vector<Vector3>(5000, Vector3()));
-	debugTextMesh->SetVertexColours(std::vector<Vector4>(5000, Vector3()));
-	debugTextMesh->SetVertexTextureCoords(std::vector<Vector2>(5000, Vector3()));
-
-
 #endif
 #ifdef _ORBIS
 	rendererAPI = new PS4::PS4RendererAPI(*Window::GetWindow());
@@ -67,7 +58,7 @@ RendererBase::RendererBase() {
 
 	debugLinesMesh = new PS4::PS4Mesh();
 	debugTextMesh = new PS4::PS4Mesh();
-
+#endif
 	debugLinesMesh->SetVertexPositions(std::vector<Vector3>(5000, Vector3()));
 	debugLinesMesh->SetVertexColours(std::vector<Vector4>(5000, Vector4()));
 	debugLinesMesh->SetVertexTextureCoords(std::vector<Vector2>(5000, Vector2()));
@@ -80,7 +71,6 @@ RendererBase::RendererBase() {
 	debugTextMesh->SetVertexNormals(std::vector<Vector3>(5000, Vector2()));
 	debugTextMesh->SetVertexTangents(std::vector<Vector4>(5000, Vector2()));
 
-#endif
 	debugLinesMesh->UploadToGPU(rendererAPI);
 	debugTextMesh->UploadToGPU(rendererAPI);
 
