@@ -27,6 +27,8 @@ PS4Mesh::PS4Mesh(const std::string& filename) :MeshGeometry(filename){
 
 PS4Mesh::~PS4Mesh()	{
 	delete[] attributeBuffers;
+	Gnm::unregisterResource(indexHandle);
+	Gnm::unregisterResource(vertexHandle);
 }
 
 PS4Mesh* PS4Mesh::GenerateQuad() {
@@ -97,9 +99,10 @@ void	PS4Mesh::UploadToGPU(Rendering::RendererAPI* renderer) {
 	vertexBuffer = static_cast<MeshVertex*>	(garlicAllocator->allocate(vertexDataSize, Gnm::kAlignmentOfBufferInBytes));
 
 	if (GetIndexCount() > 0) {
-		Gnm::registerResource(nullptr, ownerHandle, indexBuffer, indexDataSize, "IndexData", Gnm::kResourceTypeIndexBufferBaseAddress, 0);
+		Gnm::registerResource(&indexHandle, ownerHandle, indexBuffer, indexDataSize, "IndexData", Gnm::kResourceTypeIndexBufferBaseAddress, 0);
 	}
-	Gnm::registerResource(nullptr, ownerHandle, vertexBuffer, vertexDataSize, "VertexData", Gnm::kResourceTypeIndexBufferBaseAddress, 0);
+	Gnm::registerResource(&vertexHandle, ownerHandle, vertexBuffer, vertexDataSize, "VertexData", Gnm::kResourceTypeIndexBufferBaseAddress, 0);
+
 
 	for (int i = 0; i < GetVertexCount(); ++i) {
 		memcpy(&vertexBuffer[i].position,	  &positions[i], sizeof(float) * 3);
@@ -173,12 +176,25 @@ void PS4Mesh::SubmitDraw(Gnmx::GnmxGfxContext& cmdList, Gnm::ShaderStage stage) 
 } 
 
 void PS4Mesh::UpdateGPUBuffers(unsigned int startVertex, unsigned int vertexCount) {
-	delete[] attributeBuffers;
-	//garlicAllocator->release(indexBuffer);
-	//garlicAllocator->release(vertexBuffer);
-	Gnm::unregisterAllResourcesForOwner(ownerHandle);
+	for (int i = 0; i < GetVertexCount(); ++i) {
+		if (i >= MAX_DEBUG_VERTEX_LIMIT) break;
+		memcpy(&vertexBuffer[i].position, &positions[i], sizeof(float) * 3);
+		memcpy(&vertexBuffer[i].textureCoord, &texCoords[i], sizeof(float) * 2);
+		memcpy(&vertexBuffer[i].normal, &normals[i], sizeof(float) * 3);
+		memcpy(&vertexBuffer[i].tangent, &tangents[i], sizeof(float) * 4);
+		if (colours.size() != 0) {
+			memcpy(&vertexBuffer[i].colour, &colours[i], sizeof(float) * 4);
+		}
+		else {
+			Vector4 def = Vector4(1, 1, 1, 1);
+			memcpy(&vertexBuffer[i].colour, &def, sizeof(float) * 4);
+		}
+	}
 
-
-	UploadToGPU(nullptr);
+	if (GetIndexCount() > 0) {
+		for (int i = 0; i < GetIndexCount(); ++i) { //Our index buffer might not have the same data size as the source indices?
+			indexBuffer[i] = indices[i];
+		}
+	}
 }
 #endif

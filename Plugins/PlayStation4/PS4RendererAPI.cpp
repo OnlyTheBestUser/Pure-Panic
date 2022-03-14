@@ -181,7 +181,7 @@ PS4ScreenBuffer*	PS4RendererAPI::GenerateScreenBuffer(uint width, uint height, b
 }
 
 void	PS4RendererAPI::DestroyGCMRendering() {
-	//onionAllocator->release(frames);
+	onionAllocator->release(frames);
 }
 
 void	PS4RendererAPI::DestroyVideoSystem() {
