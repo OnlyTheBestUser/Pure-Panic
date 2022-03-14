@@ -1,6 +1,6 @@
-#version 330 core
+#version 420 core
 
-uniform samplerCube cubeTex;
+layout (binding = 0) uniform samplerCube cubeTex;
 
 in Vertex {
 	vec3 viewDir;

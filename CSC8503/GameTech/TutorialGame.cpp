@@ -4,6 +4,8 @@
 #include "../../Common/MeshGeometry.h"
 
 #include "../../Common/Quaternion.h"
+#include "../CSC8503Common/CollisionDetection.h"
+#include "../CSC8503Common/Timer.h"
 
 #include "../CSC8503Common/InputHandler.h"
 #include "../CSC8503Common/GameActor.h"
@@ -19,11 +21,23 @@ TutorialGame::TutorialGame()	{
 	world			= new GameWorld();
 	renderer		= new Renderer(*world);
 	physics			= new PhysicsSystem(*world);
-	paintManager	= PaintManager::GetInstance();
-	levelLoader = new LevelLoader(world, physics);
+	levelLoader		= new LevelLoader(world, physics, renderer);
 
-	forceMagnitude	= 30.0f;
-	useGravity		= true;
+#ifndef _ORBIS
+	audio = NCL::AudioManager::GetInstance();
+	audio->Initialize();
+	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_01.ogg", true, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_02.ogg", true, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "menu_music.ogg", false, true, true);
+
+	bgm = new BGMManager(audio);
+	bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 3.0f);
+#endif
+
+	levelLoader = new LevelLoader(world, physics, renderer);
+
+	forceMagnitude = 30.0f;
+	useGravity = true;
 	physics->UseGravity(useGravity);
 
 	inSelectionMode = false;
@@ -31,6 +45,8 @@ TutorialGame::TutorialGame()	{
 	testStateObject = nullptr;
 
 	state = PLAY;
+
+	timer = new Timer(abs(60.0f));
 
 	Debug::SetRenderer(renderer);
 
@@ -55,15 +71,15 @@ TutorialGame::TutorialGame()	{
 		InputHandler.h:
 			This is where keys are assigned, each key you want to assign is made as a Command* pointer variable. The handleInputs method
 			is called every frame, it will loop through each of the keys, see if they are assigned to a command, if so it checks if the key is
-			pressed and executes accordingly. 
+			pressed and executes accordingly.
 
-		Basically, all this means is that the hard coding of key checking is done in a separate file, and commands are kept in their own file, 
-		so everything is organised and neat. 
+		Basically, all this means is that the hard coding of key checking is done in a separate file, and commands are kept in their own file,
+		so everything is organised and neat.
 
 		To use this, as shown in the example below, you need to instantiate an input handler and some commands, and bind the commands to the buttons.
 		It makes it very easy and readable to change which keys do what. If there is a specific gameobject you wish to register inputs for, you need
 		to instantiate a GameActor and pass it into the Commands accordingly.
-			
+
 	*/
 
 	// Character movement Go to Line 395
@@ -73,14 +89,20 @@ TutorialGame::TutorialGame()	{
 	Command* toggleGrav = new ToggleGravityCommand(physics);
 	Command* toggleDebug = new ToggleBoolCommand(&debugDraw);
 	Command* togglePause = new ToggleBoolCommand(&pause);
+	Command* toggleMouse = new ToggleMouseCommand(&inSelectionMode);
 	Command* resetWorld = new ResetWorldCommand(&state);
 	Command* quitCommand = new QuitCommand(&quit, &pause);
-
+	//Command* paintFireCommand = new PaintFireCommand(this);
+	Command* startTimer = new StartTimerCommand(timer);
+	
 	inputHandler->BindButton(TOGGLE_GRAV, toggleGrav);
 	inputHandler->BindButton(TOGGLE_DEBUG, toggleDebug);
 	inputHandler->BindButton(TOGGLE_PAUSE, togglePause);
 	inputHandler->BindButton(RESET_WORLD, resetWorld);
 	inputHandler->BindButton(QUIT, quitCommand);
+	//inputHandler->BindButton(FIRE, paintFireCommand);
+	inputHandler->BindButton(TOGGLE_MOUSE, toggleMouse);
+	inputHandler->BindButton(START_TIMER, startTimer);
 
 #pragma endregion
 
@@ -88,7 +110,7 @@ TutorialGame::TutorialGame()	{
 }
 /*
 
-Each of the little demo scenarios used in the game uses the same 2 meshes, 
+Each of the little demo scenarios used in the game uses the same 2 meshes,
 and the same texture and shader. There's no need to ever load in anything else
 for this module, even in the coursework, but you can add it if you like!
 
@@ -122,12 +144,6 @@ void TutorialGame::UpdateGame(float dt) {
 
 	inputHandler->HandleInput();
 
-	//Debug::DrawLine(Vector3(), Vector3(0, 20, 0), Debug::RED);
-	//Debug::DrawLine(Vector3(), Vector3(360, 0, 0), Debug::RED);
-	//Debug::DrawLine(Vector3(360, 0, 0), Vector3(360, 0, 360), Debug::RED);
-	//Debug::DrawLine(Vector3(360, 0, 360), Vector3(0, 0, 360), Debug::RED);
-	//Debug::DrawLine(Vector3(0, 0, 360), Vector3(0, 0, 0), Debug::RED);
-
 	renderer->Update(dt);
 
 	Debug::FlushRenderables(dt);
@@ -136,6 +152,11 @@ void TutorialGame::UpdateGame(float dt) {
 
 void TutorialGame::UpdateGameWorld(float dt)
 {
+#ifndef _ORBIS
+	audio->Update();
+	audio->UpdateAudioListener(0, player1->GetTransform().GetPosition(), player1->GetTransform().GetOrientation());
+#endif // !_ORBIS
+
 	if (!inSelectionMode) {
 		world->GetMainCamera()->UpdateCamera(dt);
 	}
@@ -166,6 +187,8 @@ void TutorialGame::UpdateGameWorld(float dt)
 	physics->Update(dt);
 
 	world->UpdateWorld(dt);
+
+	timer->Update(dt);
 }
 
 void TutorialGame::DebugDrawCollider(const CollisionVolume* c, Transform* worldTransform) {
@@ -221,7 +244,7 @@ void TutorialGame::UpdateKeys() {
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F2)) {
 		InitCamera(); //F2 will reset the camera to a specific default place
 	}
-	
+
 	//Running certain physics updates in a consistent order might cause some
 	//bias in the calculations - the same objects might keep 'winning' the constraint
 	//allowing the other one to stretch too much etc. Shuffling the order so that it
@@ -247,7 +270,7 @@ void TutorialGame::UpdateKeys() {
 }
 
 void TutorialGame::DebugObjectMovement() {
-//If we've selected an object, we can manipulate it with some key presses
+	//If we've selected an object, we can manipulate it with some key presses
 	if (inSelectionMode && selectionObject) {
 		//Twist the selected object!
 		//if (Window::GetKeyboard()->KeyDown(KeyboardKeys::LEFT)) {
@@ -282,7 +305,6 @@ void TutorialGame::DebugObjectMovement() {
 			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, -10, 0));
 		}
 	}
-
 }
 
 void TutorialGame::InitCamera() {
@@ -299,6 +321,9 @@ void TutorialGame::InitWorld() {
 
 	levelLoader->ReadInLevelFile(NCL::Assets::DATADIR + "../../Assets/Maps/map1.txt");
 	Player* player = levelLoader->AddPlayerToWorld(Vector3(0, 5, 0));
+	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 20), PowerUpType::SpeedBoost);
+	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 30), PowerUpType::FireRate);
+	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 40), PowerUpType::Heal);
 
 	//Command* f = new MoveForwardCommand(player);
 	//Command* b = new MoveBackwardCommand(player);
@@ -326,24 +351,26 @@ void TutorialGame::InitWorld() {
 	Command* f = new FireCommand(player);
 	inputHandler->BindButton(FIRE, f);
 
-	//GameObject* cap1 = AddCapsuleToWorld(Vector3(15, 5, 0), 3.0f, 1.5f);
-	//cap1->SetDynamic(true);
-	
-	//cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);
-	player->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	/*GameObject* cap1 = levelLoader->AddCapsuleToWorld(Vector3(15, 15, 0), 3.0f, 1.5f);
+	cap1->GetPhysicsObject()->SetDynamic(true);
+	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);*/
+
 	player1 = player;
 
 	//Projectile* spit = AddProjectileToWorld(Vector3(5, 5, 0), 0.3f, 1.0f);
 
 	physics->BuildStaticList();
 }
+//PowerUp* TutorialGame::AddPowerUpToWorld(const Vector3& position) {
+//
+//}
 
 /*
 
 Every frame, this code will let you perform a raycast, to see if there's an object
-underneath the cursor, and if so 'select it' into a pointer, so that it can be 
+underneath the cursor, and if so 'select it' into a pointer, so that it can be
 manipulated later. Pressing Q will let you toggle between this behaviour and instead
-letting you move the camera around. 
+letting you move the camera around.
 
 */
 bool TutorialGame::SelectObject() {
@@ -421,6 +448,9 @@ void TutorialGame::MoveSelectedObject(float dt) {
 		if (world->Raycast(ray, closestCollision, true)) {
 			if (closestCollision.node == selectionObject) {
 				selectionObject->GetPhysicsObject()->AddForceAtPosition(ray.GetDirection() * forceMagnitude, closestCollision.collidedAt);
+#ifndef _ORBIS
+				audio->StartPlayingSound(Assets::AUDIODIR + "splat_neutral_01.ogg", selectionObject->GetTransform().GetPosition(), 1.0f);
+#endif // !_ORBIS
 			}
 		}
 	}
@@ -468,19 +498,49 @@ void TutorialGame::MoveSelectedObject(float dt) {
 	}*/
 }
 
-void TutorialGame::PaintSelectedObject() {
-	if (!selectionObject)
-		return;
+void TutorialGame::UpdateBGM() {
+#ifndef _ORBIS
 
-	if (Window::GetMouse()->ButtonPressed(NCL::MouseButtons::RIGHT)) {
-		Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
-		RayCollision closestCollision;
-		if (world->Raycast(ray, closestCollision, true)) {
-			if (closestCollision.node == selectionObject) {
-				//Paint that node
-				selectionObject->GetPhysicsObject()->AddForceAtPosition(ray.GetDirection() * forceMagnitude, closestCollision.collidedAt);
-			}
-		}
+	switch (state) {
+	case PLAY:
+		std::cout << "play";
+		bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 3.0f);
+		break;
+	case PAUSE:
+		std::cout << "pause";
+		bgm->StopMusic();
+		break;
+	case RESET:
+		std::cout << "reset";
+		bgm->StopMusic();
+		break;
+	default:
+		bgm->StopMusic();
+		break;
 	}
 
+#endif // !_ORBIS
+}
+
+void TutorialGame::PaintObject() {
+
+	Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
+	RayCollision closestCollision;
+	if (world->Raycast(ray, closestCollision, true)) {
+		auto test = ((GameObject*)closestCollision.node)->GetRenderObject();
+
+		//Debug::DrawLine(ray.GetPosition(), ray.GetPosition() * ray.GetDirection());
+		Debug::DrawSphere(closestCollision.collidedAt, 0.5, Vector4(1,0,0,1), 0.f);
+		if (test) {
+			
+			Vector2 texUV_a, texUV_b, texUV_c;
+			Vector3 collisionPoint;
+			Vector3 barycentric;
+			CollisionDetection::GetBarycentricFromRay(ray, *test, texUV_a, texUV_b, texUV_c, barycentric, collisionPoint);
+			
+			
+			// Get the uv from the ray
+			renderer->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, 1, 0.2, 0.2, Vector4(0.3, 0, 0.5, 1));
+		}
+	}
 }

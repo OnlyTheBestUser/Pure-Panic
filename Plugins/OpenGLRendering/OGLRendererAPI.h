@@ -57,11 +57,6 @@ namespace NCL {
 			void EndFrame()		override;
 			void SwapBuffers()  override;
 
-			enum TextureType {
-				TEXTURE2D,
-				CUBEMAP,
-			};
-
 		protected:			
 
 			void BindTextureToShader(TextureType type,const TextureBase*t, const std::string& uniform, int texUnit) const;
@@ -78,20 +73,11 @@ namespace NCL {
 			void DrawMesh(MeshGeometry* mesh) override;
 			void DrawMeshAndSubMesh(MeshGeometry* mesh) override;
 
-			void BindShader(ShaderBase* shader) override;
-			void BindTexture(const TextureBase* tex, std::string uniform, int texSlot) override;
-			void BindCubemap(const TextureBase* tex, std::string uniform, int texSlot) override;
 			void BindFrameBuffer() override;
 			void BindFrameBuffer(const FrameBufferBase* fbo) override;
 
-			void UpdateUniformInt(ShaderBase* shader, std::string uniform, const int f) override;
-			void UpdateUniformFloat(ShaderBase* shader, std::string uniform, const float f) override;
-			void UpdateUniformVector3(ShaderBase* shader, std::string uniform, const Maths::Vector3 vec) override;
-			void UpdateUniformVector4(ShaderBase* shader, std::string uniform, const Maths::Vector4 vec) override;
-			void UpdateUniformMatrix4(ShaderBase* shader, std::string uniform, const Maths::Matrix4 matrix) override;
-
 			void SetDepth(bool depth) override;
-			void SetBlend(bool blend) override;
+			void SetBlend(bool blend, BlendType srcFunc, BlendType dstFunc) override;
 
 			void SetCullFace(bool cull) override;
 			void SetCullType(CULL_TYPE type) override;

@@ -133,6 +133,12 @@
     <WavePsslc Include="..\..\Assets\Shaders\PS4\skyboxVertex.pssl">
       <Filter>Assets\Shaders</Filter>
     </WavePsslc>
+    <WavePsslc Include="..\..\Assets\Shaders\PS4\DebugPixel.pssl">
+      <Filter>Assets\Shaders</Filter>
+    </WavePsslc>
+    <WavePsslc Include="..\..\Assets\Shaders\PS4\DebugVertex.pssl">
+      <Filter>Assets\Shaders</Filter>
+    </WavePsslc>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\Assets\Textures\checkerboard.png">
@@ -163,6 +169,9 @@
       <Filter>Assets\Textures</Filter>
     </CustomBuild>
     <CustomBuild Include="..\..\Assets\Textures\Animated_Screens_A_Colour.png">
+      <Filter>Assets\Textures</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\PressStart2P.png">
       <Filter>Assets\Textures</Filter>
     </CustomBuild>
   </ItemGroup>

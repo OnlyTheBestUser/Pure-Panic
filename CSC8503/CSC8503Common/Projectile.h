@@ -3,26 +3,32 @@
 #include "GameObject.h"
 
 namespace NCL {
-
+	namespace Rendering {
+		class Renderer;
+	}
 	namespace CSC8503 {
 
 		class Projectile : public GameObject
 		{
 		public:
-			Projectile(GameWorld& gWorld, float capsuleRadius, float capsuleHeight): GameObject("projectile"), gameWorld(gWorld), radius(capsuleRadius), height(capsuleHeight) {
+			Projectile(GameWorld& gWorld, Renderer* rend, const int& playerID = 0, const float& damageValue = 10.0f): GameObject("projectile"), renderInst(rend), gameWorld(gWorld), damagePerShot(damageValue), ownerPlayerID(playerID) {
 			};
 			~Projectile() {}
 
-			void OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vector3 localB, Vector3 normal) override {
-				gameWorld.RemoveGameObject(this, true);
-			}
+			void OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vector3 localB, Vector3 normal) override;
+
+			float GetDamage() const { return damagePerShot; }
+
+			int GetOwnerPlayerID() const { return ownerPlayerID; }
 
 			void Update(float dt) override;
+
 		private:
-			//Vector3 velocity;
+			float lifeSpan = 5.0f;
 			GameWorld& gameWorld;
-			float radius;
-			float height;
+			Renderer* renderInst;
+			int ownerPlayerID;
+			float damagePerShot;
 		};
 	}
 }

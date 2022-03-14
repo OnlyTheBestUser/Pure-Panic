@@ -40,6 +40,7 @@ namespace NCL::PS4 {
 			float textureCoord[2];
 			float normal[3];
 			float tangent[3];
+			//float colour[4];
 		};
 
 		sce::Gnm::IndexSize		indexType;

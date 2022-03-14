@@ -12,11 +12,6 @@
 using namespace NCL;
 using namespace CSC8503;
 
-/*
-These two variables help define the relationship between positions
-and the forces that are added to objects to change those positions
-*/
-
 PhysicsSystem::PhysicsSystem(GameWorld& g) : gameWorld(g)	{
 	applyGravity	= false;
 	useBroadPhase	= true;	
@@ -39,6 +34,17 @@ PhysicsSystem::PhysicsSystem(GameWorld& g) : gameWorld(g)	{
 	validLayers.emplace_back(Vector2(5, 1));
 	validLayers.emplace_back(Vector2(3, 5));
 	validLayers.emplace_back(Vector2(5, 3));
+
+	//Powerups
+	validLayers.emplace_back(Vector2(5, 8));
+	validLayers.emplace_back(Vector2(8, 5));
+
+	//Projectiles
+	validLayers.emplace_back(Vector2(16, 1));
+	validLayers.emplace_back(Vector2(1, 16));
+	validLayers.emplace_back(Vector2(16, 5));
+	validLayers.emplace_back(Vector2(5, 16));
+
 }
 
 PhysicsSystem::~PhysicsSystem()	{
@@ -59,7 +65,7 @@ void PhysicsSystem::BuildStaticList()
 	for (auto i = first; i != last; ++i) {
 		(*i)->UpdateBroadphaseAABB(); // Force update
 		Vector3 halfSizes;
-		if (!(*i)->GetBroadphaseAABB(halfSizes) || (*i)->IsDynamic())
+		if (!(*i)->GetBroadphaseAABB(halfSizes) || (*i)->GetPhysicsObject()->IsDynamic())
 			continue;
 		Vector3 pos = (*i)->GetTransform().GetPosition();
 		staticTree->Insert(*i, pos, halfSizes, (*i)->GetName());
@@ -101,19 +107,6 @@ int realHZ		= idealHZ;
 float realDT	= idealDT;
 
 void PhysicsSystem::Update(float dt) {	
-	/*if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::B)) {
-		useBroadPhase = !useBroadPhase;
-		std::cout << "Setting broadphase to " << useBroadPhase << std::endl;
-	}
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::I)) {
-		constraintIterationCount--;
-		std::cout << "Setting constraint iterations to " << constraintIterationCount << std::endl;
-	}
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::O)) {
-		constraintIterationCount++;
-		std::cout << "Setting constraint iterations to " << constraintIterationCount << std::endl;
-	}*/
-
 	dTOffset += dt; //We accumulate time delta here - there might be remainders from previous frame!
 
 	GameTimer t;
@@ -195,28 +188,28 @@ From this simple mechanism, we we build up gameplay interactions inside the
 OnCollisionBegin / OnCollisionEnd functions (removing health when hit by a 
 rocket launcher, gaining a point when the player hits the gold coin, and so on).
 */
-void PhysicsSystem::UpdateCollisionList() {
-	for (std::set<CollisionDetection::CollisionInfo>::iterator i = allCollisions.begin(); i != allCollisions.end(); ) {
-		/*if (i->a == nullptr || i->b == nullptr)
-		{
-			i = allCollisions.erase(i);
-			continue;
-		}*/
-		if ((*i).framesLeft == numCollisionFrames) {
-			i->a->OnCollisionBegin(i->b, i->point.localA, i->point.localB, i->point.normal);
-			i->b->OnCollisionBegin(i->a, i->point.localB, i->point.localA, -i->point.normal);
-		}
-		(*i).framesLeft = (*i).framesLeft - 1;
-		if ((*i).framesLeft < 0) {
-			i->a->OnCollisionEnd(i->b);
-			i->b->OnCollisionEnd(i->a);
-			i = allCollisions.erase(i);
-		}
-		else {
-			++i;
-		}
-	}
-}
+//void PhysicsSystem::UpdateCollisionList() {
+//	for (std::set<CollisionDetection::CollisionInfo>::iterator i = allCollisions.begin(); i != allCollisions.end(); ) {
+//		/*if (i->a == nullptr || i->b == nullptr)
+//		{
+//			i = allCollisions.erase(i);
+//			continue;
+//		}*/
+//		if ((*i).framesLeft == numCollisionFrames) {
+//			i->a->OnCollisionBegin(i->b, i->point.localA, i->point.localB, i->point.normal);
+//			i->b->OnCollisionBegin(i->a, i->point.localB, i->point.localA, -i->point.normal);
+//		}
+//		(*i).framesLeft = (*i).framesLeft - 1;
+//		if ((*i).framesLeft < 0) {
+//			i->a->OnCollisionEnd(i->b);
+//			i->b->OnCollisionEnd(i->a);
+//			i = allCollisions.erase(i);
+//		}
+//		else {
+//			++i;
+//		}
+//	}
+//}
 
 void PhysicsSystem::UpdateObjectAABBs() {
 	gameWorld.OperateOnContents(
@@ -337,7 +330,7 @@ void PhysicsSystem::BroadPhase() {
 
 	for (auto i = first; i != last; ++i) {
 		Vector3 halfSizes;
-		if (!(*i)->GetBroadphaseAABB(halfSizes) || !(*i)->IsDynamic()) {
+		if (!(*i)->GetBroadphaseAABB(halfSizes) || !(*i)->GetPhysicsObject()->IsDynamic()) {
 				continue;
 		}
 
@@ -376,7 +369,7 @@ void PhysicsSystem::BroadPhase() {
 				info.a = std::min((*i).object, (*j).object);
 				info.b = std::max((*i).object, (*j).object);
 #endif
-				if (ValidCollisionLayers(info.a->GetCollisionLayers(), info.b->GetCollisionLayers()) && !(!info.a->IsDynamic() && !info.b->IsDynamic())) {
+				if (ValidCollisionLayers(info.a->GetCollisionLayers(), info.b->GetCollisionLayers()) && !(!info.a->GetPhysicsObject()->IsDynamic() && !info.b->GetPhysicsObject()->IsDynamic())) {
 					broadphaseCollisions.insert(info);
 				}
 			}
@@ -419,6 +412,11 @@ void PhysicsSystem::CheckToWake(PhysicsObject* object)
 
 void PhysicsSystem::CheckToSleep(PhysicsObject* object)
 {
+	if (!object->CheckCanSleep())
+	{
+		return;
+	}
+
 	const int maxQueueSize = 6;
 	const float bounceTolerance = 0.5;
 
@@ -508,7 +506,7 @@ void PhysicsSystem::IntegrateAccel(float dt, GameObject* gobj) {
 	Vector3 force = object->GetForce();
 	Vector3 accel = force * inverseMass;
 	
-	if (applyGravity && inverseMass > 0 && object->UsesGravity() && gobj->IsDynamic()) {
+	if (applyGravity && inverseMass > 0 && object->UsesGravity() && object->IsDynamic()) {
 		accel += gravity;
 	}
 	

@@ -17,11 +17,10 @@
 #include "../../Plugins/OpenGLRendering/OGLShader.h"
 #include "../../Plugins/OpenGLRendering/OGLMesh.h"
 #include "../../Plugins/OpenGLRendering/OGLTexture.h"
+#include "../../Plugins/OpenGLRendering/OGLUniformBuffer.h"
 using namespace NCL;
 using namespace Rendering;
 using namespace CSC8503;
-
-
 
 Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 #ifdef _WIN64
@@ -56,6 +55,9 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 	//maskFBO->AddTexture(2048 / 4, 2048 / 4);
 	maskShader = new OGLShader("MaskVertex.glsl", "MaskFragment.glsl");
 
+	// Uniform block bindings
+	camBuffer = new OGLUniformBuffer(sizeof(CameraMatrix), 0);
+
 #endif
 #ifdef _ORBIS
 	skyboxMesh = PS4::PS4Mesh::GenerateQuad();
@@ -67,9 +69,8 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 	);
 
 	skyboxTex = PS4::PS4Texture::LoadSkyboxFromFile(NCL::Assets::TEXTUREDIR + "Cubemap/cubemap.gnf");
-	PS4::PS4UniformBuffer test((PS4::PS4RendererAPI*)rendererAPI, (uint32_t)sizeof(CamMatrix));
-	CamMatrix* cam = new CamMatrix();
-	test.SetData(cam, (uint32_t)sizeof(CamMatrix), 0);
+
+	camBuffer = new PS4::PS4UniformBuffer(sizeof(CameraMatrix));
 #endif
 
 	//Set up the light properties
@@ -79,6 +80,8 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 }
 
 Renderer::~Renderer() {
+	delete camBuffer;
+
 	delete shadowFBO;
 	delete shadowShader;
 
@@ -86,7 +89,6 @@ Renderer::~Renderer() {
 	delete skyboxMesh;
 	delete skyboxTex;
 
-	delete maskFBO;
 	delete maskShader;
 }
 
@@ -97,15 +99,11 @@ void Renderer::Update(float dt) {
 void Renderer::Render() {
 	rendererAPI->BeginFrame();
 
-
 	rendererAPI->SetCullFace(true);
 	rendererAPI->SetClearColour(1, 1, 1, 1);
 	BuildObjectList();
 	SortObjectList();
 
-	for (const auto& i : activeObjects) {
-		Paint(i, Vector3(0, 0, 0), 1.0f, 1.0f, 1.0f, Vector4(1, 0, 0, 1));
-	}
 #ifdef _WIN64
 	ApplyPaintToMasks();
 #endif
@@ -113,9 +111,7 @@ void Renderer::Render() {
 	rendererAPI->SetCullFace(false);
 
 	rendererAPI->EndFrame();
-#ifdef _WIN64
 	DrawDebugData();
-#endif
 	rendererAPI->SwapBuffers();
 }
 
@@ -142,6 +138,12 @@ void Renderer::RenderScene() {
 #ifdef _WIN64
 	RenderShadows();
 #endif
+	// Set scene uniform buffers
+	float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
+	camMatrix.projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);
+	camMatrix.viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
+	camBuffer->SetData(&camMatrix, sizeof(CameraMatrix));
+
 	RenderSkybox();
 	RenderObjects();
 }
@@ -158,7 +160,7 @@ void Renderer::RenderShadows() {
 	rendererAPI->SetViewportSize(4096, 4096);
 	rendererAPI->SetCullType(NCL::Rendering::RendererAPI::CULL_TYPE::FRONT);
 
-	rendererAPI->BindShader(shadowShader);
+	shadowShader->BindShader();
 
 	Matrix4 shadowViewMatrix = Matrix4::BuildViewMatrix(lightPos, Vector3(0, 0, 0), Vector3(0, 1, 0));
 	Matrix4 shadowProjMatrix = Matrix4::Perspective(100.0f, 500.0f, 1, 45.0f);
@@ -170,7 +172,7 @@ void Renderer::RenderShadows() {
 	for (const auto& i : activeObjects) {
 		Matrix4 modelMatrix = (*i).GetTransform()->GetMatrix();
 		Matrix4 mvpMatrix = mvMatrix * modelMatrix;
-		rendererAPI->UpdateUniformMatrix4(shadowShader, "mvpMatrix", mvpMatrix);
+		shadowShader->UpdateUniformMatrix4("mvpMatrix", mvpMatrix);
 
 		rendererAPI->DrawMeshAndSubMesh((*i).GetMesh());
 	}
@@ -185,17 +187,11 @@ void Renderer::RenderSkybox() {
 	rendererAPI->SetBlend(false);
 	rendererAPI->SetDepth(false);
 
-	float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
-	Matrix4 viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
-	Matrix4 projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);
+	skyboxShader->BindShader();
 
-	rendererAPI->BindShader(skyboxShader);
+	skyboxShader->UpdateUniformMatrix4("invProjMatrix", camMatrix.projMatrix.Inverse());
 
-	rendererAPI->UpdateUniformMatrix4(skyboxShader, "projMatrix", projMatrix);
-	rendererAPI->UpdateUniformMatrix4(skyboxShader, "viewMatrix", viewMatrix);
-	rendererAPI->UpdateUniformMatrix4(skyboxShader, "invProjMatrix", projMatrix.Inverse());
-
-	rendererAPI->BindCubemap(skyboxTex, "cubeTex", 0);
+	skyboxTex->Bind(0);
 
 	rendererAPI->DrawMesh(skyboxMesh);
 
@@ -207,65 +203,58 @@ void Renderer::RenderSkybox() {
 void Renderer::RenderObjects() {
 	ShaderBase* activeShader = nullptr;
 
-	float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
-	Matrix4 viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
-	Matrix4 projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);
-
 	for (const auto& i : activeObjects) {
 		ShaderBase* shader = (*i).GetShader();
 
 		if (activeShader != shader) {
-			rendererAPI->BindShader(shader);
+			shader->BindShader();
 
-			rendererAPI->UpdateUniformMatrix4(shader, "projMatrix", projMatrix);
-			rendererAPI->UpdateUniformMatrix4(shader, "viewMatrix", viewMatrix);
-			rendererAPI->UpdateUniformMatrix4(shader, "viewProjMatrix", projMatrix * viewMatrix);
-			rendererAPI->UpdateUniformMatrix4(shader, "invProjMatrix", projMatrix.Inverse());
-			rendererAPI->UpdateUniformVector3(shader, "cameraPos", gameWorld.GetMainCamera()->GetPosition());
+			shader->UpdateUniformMatrix4("viewProjMatrix", camMatrix.projMatrix * camMatrix.viewMatrix);
+			shader->UpdateUniformMatrix4("invProjMatrix", camMatrix.projMatrix.Inverse());
+			shader->UpdateUniformVector3("cameraPos", gameWorld.GetMainCamera()->GetPosition());
 
-			rendererAPI->UpdateUniformVector4(shader, "lightColour", lightColour);
-			rendererAPI->UpdateUniformVector3(shader, "lightPos", lightPos);
-			rendererAPI->UpdateUniformFloat(shader, "lightRadius", lightRadius);
+			shader->UpdateUniformVector4("lightColour", lightColour);
+			shader->UpdateUniformVector3("lightPos", lightPos);
+			shader->UpdateUniformFloat( "lightRadius", lightRadius);
 
 			activeShader = shader;
 		}
 
-		rendererAPI->BindTexture((*i).GetDefaultTexture(), "mainTex", 0);
-		rendererAPI->UpdateUniformInt(shader, "hasTexture", (*i).GetDefaultTexture() ? 1 : 0);
+		if ((*i).GetDefaultTexture()) (*i).GetDefaultTexture()->Bind(0);
+		shader->UpdateUniformInt("hasTexture", (*i).GetDefaultTexture() ? 1 : 0);
 #ifdef _WIN64
-		rendererAPI->BindTexture(shadowFBO->GetTexture(), "shadowTex", 1);
-		//rendererAPI->BindTexture(i->GetPaintMask(), "paintMaskTex", 2);
-		//rendererAPI->UpdateUniformInt(shader, "hasPaintMask", (*i).GetPaintMask() ? 1 : 0);
+		if (shadowFBO->GetTexture()) shadowFBO->GetTexture()->Bind(1);
+
+		if ((*i).GetPaintMask()) (*i).GetPaintMask()->Bind(2);
+		shader->UpdateUniformInt("hasPaintMask", (*i).GetPaintMask() ? 1 : 0);
 #endif
 
 		Matrix4 modelMatrix = (*i).GetTransform()->GetMatrix();
 #ifdef _WIN64
 		Matrix4 fullShadowMat = shadowMatrix * modelMatrix;
 #endif
-		rendererAPI->UpdateUniformMatrix4(shader, "modelMatrix", modelMatrix);
-		rendererAPI->UpdateUniformMatrix4(shader, "invModelMatrix", modelMatrix.Inverse());
+		shader->UpdateUniformMatrix4("modelMatrix", modelMatrix);
+		shader->UpdateUniformMatrix4("invModelMatrix", modelMatrix.Inverse());
 #ifdef _WIN64
-		rendererAPI->UpdateUniformMatrix4(shader, "shadowMatrix", fullShadowMat);
+		shader->UpdateUniformMatrix4("shadowMatrix", fullShadowMat);
 
-		rendererAPI->UpdateUniformVector4(shader, "objectColour", i->GetColour());
-		rendererAPI->UpdateUniformInt(shader, "hasVertexColours", !(*i).GetMesh()->GetColourData().empty());
+		shader->UpdateUniformVector4("objectColour", i->GetColour());
+		shader->UpdateUniformInt("hasVertexColours", !(*i).GetMesh()->GetColourData().empty());
 #endif
 
 		rendererAPI->DrawMeshAndSubMesh((*i).GetMesh());
 	}
-
-	/* 
-	* Go through all paint instances <- struct of all information from paint method
-	* bind paint shader 
-	* draw each object that is part
-	*/
 }
 
-void Renderer::Paint(const RenderObject* paintable, NCL::Maths::Vector3 pos, float radius, float hardness, float strength, NCL::Maths::Vector4 colour)
+void Renderer::Paint(const RenderObject* paintable, Vector3& barycentric, Vector3& colpos, Vector2& texUV_a, Vector2& texUV_b, Vector2& texUV_c, float radius, float hardness, float strength, NCL::Maths::Vector4 colour)
 {
 	PaintInstance pi;
 	pi.object = paintable;
-	pi.pos = pos;
+	pi.barycentric = barycentric;
+	pi.colPoint = colpos;
+	pi.texUV_a = texUV_a;
+	pi.texUV_b = texUV_b;
+	pi.texUV_c = texUV_c;
 	pi.radius = radius;
 	pi.hardness = hardness;
 	pi.strength = strength;
@@ -277,39 +266,77 @@ void Renderer::Paint(const RenderObject* paintable, NCL::Maths::Vector3 pos, flo
 void Renderer::ApplyPaintToMasks() {
 #ifdef _WIN64
 	rendererAPI->SetDepth(false);
-	rendererAPI->SetBlend(true);
-	glBlendFunc(GL_ONE, GL_SRC_ALPHA);
+	rendererAPI->SetBlend(true, RendererAPI::BlendType::ONE, RendererAPI::BlendType::ALPHA);
 
-	rendererAPI->BindShader(maskShader);
+	maskShader->BindShader();
 
 	Vector2 currentSize;
 	for (const auto& i : paintInstances) {
-		if (i.object->GetPaintMask() == 0) continue;
-		maskFBO = new OGLFrameBuffer();
-		maskFBO->AddTexture((OGLTexture*)(i.object->GetPaintMask()));
+		if (i.object->GetPaintMask() == nullptr) continue;
+		OGLFrameBuffer maskFBO;
+		maskFBO.AddTexture((OGLTexture*)(i.object->GetPaintMask()));
 
 		if (Vector2(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight()) != currentSize) {
 			currentSize = Vector2(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight());
 			rendererAPI->SetViewportSize(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight());
 		}
 
-		rendererAPI->UpdateUniformMatrix4(maskShader, "modelMatrix", i.object->GetTransform()->GetMatrix());
-
 		// Update uniforms here
+		maskShader->UpdateUniformMatrix4("modelMatrix", i.object->GetTransform()->GetMatrix());
+		maskShader->UpdateUniformVector3("barycentricCoord", i.barycentric);
+		maskShader->UpdateUniformVector3("collisionPoint", i.colPoint);
+		maskShader->UpdateUniformVector2("nearTexCoord_a", i.texUV_a);
+		maskShader->UpdateUniformVector2("nearTexCoord_b", i.texUV_b);
+		maskShader->UpdateUniformVector2("nearTexCoord_c", i.texUV_c);
 
-		rendererAPI->BindFrameBuffer(maskFBO);
+		Vector2 pos = i.texUV_a * i.barycentric.x 
+			+ i.texUV_b * i.barycentric.y 
+			+ i.texUV_c * i.barycentric.z;
+		maskShader->UpdateUniformVector2("uvHitPoint", pos);
+
+		maskShader->UpdateUniformVector2("viewport", Vector2(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight()));
+
+		maskShader->UpdateUniformVector2("textureSize", Vector2(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight()));
+		float scale = 400.0f / (400.0f / 1.0f);
+		maskShader->UpdateUniformVector3("textureScale", i.object->GetTransform()->GetScale());
+		maskShader->UpdateUniformFloat("radius", 5.0f);
+		maskShader->UpdateUniformFloat("hardness", i.hardness);
+		maskShader->UpdateUniformFloat("strength", i.strength);
+		maskShader->UpdateUniformVector4("colour", i.colour);
+
+		rendererAPI->BindFrameBuffer(&maskFBO);
 
 		rendererAPI->DrawMesh(skyboxMesh);
-		delete maskFBO;
 	}
-	glBlendFunc(GL_ONE, GL_NONE);
-	rendererAPI->SetBlend(false);
+	rendererAPI->SetBlend(false, RendererAPI::BlendType::ONE, RendererAPI::BlendType::NONE);
 	rendererAPI->SetDepth(true);
 	rendererAPI->SetViewportSize(rendererAPI->GetCurrentWidth(), rendererAPI->GetCurrentHeight());
 	rendererAPI->ClearBuffer(true, true, true);
 	rendererAPI->BindFrameBuffer();
 #endif
 	paintInstances.clear();
+}
+
+Maths::Vector2 Renderer::GetUVCoord(const RenderObject* paintable, NCL::Maths::Vector3 pos) {
+	const vector<Vector3> vertices = paintable->GetMesh()->GetPositionData();
+
+	Vector3 localPos = paintable->GetTransform()->GetMatrix().Inverse() * pos;
+	Vector3 closestDistance = Vector3(10000,10000,10000);
+	int closestVertex = -1;
+	for (auto i = 0; i < paintable->GetMesh()->GetVertexCount(); ++i) {
+		Vector3 distance = vertices[i] - localPos;
+		float t1 = distance.Length();
+		float t2 = closestDistance.Length();
+		if (distance.Length() < closestDistance.Length()) {
+			closestDistance = distance;
+			closestVertex = i;
+		}
+	}
+
+	if (closestVertex != -1) {
+		return paintable->GetMesh()->GetTextureCoordData()[closestVertex];
+	}
+	return Vector2();
 }
 
 Maths::Matrix4 Renderer::SetupDebugLineMatrix()	const {

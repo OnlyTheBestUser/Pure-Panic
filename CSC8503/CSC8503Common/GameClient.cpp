@@ -1,3 +1,4 @@
+#ifndef _ORBIS
 #include "GameClient.h"
 #include <iostream>
 #include <string>
@@ -5,11 +6,11 @@
 using namespace NCL;
 using namespace CSC8503;
 
-GameClient::GameClient()	{
+GameClient::GameClient() {
 	netHandle = enet_host_create(nullptr, 1, 1, 0, 0);
 }
 
-GameClient::~GameClient()	{
+GameClient::~GameClient() {
 	//threadAlive = false;
 	//updateThread.join();
 	enet_host_destroy(netHandle);
@@ -44,7 +45,7 @@ void GameClient::UpdateClient() {
 			std::cout << "Client: Connected to server!" << std::endl;
 		}
 		else if (event.type == ENET_EVENT_TYPE_RECEIVE) {
-			std::cout << "Client: Packet recieved..." << std::endl;
+			//std::cout << "Client: Packet recieved..." << std::endl;
 			GamePacket* packet = (GamePacket*)event.packet->data;
 			ProcessPacket(packet);
 		}
@@ -52,7 +53,7 @@ void GameClient::UpdateClient() {
 	}
 }
 
-void GameClient::SendPacket(GamePacket&  payload) {
+void GameClient::SendPacket(GamePacket& payload) {
 	ENetPacket* dataPacket = enet_packet_create(&payload, payload.GetTotalSize(), 0);
 
 	int test = enet_peer_send(netPeer, 0, dataPacket);
@@ -63,3 +64,4 @@ void GameClient::SendPacket(GamePacket&  payload) {
 //		UpdateClient();
 //	}
 //}
+#endif

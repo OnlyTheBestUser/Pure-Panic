@@ -17,6 +17,7 @@ namespace NCL {
 #ifndef _ORBIS
 				inputBase = new PCInput();
 #endif
+				commandsExecuted.reserve(128);
 			}
 
 			~InputHandler() { 
@@ -35,11 +36,16 @@ namespace NCL {
 				return inputBase->GetAxis(index);
 			}
 
+			bool commandExecuted(Input action) { 
+				return inputBase->GetButtonDown(action); 
+			}
+
 		private:
 
-			Command* commands[127];
-			AxisCommand* axisCommands[127];
+			Command* commands[127] = {nullptr};
+			AxisCommand* axisCommands[127] = {nullptr};
 			InputBase* inputBase;
+			vector<int> commandsExecuted;
 
 			//std::vector<Command*> commandsToExecute;
 		};

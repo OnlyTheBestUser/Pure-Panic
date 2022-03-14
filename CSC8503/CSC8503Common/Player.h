@@ -3,19 +3,22 @@
 #include "GameWorld.h"
 #include "../../Common/Vector3.h"
 #include "../../Common/Camera.h"
+#include"../CSC8503Common/PowerUp.h"
 #include "Projectile.h"
 #include <chrono>
+#include <algorithm>
 
 namespace NCL {
     using namespace Maths;
     namespace CSC8503 {
-
+		class LevelLoader;
         class Player : public GameActor
         {
         public:
-			Player(Camera* camera, GameWorld& g, MeshGeometry* pm, ShaderBase* shd, string name = "", Vector3 ch = Vector3(0, 2, 0)) : GameActor(name), checkpoint(ch), spawnPos(ch), gameWorld(g), projectileMesh(pm), basicShader(shd) {
+			Player(Camera* camera, LevelLoader* lvlLoader, GameWorld* world, string name = "", Vector3 ch = Vector3(0, 2, 0)) : GameActor(name), checkpoint(ch), spawnPos(ch), levelLoader(lvlLoader), world(world){
 				this->camera = camera;
 				camLocked = true;
+				playerID = 0;
 			};
             ~Player() {};
 
@@ -25,16 +28,43 @@ namespace NCL {
             float GetTimeTaken() const { return timeTaken; }
             int GetScore() const { return score; }
             Vector3 GetCheckpoint() const { return checkpoint; }
-
+			
+			bool IsDead();
+			void Respawn();
+			
             bool Win() const { return finish; }
             void Reset();
 
 			bool HasKey() const { return key; }
 
-			void IncreaseSpeed(float speedIncrease, float duration) {
-				curSpeed += speedIncrease;
-				powerupTime += duration;
+			void IncreaseSpeed(const float& speedIncrease, const float& duration) {
+				if (speedIncrease <= 0 || duration <= 0) return;
+				curSpeed *= speedIncrease;
+				powerupTime = duration;
+				currentPowerUp = PowerUpType::SpeedBoost;
 			};
+
+			void IncreaseFireRate(const float& increaseFireRateFactor, const float& duration) {
+				if (increaseFireRateFactor <= 0 || duration <= 0) return;
+				fireRate *= increaseFireRateFactor;
+				powerupTime = duration;
+				currentPowerUp = PowerUpType::FireRate;
+			}
+
+			void IncreaseHealth(const float& increaseHealthBy) {
+				if (increaseHealthBy <= 0) return;
+				health += increaseHealthBy;
+				if (health > maxHealth) health = maxHealth;
+
+				currentPowerUp = PowerUpType::Heal;
+			}
+			
+			void ResetPowerUps()
+			{
+				fireRate = defaultFireRate;
+				curSpeed = defaultCurSpeed;
+				currentPowerUp = PowerUpType::None;
+			}
 
 			float GetSpeed() const { return curSpeed; }
 
@@ -72,11 +102,33 @@ namespace NCL {
 				return ( Matrix4::Rotation(camera->GetYaw(), Vector3(0, 1, 0)) * Matrix4::Rotation(camera->GetPitch(), Vector3(1, 0, 0)) * Vector3(0, 0, -1)).Normalised();
 			}
 
+			PowerUpType GetCurrentPowerup () const {
+				return currentPowerUp;
+			}
+
+			void DealDamage(float damageAmount) {
+				health -= damageAmount;
+				if (health < 0) health = 0;
+			}
+
 			void ChangeCamLock() { camLocked = !camLocked; }
 			bool* GetCamLock() { return &camLocked; }
 
+			bool IsFiring() { 
+				bool ret = fired;
+				fired = false;
+				return ret;
+			}
+
+			Camera* GetCam() { return camera; }
+
+			int GetPlayerID() const { return playerID; }
+			void SetPlayerID(int x) { playerID = x; }
+
         protected:
 			float CheckDistToGround();
+
+			int playerID;
 
             bool start = false;
             bool finish = false;
@@ -85,23 +137,30 @@ namespace NCL {
             Vector3 spawnPos;
             Vector3 checkpoint;
 			bool key = false;
+			float defaultFireRate = 0.2f;
+			float defaultCurSpeed = 80.0f;
+			float fireRate = 0.2f;
+			float timeSincePrevShot = 0.0f;
 			float powerupTime = 0.0f;
-			float curSpeed = 500.0f;
+			float curSpeed = 80.0f;
 			Vector3 force = Vector3(0,0,0);
 
-			float inAirSpeed = 1300.0f;
+			float inAirSpeed = 500.0f;
 			bool canJump;
+
+			const float maxHealth = 100.0f;
+			float health = 90.0f;
+
+			PowerUpType currentPowerUp = PowerUpType::None;
 
 			float cameraVertMult = 0.5f;
 			Camera* camera;
-			GameWorld& gameWorld;
+			GameWorld* world;
 			bool camLocked;
 			
-			ShaderBase* basicShader;
-			MeshGeometry* projectileMesh;
+			bool fired = false;
 
-		private:
-			Projectile* spawnProjectile(const float& radius, const float& height, const float& initialSpeed = 25.0f);
+			LevelLoader* levelLoader;
         };
     }
 }

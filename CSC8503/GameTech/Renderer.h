@@ -4,9 +4,11 @@
 namespace NCL {
 	namespace Rendering {
 		class SimpleFont;
+		class UniformBuffer;
 
-		struct CamMatrix {
-			Vector3 viewMatrix;
+		struct CameraMatrix {
+			Matrix4 projMatrix;
+			Matrix4 viewMatrix;
 		};
 
 		class Renderer : public RendererBase
@@ -21,7 +23,8 @@ namespace NCL {
 			void BuildObjectList();
 			void SortObjectList();
 			void RenderScene();
-			void Paint(const RenderObject* paintable, NCL::Maths::Vector3 pos, float radius = 1.0f, float hardness = .5f, float strength = 0.5f, NCL::Maths::Vector4 color = Vector4(0,0,0,0));
+			void Paint(const RenderObject* paintable, Vector3& pos, Vector3& colpos, Vector2& texUV_a, Vector2& texUV_b, Vector2& texUV_c, float radius = 1.0f, float hardness = .5f, float strength = 0.5f, Vector4 color = Vector4(0,0,0,0));
+			Maths::Vector2 GetUVCoord(const RenderObject* paintable, NCL::Maths::Vector3 pos); // Gets where the uv point on a texture is given the object and collision position
 			void ApplyPaintToMasks();
 
 			void RenderShadows();
@@ -36,12 +39,19 @@ namespace NCL {
 
 			struct PaintInstance {
 				const RenderObject* object;
-				Maths::Vector3 pos;
+				Vector3 colPoint;
+				Vector3 barycentric;
+				Vector2 texUV_a;
+				Vector2 texUV_b;
+				Vector2 texUV_c;
 				float radius;
 				float hardness;
 				float strength;
 				Vector4 colour;
 			};
+
+			CameraMatrix camMatrix;
+			UniformBuffer* camBuffer;
 
 			CSC8503::GameWorld& gameWorld;
 			vector<const RenderObject*> activeObjects;
@@ -50,7 +60,6 @@ namespace NCL {
 			FrameBufferBase* shadowFBO;
 			ShaderBase* shadowShader;
 
-			FrameBufferBase* maskFBO;
 			ShaderBase* maskShader;
 
 			ShaderBase* skyboxShader;

@@ -1,9 +1,10 @@
 #pragma once
-#include "Renderer.h"
-#include "../CSC8503Common/PaintManager.h"
 #include "LevelLoader.h"
 #include "../CSC8503Common/PhysicsSystem.h"
 #include "../CSC8503Common/Player.h"
+#include "../CSC8503Common/AudioManager.h"
+#include "../CSC8503Common/BGMManager.h"
+#include "..//CSC8503Common/Timer.h"
 //#include "../CSC8503Common/Projectile.h"
 
 namespace NCL {
@@ -27,7 +28,12 @@ namespace NCL {
 			virtual ~TutorialGame();
 
 			virtual void UpdateGame(float dt);
-			void SetState(GameState s) { state = s; }
+
+			void SetState(GameState s) { 
+				state = s; 
+				UpdateBGM(); 
+			}
+
 			void ResetGame() {
 				state = RESET;
 				quit = false;
@@ -46,6 +52,8 @@ namespace NCL {
 				return quit;
 			}
 
+			void PaintObject();
+
 		protected:
 			InputHandler* inputHandler;
 
@@ -63,18 +71,19 @@ namespace NCL {
 	
 			bool SelectObject();
 			void MoveSelectedObject(float dt);
-			void PaintSelectedObject();
 			void DebugObjectMovement();
 			void DebugDrawCollider(const CollisionVolume* c, Transform* worldTransform);
 			void DebugDrawVelocity(const Vector3& vel, Transform* worldTransform);
 			void DebugDrawObjectInfo(const GameObject* obj);
+			void UpdateBGM();
 
 			StateGameObject* testStateObject;
 
-			PaintManager* paintManager;
 			Renderer*			renderer;
 			PhysicsSystem*		physics;
 			GameWorld*			world;
+			NCL::AudioManager*		audio;
+			BGMManager*	bgm;
 			LevelLoader*		levelLoader;
 
 			GameState state;
@@ -95,6 +104,8 @@ namespace NCL {
 
 			bool won = false;
 			Player* player1 = nullptr;
+
+			Timer* timer;
 		};
 	}
 }

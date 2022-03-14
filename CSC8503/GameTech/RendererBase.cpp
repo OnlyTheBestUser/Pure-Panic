@@ -1,4 +1,6 @@
 #include "../../Plugins/PlayStation4/PS4RendererAPI.h"
+#include "../../Plugins/PlayStation4/PS4Shader.h"
+#include "../../Plugins/PlayStation4/PS4Mesh.h"
 #include "RendererBase.h"
 #include "../../Plugins/OpenGLRendering/OGLRendererAPI.h"
 #include "../../Plugins/OpenGLRendering/OGLFrameBuffer.h"
@@ -10,9 +12,12 @@
 #include "../../Common/TextureLoader.h"
 
 #include "../../Common/MeshGeometry.h"
-#include "../../Plugins/PlayStation4/PS4Mesh.h"
+#include "../../Common/Assets.h"
+
 using namespace NCL;
 using namespace Rendering;
+
+RendererAPI* RendererBase::rendererAPI = nullptr;
 
 RendererBase::RendererBase() {
 #ifdef _WIN64
@@ -53,12 +58,30 @@ RendererBase::RendererBase() {
 
 	TextureLoader::RegisterAPILoadFunction(PS4::PS4Texture::LoadTextureFromFile);
 
-	debugLinesMesh = PS4::PS4Mesh::GenerateQuad();
-	debugTextMesh = PS4::PS4Mesh::GenerateQuad();
+	font = new SimpleFont("PressStart2P.fnt", "PressStart2P.gnf");
 
+	debugShader = PS4::PS4Shader::GenerateShader(
+		Assets::SHADERDIR + "PS4/DebugVertex.sb",
+		Assets::SHADERDIR + "PS4/DebugPixel.sb"
+	);
+
+	debugLinesMesh = new PS4::PS4Mesh();
+	debugTextMesh = new PS4::PS4Mesh();
+
+	int test = 5000;
+	debugLinesMesh->SetVertexPositions(std::vector<Vector3>(test, Vector3()));
+	debugLinesMesh->SetVertexColours(std::vector<Vector4>(test, Vector4()));
+	debugLinesMesh->SetVertexTextureCoords(std::vector<Vector2>(test, Vector2()));
+	debugLinesMesh->SetVertexNormals(std::vector<Vector3>(test, Vector3()));
+	debugLinesMesh->SetVertexTangents(std::vector<Vector4>(test, Vector4()));
+
+	debugTextMesh->SetVertexPositions(std::vector<Vector3>(test, Vector3()));
+	debugTextMesh->SetVertexColours(std::vector<Vector4>(test, Vector4()));
+	debugTextMesh->SetVertexTextureCoords(std::vector<Vector2>(test, Vector2()));
+	debugTextMesh->SetVertexNormals(std::vector<Vector3>(test, Vector3()));
+	debugTextMesh->SetVertexTangents(std::vector<Vector4>(test, Vector4()));
 
 #endif
-
 	debugTextMesh->UploadToGPU(rendererAPI);
 	debugLinesMesh->UploadToGPU(rendererAPI);
 
@@ -74,7 +97,6 @@ RendererBase::~RendererBase() {
 
 	delete debugShader;
 }
-
 
 void RendererBase::DrawString(const std::string& text, const Maths::Vector2& pos, const Maths::Vector4& colour, float size) {
 	DebugString s;
@@ -94,10 +116,11 @@ void RendererBase::DrawLine(const Maths::Vector3& start, const Maths::Vector3& e
 }
 
 void RendererBase::DrawDebugData() {
+
 	if (debugStrings.empty() && debugLines.empty()) {
 		return; //don't mess with OGL state if there's no point!
 	}
-	rendererAPI->BindShader(debugShader);
+	debugShader->BindShader();
 
 	if (forceValidDebugState) {
 		rendererAPI->SetBlend(true);
@@ -106,19 +129,19 @@ void RendererBase::DrawDebugData() {
 
 	Matrix4 pMat;
 
-	rendererAPI->BindTexture(font->GetTexture(), "mainTex", 0);
+	font->GetTexture()->Bind(0);
 
 	if (debugLines.size() > 0) {
 		pMat = SetupDebugLineMatrix();
-		rendererAPI->UpdateUniformMatrix4(debugShader, "viewProjMatrix", pMat);
-		rendererAPI->UpdateUniformInt(debugShader, "useTexture", 0);
+		debugShader->UpdateUniformMatrix4("viewProjMatrix", pMat);
+		debugShader->UpdateUniformInt("useTexture", 0);
 		DrawDebugLines();
 	}
 
 	if (debugStrings.size() > 0) {
 		pMat = SetupDebugStringMatrix();
-		rendererAPI->UpdateUniformMatrix4(debugShader, "viewProjMatrix", pMat);
-		rendererAPI->UpdateUniformInt(debugShader, "useTexture", 1);
+		debugShader->UpdateUniformMatrix4("viewProjMatrix", pMat);
+		debugShader->UpdateUniformInt("useTexture", 1);
 		DrawDebugStrings();
 	}
 
@@ -146,7 +169,6 @@ void RendererBase::DrawDebugStrings() {
 	debugTextMesh->SetVertexColours(vertColours);
 	debugTextMesh->UpdateGPUBuffers(0, vertPos.size());
 
-
 	rendererAPI->DrawMesh(debugTextMesh);
 
 	debugStrings.clear();
@@ -156,9 +178,11 @@ void RendererBase::DrawDebugLines() {
 	vector<Vector3> vertPos;
 	vector<Vector4> vertCol;
 
+	int indices = 0;
 	for (DebugLine& s : debugLines) {
 		vertPos.emplace_back(s.start);
 		vertPos.emplace_back(s.end);
+
 
 		vertCol.emplace_back(s.colour);
 		vertCol.emplace_back(s.colour);
@@ -166,6 +190,7 @@ void RendererBase::DrawDebugLines() {
 
 	debugLinesMesh->SetVertexPositions(vertPos);
 	debugLinesMesh->SetVertexColours(vertCol);
+	
 	debugLinesMesh->UpdateGPUBuffers(0, vertPos.size());
 
 	rendererAPI->DrawMesh(debugLinesMesh);

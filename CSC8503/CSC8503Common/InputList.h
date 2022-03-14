@@ -11,5 +11,7 @@ namespace NCL {
 			QUIT,
 			DESCEND,
 			RESET_WORLD
+			TOGGLE_MOUSE,
+			START_TIMER
 		};
 }

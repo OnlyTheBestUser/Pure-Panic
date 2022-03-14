@@ -22,6 +22,8 @@ namespace NCL {
 			 OGLTexture(GLuint texToOwn);
 			~OGLTexture();
 
+			void Bind(int slot = 0) const override;
+
 			static TextureBase* RGBATextureFromData(char* data, int width, int height, int channels);
 
 			static TextureBase* RGBATextureFromFilename(const std::string&name);
