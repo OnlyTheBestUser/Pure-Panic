@@ -320,7 +320,7 @@ void TutorialGame::InitWorld() {
 	physics->Clear();
 
 	LevelManager->ReadInLevelFile(NCL::Assets::DATADIR + "../../Assets/Maps/map1.txt");
-	Player* player = LevelManager->AddPlayerToWorld(Vector3(0, 5, 0));
+	Player* player = LevelManager->SpawnPlayer(Vector3(0, 5, 0));
 	LevelManager->AddPowerUpToWorld(Vector3(0, 5, 20), PowerUpType::SpeedBoost);
 	LevelManager->AddPowerUpToWorld(Vector3(0, 5, 30), PowerUpType::FireRate);
 	LevelManager->AddPowerUpToWorld(Vector3(0, 5, 40), PowerUpType::Heal);
