@@ -21,7 +21,7 @@ TutorialGame::TutorialGame()	{
 	world			= new GameWorld();
 	renderer		= new Renderer(*world);
 	physics			= new PhysicsSystem(*world);
-	levelLoader		= new LevelLoader(world, physics, renderer);
+	LevelManager		= new LevelManager(world, physics, renderer);
 
 #ifndef _ORBIS
 	audio = NCL::AudioManager::GetInstance();
@@ -34,7 +34,7 @@ TutorialGame::TutorialGame()	{
 	bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 3.0f);
 #endif
 
-	levelLoader = new LevelLoader(world, physics, renderer);
+	LevelManager = new LevelManager(world, physics, renderer);
 
 	forceMagnitude = 30.0f;
 	useGravity = true;
@@ -124,7 +124,7 @@ TutorialGame::~TutorialGame() {
 	delete physics;
 	delete renderer;
 	delete world;
-	delete levelLoader;
+	delete LevelManager;
 }
 
 void TutorialGame::UpdateGame(float dt) {
@@ -319,11 +319,11 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	levelLoader->ReadInLevelFile(NCL::Assets::DATADIR + "../../Assets/Maps/map1.txt");
-	Player* player = levelLoader->AddPlayerToWorld(Vector3(0, 5, 0));
-	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 20), PowerUpType::SpeedBoost);
-	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 30), PowerUpType::FireRate);
-	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 40), PowerUpType::Heal);
+	LevelManager->ReadInLevelFile(NCL::Assets::DATADIR + "../../Assets/Maps/map1.txt");
+	Player* player = LevelManager->AddPlayerToWorld(Vector3(0, 5, 0));
+	LevelManager->AddPowerUpToWorld(Vector3(0, 5, 20), PowerUpType::SpeedBoost);
+	LevelManager->AddPowerUpToWorld(Vector3(0, 5, 30), PowerUpType::FireRate);
+	LevelManager->AddPowerUpToWorld(Vector3(0, 5, 40), PowerUpType::Heal);
 
 	//Command* f = new MoveForwardCommand(player);
 	//Command* b = new MoveBackwardCommand(player);
@@ -351,7 +351,7 @@ void TutorialGame::InitWorld() {
 	Command* f = new FireCommand(player);
 	inputHandler->BindButton(FIRE, f);
 
-	/*GameObject* cap1 = levelLoader->AddCapsuleToWorld(Vector3(15, 15, 0), 3.0f, 1.5f);
+	/*GameObject* cap1 = LevelManager->AddCapsuleToWorld(Vector3(15, 15, 0), 3.0f, 1.5f);
 	cap1->GetPhysicsObject()->SetDynamic(true);
 	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);*/
 

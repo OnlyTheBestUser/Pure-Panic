@@ -11,7 +11,7 @@ void Projectile::Update(float dt) {
 	lifeSpan -= dt;
 	if (lifeSpan < 0.0f)
 	{
-		gameWorld.RemoveGameObject(this, true);
+		GameWorld::RemoveGameObject(this, true);
 	}
 }
 
@@ -19,17 +19,15 @@ void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vecto
 #ifndef _ORBIS
 	int soundToPlay = rand() % 2;
 	NCL::AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + (soundToPlay == 0 ? "splat_neutral_01.ogg" : "splat_neutral_02.ogg"), this->GetTransform().GetPosition());
-#endif // !_ORBIS
+#endif
 
 	Ray ray(this->GetTransform().GetPosition(), -this->GetPhysicsObject()->GetLinearVelocity());
 	ray.SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
-	//Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
+
 	RayCollision closestCollision;
-	if (gameWorld.Raycast(ray, closestCollision, true)) {
+	if (GameWorld::Raycast(ray, closestCollision, true)) {
 		RenderObject* test = ((GameObject*)closestCollision.node)->GetRenderObject();
-		
-		//Debug::DrawLine(ray.GetPosition(), ray.GetPosition() * ray.GetDirection());
-		//Debug::DrawSphere(closestCollision.collidedAt, 0.5, Vector4(1, 0, 0, 1), 0.f);
+
 		if (test) {
 			if (test->GetPaintMask() != nullptr) {
 
@@ -52,5 +50,5 @@ void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vecto
 		}
 	}
 
-	gameWorld.RemoveGameObject(this, true);
+	GameWorld::RemoveGameObject(this, true);
 }

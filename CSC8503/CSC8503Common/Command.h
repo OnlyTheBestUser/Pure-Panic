@@ -150,14 +150,15 @@ namespace NCL {
 		};
 
 		class ResetWorldCommand : public Command {
-			public:
-				ResetWorldCommand(GameState* s) : state(s) {};
-				virtual ~ResetWorldCommand() {};
-				void execute() {
-					*state = RESET;
-				}
-			protected:
-				GameState* state;
+		public:
+			ResetWorldCommand(GameState* s) : state(s) {};
+			virtual ~ResetWorldCommand() {};
+			void execute() {
+				*state = RESET;
+			}
+		protected:
+			GameState* state;
+		};
 
 		class ToggleMouseCommand : public Command {
 		public:

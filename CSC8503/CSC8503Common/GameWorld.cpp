@@ -38,22 +38,22 @@ void GameWorld::ClearAndErase() {
 }
 
 void GameWorld::AddGameObject(GameObject* o) {
-	gameObjects.emplace_back(o);
-	o->SetWorldID(worldIDCounter++);
+	singleton->gameObjects.emplace_back(o);
+	o->SetWorldID(singleton->worldIDCounter++);
 }
 
 void GameWorld::RemoveGameObject(GameObject* o, bool andDelete) {
 	// Check if object is already added to vector, sometimes gets double added
-	for (auto obj : toRemoveGameObjects)
+	for (auto obj : singleton->toRemoveGameObjects)
 	{
 		if (o->GetWorldID() == obj->GetWorldID())
 		{
 			return;
 		}
 	}
-	toRemoveGameObjects.emplace_back(o);
+	singleton->toRemoveGameObjects.emplace_back(o);
 	if (andDelete) {
-		toDeleteGameObjects.emplace_back(o);
+		singleton->toDeleteGameObjects.emplace_back(o);
 	}
 }
 void GameWorld::RemoveGameObjectsFromWorld()
@@ -107,11 +107,11 @@ void GameWorld::UpdateWorld(float dt) {
 
 }
 
-bool GameWorld::Raycast(Ray& r, RayCollision& closestCollision, bool closestObject) const {
+bool GameWorld::Raycast(Ray& r, RayCollision& closestCollision, bool closestObject) {
 	//The simplest raycast just goes through each object and sees if there's a collision
 	RayCollision collision;
 
-	for (auto& i : gameObjects) {
+	for (auto& i : singleton->gameObjects) {
 		if (!i->GetBoundingVolume()) { //objects might not be collideable etc...
 			continue;
 		}
@@ -146,11 +146,11 @@ bool GameWorld::Raycast(Ray& r, RayCollision& closestCollision, bool closestObje
 	return false;
 }
 
-bool GameWorld::RaycastIgnoreObject(GameObject* obj, Ray& r, RayCollision& closestCollision, bool closestObject) const {
+bool GameWorld::RaycastIgnoreObject(GameObject* obj, Ray& r, RayCollision& closestCollision, bool closestObject) {
 	//The simplest raycast just goes through each object and sees if there's a collision
 	RayCollision collision;
 
-	for (auto& i : gameObjects) {
+	for (auto& i : singleton->gameObjects) {
 		if (i == obj) {
 			continue;
 		}

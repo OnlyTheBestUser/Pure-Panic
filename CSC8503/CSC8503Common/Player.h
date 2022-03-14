@@ -11,11 +11,11 @@
 namespace NCL {
     using namespace Maths;
     namespace CSC8503 {
-		class LevelLoader;
+		class LevelManager;
         class Player : public GameActor
         {
         public:
-			Player(Camera* camera, LevelLoader* lvlLoader, GameWorld* world, string name = "", Vector3 ch = Vector3(0, 2, 0)) : GameActor(name), checkpoint(ch), spawnPos(ch), levelLoader(lvlLoader), world(world){
+			Player(Camera* camera, string name = "", Vector3 ch = Vector3(0, 2, 0)) : GameActor(name), checkpoint(ch), spawnPos(ch), world(world){
 				this->camera = camera;
 				camLocked = true;
 				playerID = 0;
@@ -159,8 +159,6 @@ namespace NCL {
 			bool camLocked;
 			
 			bool fired = false;
-
-			LevelLoader* levelLoader;
         };
     }
 }
