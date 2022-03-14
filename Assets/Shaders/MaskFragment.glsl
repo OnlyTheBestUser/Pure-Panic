@@ -43,9 +43,10 @@ void main(void)	{
 
     float edge = f * strength;
 
-    fragColour.rgb = mix(fragColour.rgb, colour.rgb, edge);
+    fragColour.rgba = mix(fragColour.rgba, vec4(colour.rgb, 1), edge);
+    //fragColour.r = fragColour.a;
+    //fragColour.g = fragColour.a;
+    //fragColour.b = fragColour.a;
 
-    fragColour.a = 1;
-
-	//fragColour = vec4(0.01,0,0,1);
+    //fragColour.a = 1;
 }

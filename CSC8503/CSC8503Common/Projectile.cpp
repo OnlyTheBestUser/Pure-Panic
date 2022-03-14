@@ -47,7 +47,7 @@ void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vecto
 				}
 				
 				// Get the uv from the ray
-				renderInst->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, 1, 0.3, 0.5, colour);
+				renderInst->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, 1, 0.7, 1, colour);
 			}
 		}
 	}

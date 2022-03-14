@@ -266,7 +266,7 @@ void Renderer::Paint(const RenderObject* paintable, Vector3& barycentric, Vector
 void Renderer::ApplyPaintToMasks() {
 #ifdef _WIN64
 	rendererAPI->SetDepth(false);
-	rendererAPI->SetBlend(true, RendererAPI::BlendType::ONE, RendererAPI::BlendType::ALPHA);
+	rendererAPI->SetBlend(true, RendererAPI::BlendType::ONE, RendererAPI::BlendType::ONE_MINUS_ALPHA);
 
 	maskShader->BindShader();
 
