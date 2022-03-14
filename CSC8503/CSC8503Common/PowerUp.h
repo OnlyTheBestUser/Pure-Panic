@@ -20,15 +20,17 @@ namespace NCL {
 			virtual ~PowerUp() {}
 
 			bool pickedUp = false;
+			bool networked = false;
 
 		protected:
-			PowerUp(PowerUpType powerType, GameWorld& gw) : GameObject("PowerUp"), powerUpType(powerType), gameWorld(gw) {
+			PowerUp(PowerUpType powerType, GameWorld& gw, bool networked = false) : GameObject("PowerUp"), powerUpType(powerType), gameWorld(gw) {
 				powerupDuration = 5.0f;
 			}
 
 			PowerUpType powerUpType;
 			float powerupDuration;
 			GameWorld& gameWorld;
+			
 		};
 	}
 }

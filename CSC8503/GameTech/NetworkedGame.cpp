@@ -134,6 +134,16 @@ void NetworkedGame::UpdateAsClient(float dt) {
 	newPacket.firing = localPlayer->IsFiring();
 
 	thisClient->SendPacket(newPacket);
+
+	for (auto x : powerups) {
+		if (x->pickedUp) {
+			PowerUpPacket powerUpPacket;
+			powerUpPacket.worldID = x->GetWorldID();
+			powerUpPacket.clientID = playerID;
+			thisClient->SendPacket(powerUpPacket);
+			//world->RemoveGameObject(x);
+		}
+	}
 #endif
 }
 
@@ -210,6 +220,7 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
 		HandlePowerUp((PowerUpPacket*)payload);
 		return;
 	}
+
 }
 
 void NetworkedGame::OnPlayerCollision(NetworkPlayer* a, NetworkPlayer* b) {
@@ -342,7 +353,7 @@ void NetworkedGame::HandlePowerUp(PowerUpPacket* packet)
 {
 	for (PowerUp* x : powerups) {
 		if (x->GetWorldID() == packet->worldID) {
-			world->RemoveGameObject(x, true);
+			world->RemoveGameObject(x);
 		}
 	}
 
