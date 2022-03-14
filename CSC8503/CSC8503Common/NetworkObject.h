@@ -25,6 +25,16 @@ namespace NCL {
 			}
 		};
 
+
+		struct PowerUpPacket : public IDPacket {
+			int worldID;
+
+			PowerUpPacket() {
+				type = PowerUp_State;
+				size = sizeof(PowerUpPacket) - sizeof(GamePacket);
+			}
+		};
+
 		struct ClientPacket : public GamePacket {
 			int		clientID;
 			int		lastID;

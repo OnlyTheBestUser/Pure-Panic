@@ -47,6 +47,7 @@ void NetworkedGame::StartAsServer() {
 	thisServer = new GameServer(NetworkBase::GetDefaultPort(), 4);
 
 	thisServer->RegisterPacketHandler(Received_State, this);
+	thisServer->RegisterPacketHandler(PowerUp_State, this);
 
 	SpawnPlayer();
 	StartLevel();
@@ -64,6 +65,7 @@ void NetworkedGame::StartAsClient(char a, char b, char c, char d) {
 	thisClient->RegisterPacketHandler(Player_Connected, this);
 	thisClient->RegisterPacketHandler(Player_Disconnected, this);
 	thisClient->RegisterPacketHandler(Assign_ID, this);
+	thisClient->RegisterPacketHandler(PowerUp_State, this);
 #endif
 }
 
@@ -172,6 +174,7 @@ void NetworkedGame::StartLevel() {
 }
 #ifndef _ORBIS
 void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
+
 	//SERVER version of the game will receive these from the clients
 	if (type == Received_State) {
 		ClientPacket* realPacket = (ClientPacket*)payload;
@@ -202,6 +205,9 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
 		return;
 	case(Fire_State):
 		HandleFireState((FirePacket*)payload);
+		return;
+	case(PowerUp_State):
+		HandlePowerUp((PowerUpPacket*)payload);
 		return;
 	}
 }
@@ -330,6 +336,19 @@ void NetworkedGame::HandlePlayerConnect(NewPlayerPacket* packet)
 
 void NetworkedGame::HandlePlayerDisconnect(PlayerDisconnectPacket* packet) {
 	RemovePlayerFromServer(packet->clientID);
+}
+
+void NetworkedGame::HandlePowerUp(PowerUpPacket* packet)
+{
+	for (PowerUp* x : powerups) {
+		if (x->GetWorldID() == packet->worldID) {
+			world->RemoveGameObject(x, true);
+		}
+	}
+
+	if (thisServer) {
+		thisServer->SendGlobalPacket(*(GamePacket*)packet);
+	}
 }
 
 void NetworkedGame::RemovePlayerFromServer(int clientID) {

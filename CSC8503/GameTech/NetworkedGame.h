@@ -76,6 +76,7 @@ namespace NCL {
 			void HandleAssignID(AssignIDPacket* packet);
 			void HandlePlayerConnect(NewPlayerPacket* packet);
 			void HandlePlayerDisconnect(PlayerDisconnectPacket* packet);
+			void HandlePowerUp(PowerUpPacket* packet);
 #endif
 		};
 	}

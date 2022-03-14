@@ -85,6 +85,7 @@ namespace NCL {
 			NCL::AudioManager*		audio;
 			BGMManager*	bgm;
 			LevelLoader*		levelLoader;
+			vector<PowerUp*>	powerups;
 
 			GameState state;
 

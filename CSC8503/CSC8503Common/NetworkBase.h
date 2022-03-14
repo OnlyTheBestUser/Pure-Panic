@@ -14,6 +14,7 @@ enum BasicNetworkMessages {
 	Full_State,		//Full transform etc
 	Received_State, //received from a client, informs that its received packet n
 	Fire_State,
+	PowerUp_State,
 	Player_Connected,
 	Player_Disconnected,
 	Assign_ID,

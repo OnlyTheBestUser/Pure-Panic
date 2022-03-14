@@ -17,7 +17,9 @@ namespace NCL {
 		class PowerUp : public GameObject
 		{
 		public:
-			~PowerUp() {}
+			virtual ~PowerUp() {}
+
+			bool pickedUp = false;
 
 		protected:
 			PowerUp(PowerUpType powerType, GameWorld& gw) : GameObject("PowerUp"), powerUpType(powerType), gameWorld(gw) {
@@ -27,7 +29,6 @@ namespace NCL {
 			PowerUpType powerUpType;
 			float powerupDuration;
 			GameWorld& gameWorld;
-
 		};
 	}
 }
