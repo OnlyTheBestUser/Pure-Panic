@@ -65,10 +65,27 @@ RendererBase::RendererBase() {
 		Assets::SHADERDIR + "PS4/DebugPixel.sb"
 	);
 
+	debugLinesMesh = new PS4::PS4Mesh();
+	debugTextMesh = new PS4::PS4Mesh();
 
+	debugLinesMesh->SetVertexPositions(std::vector<Vector3>(5000, Vector3()));
+	debugLinesMesh->SetVertexColours(std::vector<Vector4>(5000, Vector4()));
+	debugLinesMesh->SetVertexTextureCoords(std::vector<Vector2>(5000, Vector2()));
+	debugLinesMesh->SetVertexNormals(std::vector<Vector3>(5000, Vector3()));
+	debugLinesMesh->SetVertexTangents(std::vector<Vector4>(5000, Vector2()));
 
+	debugTextMesh->SetVertexPositions(std::vector<Vector3>(5000, Vector3()));
+	debugTextMesh->SetVertexColours(std::vector<Vector4>(5000, Vector4()));
+	debugTextMesh->SetVertexTextureCoords(std::vector<Vector2>(5000, Vector2()));
+	debugTextMesh->SetVertexNormals(std::vector<Vector3>(5000, Vector2()));
+	debugTextMesh->SetVertexTangents(std::vector<Vector4>(5000, Vector2()));
 
 #endif
+	debugLinesMesh->UploadToGPU(rendererAPI);
+	debugTextMesh->UploadToGPU(rendererAPI);
+
+	debugLinesMesh->SetPrimitiveType(GeometryPrimitive::Lines);
+	debugTextMesh->SetPrimitiveType(GeometryPrimitive::Triangles);
 }
 
 RendererBase::~RendererBase() {
@@ -147,10 +164,13 @@ void RendererBase::DrawDebugStrings() {
 		font->BuildVerticesForString(s.text, s.pos, s.colour, s.size, vertPos, vertTex, vertColours);
 	}
 
-	if (debugTextMesh == nullptr) {
+	debugTextMesh->SetVertexPositions(vertPos);
+	debugTextMesh->SetVertexColours(vertColours);
+	debugTextMesh->SetVertexTextureCoords(vertTex);
+	debugTextMesh->SetVertexNormals(std::vector<Vector3>(vertPos.size(), Vector3()));
+	debugTextMesh->SetVertexTangents(std::vector<Vector4>(vertPos.size(), Vector4()));
 
-	}
-	//debugTextMesh->UpdateGPUBuffers(0, vertPos.size());
+	debugTextMesh->UpdateGPUBuffers(0, vertPos.size());
 
 	rendererAPI->DrawMesh(debugTextMesh);
 
@@ -171,19 +191,14 @@ void RendererBase::DrawDebugLines() {
 		vertCol.emplace_back(s.colour);
 	}
 
-	if (debugLinesMesh == nullptr) {
-		debugLinesMesh = PS4::PS4Mesh::GenerateQuad();
 
-		debugLinesMesh->SetVertexPositions(vertPos);
-		debugLinesMesh->SetVertexColours(vertCol);
-		debugLinesMesh->SetVertexTextureCoords(std::vector<Vector2>(vertPos.size(), Vector2()));
-		debugLinesMesh->SetVertexNormals(std::vector<Vector3>(vertPos.size(), Vector2()));
-		debugLinesMesh->SetVertexTangents(std::vector<Vector4>(vertPos.size(), Vector2()));
-		debugLinesMesh->SetPrimitiveType(GeometryPrimitive::Lines);
+	debugLinesMesh->SetVertexPositions(vertPos);
+	debugLinesMesh->SetVertexColours(vertCol);
+	debugLinesMesh->SetVertexTextureCoords(std::vector<Vector2>(vertPos.size(), Vector2()));
+	debugLinesMesh->SetVertexNormals(std::vector<Vector3>(vertPos.size(), Vector3()));
+	debugLinesMesh->SetVertexTangents(std::vector<Vector4>(vertPos.size(), Vector4()));
 
-		debugLinesMesh->UploadToGPU(rendererAPI);
-		//debugLinesMesh->UpdateGPUBuffers(0, vertPos.size());
-	}
+	debugLinesMesh->UpdateGPUBuffers(0, vertPos.size());
 
 	rendererAPI->DrawMesh(debugLinesMesh);
 
