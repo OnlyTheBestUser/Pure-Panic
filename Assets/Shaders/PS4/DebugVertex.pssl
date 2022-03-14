@@ -9,12 +9,14 @@ struct VS_INPUT
 	float2 UV			: TEXCOORD0;
 	float3 Normal		: TEXCOORD1;
 	float3 Tangent		: TEXCOORD2;
+	float4 Color		: COLOR0;
 };
 
 struct VS_OUTPUT
 {
 	float4 Position		: S_POSITION;
 	float2 UV			: TEXCOORD0;
+	float4 Color		: COLOR0;
 };
 
 VS_OUTPUT main(VS_INPUT Input)
@@ -23,6 +25,7 @@ VS_OUTPUT main(VS_INPUT Input)
 
 	Output.Position = mul(m_viewProjMatrix, float4(Input.Position.xyz, 1));
 	Output.UV = Input.UV;
+	Output.Color = Input.Color;
 
 	return Output;
 }

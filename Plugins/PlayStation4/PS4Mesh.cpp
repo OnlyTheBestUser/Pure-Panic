@@ -39,15 +39,18 @@ PS4Mesh* PS4Mesh::GenerateQuad() {
 	mesh->SetVertexTextureCoords({ Vector2(0.0f, 0.0f) , Vector2(1.0f, 0.0f), Vector2(1.0f, 1.0f), Vector2(0.0f, 1.0f) });
 	std::vector<Vector3> normals;
 	std::vector<Vector4> tangents;
+	std::vector<Vector4> colours;
 	std::vector<unsigned int> indices;
 
 	for (int i = 0; i < 4; ++i) {
 		normals.emplace_back(Vector3(0, 0, 1));
 		tangents.emplace_back(Vector4(1, 0, 0, 0));
+		colours.emplace_back(Vector3(1, 1, 1));
 
 		indices.emplace_back(i);
 	}
 
+	mesh->SetVertexColours(colours);
 	mesh->SetVertexNormals(normals);
 	mesh->SetVertexTangents(tangents);
 	mesh->SetVertexIndices(indices);
@@ -102,8 +105,14 @@ void	PS4Mesh::UploadToGPU(Rendering::RendererAPI* renderer) {
 		memcpy(&vertexBuffer[i].position,	  &positions[i], sizeof(float) * 3);
 		memcpy(&vertexBuffer[i].textureCoord, &texCoords[i], sizeof(float) * 2);
 		memcpy(&vertexBuffer[i].normal,		  &normals[i],   sizeof(float) * 3);
-		memcpy(&vertexBuffer[i].tangent,	  &tangents[i],  sizeof(float) * 3);
-		//memcpy(&vertexBuffer[i].colour,		  &colours[i], sizeof(float) * 4);
+		memcpy(&vertexBuffer[i].tangent,	  &tangents[i],  sizeof(float) * 4);
+		if (colours.size() != 0) {
+			memcpy(&vertexBuffer[i].colour, &colours[i], sizeof(float) * 4);
+		}
+		else {
+			Vector4 def = Vector4(1, 1, 1, 1);
+			memcpy(&vertexBuffer[i].colour, &def, sizeof(float) * 4);
+		}
 	}
 
 	if (GetIndexCount() > 0) {
@@ -112,14 +121,14 @@ void	PS4Mesh::UploadToGPU(Rendering::RendererAPI* renderer) {
 		}
 	}
 
-	attributeCount		= 4;
-	attributeBuffers	= new sce::Gnm::Buffer[4];
+	attributeCount		= 5;
+	attributeBuffers	= new sce::Gnm::Buffer[5];
 
 	InitAttributeBuffer(attributeBuffers[0], Gnm::kDataFormatR32G32B32Float, &(vertexBuffer[0].position));
 	InitAttributeBuffer(attributeBuffers[1], Gnm::kDataFormatR32G32Float	, &(vertexBuffer[0].textureCoord));
 	InitAttributeBuffer(attributeBuffers[2], Gnm::kDataFormatR32G32B32Float, &(vertexBuffer[0].normal));
 	InitAttributeBuffer(attributeBuffers[3], Gnm::kDataFormatR32G32B32A32Float, &(vertexBuffer[0].tangent));
-	//InitAttributeBuffer(attributeBuffers[4], Gnm::kDataFormatR32G32B32A32Float, &(vertexBuffer[0].colour));
+	InitAttributeBuffer(attributeBuffers[4], Gnm::kDataFormatR32G32B32A32Float, &(vertexBuffer[0].colour));
 }
 
 void	PS4Mesh::InitAttributeBuffer(sce::Gnm::Buffer &buffer, Gnm::DataFormat format, void*offset) {
