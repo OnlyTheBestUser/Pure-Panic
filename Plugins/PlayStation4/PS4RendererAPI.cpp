@@ -326,9 +326,10 @@ void NCL::PS4::PS4RendererAPI::BindFrameBuffer(const FrameBufferBase* fbo)
 }
 
 void NCL::PS4::PS4RendererAPI::SetDepth(bool d) {
-	//Gnm::DepthEqaaControl depth;
-	//depth.init();
-	//currentGFXContext->setDepthEqaaControl();
+	sce::Gnm::DepthStencilControl depth;
+	depth.setDepthEnable(d);
+	depth.setDepthControl(Gnm::DepthControlZWrite::kDepthControlZWriteEnable, Gnm::CompareFunc::kCompareFuncLess);
+	currentGFXContext->setDepthStencilControl(depth);
 }
 
 void NCL::PS4::PS4RendererAPI::SetBlend(bool b, BlendType srcFunc, BlendType dstFunc) {
