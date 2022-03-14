@@ -13,8 +13,8 @@ struct VS_INPUT
 struct VS_OUTPUT
 {
 	float4 Position		: S_POSITION;
-	float3 Color		: TEXCOORD0;
-	float2 UV			: TEXCOORD1;
+	float3 Color		: COLOR0;
+	float2 UV			: TEXCOORD0;
 };
 
 VS_OUTPUT main(VS_INPUT Input)

@@ -13,6 +13,7 @@ PS4Mesh::PS4Mesh()	{
 	indexBuffer		= 0;
 	vertexBuffer	= 0;
 	attributeCount	= 0;
+	indexType = sce::Gnm::IndexSize::kIndexSize32;
 }
 
 PS4Mesh::PS4Mesh(const std::string& filename) :MeshGeometry(filename){
@@ -92,18 +93,6 @@ void	PS4Mesh::UploadToGPU(Rendering::RendererAPI* renderer) {
 	}
 	vertexBuffer = static_cast<MeshVertex*>	(garlicAllocator->allocate(vertexDataSize, Gnm::kAlignmentOfBufferInBytes));
 
-	//switch (GetPrimitiveType())
-	//{
-	//default:
-	//	break;
-	//case NCL::GeometryPrimitive::Triangles:
-	//	primitiveType = Gnm::kPrimitiveTypeTriList;
-	//	break;
-	//case NCL::GeometryPrimitive::Lines:
-	//	primitiveType = Gnm::kPrimitiveTypeLineList;
-	//	break;
-	//}
-
 	if (GetIndexCount() > 0) {
 		Gnm::registerResource(nullptr, ownerHandle, indexBuffer, indexDataSize, "IndexData", Gnm::kResourceTypeIndexBufferBaseAddress, 0);
 	}
@@ -140,14 +129,32 @@ void	PS4Mesh::InitAttributeBuffer(sce::Gnm::Buffer &buffer, Gnm::DataFormat form
 
 void PS4Mesh::SubmitDraw(Gnmx::GnmxGfxContext& cmdList, Gnm::ShaderStage stage) {
 	cmdList.setVertexBuffers(stage, 0, attributeCount, attributeBuffers);
+
+	switch (primType)
+	{
+	case NCL::Points:
+		break;
+	case NCL::Lines:
+		primitiveType = sce::Gnm::PrimitiveType::kPrimitiveTypeLineList;
+		break;
+	case NCL::Triangles:
+		break;
+	case NCL::TriangleFan:
+		break;
+	case NCL::TriangleStrip:
+		primitiveType = sce::Gnm::PrimitiveType::kPrimitiveTypeTriList;
+		break;
+	case NCL::Patches:
+		break;
+	default:
+		break;
+	}
 	cmdList.setPrimitiveType(primitiveType);
 	cmdList.setIndexSize(indexType);
 
 	if (GetIndexCount() != 0) {
  		cmdList.drawIndex(GetIndexCount(), indexBuffer);
-	}
-	else
-	{
+	} else {
 		cmdList.drawIndexAuto(GetVertexCount());
 		cmdList.setIndexSize(indexType);
 	}
@@ -155,7 +162,10 @@ void PS4Mesh::SubmitDraw(Gnmx::GnmxGfxContext& cmdList, Gnm::ShaderStage stage) 
 
 void PS4Mesh::UpdateGPUBuffers(unsigned int startVertex, unsigned int vertexCount) {
 	delete[] attributeBuffers;
+	//garlicAllocator->release(indexBuffer);
+	//garlicAllocator->release(vertexBuffer);
 	Gnm::unregisterAllResourcesForOwner(ownerHandle);
+
 
 	UploadToGPU(nullptr);
 }

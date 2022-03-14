@@ -46,8 +46,8 @@ namespace NCL::PS4 {
 		sce::Gnm::IndexSize		indexType;
 		sce::Gnm::PrimitiveType primitiveType;
 
-		int*		indexBuffer;
-		MeshVertex*	vertexBuffer;
+		int*		indexBuffer = nullptr;
+		MeshVertex*	vertexBuffer = nullptr;
 
 		int	vertexDataSize;
 		int indexDataSize;

@@ -65,27 +65,8 @@ RendererBase::RendererBase() {
 		Assets::SHADERDIR + "PS4/DebugPixel.sb"
 	);
 
-	debugLinesMesh = new PS4::PS4Mesh();
-	debugTextMesh = new PS4::PS4Mesh();
-
-	int test = 5000;
-	debugLinesMesh->SetVertexPositions(std::vector<Vector3>(test, Vector3()));
-	debugLinesMesh->SetVertexColours(std::vector<Vector4>(test, Vector4()));
-	debugLinesMesh->SetVertexTextureCoords(std::vector<Vector2>(test, Vector2()));
-	debugLinesMesh->SetVertexNormals(std::vector<Vector3>(test, Vector3()));
-	debugLinesMesh->SetVertexTangents(std::vector<Vector4>(test, Vector4()));
-
-	debugTextMesh->SetVertexPositions(std::vector<Vector3>(test, Vector3()));
-	debugTextMesh->SetVertexColours(std::vector<Vector4>(test, Vector4()));
-	debugTextMesh->SetVertexTextureCoords(std::vector<Vector2>(test, Vector2()));
-	debugTextMesh->SetVertexNormals(std::vector<Vector3>(test, Vector3()));
-	debugTextMesh->SetVertexTangents(std::vector<Vector4>(test, Vector4()));
 
 #endif
-	debugTextMesh->UploadToGPU(rendererAPI);
-	debugLinesMesh->UploadToGPU(rendererAPI);
-
-	debugLinesMesh->SetPrimitiveType(GeometryPrimitive::Lines);
 }
 
 RendererBase::~RendererBase() {
@@ -164,10 +145,19 @@ void RendererBase::DrawDebugStrings() {
 		font->BuildVerticesForString(s.text, s.pos, s.colour, s.size, vertPos, vertTex, vertColours);
 	}
 
-	debugTextMesh->SetVertexPositions(vertPos);
-	debugTextMesh->SetVertexTextureCoords(vertTex);
-	debugTextMesh->SetVertexColours(vertColours);
-	debugTextMesh->UpdateGPUBuffers(0, vertPos.size());
+	if (debugTextMesh == nullptr) {
+		debugTextMesh = new PS4::PS4Mesh();
+
+		debugTextMesh->SetVertexPositions(vertPos);
+		debugTextMesh->SetVertexColours(vertColours);
+		debugTextMesh->SetVertexTextureCoords(vertTex);
+		debugTextMesh->SetVertexNormals(std::vector<Vector3>(vertPos.size(), Vector3()));
+		debugTextMesh->SetVertexTangents(std::vector<Vector4>(vertPos.size(), Vector4()));
+		debugTextMesh->SetPrimitiveType(GeometryPrimitive::TriangleStrip);
+
+		debugTextMesh->UploadToGPU(rendererAPI);
+	}
+	//debugTextMesh->UpdateGPUBuffers(0, vertPos.size());
 
 	rendererAPI->DrawMesh(debugTextMesh);
 
@@ -188,10 +178,19 @@ void RendererBase::DrawDebugLines() {
 		vertCol.emplace_back(s.colour);
 	}
 
-	debugLinesMesh->SetVertexPositions(vertPos);
-	debugLinesMesh->SetVertexColours(vertCol);
-	
-	debugLinesMesh->UpdateGPUBuffers(0, vertPos.size());
+	if (debugLinesMesh == nullptr) {
+		debugLinesMesh = PS4::PS4Mesh::GenerateQuad();
+
+		debugLinesMesh->SetVertexPositions(vertPos);
+		debugLinesMesh->SetVertexColours(vertCol);
+		debugLinesMesh->SetVertexTextureCoords(std::vector<Vector2>(vertPos.size(), Vector2()));
+		debugLinesMesh->SetVertexNormals(std::vector<Vector3>(vertPos.size(), Vector2()));
+		debugLinesMesh->SetVertexTangents(std::vector<Vector4>(vertPos.size(), Vector2()));
+		debugLinesMesh->SetPrimitiveType(GeometryPrimitive::Lines);
+
+		debugLinesMesh->UploadToGPU(rendererAPI);
+		//debugLinesMesh->UpdateGPUBuffers(0, vertPos.size());
+	}
 
 	rendererAPI->DrawMesh(debugLinesMesh);
 
