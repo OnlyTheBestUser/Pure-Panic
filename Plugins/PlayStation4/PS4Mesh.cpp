@@ -22,7 +22,7 @@ PS4Mesh::PS4Mesh(const std::string& filename) :MeshGeometry(filename){
 
 	attributeCount = 0;
 	indexType = sce::Gnm::IndexSize::kIndexSize32;
-	primitiveType = sce::Gnm::PrimitiveType::kPrimitiveTypeTriList;
+	primType = GeometryPrimitive::Triangles;
 }
 
 PS4Mesh::~PS4Mesh()	{
@@ -33,7 +33,7 @@ PS4Mesh* PS4Mesh::GenerateQuad() {
 	PS4Mesh* mesh = new PS4Mesh();
 
 	mesh->indexType		= sce::Gnm::IndexSize::kIndexSize32;
-	mesh->primitiveType = sce::Gnm::PrimitiveType::kPrimitiveTypeTriStrip;
+	mesh->primType = GeometryPrimitive::TriangleStrip;
 
 	mesh->SetVertexPositions({ Vector3(-1.0f, -1.0f, 0.0f), Vector3(-1.0f,  1.0f, 0.0f),Vector3(1.0f, -1.0f, 0.0f), Vector3(1.0f,  1.0f, 0.0f) });
 	mesh->SetVertexTextureCoords({ Vector2(0.0f, 0.0f) , Vector2(1.0f, 0.0f), Vector2(1.0f, 1.0f), Vector2(0.0f, 1.0f) });
@@ -59,7 +59,7 @@ PS4Mesh* PS4Mesh::GenerateSinglePoint() {
 	PS4Mesh* mesh = new PS4Mesh();
 
 	mesh->indexType		= sce::Gnm::IndexSize::kIndexSize32;
-	mesh->primitiveType = sce::Gnm::PrimitiveType::kPrimitiveTypePointList;
+	mesh->primType = GeometryPrimitive::Points;
 
 	mesh->SetVertexPositions({ Vector3(0.0f, 0.0f, 0.0f) });
 	mesh->SetVertexNormals({ Vector3(0, 0, 1) });
@@ -73,7 +73,7 @@ PS4Mesh* PS4Mesh::GenerateTriangle() {
 	PS4Mesh* mesh = new PS4Mesh();
 
 	mesh->indexType		= sce::Gnm::IndexSize::kIndexSize32;
-	mesh->primitiveType = sce::Gnm::PrimitiveType::kPrimitiveTypeTriList;
+	mesh->primType = GeometryPrimitive::Triangles;
 
 	mesh->SetVertexPositions({ Vector3(0.0f, 0.5f, 0.0f), Vector3(0.5f, -0.5f, 0.0f), Vector3(-0.5f, -0.5f, 0.0f) });
 	mesh->SetVertexTextureCoords({ Vector2(0.5f, 0.0f) , Vector2(1.0f, 1.0f), Vector2(0.0f, 1.0f) });
@@ -133,23 +133,26 @@ void PS4Mesh::SubmitDraw(Gnmx::GnmxGfxContext& cmdList, Gnm::ShaderStage stage) 
 	switch (primType)
 	{
 	case NCL::Points:
+		cmdList.setPrimitiveType(Gnm::PrimitiveType::kPrimitiveTypePointList);
 		break;
 	case NCL::Lines:
-		primitiveType = sce::Gnm::PrimitiveType::kPrimitiveTypeLineList;
+		cmdList.setPrimitiveType(Gnm::PrimitiveType::kPrimitiveTypeLineList);
 		break;
 	case NCL::Triangles:
+		cmdList.setPrimitiveType(Gnm::PrimitiveType::kPrimitiveTypeTriList);
 		break;
 	case NCL::TriangleFan:
+		cmdList.setPrimitiveType(Gnm::PrimitiveType::kPrimitiveTypeTriFan);
 		break;
 	case NCL::TriangleStrip:
-		primitiveType = sce::Gnm::PrimitiveType::kPrimitiveTypeTriList;
+		cmdList.setPrimitiveType(Gnm::PrimitiveType::kPrimitiveTypeTriStrip);
 		break;
 	case NCL::Patches:
+		cmdList.setPrimitiveType(Gnm::PrimitiveType::kPrimitiveTypePatch);
 		break;
 	default:
 		break;
 	}
-	cmdList.setPrimitiveType(primitiveType);
 	cmdList.setIndexSize(indexType);
 
 	if (GetIndexCount() != 0) {

@@ -66,6 +66,8 @@ RendererBase::RendererBase() {
 	);
 
 
+
+
 #endif
 }
 
@@ -146,16 +148,7 @@ void RendererBase::DrawDebugStrings() {
 	}
 
 	if (debugTextMesh == nullptr) {
-		debugTextMesh = new PS4::PS4Mesh();
 
-		debugTextMesh->SetVertexPositions(vertPos);
-		debugTextMesh->SetVertexColours(vertColours);
-		debugTextMesh->SetVertexTextureCoords(vertTex);
-		debugTextMesh->SetVertexNormals(std::vector<Vector3>(vertPos.size(), Vector3()));
-		debugTextMesh->SetVertexTangents(std::vector<Vector4>(vertPos.size(), Vector4()));
-		debugTextMesh->SetPrimitiveType(GeometryPrimitive::TriangleStrip);
-
-		debugTextMesh->UploadToGPU(rendererAPI);
 	}
 	//debugTextMesh->UpdateGPUBuffers(0, vertPos.size());
 
