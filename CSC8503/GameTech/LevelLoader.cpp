@@ -18,6 +18,7 @@
 #include "../../Plugins/OpenGLRendering/OGLMesh.h"
 #include "../../Plugins/OpenGLRendering/OGLShader.h"
 #include "../../Plugins/OpenGLRendering/OGLTexture.h"
+#include "../CSC8503Common/AudioManager.h"
 #endif
 
 using namespace NCL;
@@ -172,7 +173,7 @@ Player* LevelLoader::AddPlayerToWorld(const Vector3& position) {
 	float meshSize = 3.0f;
 	float inverseMass = 5.0f;
 
-	Player* character = new Player(world->GetMainCamera(), this, world, "Player");
+	Player* character = new Player(world->GetMainCamera(), this, world, "Player", position);
 
 	CapsuleVolume* volume = new CapsuleVolume(0.85f * meshSize, 0.3f * meshSize);
 	character->SetBoundingVolume((CollisionVolume*)volume);
@@ -568,6 +569,9 @@ GameObject* LevelLoader::AddCapsuleToWorld(const Maths::Vector3& position, float
 }
 
 Projectile* LevelLoader::SpawnProjectile(Player* owner, const float& initialSpeed, const float& meshSize) {
+#ifndef _ORBIS
+	AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + "gun_fire.ogg", owner->GetTransform().GetPosition(), 0.3f);
+#endif // !_ORBIS
 	return SpawnProjectile((GameObject*)owner, owner->GetCam()->GetPitch(), owner->GetPlayerID(), initialSpeed, meshSize);
 }
 
