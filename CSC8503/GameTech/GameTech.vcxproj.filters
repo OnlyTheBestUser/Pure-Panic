@@ -31,6 +31,8 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="NetworkedPlayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="Renderer.cpp">
       <Filter>Renderers</Filter>
     </ClCompile>
@@ -52,6 +54,8 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NetworkedPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Renderer.h">
       <Filter>Renderers</Filter>
     </ClInclude>

@@ -25,7 +25,7 @@ void AudioManager::Initialize() {
 
 	system = nullptr;
 	studioSystem->getCoreSystem(&system);
-	system->set3DSettings(1.0f, 1.0f, 50.0f);
+	system->set3DSettings(1.0f, 1.0f, 0.05f);
 }
 
 AudioManager* AudioManager::GetInstance()
@@ -68,7 +68,6 @@ void AudioManager::LoadSound(const std::string& soundName, bool threeDimensional
 	mode = mode | (threeDimensional ? FMOD_3D : FMOD_2D);
 	mode = mode | (looping ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
 	mode = mode | (stream ? FMOD_CREATESTREAM : FMOD_CREATECOMPRESSEDSAMPLE);
-	mode = (mode | FMOD_3D_LINEARROLLOFF);
 
 	FMOD::Sound* newSound = nullptr;
 	IsErroneous(system->createSound(soundName.c_str(), mode, nullptr, &newSound));
