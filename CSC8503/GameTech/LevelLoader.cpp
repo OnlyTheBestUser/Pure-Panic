@@ -345,13 +345,13 @@ GameObject* LevelLoader::AddPaintWallToWorld(const Vector3& position, Vector3 di
 		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
 
 	if (rotation == 0)
-		cube->GetTransform().SetOffset(Vector3(0, 15, 6));
+		cube->GetTransform().SetOffset(Vector3(0, 15, 6.5));
 	if (rotation == 90)
-		cube->GetTransform().SetOffset(Vector3(6, 15, 0));
+		cube->GetTransform().SetOffset(Vector3(6.5, 15, 0));
 	if (rotation == 180)
-		cube->GetTransform().SetOffset(Vector3(0, 15, -6));
+		cube->GetTransform().SetOffset(Vector3(0, 15, -6.5));
 	if (rotation == 270)
-		cube->GetTransform().SetOffset(Vector3(-6, 15, 0));
+		cube->GetTransform().SetOffset(Vector3(-6.5, 15, 0));
 
 #ifdef _WIN64
 	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, OGLTexture::RGBATextureEmpty(corridorWallAlertTex->GetHeight()/16, corridorWallAlertTex->GetWidth()/16), basicShader));
@@ -581,7 +581,7 @@ Projectile* LevelLoader::SpawnProjectile(GameObject* owner, float pitch, int pla
 
 	Projectile* projectile = new Projectile(*world, renderer, playerID);
 
-	SphereVolume* volume = new SphereVolume(meshSize * 1.4);// / 2.0f * meshSize * 1.3f);
+	SphereVolume* volume = new SphereVolume(meshSize * 0.8);// / 2.0f * meshSize * 1.3f);
 	projectile->SetBoundingVolume((CollisionVolume*)volume);
 
 	projectile->GetTransform()

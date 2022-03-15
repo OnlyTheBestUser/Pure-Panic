@@ -29,7 +29,7 @@ void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vecto
 		RenderObject* test = ((GameObject*)closestCollision.node)->GetRenderObject();
 		
 		//Debug::DrawLine(ray.GetPosition(), ray.GetPosition() * ray.GetDirection());
-		//Debug::DrawSphere(closestCollision.collidedAt, 0.5, Vector4(1, 0, 0, 1), 0.f);
+		Debug::DrawSphere(closestCollision.collidedAt, 0.5, Vector4(1, 0, 0, 1), 0.2f);
 		if (test) {
 			if (test->GetPaintMask() != nullptr) {
 
@@ -47,7 +47,7 @@ void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vecto
 				}
 				
 				// Get the uv from the ray
-				renderInst->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, 1, 0.7, 1, colour);
+				renderInst->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, 0.4, 0.7, 1, colour);
 				
 				//uncomment for rainbow gun lmao
 				//renderInst->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, 1, 0.7, 1, Vector4(static_cast <float> (rand()) / static_cast <float> (RAND_MAX) , static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX), 1));
