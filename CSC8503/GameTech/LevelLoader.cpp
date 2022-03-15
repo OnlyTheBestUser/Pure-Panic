@@ -231,7 +231,7 @@ GameObject* LevelLoader::AddDummyPlayerToWorld(const Vector3& position)
 }
 
 GameObject* LevelLoader::AddFloorToWorld(const Maths::Vector3& position) {
-	GameObject* floor = new GameObject("Floor");
+	GameObject* floor = new GameObject("Floor", 1.5f);
 
 	Vector3 floorSize = Vector3(250, 1, 250);
 	AABBVolume* volume = new AABBVolume(floorSize);
@@ -335,7 +335,7 @@ GameObject* LevelLoader::AddLongWallToWorld(const Vector3& position, Vector3 dim
 
 GameObject* LevelLoader::AddPaintWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name)
 {
-	GameObject* cube = new GameObject(name);
+	GameObject* cube = new GameObject(name, 12.0f);
 	OBBVolume* volume = new OBBVolume(dimensions + Vector3(0, 10, -2));
 	cube->SetBoundingVolume((CollisionVolume*)volume);
 
