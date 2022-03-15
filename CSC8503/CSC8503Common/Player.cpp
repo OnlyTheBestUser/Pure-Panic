@@ -69,7 +69,7 @@ float Player::CheckDistToGround()
 {
 	Ray ray(GetTransform().GetPosition(), Vector3(0, -1, 0));
 	RayCollision closestCollision;
-	world->Raycast(ray, closestCollision, true);
+	GameWorld::Raycast(ray, closestCollision, true);
 	float distToGround = GetTransform().GetPosition().y - closestCollision.collidedAt.y;
 
 	const CollisionVolume* volume = GetBoundingVolume();

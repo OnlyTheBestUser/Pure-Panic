@@ -8,6 +8,8 @@
 using namespace NCL;
 using namespace NCL::CSC8503;
 
+GameWorld* GameWorld::singleton = nullptr;
+
 GameWorld::GameWorld()	{
 	mainCamera = new Camera();
 
@@ -15,11 +17,10 @@ GameWorld::GameWorld()	{
 	shuffleObjects		= false;
 	worldIDCounter		= 0;
 
-	navGrid = new NavigationGrid("TestGrid1.txt");
+	singleton = this;
 }
 
 GameWorld::~GameWorld()	{
-	delete navGrid;
 }
 
 void GameWorld::Clear() {

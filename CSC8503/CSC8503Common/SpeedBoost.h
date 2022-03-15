@@ -8,14 +8,14 @@ namespace NCL {
 		class SpeedBoost : public PowerUp
 		{
 		public:
-			SpeedBoost(GameWorld& gw, float speedIncreasedBy = 1.5f) : PowerUp(PowerUpType::SpeedBoost, gw), increaseInSpeed(speedIncreasedBy) {}
+			SpeedBoost(float speedIncreasedBy = 1.5f) : PowerUp(PowerUpType::SpeedBoost), increaseInSpeed(speedIncreasedBy) {}
 
 			void OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vector3 localB, Vector3 normal) override {
 				if (otherObject->GetName() == "Player") {
 					Player* player = ((Player*)otherObject);
 					if (player->GetCurrentPowerup() != PowerUpType::None) return;
 					((Player*)otherObject)->IncreaseSpeed(increaseInSpeed, powerupDuration);
-					gameWorld.RemoveGameObject(this, true);
+					GameWorld::RemoveGameObject(this, true);
 				}
 			}
 		private:

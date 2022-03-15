@@ -15,7 +15,7 @@ namespace NCL {
         class Player : public GameActor
         {
         public:
-			Player(Camera* camera, string name = "", Vector3 ch = Vector3(0, 2, 0)) : GameActor(name), checkpoint(ch), spawnPos(ch), world(world){
+			Player(Camera* camera, string name = "", Vector3 ch = Vector3(0, 2, 0)) : GameActor(name), checkpoint(ch), spawnPos(ch) {
 				this->camera = camera;
 				camLocked = true;
 				playerID = 0;
@@ -155,7 +155,6 @@ namespace NCL {
 
 			float cameraVertMult = 0.5f;
 			Camera* camera;
-			GameWorld* world;
 			bool camLocked;
 			
 			bool fired = false;

@@ -10,7 +10,7 @@ namespace NCL {
 			LOCK,
 			QUIT,
 			DESCEND,
-			RESET_WORLD
+			RESET_WORLD,
 			TOGGLE_MOUSE,
 			START_TIMER
 		};

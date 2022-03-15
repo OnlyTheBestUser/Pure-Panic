@@ -84,7 +84,7 @@ namespace NCL {
 			GameWorld*			world;
 			NCL::AudioManager*		audio;
 			BGMManager*	bgm;
-			LevelManager*		LevelManager;
+			LevelManager*		levelManager;
 
 			GameState state;
 

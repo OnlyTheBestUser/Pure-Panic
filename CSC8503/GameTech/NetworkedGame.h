@@ -34,7 +34,7 @@ namespace NCL {
 
 			void RemovePlayerFromServer(int clientID);
 
-			static NetworkedGame* GetInstance() { return instance; }
+			static NetworkedGame* GetInstance() { return singleton; }
 
 		protected:
 			void UpdateAsServer(float dt);
@@ -42,7 +42,7 @@ namespace NCL {
 
 			void BroadcastSnapshot();
 
-			static NetworkedGame* instance;
+			static NetworkedGame* singleton;
 			std::map<int, int> stateIDs;
 
 			GameServer* thisServer;

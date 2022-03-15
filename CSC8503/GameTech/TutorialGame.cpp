@@ -21,7 +21,7 @@ TutorialGame::TutorialGame()	{
 	world			= new GameWorld();
 	renderer		= new Renderer(*world);
 	physics			= new PhysicsSystem(*world);
-	LevelManager		= new LevelManager(world, physics, renderer);
+	levelManager	= new LevelManager(physics, renderer);
 
 #ifndef _ORBIS
 	audio = NCL::AudioManager::GetInstance();
@@ -33,8 +33,6 @@ TutorialGame::TutorialGame()	{
 	bgm = new BGMManager(audio);
 	bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 3.0f);
 #endif
-
-	LevelManager = new LevelManager(world, physics, renderer);
 
 	forceMagnitude = 30.0f;
 	useGravity = true;
@@ -108,13 +106,7 @@ TutorialGame::TutorialGame()	{
 
 	InitialiseAssets();
 }
-/*
 
-Each of the little demo scenarios used in the game uses the same 2 meshes,
-and the same texture and shader. There's no need to ever load in anything else
-for this module, even in the coursework, but you can add it if you like!
-
-*/
 void TutorialGame::InitialiseAssets() {
 	InitCamera();
 	InitWorld();
@@ -124,7 +116,7 @@ TutorialGame::~TutorialGame() {
 	delete physics;
 	delete renderer;
 	delete world;
-	delete LevelManager;
+	delete levelManager;
 }
 
 void TutorialGame::UpdateGame(float dt) {
@@ -319,11 +311,8 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	LevelManager->ReadInLevelFile(NCL::Assets::DATADIR + "../../Assets/Maps/map1.txt");
-	Player* player = LevelManager->SpawnPlayer(Vector3(0, 5, 0));
-	LevelManager->AddPowerUpToWorld(Vector3(0, 5, 20), PowerUpType::SpeedBoost);
-	LevelManager->AddPowerUpToWorld(Vector3(0, 5, 30), PowerUpType::FireRate);
-	LevelManager->AddPowerUpToWorld(Vector3(0, 5, 40), PowerUpType::Heal);
+	levelManager->ReadInLevelFile(NCL::Assets::DATADIR + "../../Assets/Maps/map1.txt");
+	Player* player = levelManager->SpawnPlayer(Vector3(0, 5, 0));
 
 	//Command* f = new MoveForwardCommand(player);
 	//Command* b = new MoveBackwardCommand(player);
@@ -356,8 +345,6 @@ void TutorialGame::InitWorld() {
 	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);*/
 
 	player1 = player;
-
-	//Projectile* spit = AddProjectileToWorld(Vector3(5, 5, 0), 0.3f, 1.0f);
 
 	physics->BuildStaticList();
 }

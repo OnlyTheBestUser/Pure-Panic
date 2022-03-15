@@ -20,14 +20,12 @@ namespace NCL {
 			~PowerUp() {}
 
 		protected:
-			PowerUp(PowerUpType powerType, GameWorld& gw) : GameObject("PowerUp"), powerUpType(powerType), gameWorld(gw) {
+			PowerUp(PowerUpType powerType) : GameObject("PowerUp"), powerUpType(powerType) {
 				powerupDuration = 5.0f;
 			}
 
 			PowerUpType powerUpType;
 			float powerupDuration;
-			GameWorld& gameWorld;
-
 		};
 	}
 }

@@ -60,8 +60,6 @@ namespace NCL {
 				std::vector<Constraint*>::const_iterator& first,
 				std::vector<Constraint*>::const_iterator& last) const;
 
-			NavigationGrid* GetNavGrid() const { return navGrid; }
-
 		protected:
 			static GameWorld* singleton;
 
@@ -71,8 +69,6 @@ namespace NCL {
 			std::vector<Constraint*> constraints;
 
 			Camera* mainCamera;
-
-			NavigationGrid* navGrid;
 
 			bool	shuffleConstraints;
 			bool	shuffleObjects;

@@ -40,10 +40,10 @@ namespace NCL {
 
 		class NetworkObject {
 		public:
-			NetworkObject(GameObject& o, int id, GameWorld* world);
+			NetworkObject(GameObject& o, int id);
 			virtual ~NetworkObject() {
 				object.SetNetworkObject(nullptr);
-				world->RemoveGameObject(&object);
+				GameWorld::RemoveGameObject(&object);
 			}
 
 			//Called by clients
@@ -74,8 +74,6 @@ namespace NCL {
 			int fullErrors;
 
 			int networkID;
-
-			GameWorld* world;
 		};
 	}
 }

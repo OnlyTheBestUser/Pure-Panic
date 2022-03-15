@@ -12,7 +12,7 @@ namespace NCL {
 	namespace CSC8503 {
 		class LevelManager {
 		public:
-			LevelManager(GameWorld* world, PhysicsSystem* physics, Renderer* renderer);
+			LevelManager(PhysicsSystem* physics, Renderer* renderer);
 			~LevelManager();
 
 			static void ReadInLevelFile(std::string filename);
@@ -30,19 +30,27 @@ namespace NCL {
 			GameObject* AddLongWallToWorld (const Vector3& position, Vector3 dimensions, int rotation, string name = "LongWall");
 			GameObject* AddPaintWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name = "PaintWall");
 
-			GameObject* AddSphereToWorld   (const Vector3& position, float radius, float inverseMass = 10.0f, bool rubber = false, bool hollow = false, bool dynamic = false);
-			GameObject* AddCubeToWorld	   (const Vector3& position, Vector3 dimensions, bool OBB = false, float inverseMass = 10.0f, int layer = 1, bool isTrigger = false, bool dynamic = false);
-			GameObject* AddCapsuleToWorld  (const Vector3& position, float halfHeight, float radius, float inverseMass = 10.0f);
+			GameObject* AddSphereToWorld (const Vector3& position, float radius, float inverseMass = 10.0f, bool rubber = false, bool hollow = false, bool dynamic = false);
+			GameObject* AddCubeToWorld   (const Vector3& position, Vector3 dimensions, bool OBB = false, float inverseMass = 10.0f, int layer = 1, bool isTrigger = false, bool dynamic = false);
+			GameObject* AddCapsuleToWorld(const Vector3& position, float halfHeight, float radius, float inverseMass = 10.0f);
 
 			void AddCornerWallToWorld    (const Vector3& position, Vector3 dimensions, int rotation);
 			void AddSecurityCameraToWorld(const Vector3& position, int rotation);
 			void AddWallHammerToWorld    (const Vector3& position, int rotation);
 
-			GameObject* AddRenderPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture);
-
+			GameObject* AddRenderPartToWorld  (const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture);
 			GameObject* AddPlayerObjectToWorld(const Vector3& position, GameObject* character);
-			PowerUp*    AddPowerUpToWorld(const Vector3& position, const PowerUpType& ability, const float& radius = 1.0f);
-			Projectile* AddProjectileToWorld(GameObject* owner, float pitch, int playerID, const float& initialSpeed = singleton->PROJ_SPEED, const float& meshSize = singleton->PROJ_SIZE);
+			PowerUp*    AddPowerUpToWorld     (const Vector3& position, const PowerUpType& ability, const float& radius = 1.0f);
+			Projectile* AddProjectileToWorld  (GameObject* owner, float pitch, int playerID, const float& initialSpeed = singleton->PROJ_SPEED, const float& meshSize = singleton->PROJ_SIZE);
+
+			void SetFieldsForSphere(GameObject* sphere, const Vector3& position, CollisionLayer layers, float radius, float inverseMass = 10.0f, bool isTrigger = false, bool dynamic = false, bool rubber = false, bool hollow = false);
+			void SetFieldsForCube(GameObject* sphere, const Vector3& position, Vector3 dimensions, CollisionLayer layers, float inverseMass = 10.0f, bool isTrigger = false, bool dynamic = false, bool OBB = false);
+			void SetFieldsForCapsule(GameObject* sphere, const Vector3& position, CollisionLayer layers, float halfHeight, float radius, float inverseMass = 10.0f, bool isTrigger = false, bool dynamic = false);
+
+			void SetFields(GameObject* obj, CollisionVolume* volume, const Vector3& position, const Vector3& dimensions, bool isTrigger);
+			PhysicsObject* GetPhysicsObject(Transform* transform, CollisionVolume* volume, CollisionLayer layers, bool dynamic, float inverseMass, float elasticity, float lDamping);
+			RenderObject* GetRenderObject(Transform* transform, MeshGeometry* mesh, TextureBase* texture, ShaderBase* shader);
+
 
 			static void SplitStringOnDelimiter(const std::string& s, char delim, vector<std::string>& result);
 			static Vector3 Vec3FromStr(std::string input);
@@ -53,7 +61,6 @@ namespace NCL {
 			const float PROJ_SPEED = 70.0f;
 			const float PROJ_SIZE = 0.5f;
 
-			GameWorld*     world;
 			PhysicsSystem* physics;
 			Renderer*	   renderer;
 

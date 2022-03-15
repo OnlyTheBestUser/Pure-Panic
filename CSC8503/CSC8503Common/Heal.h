@@ -7,14 +7,14 @@ namespace NCL {
 	namespace CSC8503 {
 		class Heal : public PowerUp {
 		public:
-			Heal(GameWorld& gw, const float& healthCure = 10.0f) : PowerUp(PowerUpType::Heal, gw), healthTake(healthCure) {}
+			Heal(const float& healthCure = 10.0f) : PowerUp(PowerUpType::Heal), healthTake(healthCure) {}
 
 			void OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vector3 localB, Vector3 normal) override {
 				if (otherObject->GetName() == "Player") {
 					Player* player = ((Player*)otherObject);
 					if (player->GetCurrentPowerup() != PowerUpType::None) return;
 					((Player*)otherObject)->IncreaseHealth(healthTake);
-					gameWorld.RemoveGameObject(this, true);
+					GameWorld::RemoveGameObject(this, true);
 				}
 			}
 
