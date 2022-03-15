@@ -140,7 +140,7 @@ void LevelLoader::ReadInLevelFile(std::string filename) {
 					AddWallHammerToWorld(Vec3FromStr(lineContents[1]), std::stoi(lineContents[2]));
 				}
 				else if (lineContents[0] == "PAINT_WALL") {
-					AddPaintWallToWorld(Vec3FromStr(lineContents[1]), Vector3(5, 5, 4), std::stoi(lineContents[2]));
+					AddPaintWallToWorld(Vec3FromStr(lineContents[1]), Vector3(5, 5, 4), std::stoi(lineContents[2]), lineContents[0]);
 				}
 			}
 		}
@@ -345,13 +345,13 @@ GameObject* LevelLoader::AddPaintWallToWorld(const Vector3& position, Vector3 di
 		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
 
 	if (rotation == 0)
-		cube->GetTransform().SetOffset(Vector3(0, 15, 6.5));
+		cube->GetTransform().SetOffset(Vector3(0, 15, 6));
 	if (rotation == 90)
-		cube->GetTransform().SetOffset(Vector3(6.5, 15, 0));
+		cube->GetTransform().SetOffset(Vector3(6, 15, 0));
 	if (rotation == 180)
-		cube->GetTransform().SetOffset(Vector3(0, 15, -6.5));
+		cube->GetTransform().SetOffset(Vector3(0, 15, -6));
 	if (rotation == 270)
-		cube->GetTransform().SetOffset(Vector3(-6.5, 15, 0));
+		cube->GetTransform().SetOffset(Vector3(-6, 15, 0));
 
 #ifdef _WIN64
 	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, OGLTexture::RGBATextureEmpty(corridorWallAlertTex->GetHeight()/16, corridorWallAlertTex->GetWidth()/16), basicShader));

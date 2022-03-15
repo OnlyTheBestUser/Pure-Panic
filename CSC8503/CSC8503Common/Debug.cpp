@@ -93,7 +93,7 @@ void Debug::DrawCircle(const Vector3& centre, const float& radius, const Quatern
 	for (int i = 0; i < pointNum; i++) {
 		rot += ((M_PI * 2) / pointNum);
 		curPoint = Vector3(centre.x, centre.y, centre.z) + rotation * Vector3((cos(rot) * radius), 0, (sin(rot) * radius));
-		Debug::DrawLine(prevPoint, curPoint, Vector4(1, 0, 0, 1), time);
+		Debug::DrawLine(prevPoint, curPoint, colour, time);
 		prevPoint = curPoint;
 	}
 }
