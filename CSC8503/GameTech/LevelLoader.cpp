@@ -172,7 +172,7 @@ Player* LevelLoader::AddPlayerToWorld(const Vector3& position) {
 	float meshSize = 3.0f;
 	float inverseMass = 5.0f;
 
-	Player* character = new Player(world->GetMainCamera(), this, world, "Player");
+	Player* character = new Player(world->GetMainCamera(), this, world, "Player", position);
 
 	CapsuleVolume* volume = new CapsuleVolume(0.85f * meshSize, 0.3f * meshSize);
 	character->SetBoundingVolume((CollisionVolume*)volume);
@@ -336,13 +336,22 @@ GameObject* LevelLoader::AddLongWallToWorld(const Vector3& position, Vector3 dim
 GameObject* LevelLoader::AddPaintWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name)
 {
 	GameObject* cube = new GameObject(name);
-	OBBVolume* volume = new OBBVolume(dimensions + Vector3(2, 10, 0));
+	OBBVolume* volume = new OBBVolume(dimensions + Vector3(0, 10, -2));
 	cube->SetBoundingVolume((CollisionVolume*)volume);
 
 	cube->GetTransform()
 		.SetPosition(position)
 		.SetScale(dimensions * 2)
 		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
+
+	if (rotation == 0)
+		cube->GetTransform().SetOffset(Vector3(0, 15, 6));
+	if (rotation == 90)
+		cube->GetTransform().SetOffset(Vector3(6, 15, 0));
+	if (rotation == 180)
+		cube->GetTransform().SetOffset(Vector3(0, 15, -6));
+	if (rotation == 270)
+		cube->GetTransform().SetOffset(Vector3(-6, 15, 0));
 
 #ifdef _WIN64
 	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, OGLTexture::RGBATextureEmpty(corridorWallAlertTex->GetHeight()/16, corridorWallAlertTex->GetWidth()/16), basicShader));
