@@ -15,6 +15,7 @@ size_t       sceLibcHeapSize = 256 * 1024 * 1024;	/* Set up heap area upper limi
 
 #include "../CSC8503Common/NavigationGrid.h"
 
+#include "NetworkedGame.h"
 #include "TutorialGame.h"
 #include "MainMenu.h"
 #include "../CSC8503Common/BehaviourAction.h"
@@ -25,7 +26,73 @@ size_t       sceLibcHeapSize = 256 * 1024 * 1024;	/* Set up heap area upper limi
 #include "../CSC8503Common/PushdownMachine.h"
 #include <iostream>
 
-#include "NetworkedGame.h"
+#include "Thread.h"
+#include "MutexClass.h"
+
+//vector<string> sharedBuffer;	// shared thread buffer
+vector<TutorialGame*> sharedGameBuffer;	// shared thread buffer
+MutexClass mutex;		// global mutex object
+
+/*class Producer : public Thread
+{
+protected:
+	virtual void Run();
+};
+class Consumer : public Thread
+{
+protected:
+	virtual void Run();
+};*/
+class NetworkedGameInitialiser : public Thread
+{
+protected:
+	virtual void Run();
+};
+class SplitscreenGameInitialiser : public Thread
+{
+protected:
+	virtual void Run();
+};
+
+/*void Producer::Run()
+{
+	mutex.LockMutex();
+	sharedBuffer.push_back("Producer");
+	completed = true;
+	mutex.UnlockMutex();
+}
+void Consumer::Run()
+{
+	bool done = false;
+	while (!done)
+	{
+		mutex.LockMutex();
+		if (sharedBuffer.size() > 0)
+		{
+			std::cout << "Got message: " << sharedBuffer.front() << std::endl;
+			done = true;
+			completed = true;
+		}
+		mutex.UnlockMutex();
+	}
+}*/
+void NetworkedGameInitialiser::Run()
+{
+	NetworkedGame* ng = new NetworkedGame();
+	mutex.LockMutex();
+	sharedGameBuffer.push_back(ng);
+	completed = true;
+	mutex.UnlockMutex();
+}
+void SplitscreenGameInitialiser::Run()
+{
+	TutorialGame* tg = new TutorialGame();
+	mutex.LockMutex();
+	sharedGameBuffer.push_back(tg);
+	completed = true;
+	mutex.UnlockMutex();
+}
+
 
 using namespace NCL;
 using namespace CSC8503;
@@ -116,7 +183,7 @@ protected:
 
 class Menu : public PushdownState {
 public:
-	Menu(MainMenu* m, TutorialGame* g, TutorialGame* h, TutorialGame* i) : m(m), g(g), h(h), i(i) {};
+	Menu(MainMenu* m, TutorialGame* g, NetworkedGame* h) : m(m), tg(g), ng(h) {};
 
 	PushdownResult OnUpdate(float dt, PushdownState** newState) override {
 		m->UpdateGame(dt);
@@ -128,11 +195,6 @@ public:
 
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM2)) {
 			*newState = new Game(h);
-			return PushdownResult::Push;
-		}
-
-		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM3)) {
-			*newState = new Game(i);
 			return PushdownResult::Push;
 		}
 
@@ -150,9 +212,8 @@ public:
 	}
 
 protected:
-	TutorialGame* g;
-	TutorialGame* h;
-	TutorialGame* i;
+	TutorialGame* tg;
+	NetworkedGame* ng;
 	MainMenu* m;
 };
 
@@ -191,12 +252,41 @@ int main() {
 	float totalTime = 0.0f;
 	int totalFrames = 0;
 
-	//TutorialGame* g = new TutorialGame();
+	/*Producer prod;
+	Consumer cons;*/
+	NetworkedGameInitialiser ngi;
+	SplitscreenGameInitialiser sgi;
+
+	std::cout << "		Networked Game State: " << ngi.GetThreadState() << std::endl;
+	std::cout << "		SplitScreen Game State: " << sgi.GetThreadState() << std::endl;
+
+	/*cons.Start();
+	Sleep(1000);
+	prod.Start();*/
+	ngi.Start();
+	sgi.Start();
+
+	std::cout << "		Networked Game State: " << ngi.GetThreadState() << std::endl;
+	std::cout << "		SplitScreen Game State: " << sgi.GetThreadState() << std::endl;
+
+	/*prod.Join();
+	cons.Join();*/
+	ngi.Join();
+	sgi.Join();
+
+	std::cout << "		Networked Game State: " << ngi.GetThreadState() << std::endl;
+	std::cout << "		SplitScreen Game State: " << sgi.GetThreadState() << std::endl;
+
+	MainMenu* m = new MainMenu();
+	
+	/*TutorialGame* g = new TutorialGame();
+
 	NetworkedGame* h = new NetworkedGame();
-	// MainMenu* m = new MainMenu();
-	// PushdownMachine p = new Menu(m, g, h, g);
-	//MainMenu* m = new MainMenu();
-	//PushdownMachine p = new Menu(m, g, g, g);
+
+	PushdownMachine p = new Menu(m, g, h);*/
+	
+	
+	
 	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
 	float smallestFrameRate = 144.0f;
 	while (w->UpdateWindow()) { //&& !w->GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
@@ -236,7 +326,7 @@ int main() {
 			curTimeWait = avgTimeWait;
 		}
 
-		h->UpdateGame(dt);
+		m->UpdateGame(dt);
 
 		//if (!p.Update(dt)) {
 		//	return 0;

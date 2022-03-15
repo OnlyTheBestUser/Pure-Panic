@@ -16,6 +16,9 @@
     <Filter Include="Renderers">
       <UniqueIdentifier>{10f01780-66e5-49ea-8709-aa84196e3a2f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Threading">
+      <UniqueIdentifier>{f1799bab-61a5-4ffa-a9e7-390914cba15b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -42,6 +45,12 @@
     <ClCompile Include="LevelLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Thread.cpp">
+      <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="MutexClass.cpp">
+      <Filter>Threading</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TutorialGame.h">
@@ -64,6 +73,12 @@
     </ClInclude>
     <ClInclude Include="LevelLoader.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Thread.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="MutexClass.h">
+      <Filter>Threading</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
