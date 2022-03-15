@@ -10,11 +10,16 @@ namespace NCL {
 			Heal(GameWorld& gw, const float& healthCure = 10.0f) : PowerUp(PowerUpType::Heal, gw), healthTake(healthCure) {}
 
 			void OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vector3 localB, Vector3 normal) override {
-				if (otherObject->GetName() == "Player") {
+				if (!IsPicked && otherObject->GetName() == "Player") {
+					
 					Player* player = ((Player*)otherObject);
 					if (player->GetCurrentPowerup() != PowerUpType::None) return;
 					((Player*)otherObject)->IncreaseHealth(healthTake);
-					gameWorld.RemoveGameObject(this, true);
+
+					IsPicked = true;// gameWorld.RemoveGameObject(this, true);
+					reappearAfter = REAPPEAR_AFTER_DURATION;
+
+					GetRenderObject()->SetVisibility(0.f);
 				}
 			}
 

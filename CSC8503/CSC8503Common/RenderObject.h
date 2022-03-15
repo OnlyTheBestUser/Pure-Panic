@@ -52,6 +52,10 @@ namespace NCL {
 				return colour;
 			}
 
+			void SetVisibility(float alpha) {
+				colour.w = alpha;
+			}
+
 		protected:
 			MeshGeometry*	mesh;
 			TextureBase*	texture;

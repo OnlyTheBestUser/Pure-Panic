@@ -11,11 +11,16 @@ namespace NCL {
 			~FireRate() {}
 
 			void OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vector3 localB, Vector3 normal) override {
-				if (otherObject->GetName() == "Player") {
+				if (!IsPicked && otherObject->GetName() == "Player") {
+					
 					Player* player = ((Player*)otherObject);
 					if (player->GetCurrentPowerup() != PowerUpType::None) return;
 					((Player*)otherObject)->IncreaseFireRate(FireRateIncrease, powerupDuration);
-					gameWorld.RemoveGameObject(this, true);
+					
+					IsPicked = true;// gameWorld.RemoveGameObject(this, true);
+					reappearAfter = REAPPEAR_AFTER_DURATION;
+					
+					GetRenderObject()->SetVisibility(0.f);
 				}
 			}
 
