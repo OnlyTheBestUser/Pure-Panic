@@ -13,15 +13,19 @@ namespace NCL {
 
 		class Timer {
 		public:
-			Timer(float totalDuration) : timeLeft(totalDuration) {}
-			void StartTimer() { state = TimerStates::Running; };
+			Timer(float totalDuration) : maxTime(totalDuration), timeLeft(totalDuration) {}
+			void StartTimer();
 			void PauseTimer() { state = TimerStates::Paused; };
 			void Update(const float& dt);
 			float GetTime() const {
 				return timeLeft;
 			}
+			TimerStates GetState() const {
+				return state;
+			}
 		private:
 			float timeLeft;
+			float maxTime;
 			TimerStates state = TimerStates::NotStarted;
 		};
 	}
