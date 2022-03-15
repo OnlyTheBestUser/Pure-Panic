@@ -212,76 +212,46 @@ Projectile* LevelManager::SpawnProjectile(GameObject* owner, float pitch, int pl
 	return singleton->AddProjectileToWorld(owner, pitch, playerID, initialSpeed, meshSize);
 }
 
-GameObject* LevelManager::AddFloorToWorld(const Maths::Vector3& position) {
+GameObject* LevelManager::AddFloorToWorld(const Vector3& position) {
 	GameObject* floor = new GameObject("Floor");
-
-	SetFieldsForCube(floor, position, Vector3(250, 1, 250), false, 0, );
-
 	Vector3 floorSize = Vector3(250, 1, 250);
-	AABBVolume* volume = new AABBVolume(floorSize);
-	floor->SetBoundingVolume((CollisionVolume*)volume);
-	floor->GetTransform()
-		.SetScale(floorSize * 2)
-		.SetPosition(position);
 
-#ifdef _WIN64
-	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, OGLTexture::RGBATextureEmpty(basicTex->GetWidth(), basicTex->GetHeight()), basicShader));
-#else
-	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
-#endif
-	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume()));
+	SetFieldsForCube(floor, position, floorSize, CollisionLayer::LAYER_ONE, false, false, false, 0, DEF_ELASTICITY, DEF_LDAMPING, DEF_FRICTION);
 
-
-	floor->GetPhysicsObject()->SetInverseMass(0);
-	floor->GetPhysicsObject()->InitCubeInertia();
-
-	floor->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	floor->GetPhysicsObject()->SetDynamic(false);
 	GameWorld::AddGameObject(floor);
+
 	return floor;
 }
 
 GameObject* LevelManager::AddAABBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name) {
 	GameObject* cube = new GameObject(name);
-	AABBVolume* volume = new AABBVolume(dimensions);
-	cube->SetBoundingVolume((CollisionVolume*)volume);
+	CollisionVolume* volume = (CollisionVolume*) new AABBVolume(dimensions);
 
-	cube->GetTransform()
-		.SetPosition(position)
-		.SetScale(dimensions * 2)
-		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
+	SetFields(cube, volume, position, dimensions * 2, false);
+	cube->SetPhysicsObject(GetPhysicsObject(&cube->GetTransform(), volume, CollisionLayer::LAYER_ONE, false, 0, DEF_ELASTICITY, DEF_LDAMPING, DEF_FRICTION));
 
-	cube->SetRenderObject(nullptr);
-	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
-
-	cube->GetPhysicsObject()->SetInverseMass(0.0f);
 	cube->GetPhysicsObject()->InitCubeInertia();
-
-	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	cube->GetPhysicsObject()->SetDynamic(false);
+	cube->GetTransform().SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
+	
 	GameWorld::AddGameObject(cube);
+
 	return cube;
 }
 
 GameObject* LevelManager::AddOBBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name) {
 	GameObject* cube = new GameObject(name);
-	OBBVolume* volume = new OBBVolume(dimensions + Vector3(2, 10, 0));
-	cube->SetBoundingVolume((CollisionVolume*)volume);
+	CollisionVolume* volume = (CollisionVolume*) new OBBVolume(dimensions + Vector3(2, 10, 0));
 
-	cube->GetTransform()
-		.SetPosition(position)
-		.SetScale(dimensions * 2)
-		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
+	SetFields(cube, volume, position, dimensions * 2, false);
+
+	cube->SetPhysicsObject(GetPhysicsObject(&cube->GetTransform(), volume, CollisionLayer::LAYER_ONE, false, 0, DEF_ELASTICITY, DEF_LDAMPING, DEF_FRICTION));
+	cube->GetPhysicsObject()->InitCubeInertia();
+	cube->GetTransform().SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
 
 	cube->SetRenderObject(nullptr);
-	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
 
-	cube->GetPhysicsObject()->SetInverseMass(0.0f);
-	cube->GetPhysicsObject()->InitCubeInertia();
-
-	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	cube->GetPhysicsObject()->SetDynamic(false);
 	GameWorld::AddGameObject(cube);
+
 	return cube;
 }
 
@@ -322,27 +292,22 @@ GameObject* LevelManager::AddLongWallToWorld(const Vector3& position, Vector3 di
 GameObject* LevelManager::AddPaintWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name)
 {
 	GameObject* cube = new GameObject(name);
-	OBBVolume* volume = new OBBVolume(dimensions + Vector3(2, 10, 0));
-	cube->SetBoundingVolume((CollisionVolume*)volume);
+	CollisionVolume* volume = (CollisionVolume*) new OBBVolume(dimensions + Vector3(2, 10, 0));
 
-	cube->GetTransform()
-		.SetPosition(position)
-		.SetScale(dimensions * 2)
-		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
+	SetFields(cube, volume, position, dimensions * 2, false);
 
-#ifdef _WIN64
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, OGLTexture::RGBATextureEmpty(corridorWallAlertTex->GetHeight()/16, corridorWallAlertTex->GetWidth()/16), basicShader));
-#else
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, basicShader));
-#endif
-	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
-
-	cube->GetPhysicsObject()->SetInverseMass(0.0f);
+	cube->SetPhysicsObject(GetPhysicsObject(&cube->GetTransform(), volume, CollisionLayer::LAYER_ONE, false, 0, DEF_ELASTICITY, DEF_LDAMPING, DEF_FRICTION));
 	cube->GetPhysicsObject()->InitCubeInertia();
+	cube->GetTransform().SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
 
-	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	cube->GetPhysicsObject()->SetDynamic(false);
+	#ifdef _WIN64
+		cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, OGLTexture::RGBATextureEmpty(corridorWallAlertTex->GetHeight()/16, corridorWallAlertTex->GetWidth()/16), basicShader));
+	#else
+		cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, basicShader));
+	#endif
+
 	GameWorld::AddGameObject(cube);
+
 	return cube;
 }
 
@@ -429,6 +394,7 @@ void		LevelManager::AddWallHammerToWorld(const Vector3& position, int rotation)
 GameObject* LevelManager::AddRenderPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture) {
 	GameObject* cube = new GameObject();
 	cube->SetBoundingVolume(nullptr);
+	cube->SetPhysicsObject(nullptr);
 
 	cube->GetTransform()
 		.SetPosition(position)
@@ -441,36 +407,35 @@ GameObject* LevelManager::AddRenderPartToWorld(const Vector3& position, Vector3 
 #ifdef _ORBIS
 	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, basicShader));
 #endif
-	cube->SetPhysicsObject(nullptr);
 
 	GameWorld::AddGameObject(cube);
 	return cube;
 }
 
-GameObject* LevelManager::AddSphereToWorld(const Vector3& position, float radius, float inverseMass, bool rubber, bool hollow, bool dynamic) {
+GameObject* LevelManager::AddSphereToWorld(const Vector3& position, float radius, int layer, bool isTrigger, bool dynamic, bool rubber, bool hollow, float inverseMass) {
 	GameObject* sphere = new GameObject();
 
-	SetFieldsForSphere(sphere, position, radius, rubber, hollow, dynamic);
+	SetFieldsForSphere(sphere, position, (CollisionLayer) layer, radius, isTrigger, dynamic, rubber, hollow, inverseMass);
 
 	GameWorld::AddGameObject(sphere);
 
 	return sphere;
 }
 
-GameObject* LevelManager::AddCubeToWorld(const Maths::Vector3& position, Maths::Vector3 dimensions, bool OBB, float inverseMass, int layer, bool isTrigger, bool dynamic) {
+GameObject* LevelManager::AddCubeToWorld(const Vector3& position, Maths::Vector3 dimensions, int layer, bool isTrigger, bool dynamic, bool OBB, float inverseMass) {
 	GameObject* cube = new GameObject();
 
-	SetFieldsForCube(cube, position, dimensions, OBB, inverseMass, layer, isTrigger, dynamic);
+	SetFieldsForCube(cube, position, dimensions, (CollisionLayer) layer, isTrigger, dynamic, OBB, inverseMass);
 
 	GameWorld::AddGameObject(cube);
 
 	return cube;
 }
 
-GameObject* LevelManager::AddCapsuleToWorld(const Maths::Vector3& position, float halfHeight, float radius, float inverseMass) {
+GameObject* LevelManager::AddCapsuleToWorld(const Vector3& position, float halfHeight, float radius, int layer, bool isTrigger, bool dynamic, float inverseMass) {
 	GameObject* capsule = new GameObject();
 
-	SetFieldsForCapsule(capsule, position, halfHeight, radius, inverseMass);
+	SetFieldsForCapsule(capsule, position, (CollisionLayer) layer, halfHeight, radius, isTrigger, dynamic, inverseMass);
 
 	GameWorld::AddGameObject(capsule);
 
@@ -479,25 +444,16 @@ GameObject* LevelManager::AddCapsuleToWorld(const Maths::Vector3& position, floa
 
 GameObject* LevelManager::AddPlayerObjectToWorld(const Vector3& position, GameObject* character) {
 	float meshSize = 3.0f;
-	float inverseMass = 0.5f;
 
 	CapsuleVolume* volume = new CapsuleVolume(0.85f * meshSize, 0.3f * meshSize);
-	character->SetBoundingVolume((CollisionVolume*)volume);
 
-	character->GetTransform()
-		.SetScale(Vector3(meshSize, meshSize, meshSize))
-		.SetPosition(position);
+	SetFields(character, volume, position, Vector3(meshSize, meshSize, meshSize), false);
+	character->SetPhysicsObject(GetPhysicsObject(&character->GetTransform(), volume, CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE, true, 5.0f, DEF_ELASTICITY, 3.0f, false));
+	character->SetRenderObject(GetRenderObject(&character->GetTransform(), charMeshA, nullptr, basicShader, Vector4(0.5,1,0.5,1)));
 
-	character->SetRenderObject(new RenderObject(&character->GetTransform(), charMeshA, nullptr, basicShader));
-	character->SetPhysicsObject(new PhysicsObject(&character->GetTransform(), character->GetBoundingVolume()));
-
-	character->GetPhysicsObject()->SetInverseMass(inverseMass);
-	character->GetPhysicsObject()->SetFriction(1.0f);
-	character->GetPhysicsObject()->SetLinearDamping(10.0f);
 	character->GetPhysicsObject()->InitSphereInertia();
+	character->GetPhysicsObject()->SetCanSleep(false);
 	character->GetPhysicsObject()->SetShouldApplyAngular(false);
-	character->GetPhysicsObject()->SetDynamic(true);
-	character->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
 
 	GameWorld::AddGameObject(character);
 
@@ -528,9 +484,7 @@ PowerUp*    LevelManager::AddPowerUpToWorld(const Vector3& position, const Power
 		return powerup;
 	}
 
-	SetFieldsForSphere(powerup, position, radius, 0, false, false, false);
-	powerup->SetTrigger(true);
-	powerup->SetCollisionLayers(CollisionLayer::LAYER_FOUR);
+	SetFieldsForSphere(powerup, position, CollisionLayer::LAYER_FOUR, radius, true, false, false, false, 0);
 
 	GameWorld::AddGameObject(powerup);
 
@@ -573,81 +527,52 @@ Projectile* LevelManager::AddProjectileToWorld(GameObject* owner, float pitch, i
 	return projectile;
 }
 
-void LevelManager::SetFieldsForSphere(GameObject* sphere, const Vector3& position, CollisionLayer layers, float radius, float inverseMass, bool isTrigger, bool dynamic, bool rubber, bool hollow) {
+void LevelManager::SetFieldsForSphere(GameObject* sphere, const Vector3& position, CollisionLayer layers, float radius, bool isTrigger, bool dynamic, bool rubber, bool hollow, float inverseMass, float elasticity, float lDamping, float friction) {
+	CollisionVolume* volume = (CollisionVolume*) new SphereVolume(radius);
 	
-	
-	Vector3 sphereSize = Vector3(radius, radius, radius);
-	SphereVolume* volume = new SphereVolume(radius);
-	sphere->SetBoundingVolume((CollisionVolume*)volume);
-
-	sphere->GetTransform()
-		.SetScale(sphereSize)
-		.SetPosition(position);
-
-	sphere->SetRenderObject(new RenderObject(&sphere->GetTransform(), sphereMesh, basicTex, basicShader));
-	sphere->SetPhysicsObject(new PhysicsObject(&sphere->GetTransform(), sphere->GetBoundingVolume()));
-	sphere->GetPhysicsObject()->SetInverseMass(inverseMass);
-	sphere->GetPhysicsObject()->SetDynamic(dynamic);
+	SetFields(sphere, volume, position, Vector3(radius, radius, radius), isTrigger);
+	sphere->SetRenderObject(GetRenderObject(&sphere->GetTransform(), sphereMesh, basicTex, basicShader));
+	sphere->SetPhysicsObject(GetPhysicsObject(&sphere->GetTransform(), volume, layers, dynamic, inverseMass, rubber ? 0.9f : 0.2, lDamping, friction));
 
 	if (hollow)	sphere->GetPhysicsObject()->InitHollowSphereInertia();
 	else		sphere->GetPhysicsObject()->InitSphereInertia();
-	if (rubber)	sphere->GetPhysicsObject()->SetElasticity(0.9f);
-	else		sphere->GetPhysicsObject()->SetElasticity(0.2f);
-
-	sphere->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 }
 
-void LevelManager::SetFieldsForCube(GameObject* cube, const Maths::Vector3& position, Maths::Vector3 dimensions, CollisionLayer layers, float inverseMass, bool isTrigger, bool dynamic, bool OBB) {
-	if (OBB) {
-		OBBVolume* volume = new OBBVolume(dimensions);
-		cube->SetBoundingVolume((CollisionVolume*)volume);
-	} else {
-		AABBVolume* volume = new AABBVolume(dimensions);
-		cube->SetBoundingVolume((CollisionVolume*)volume);
-	}
+void LevelManager::SetFieldsForCube(GameObject* cube, const Vector3& position, Vector3 dimensions, CollisionLayer layers, bool isTrigger, bool dynamic, bool OBB, float inverseMass, float elasticity, float lDamping, float friction) {
+	CollisionVolume* volume = OBB ? (CollisionVolume*) new OBBVolume(dimensions) : (CollisionVolume*) new AABBVolume(dimensions);
 
-	cube->GetTransform()
-		.SetPosition(position)
-		.SetScale(dimensions * 2);
+	SetFields(cube, volume, position, dimensions * 2, isTrigger);
+	cube->SetPhysicsObject(GetPhysicsObject(&cube->GetTransform(), volume, layers, dynamic, inverseMass, elasticity, lDamping, friction));
 
 	#ifdef _WIN64
 		cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, OGLTexture::RGBATextureEmpty(basicTex->GetWidth(), basicTex->GetHeight()), basicShader));
 	#else
 		cube->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
 	#endif
-
-	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
-
-	cube->GetPhysicsObject()->SetInverseMass(inverseMass);
+	
 	cube->GetPhysicsObject()->InitCubeInertia();
-	cube->GetPhysicsObject()->SetElasticity(0.2f);
-	cube->GetPhysicsObject()->SetDynamic(dynamic);
-
-	cube->SetCollisionLayers(layers);
-	cube->SetTrigger(isTrigger);
 }
 
-void LevelManager::SetFieldsForCapsule(GameObject* capsule, const Vector3& position, CollisionLayer layers, float halfHeight, float radius, float inverseMass, bool isTrigger, bool dynamic) {
+void LevelManager::SetFieldsForCapsule(GameObject* capsule, const Vector3& position, CollisionLayer layers, float halfHeight, float radius, bool isTrigger, bool dynamic, float inverseMass, float elasticity, float lDamping, float friction) {
 	CapsuleVolume* volume = new CapsuleVolume(halfHeight, radius);
+
 	SetFields(capsule, volume, position, Vector3(radius * 2, halfHeight, radius * 2), isTrigger);
 
-	capsule->SetPhysicsObject(GetPhysicsObject(&capsule->GetTransform(), volume, layers, dynamic, inverseMass, elasticity, lDampening));
+	capsule->SetPhysicsObject(GetPhysicsObject(&capsule->GetTransform(), volume, layers, dynamic, inverseMass, elasticity, lDamping, friction));
 	capsule->SetRenderObject(GetRenderObject(&capsule->GetTransform(), capsuleMesh, basicTex, basicShader));
 
 	capsule->GetPhysicsObject()->InitCubeInertia();
 }
 
 void LevelManager::SetFields(GameObject* obj, CollisionVolume* volume, const Vector3& position, const Vector3& dimensions, bool isTrigger) {
+	obj->SetBoundingVolume(volume);
+	obj->SetTrigger(isTrigger);
 	obj->GetTransform()
 		.SetScale(dimensions)
 		.SetPosition(position);
-	
-	obj->SetBoundingVolume(volume);
-
-	obj->SetTrigger(isTrigger);
 }
 
-PhysicsObject* LevelManager::GetPhysicsObject(Transform* transform, CollisionVolume* volume, CollisionLayer layers, bool dynamic, float inverseMass, float elasticity, float lDamping) {
+PhysicsObject* LevelManager::GetPhysicsObject(Transform* transform, CollisionVolume* volume, int layers, bool dynamic, float inverseMass, float elasticity, float lDamping, float friction) {
 	PhysicsObject* physics = new PhysicsObject(transform, volume);
 
 	physics->SetCollisionLayers(layers);
@@ -659,8 +584,10 @@ PhysicsObject* LevelManager::GetPhysicsObject(Transform* transform, CollisionVol
 	return physics;
 }
 
-RenderObject* LevelManager::GetRenderObject(Transform* transform, MeshGeometry* mesh, TextureBase* texture, ShaderBase* shader) {
+RenderObject* LevelManager::GetRenderObject(Transform* transform, MeshGeometry* mesh, TextureBase* texture, ShaderBase* shader, Vector4 colour) {
 	RenderObject* renderer = new RenderObject(transform, mesh, texture, shader);
 
+	renderer->SetColour(colour);
 
+	return renderer;
 }
