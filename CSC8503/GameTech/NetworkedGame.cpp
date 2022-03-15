@@ -92,6 +92,18 @@ void NetworkedGame::UpdateGame(float dt) {
 	}
 #endif
 
+	for (auto x : powerups) {
+		if (x->pickedUp) {
+			PowerUpPacket powerUpPacket;
+			powerUpPacket.worldID = x->GetWorldID();
+			powerUpPacket.clientID = playerID;
+			if(thisClient)
+				thisClient->SendPacket(powerUpPacket);
+			if (thisServer)
+				thisServer->SendGlobalPacket(powerUpPacket);
+		}
+	}
+
 	TutorialGame::UpdateGame(dt);
 }
 
@@ -134,16 +146,6 @@ void NetworkedGame::UpdateAsClient(float dt) {
 	newPacket.firing = localPlayer->IsFiring();
 
 	thisClient->SendPacket(newPacket);
-
-	for (auto x : powerups) {
-		if (x->pickedUp) {
-			PowerUpPacket powerUpPacket;
-			powerUpPacket.worldID = x->GetWorldID();
-			powerUpPacket.clientID = playerID;
-			thisClient->SendPacket(powerUpPacket);
-			//world->RemoveGameObject(x);
-		}
-	}
 #endif
 }
 
