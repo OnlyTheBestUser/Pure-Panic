@@ -1,6 +1,9 @@
 #pragma once
-#include <winsock2.h>
 #include <enet/enet.h>
+#ifndef _ORBIS
+#include <winsock2.h>
+#endif
+
 #include <map>
 #include <string>
 

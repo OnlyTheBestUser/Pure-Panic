@@ -247,9 +247,6 @@
     <ClInclude Include="InputList.h">
       <Filter>Input Handling</Filter>
     </ClInclude>
-    <ClInclude Include="PaintManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameWorld.cpp">
@@ -308,9 +305,6 @@
     </ClCompile>
     <ClCompile Include="PCInput.cpp">
       <Filter>Input Handling</Filter>
-    </ClCompile>
-    <ClCompile Include="PaintManager.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GameClient.cpp">
       <Filter>Networking</Filter>
