@@ -16,3 +16,9 @@ void Timer::Update(const float& dt) {
 	}
 	Debug::Print(std::to_string(int(timeLeft)), Vector2(92.0f, 10.0f), 30.0f, Debug::BLACK);
 }
+
+void Timer::StartTimer() {
+	if (state == Ended)
+		timeLeft = maxTime;
+	state = TimerStates::Running;
+}

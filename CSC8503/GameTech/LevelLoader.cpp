@@ -172,7 +172,7 @@ Player* LevelLoader::AddPlayerToWorld(const Vector3& position) {
 	float meshSize = 3.0f;
 	float inverseMass = 5.0f;
 
-	Player* character = new Player(world->GetMainCamera(), this, world, "Player");
+	Player* character = new Player(world->GetMainCamera(), this, world, "Player", position);
 
 	CapsuleVolume* volume = new CapsuleVolume(0.85f * meshSize, 0.3f * meshSize);
 	character->SetBoundingVolume((CollisionVolume*)volume);

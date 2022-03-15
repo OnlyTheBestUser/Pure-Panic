@@ -6,6 +6,8 @@ const int NO_OF_TEAMS = 2;
 
 namespace NCL {
 	namespace CSC8503 {
+
+		class TutorialGame;
 		
 		enum TeamTypes
 		{
@@ -14,7 +16,8 @@ namespace NCL {
 		};
 
 		struct TeamInfo {
-			float Score = 0.f;
+			float RoundScore = 0.f;
+			float TotalScore = 0.f;
 			std::vector<Player*> TeamPlayers;
 		};
 
@@ -23,11 +26,8 @@ namespace NCL {
 		
 		public:
 
-			GameManager() {
+			GameManager(TutorialGame* tg) : game(tg) {
 				timer = new Timer(abs(10.0f));
-
-				Teams[A].Score = 0.f;
-				Teams[B].Score = 0.f;
 			}
 
 			void Update(const float& dt);
@@ -37,18 +37,25 @@ namespace NCL {
 			}
 
 			void UpdateTeamScore(const float& score, const TeamTypes& t) {
-				Teams[t].Score = score;
+				Teams[t].RoundScore = score;
 			}
 
 			void AddPlayerToTeam(Player* player,const TeamTypes& t) {
 				Teams[t].TeamPlayers.push_back(player);
 			}
 
+			void StartRound();
+
+		protected:
+
+			void HandleScoresAfterRound();
+			void PlacePlayersToSpawnPositions();
+
 		private:
 
+			TutorialGame* game;
 			Timer* timer;
-			TeamInfo Teams[NO_OF_TEAMS];
-		
+			TeamInfo Teams[NO_OF_TEAMS];		
 		};
 	}
 }

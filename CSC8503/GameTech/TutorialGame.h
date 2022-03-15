@@ -38,6 +38,7 @@ namespace NCL {
 				state = RESET;
 				quit = false;
 				pause = false;
+				InitialiseAssets();
 			}
 
 			bool Win() const { 
@@ -105,6 +106,8 @@ namespace NCL {
 
 			bool won = false;
 			Player* player1 = nullptr;
+
+			vector<Vector3> playerSpawnPositions;
 		};
 	}
 }

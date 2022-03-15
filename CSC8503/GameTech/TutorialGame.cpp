@@ -22,7 +22,7 @@ TutorialGame::TutorialGame()	{
 	renderer		= new Renderer(*world);
 	physics			= new PhysicsSystem(*world);
 	levelLoader		= new LevelLoader(world, physics, renderer);
-	gameManager		= new GameManager();
+	gameManager		= new GameManager(this);
 #ifndef _ORBIS
 	audio = NCL::AudioManager::GetInstance();
 	audio->Initialize();
@@ -314,7 +314,7 @@ void TutorialGame::InitWorld() {
 	physics->Clear();
 
 	levelLoader->ReadInLevelFile(NCL::Assets::DATADIR + "../../Assets/Maps/map1.txt");
-	Player* player = levelLoader->AddPlayerToWorld(Vector3(0, 5, 0));
+	Player* player = levelLoader->AddPlayerToWorld(Vector3(0, 5, 0)); // #TODO Use playerSpawnPositions 
 	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 20), PowerUpType::SpeedBoost);
 	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 30), PowerUpType::FireRate);
 	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 40), PowerUpType::Heal);
