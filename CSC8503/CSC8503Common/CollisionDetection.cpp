@@ -342,6 +342,7 @@ bool CollisionDetection::GetBarycentricFromRay(const Ray ray, const RenderObject
 			}
 		}
 	}
+	//Debug::DrawArrow(closestcollision, closestcollision + closestnorm, Vector4(0,1,0,1), 1.0f);
 
 	// If no mesh collided then return
 	if (distance == FLT_MAX) {

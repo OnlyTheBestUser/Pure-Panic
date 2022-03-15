@@ -21,7 +21,7 @@ void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vecto
 	NCL::AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + (soundToPlay == 0 ? "splat_neutral_01.ogg" : "splat_neutral_02.ogg"), this->GetTransform().GetPosition());
 #endif // !_ORBIS
 
-	Ray ray(this->GetTransform().GetPosition(), this->GetPhysicsObject()->GetLinearVelocity() - ( normal * 2) * (Vector3::Dot(this->GetPhysicsObject()->GetLinearVelocity(), normal)) );
+	Ray ray(this->GetTransform().GetPosition(), this->GetPhysicsObject()->GetLinearVelocity());
 	ray.SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
 	//Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
 	RayCollision closestCollision;
