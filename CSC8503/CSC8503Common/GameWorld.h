@@ -63,7 +63,7 @@ namespace NCL {
 			NavigationGrid* GetNavGrid() const { return navGrid; }
 
 		protected:
-			std::vector<GameObject*> gameObjects;
+			std::vector<GameObject*> gameObjects = {};
 			std::vector<GameObject*> toDeleteGameObjects;
 			std::vector<GameObject*> toRemoveGameObjects;
 			std::vector<Constraint*> constraints;

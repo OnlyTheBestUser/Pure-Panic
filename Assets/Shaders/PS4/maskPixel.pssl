@@ -1,0 +1,57 @@
+ConstantBuffer uvHitPoint
+{
+	float2 m_uvHitPoint;
+};
+
+ConstantBuffer viewport
+{
+	float2 m_viewport;
+};
+
+ConstantBuffer textureScale
+{
+	float3 m_textureScale;
+};
+
+ConstantBuffer radius
+{
+	float m_radius;
+};
+
+ConstantBuffer hardness
+{
+	float m_hardness;
+};
+
+ConstantBuffer strength
+{
+	float m_strength;
+};
+
+ConstantBuffer colour
+{
+	float4 m_colour;
+};
+
+
+struct VS_OUTPUT
+{
+	float3 WorldPos		: TEXCOORD1;
+	float2 UV			: TEXCOORD0;
+};
+
+float4 main(VS_OUTPUT In) : S_TARGET_OUTPUT
+{
+	float avgScale = (m_textureScale.x + m_textureScale.y + m_textureScale.z) / 3;
+
+	float m = distance(float2(0,0) / m_viewport, m_uvHitPoint);
+    float f = 1 - smoothstep(m_radius/avgScale * m_hardness, m_radius/avgScale, m);  
+
+    float edge = f * m_strength;
+
+	float4 fragColour = float4(1,1,1,1);
+    fragColour.rgb = lerp(fragColour.rgb, m_colour.rgb, edge);
+    fragColour.a = 1;
+
+	return fragColour;
+}

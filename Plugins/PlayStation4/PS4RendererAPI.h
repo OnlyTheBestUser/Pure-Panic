@@ -50,6 +50,7 @@ namespace NCL::PS4 {
 	friend class PS4UniformBuffer;
 	friend class PS4Shader;
 	friend class PS4Texture;
+	friend class PS4FrameBuffer;
 	public:
 		PS4RendererAPI(Window& window);
 		~PS4RendererAPI();

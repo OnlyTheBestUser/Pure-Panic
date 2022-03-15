@@ -16,6 +16,7 @@ using namespace sce::Vectormath::Scalar::Aos;
 namespace SonyMath = sce::Vectormath::Scalar::Aos;
 
 #include <iostream>
+#include "PS4FrameBuffer.h"
 
 using namespace NCL;
 using namespace NCL::PS4;
@@ -317,12 +318,13 @@ void NCL::PS4::PS4RendererAPI::DrawMeshAndSubMesh(MeshGeometry* mesh)
 
 void NCL::PS4::PS4RendererAPI::BindFrameBuffer()
 {
-
+	SetRenderBuffer(screenBuffers[currentScreenBuffer], true, true, true);
 }
 
 void NCL::PS4::PS4RendererAPI::BindFrameBuffer(const FrameBufferBase* fbo)
 {
-
+	const ::PS4::PS4FrameBuffer* buffer = static_cast<const NCL::PS4::PS4FrameBuffer*>(fbo);
+	SetRenderBuffer(buffer->GetBuffer(), true, false, false);
 }
 
 void NCL::PS4::PS4RendererAPI::SetDepth(bool d) {

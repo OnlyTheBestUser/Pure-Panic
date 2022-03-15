@@ -15,6 +15,8 @@ namespace NCL::PS4 {
 
 		virtual void Bind(int slot = 0) const override;
 
+		static PS4Texture* EmptyTex(int width, int height);
+		static PS4Texture* GenTexFromBuffer(const sce::Gnm::RenderTarget& fbo);
 		static PS4Texture* LoadTextureFromFile(const std::string& filename);
 		static PS4Texture* LoadSkyboxFromFile(const std::string& filename);
 

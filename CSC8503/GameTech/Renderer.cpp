@@ -3,6 +3,7 @@
 #include "../../Plugins/PlayStation4/PS4Shader.h"
 #include "../../Plugins/PlayStation4/PS4Texture.h"
 #include "../../Plugins/PlayStation4/PS4UniformBuffer.h"
+#include "../../Plugins/PlayStation4/PS4FrameBuffer.h"
 #endif
 #include "Renderer.h"
 
@@ -12,12 +13,13 @@
 #include "../../Common/MeshGeometry.h"
 
 
-
+#ifdef _WIN64
 #include "../../Plugins/OpenGLRendering/OGLFrameBuffer.h"
 #include "../../Plugins/OpenGLRendering/OGLShader.h"
 #include "../../Plugins/OpenGLRendering/OGLMesh.h"
 #include "../../Plugins/OpenGLRendering/OGLTexture.h"
 #include "../../Plugins/OpenGLRendering/OGLUniformBuffer.h"
+#endif
 using namespace NCL;
 using namespace Rendering;
 using namespace CSC8503;
@@ -70,6 +72,11 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 
 	skyboxTex = PS4::PS4Texture::LoadSkyboxFromFile(NCL::Assets::TEXTUREDIR + "Cubemap/cubemap.gnf");
 
+	maskShader = PS4::PS4Shader::GenerateShader(
+		Assets::SHADERDIR + "PS4/maskVertex.sb",
+		Assets::SHADERDIR + "PS4/maskPixel.sb"
+	);
+
 	camBuffer = new PS4::PS4UniformBuffer(sizeof(CameraMatrix));
 #endif
 
@@ -104,9 +111,7 @@ void Renderer::Render() {
 	BuildObjectList();
 	SortObjectList();
 
-#ifdef _WIN64
 	ApplyPaintToMasks();
-#endif
 	RenderScene();
 	rendererAPI->SetCullFace(false);
 
@@ -128,7 +133,11 @@ void Renderer::BuildObjectList() {
 			}
 		}
 	);
+
+	bool a = true;
 }
+
+
 
 void Renderer::SortObjectList() {
 	//Who cares!
@@ -264,17 +273,23 @@ void Renderer::Paint(const RenderObject* paintable, Vector3& barycentric, Vector
 }
 
 void Renderer::ApplyPaintToMasks() {
-#ifdef _WIN64
 	rendererAPI->SetDepth(false);
 	rendererAPI->SetBlend(true, RendererAPI::BlendType::ONE, RendererAPI::BlendType::ALPHA);
 
 	maskShader->BindShader();
 
+	bool painted = false;
 	Vector2 currentSize;
 	for (const auto& i : paintInstances) {
 		if (i.object->GetPaintMask() == nullptr) continue;
+#ifdef _WIN64
 		OGLFrameBuffer maskFBO;
 		maskFBO.AddTexture((OGLTexture*)(i.object->GetPaintMask()));
+#endif
+#ifdef _ORBIS
+		PS4::PS4FrameBuffer maskFBO;
+		maskFBO.AddTexture(i.object->GetPaintMask());
+#endif
 
 		if (Vector2(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight()) != currentSize) {
 			currentSize = Vector2(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight());
@@ -297,7 +312,6 @@ void Renderer::ApplyPaintToMasks() {
 		maskShader->UpdateUniformVector2("viewport", Vector2(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight()));
 
 		maskShader->UpdateUniformVector2("textureSize", Vector2(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight()));
-		float scale = 400.0f / (400.0f / 1.0f);
 		maskShader->UpdateUniformVector3("textureScale", i.object->GetTransform()->GetScale());
 		maskShader->UpdateUniformFloat("radius", 5.0f);
 		maskShader->UpdateUniformFloat("hardness", i.hardness);
@@ -307,13 +321,15 @@ void Renderer::ApplyPaintToMasks() {
 		rendererAPI->BindFrameBuffer(&maskFBO);
 
 		rendererAPI->DrawMesh(skyboxMesh);
+		painted = true;
 	}
-	rendererAPI->SetBlend(false, RendererAPI::BlendType::ONE, RendererAPI::BlendType::NONE);
-	rendererAPI->SetDepth(true);
-	rendererAPI->SetViewportSize(rendererAPI->GetCurrentWidth(), rendererAPI->GetCurrentHeight());
-	rendererAPI->ClearBuffer(true, true, true);
-	rendererAPI->BindFrameBuffer();
-#endif
+	if (painted) {
+		rendererAPI->SetBlend(false, RendererAPI::BlendType::ONE, RendererAPI::BlendType::NONE);
+		rendererAPI->SetDepth(true);
+		rendererAPI->SetViewportSize(rendererAPI->GetCurrentWidth(), rendererAPI->GetCurrentHeight());
+		rendererAPI->BindFrameBuffer();
+		rendererAPI->ClearBuffer(true, true, true);
+	}
 	paintInstances.clear();
 }
 

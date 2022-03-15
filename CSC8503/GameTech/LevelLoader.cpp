@@ -242,7 +242,8 @@ GameObject* LevelLoader::AddFloorToWorld(const Maths::Vector3& position) {
 #ifdef _WIN64
 	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, OGLTexture::RGBATextureEmpty(basicTex->GetWidth(), basicTex->GetHeight()), basicShader));
 #else
-	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
+	//floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, PS4::PS4Texture::EmptyTex(basicTex->GetWidth(), basicTex->GetHeight()),basicShader));
+	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicTex, basicShader));
 #endif
 	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume()));
 
