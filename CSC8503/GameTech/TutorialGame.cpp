@@ -21,7 +21,7 @@ TutorialGame::TutorialGame()	{
 	world			= new GameWorld();
 	renderer		= new Renderer(*world);
 	physics			= new PhysicsSystem(*world);
-	levelManager	= new LevelManager(physics, renderer);
+	levelLoader	= new LevelLoader(physics, renderer);
 
 #ifndef _ORBIS
 	audio = NCL::AudioManager::GetInstance();
@@ -112,7 +112,7 @@ TutorialGame::~TutorialGame() {
 	delete physics;
 	delete renderer;
 	delete world;
-	delete levelManager;
+	delete levelLoader;
 }
 
 void TutorialGame::UpdateGame(float dt) {
@@ -307,12 +307,12 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	levelManager->ReadInLevelFile(NCL::Assets::DATADIR + "../../Assets/Maps/map1.txt");
-	Player* player = levelManager->SpawnPlayer(Vector3(0, 5, 0));
+	levelLoader->ReadInLevelFile(NCL::Assets::DATADIR + "../../Assets/Maps/map1.txt");
+	Player* player = levelLoader->SpawnPlayer(Vector3(0, 5, 0));
 	
-	//powerups.emplace_back(levelManager->AddPowerUpToWorld(Vector3(0, 5, 20), PowerUpType::SpeedBoost));
-	//powerups.emplace_back(levelManager->AddPowerUpToWorld(Vector3(0, 5, 30), PowerUpType::FireRate));
-	//powerups.emplace_back(levelManager->AddPowerUpToWorld(Vector3(0, 5, 40), PowerUpType::Heal));
+	//powerups.emplace_back(levelLoader->AddPowerUpToWorld(Vector3(0, 5, 20), PowerUpType::SpeedBoost));
+	//powerups.emplace_back(levelLoader->AddPowerUpToWorld(Vector3(0, 5, 30), PowerUpType::FireRate));
+	//powerups.emplace_back(levelLoader->AddPowerUpToWorld(Vector3(0, 5, 40), PowerUpType::Heal));
 
 	AxisCommand* m = new MoveCommand(player);
 	inputHandler->BindAxis(0, m);
@@ -332,7 +332,7 @@ void TutorialGame::InitWorld() {
 	Command* f = new FireCommand(player);
 	inputHandler->BindButton(FIRE, f);
 
-	/*GameObject* cap1 = LevelManager->AddCapsuleToWorld(Vector3(15, 15, 0), 3.0f, 1.5f);
+	/*GameObject* cap1 = LevelLoader->AddCapsuleToWorld(Vector3(15, 15, 0), 3.0f, 1.5f);
 	cap1->GetPhysicsObject()->SetDynamic(true);
 	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);*/
 

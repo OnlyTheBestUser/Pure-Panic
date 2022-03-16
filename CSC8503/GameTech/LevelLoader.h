@@ -10,7 +10,7 @@
 
 namespace NCL {
 	namespace CSC8503 {
-		class LevelManager {
+		class LevelLoader {
 
 		#define DEF_MASS 10.0f
 		#define DEF_ELASTICITY 0.8f
@@ -21,8 +21,8 @@ namespace NCL {
 		#define PROJ_SIZE  0.5f
 
 		public:
-			LevelManager(PhysicsSystem* physics, Renderer* renderer);
-			~LevelManager();
+			LevelLoader(PhysicsSystem* physics, Renderer* renderer);
+			~LevelLoader();
 
 			static void ReadInLevelFile(std::string filename);
 
@@ -70,7 +70,7 @@ namespace NCL {
 			static Vector3 Vec3FromStr(std::string input);
 			static bool BoolFromStr(std::string input);
 
-			static LevelManager* singleton;
+			static LevelLoader* singleton;
 
 			PhysicsSystem* physics;
 			Renderer*	   renderer;

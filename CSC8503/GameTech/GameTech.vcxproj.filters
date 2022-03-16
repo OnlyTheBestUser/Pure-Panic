@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="LevelLoader.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="NetworkedGame.cpp" />
@@ -9,6 +8,7 @@
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RendererBase.cpp" />
     <ClCompile Include="TutorialGame.cpp" />
+    <ClCompile Include="LevelLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -32,31 +32,14 @@
     <ClCompile Include="RendererBase.cpp">
       <Filter>Renderers</Filter>
     </ClCompile>
-    <ClCompile Include="LevelManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="TutorialGame.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MainMenu.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NetworkedGame.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NetworkedPlayer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer.h">
-      <Filter>Renderers</Filter>
-    </ClInclude>
-    <ClInclude Include="RendererBase.h">
-      <Filter>Renderers</Filter>
-    </ClInclude>
-    <ClInclude Include="LevelManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <ClInclude Include="LevelLoader.h" />
+    <ClInclude Include="MainMenu.h" />
+    <ClInclude Include="NetworkedGame.h" />
+    <ClInclude Include="NetworkedPlayer.h" />
+    <ClInclude Include="Renderer.h" />
+    <ClInclude Include="RendererBase.h" />
+    <ClInclude Include="TutorialGame.h" />
   </ItemGroup>
 </Project>

@@ -11,7 +11,7 @@
 namespace NCL {
     using namespace Maths;
     namespace CSC8503 {
-		class LevelManager;
+		class LevelLoader;
         class Player : public GameActor
         {
         public:

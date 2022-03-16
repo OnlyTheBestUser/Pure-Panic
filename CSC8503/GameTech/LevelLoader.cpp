@@ -3,7 +3,7 @@
 #include <sstream>
 #include <string>
 
-#include "LevelManager.h"
+#include "LevelLoader.h"
 #include "NetworkedGame.h"
 #include "../CSC8503Common/GameWorld.h"
 #include "../../Common/TextureLoader.h"
@@ -22,9 +22,9 @@
 using namespace NCL;
 using namespace CSC8503;
 
-LevelManager* LevelManager::singleton = nullptr;
+LevelLoader* LevelLoader::singleton = nullptr;
 
-LevelManager::LevelManager(PhysicsSystem* physics, Renderer* renderer) : physics(physics), renderer(renderer) {
+LevelLoader::LevelLoader(PhysicsSystem* physics, Renderer* renderer) : physics(physics), renderer(renderer) {
 	singleton = this;
 
 	auto loadFunc = [](const string& name, MeshGeometry** into) {
@@ -88,7 +88,7 @@ LevelManager::LevelManager(PhysicsSystem* physics, Renderer* renderer) : physics
 	#endif
 }
 
-LevelManager::~LevelManager() {
+LevelLoader::~LevelLoader() {
 	delete basicTex;
 	delete basicShader;
 
@@ -119,7 +119,7 @@ LevelManager::~LevelManager() {
 	delete securityCameraTex;
 }
 
-void LevelManager::ReadInLevelFile(std::string filename) {
+void LevelLoader::ReadInLevelFile(std::string filename) {
 	std::ifstream file;
 	std::string line;
 
@@ -172,7 +172,7 @@ void LevelManager::ReadInLevelFile(std::string filename) {
 	}
 }
 
-void LevelManager::SplitStringOnDelimiter(const std::string& s, char delim, vector<std::string>& result) {
+void LevelLoader::SplitStringOnDelimiter(const std::string& s, char delim, vector<std::string>& result) {
 	std::istringstream iss(s);
 	std::string item;
 
@@ -181,7 +181,7 @@ void LevelManager::SplitStringOnDelimiter(const std::string& s, char delim, vect
 	}
 }
 
-Vector3 LevelManager::Vec3FromStr(std::string input) {
+Vector3 LevelLoader::Vec3FromStr(std::string input) {
 	vector<std::string> values;
 
 	SplitStringOnDelimiter(input, ',', values);
@@ -189,31 +189,31 @@ Vector3 LevelManager::Vec3FromStr(std::string input) {
 	return Vector3(std::stof(values[0]), std::stof(values[1]), std::stof(values[2]));
 }
 
-bool LevelManager::BoolFromStr(std::string input) {
+bool LevelLoader::BoolFromStr(std::string input) {
 	return input == "TRUE";
 }
 
-Player* LevelManager::SpawnPlayer(const Vector3& position) {
+Player* LevelLoader::SpawnPlayer(const Vector3& position) {
 	Player* character = new Player(GameWorld::GetMainCamera(), "Player");
 
 	return (Player*) singleton->AddPlayerObjectToWorld(position, character);
 }
 
-GameObject* LevelManager::SpawnDummyPlayer(const Vector3& position) {
+GameObject* LevelLoader::SpawnDummyPlayer(const Vector3& position) {
 	GameObject* character = new GameObject("Dummy");
 
 	return singleton->AddPlayerObjectToWorld(position, character);
 }
 
-Projectile* LevelManager::SpawnProjectile(Player* owner, const float& initialSpeed, const float& meshSize) {
+Projectile* LevelLoader::SpawnProjectile(Player* owner, const float& initialSpeed, const float& meshSize) {
 	return SpawnProjectile((GameObject*)owner, owner->GetCam()->GetPitch(), owner->GetPlayerID(), initialSpeed, meshSize);
 }
 
-Projectile* LevelManager::SpawnProjectile(GameObject* owner, float pitch, int playerID, const float& initialSpeed, const float& meshSize) {
+Projectile* LevelLoader::SpawnProjectile(GameObject* owner, float pitch, int playerID, const float& initialSpeed, const float& meshSize) {
 	return singleton->AddProjectileToWorld(owner, pitch, playerID, initialSpeed, meshSize);
 }
 
-GameObject* LevelManager::AddFloorToWorld(const Vector3& position) {
+GameObject* LevelLoader::AddFloorToWorld(const Vector3& position) {
 	GameObject* floor = new GameObject("Floor");
 	Vector3 floorSize = Vector3(250, 1, 250);
 
@@ -224,7 +224,7 @@ GameObject* LevelManager::AddFloorToWorld(const Vector3& position) {
 	return floor;
 }
 
-GameObject* LevelManager::AddAABBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name) {
+GameObject* LevelLoader::AddAABBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name) {
 	GameObject* cube = new GameObject(name);
 	CollisionVolume* volume = (CollisionVolume*) new AABBVolume(dimensions);
 
@@ -239,7 +239,7 @@ GameObject* LevelManager::AddAABBWallToWorld(const Vector3& position, Vector3 di
 	return cube;
 }
 
-GameObject* LevelManager::AddOBBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name) {
+GameObject* LevelLoader::AddOBBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name) {
 	GameObject* cube = new GameObject(name);
 	CollisionVolume* volume = (CollisionVolume*) new OBBVolume(dimensions + Vector3(2, 10, 0));
 
@@ -256,7 +256,7 @@ GameObject* LevelManager::AddOBBWallToWorld(const Vector3& position, Vector3 dim
 	return cube;
 }
 
-GameObject* LevelManager::AddLongWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name) {
+GameObject* LevelLoader::AddLongWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name) {
 	Vector3 location = position + Vector3(0, 10, 0);
 
 	if (position.x < 0)
@@ -290,7 +290,7 @@ GameObject* LevelManager::AddLongWallToWorld(const Vector3& position, Vector3 di
 	return physicalObject;
 }
 
-GameObject* LevelManager::AddPaintWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name)
+GameObject* LevelLoader::AddPaintWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name)
 {
 	GameObject* cube = new GameObject(name);
 	CollisionVolume* volume = (CollisionVolume*) new OBBVolume(dimensions + Vector3(2, 10, 0));
@@ -312,7 +312,7 @@ GameObject* LevelManager::AddPaintWallToWorld(const Vector3& position, Vector3 d
 	return cube;
 }
 
-void        LevelManager::AddCornerWallToWorld(const Vector3& position, Vector3 dimensions, int rotation)
+void        LevelLoader::AddCornerWallToWorld(const Vector3& position, Vector3 dimensions, int rotation)
 {
 	Vector3 location = position + Vector3(0, 15, 0);
 	if (rotation == 45)
@@ -330,7 +330,7 @@ void        LevelManager::AddCornerWallToWorld(const Vector3& position, Vector3 
 	return;
 }
 
-void		LevelManager::AddSecurityCameraToWorld(const Vector3& position, int rotation)
+void		LevelLoader::AddSecurityCameraToWorld(const Vector3& position, int rotation)
 {
 	Vector3 location = position + Vector3(0, 24, 0);
 	Vector3 dimensions = Vector3(2, 3, 4);
@@ -361,7 +361,7 @@ void		LevelManager::AddSecurityCameraToWorld(const Vector3& position, int rotati
 	return;
 }
 
-void		LevelManager::AddWallHammerToWorld(const Vector3& position, int rotation)
+void		LevelLoader::AddWallHammerToWorld(const Vector3& position, int rotation)
 {
 	Vector3 location = position + Vector3(0, 18.25, 0);
 	Vector3 dimensions = Vector3(1, 5.5, 4);
@@ -392,7 +392,7 @@ void		LevelManager::AddWallHammerToWorld(const Vector3& position, int rotation)
 	return;
 }
 
-GameObject* LevelManager::AddRenderPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture) {
+GameObject* LevelLoader::AddRenderPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture) {
 	GameObject* cube = new GameObject();
 	cube->SetBoundingVolume(nullptr);
 	cube->SetPhysicsObject(nullptr);
@@ -413,7 +413,7 @@ GameObject* LevelManager::AddRenderPartToWorld(const Vector3& position, Vector3 
 	return cube;
 }
 
-GameObject* LevelManager::AddSphereToWorld(const Vector3& position, float radius, int layer, bool isTrigger, bool dynamic, bool rubber, bool hollow, float inverseMass) {
+GameObject* LevelLoader::AddSphereToWorld(const Vector3& position, float radius, int layer, bool isTrigger, bool dynamic, bool rubber, bool hollow, float inverseMass) {
 	GameObject* sphere = new GameObject();
 
 	SetFieldsForSphere(sphere, position, (CollisionLayer) layer, radius, isTrigger, dynamic, rubber, hollow, inverseMass);
@@ -423,7 +423,7 @@ GameObject* LevelManager::AddSphereToWorld(const Vector3& position, float radius
 	return sphere;
 }
 
-GameObject* LevelManager::AddCubeToWorld(const Vector3& position, Maths::Vector3 dimensions, int layer, bool isTrigger, bool dynamic, bool OBB, float inverseMass) {
+GameObject* LevelLoader::AddCubeToWorld(const Vector3& position, Maths::Vector3 dimensions, int layer, bool isTrigger, bool dynamic, bool OBB, float inverseMass) {
 	GameObject* cube = new GameObject();
 
 	SetFieldsForCube(cube, position, dimensions, (CollisionLayer) layer, isTrigger, dynamic, OBB, inverseMass);
@@ -433,7 +433,7 @@ GameObject* LevelManager::AddCubeToWorld(const Vector3& position, Maths::Vector3
 	return cube;
 }
 
-GameObject* LevelManager::AddCapsuleToWorld(const Vector3& position, float halfHeight, float radius, int layer, bool isTrigger, bool dynamic, float inverseMass) {
+GameObject* LevelLoader::AddCapsuleToWorld(const Vector3& position, float halfHeight, float radius, int layer, bool isTrigger, bool dynamic, float inverseMass) {
 	GameObject* capsule = new GameObject();
 
 	SetFieldsForCapsule(capsule, position, (CollisionLayer) layer, halfHeight, radius, isTrigger, dynamic, inverseMass);
@@ -443,7 +443,7 @@ GameObject* LevelManager::AddCapsuleToWorld(const Vector3& position, float halfH
 	return capsule;
 }
 
-GameObject* LevelManager::AddPlayerObjectToWorld(const Vector3& position, GameObject* character) {
+GameObject* LevelLoader::AddPlayerObjectToWorld(const Vector3& position, GameObject* character) {
 	float meshSize = 3.0f;
 
 	CapsuleVolume* volume = new CapsuleVolume(0.85f * meshSize, 0.3f * meshSize);
@@ -461,7 +461,7 @@ GameObject* LevelManager::AddPlayerObjectToWorld(const Vector3& position, GameOb
 	return character;
 }
 
-PowerUp*    LevelManager::AddPowerUpToWorld(const Vector3& position, const PowerUpType& ability, const float& radius) {
+PowerUp*    LevelLoader::AddPowerUpToWorld(const Vector3& position, const PowerUpType& ability, const float& radius) {
 	PowerUp* powerup = nullptr;
 	Vector4 colour;
 
@@ -490,7 +490,7 @@ PowerUp*    LevelManager::AddPowerUpToWorld(const Vector3& position, const Power
 	return powerup;
 }
 
-Projectile* LevelManager::AddProjectileToWorld(GameObject* owner, float pitch, int playerID, const float& initialSpeed, const float& meshSize) {
+Projectile* LevelLoader::AddProjectileToWorld(GameObject* owner, float pitch, int playerID, const float& initialSpeed, const float& meshSize) {
 	float inverseMass = 1.0f;
 
 	Vector3 ownerRot = owner->GetTransform().GetOrientation().ToEuler();
@@ -526,13 +526,13 @@ Projectile* LevelManager::AddProjectileToWorld(GameObject* owner, float pitch, i
 	return projectile;
 }
 
-Vector3 LevelManager::AddSpawnPointToWorld(const Vector3& position)
+Vector3 LevelLoader::AddSpawnPointToWorld(const Vector3& position)
 {
 
 	return Vector3();
 }
 
-void LevelManager::SetFieldsForSphere(GameObject* sphere, const Vector3& position, CollisionLayer layers, float radius, bool isTrigger, bool dynamic, bool rubber, bool hollow, float inverseMass, float elasticity, float lDamping, float friction) {
+void LevelLoader::SetFieldsForSphere(GameObject* sphere, const Vector3& position, CollisionLayer layers, float radius, bool isTrigger, bool dynamic, bool rubber, bool hollow, float inverseMass, float elasticity, float lDamping, float friction) {
 	CollisionVolume* volume = (CollisionVolume*) new SphereVolume(radius);
 	
 	SetMiscFields(sphere, volume, position, Vector3(radius, radius, radius), isTrigger);
@@ -543,7 +543,7 @@ void LevelManager::SetFieldsForSphere(GameObject* sphere, const Vector3& positio
 	else		sphere->GetPhysicsObject()->InitSphereInertia();
 }
 
-void LevelManager::SetFieldsForCube(GameObject* cube, const Vector3& position, Vector3 dimensions, CollisionLayer layers, bool isTrigger, bool dynamic, bool OBB, float inverseMass, float elasticity, float lDamping, float friction) {
+void LevelLoader::SetFieldsForCube(GameObject* cube, const Vector3& position, Vector3 dimensions, CollisionLayer layers, bool isTrigger, bool dynamic, bool OBB, float inverseMass, float elasticity, float lDamping, float friction) {
 	CollisionVolume* volume = OBB ? (CollisionVolume*) new OBBVolume(dimensions) : (CollisionVolume*) new AABBVolume(dimensions);
 
 	SetMiscFields(cube, volume, position, dimensions * 2, isTrigger);
@@ -558,7 +558,7 @@ void LevelManager::SetFieldsForCube(GameObject* cube, const Vector3& position, V
 	cube->GetPhysicsObject()->InitCubeInertia();
 }
 
-void LevelManager::SetFieldsForCapsule(GameObject* capsule, const Vector3& position, CollisionLayer layers, float halfHeight, float radius, bool isTrigger, bool dynamic, float inverseMass, float elasticity, float lDamping, float friction) {
+void LevelLoader::SetFieldsForCapsule(GameObject* capsule, const Vector3& position, CollisionLayer layers, float halfHeight, float radius, bool isTrigger, bool dynamic, float inverseMass, float elasticity, float lDamping, float friction) {
 	CapsuleVolume* volume = new CapsuleVolume(halfHeight, radius);
 
 	SetMiscFields(capsule, volume, position, Vector3(radius * 2, halfHeight, radius * 2), isTrigger);
@@ -569,7 +569,7 @@ void LevelManager::SetFieldsForCapsule(GameObject* capsule, const Vector3& posit
 	capsule->GetPhysicsObject()->InitCubeInertia();
 }
 
-void LevelManager::SetMiscFields(GameObject* obj, CollisionVolume* volume, const Vector3& position, const Vector3& dimensions, bool isTrigger) {
+void LevelLoader::SetMiscFields(GameObject* obj, CollisionVolume* volume, const Vector3& position, const Vector3& dimensions, bool isTrigger) {
 	obj->SetBoundingVolume(volume);
 	obj->SetTrigger(isTrigger);
 	obj->GetTransform()
@@ -577,7 +577,7 @@ void LevelManager::SetMiscFields(GameObject* obj, CollisionVolume* volume, const
 		.SetPosition(position);
 }
 
-PhysicsObject* LevelManager::GetPhysicsObject(Transform* transform, CollisionVolume* volume, int layers, bool dynamic, float inverseMass, float elasticity, float lDamping, float friction) {
+PhysicsObject* LevelLoader::GetPhysicsObject(Transform* transform, CollisionVolume* volume, int layers, bool dynamic, float inverseMass, float elasticity, float lDamping, float friction) {
 	PhysicsObject* physics = new PhysicsObject(transform, volume);
 
 	physics->SetCollisionLayers(layers);
@@ -589,7 +589,7 @@ PhysicsObject* LevelManager::GetPhysicsObject(Transform* transform, CollisionVol
 	return physics;
 }
 
-RenderObject* LevelManager::GetRenderObject(Transform* transform, MeshGeometry* mesh, TextureBase* texture, ShaderBase* shader, Vector4 colour) {
+RenderObject* LevelLoader::GetRenderObject(Transform* transform, MeshGeometry* mesh, TextureBase* texture, ShaderBase* shader, Vector4 colour) {
 	RenderObject* renderer = new RenderObject(transform, mesh, texture, shader);
 
 	renderer->SetColour(colour);

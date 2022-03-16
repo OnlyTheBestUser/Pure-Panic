@@ -1,5 +1,5 @@
 #include "Player.h"
-#include "../GameTech/LevelManager.h"
+#include "../GameTech/LevelLoader.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -89,7 +89,7 @@ float Player::CheckDistToGround()
 void Player::Fire() {
 	if (timeSincePrevShot > fireRate)
 	{
-		LevelManager::SpawnProjectile(this);
+		LevelLoader::SpawnProjectile(this);
 		timeSincePrevShot = 0.0f;
 		fired = true;
 	}

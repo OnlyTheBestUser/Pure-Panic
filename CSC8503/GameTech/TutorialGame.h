@@ -1,5 +1,5 @@
 #pragma once
-#include "LevelManager.h"
+#include "LevelLoader.h"
 #include "../CSC8503Common/PhysicsSystem.h"
 #include "../CSC8503Common/Player.h"
 #include "../CSC8503Common/AudioManager.h"
@@ -82,7 +82,7 @@ namespace NCL {
 			GameWorld*			world;
 			NCL::AudioManager*	audio;
 			BGMManager*			bgm;
-			LevelManager*		levelManager;
+			LevelLoader*		levelLoader;
 
 			GameState state;
 
