@@ -638,6 +638,10 @@ PowerUp* LevelLoader::AddPowerUpToWorld(const Vector3& position, const PowerUpTy
 		powerup = new SpeedBoost(*world);
 		colour = Debug::CYAN;
 		break;
+	case(PowerUpType::MultiBullet):
+		powerup = new MultiBullet(*world);
+		colour = Debug::GREEN;
+		break;
 	}
 
 	if (powerup == nullptr) {

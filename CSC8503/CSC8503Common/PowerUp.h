@@ -9,6 +9,7 @@ enum PowerUpType
 	SpeedBoost,
 	FireRate,
 	Heal,
+	MultiBullet,
 	None,
 };
 
