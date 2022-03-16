@@ -224,6 +224,7 @@
     <ClInclude Include="FireRate.h" />
     <ClInclude Include="GameActor.h" />
     <ClInclude Include="GameClient.h" />
+    <ClInclude Include="GameManager.h" />
     <ClInclude Include="GameServer.h" />
     <ClInclude Include="Heal.h" />
     <ClInclude Include="InputBase.h" />
@@ -271,6 +272,7 @@
     <ClCompile Include="CollisionDetection.cpp" />
     <ClCompile Include="Debug.cpp" />
     <ClCompile Include="GameClient.cpp" />
+    <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameServer.cpp" />
     <ClCompile Include="GameWorld.cpp" />

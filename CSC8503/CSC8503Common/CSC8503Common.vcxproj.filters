@@ -24,6 +24,9 @@
     <ClCompile Include="Timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GameManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AABBVolume.h" />
@@ -46,8 +49,6 @@
     <ClInclude Include="OBBVolume.h" />
     <ClInclude Include="PCInput.h" />
     <ClInclude Include="Player.h" />
-    <ClInclude Include="PowerUp.h" />
-    <ClInclude Include="SpeedBoost.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="SphereVolume.h" />
     <ClInclude Include="CollisionVolume.h" />
@@ -68,8 +69,19 @@
     <ClInclude Include="StateMachine.h" />
     <ClInclude Include="StateTransition.h" />
     <ClInclude Include="Transform.h" />
-    <ClInclude Include="Heal.h" />
     <ClInclude Include="Timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Heal.h">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="PowerUp.h">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="SpeedBoost.h">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="GameManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -106,6 +118,9 @@
     </Filter>
     <Filter Include="Audio">
       <UniqueIdentifier>{f5f0b303-de1d-4ab0-b4c8-f5bbe3ef593c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Gameplay">
+      <UniqueIdentifier>{8ab8b2d3-3bc3-45d6-a51c-3cbc3d1c906a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

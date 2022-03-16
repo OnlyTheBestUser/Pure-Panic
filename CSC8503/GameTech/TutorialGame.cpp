@@ -21,13 +21,15 @@ TutorialGame::TutorialGame()	{
 	world			= new GameWorld();
 	renderer		= new Renderer(*world);
 	physics			= new PhysicsSystem(*world);
-	levelLoader	= new LevelLoader(physics, renderer);
-
+	levelLoader		= new LevelLoader(physics, renderer);
+	gameManager		= new GameManager(this);
+	
 #ifndef _ORBIS
 	audio = NCL::AudioManager::GetInstance();
 	audio->Initialize();
 	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_01.ogg", true, false, false);
 	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_02.ogg", true, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "gun_fire.ogg", true, false, false);
 	audio->LoadSound(Assets::AUDIODIR + "menu_music.ogg", false, true, true);
 
 	bgm = new BGMManager(audio);
@@ -41,8 +43,6 @@ TutorialGame::TutorialGame()	{
 	inSelectionMode = false;
 
 	state = PLAY;
-
-	timer = new Timer(abs(60.0f));
 
 	Debug::SetRenderer(renderer);
 
@@ -89,7 +89,7 @@ TutorialGame::TutorialGame()	{
 	Command* resetWorld = new ResetWorldCommand(&state);
 	Command* quitCommand = new QuitCommand(&quit, &pause);
 	//Command* paintFireCommand = new PaintFireCommand(this);
-	Command* startTimer = new StartTimerCommand(timer);
+	Command* startTimer = new StartTimerCommand(gameManager->GetTimer());
 	
 	inputHandler->BindButton(TOGGLE_GRAV, toggleGrav);
 	inputHandler->BindButton(TOGGLE_DEBUG, toggleDebug);
@@ -176,7 +176,7 @@ void TutorialGame::UpdateGameWorld(float dt)
 
 	world->UpdateWorld(dt);
 
-	timer->Update(dt);
+	gameManager->Update(dt);
 }
 
 void TutorialGame::DebugDrawCollider(const CollisionVolume* c, Transform* worldTransform) {
@@ -310,10 +310,6 @@ void TutorialGame::InitWorld() {
 	levelLoader->ReadInLevelFile(NCL::Assets::DATADIR + "../../Assets/Maps/map1.txt");
 	Player* player = levelLoader->SpawnPlayer(Vector3(0, 5, 0));
 	
-	//powerups.emplace_back(levelLoader->AddPowerUpToWorld(Vector3(0, 5, 20), PowerUpType::SpeedBoost));
-	//powerups.emplace_back(levelLoader->AddPowerUpToWorld(Vector3(0, 5, 30), PowerUpType::FireRate));
-	//powerups.emplace_back(levelLoader->AddPowerUpToWorld(Vector3(0, 5, 40), PowerUpType::Heal));
-
 	AxisCommand* m = new MoveCommand(player);
 	inputHandler->BindAxis(0, m);
 
@@ -519,7 +515,7 @@ void TutorialGame::PaintObject() {
 			
 			
 			// Get the uv from the ray
-			renderer->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, 1, 0.2, 0.2, Vector4(0.3, 0, 0.5, 1));
+			renderer->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, ((GameObject*)closestCollision.node)->GetPaintRadius(), 0.2, 0.2, Vector4(0.3, 0, 0.5, 1));
 		}
 	}
 }

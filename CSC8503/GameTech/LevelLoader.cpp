@@ -157,7 +157,7 @@ void LevelLoader::ReadInLevelFile(std::string filename) {
 					singleton->AddCapsuleToWorld(Vec3FromStr(lineContents[1]), std::stof(lineContents[2]), std::stof(lineContents[3]), std::stof(lineContents[4]));
 				}
 				else if (lineContents[0] == "PAINT_WALL") {
-					singleton->AddPaintWallToWorld(Vec3FromStr(lineContents[1]), Vector3(5, 5, 4), std::stoi(lineContents[2]));
+					singleton->AddPaintWallToWorld(Vec3FromStr(lineContents[1]), Vector3(5, 5, 4), std::stoi(lineContents[2]), lineContents[0]);
 				}
 				else if (lineContents[0] == "POWERUP") {
 					singleton->AddPowerUpToWorld(Vec3FromStr(lineContents[1]), (const PowerUpType) std::stoi(lineContents[2]));
@@ -214,7 +214,7 @@ Projectile* LevelLoader::SpawnProjectile(GameObject* owner, float pitch, int pla
 }
 
 GameObject* LevelLoader::AddFloorToWorld(const Vector3& position) {
-	GameObject* floor = new GameObject("Floor");
+	GameObject* floor = new GameObject("Floor", 1.5f);
 	Vector3 floorSize = Vector3(250, 1, 250);
 
 	SetFieldsForCube(floor, position, floorSize, CollisionLayer::LAYER_ONE, false, false, false, 0, DEF_ELASTICITY, DEF_LDAMPING, DEF_FRICTION);
@@ -299,7 +299,15 @@ GameObject* LevelLoader::AddPaintWallToWorld(const Vector3& position, Vector3 di
 
 	cube->SetPhysicsObject(GetPhysicsObject(&cube->GetTransform(), volume, CollisionLayer::LAYER_ONE, false, 0, DEF_ELASTICITY, DEF_LDAMPING, DEF_FRICTION));
 	cube->GetPhysicsObject()->InitCubeInertia();
-	cube->GetTransform().SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
+
+	if (rotation == 0)
+		cube->GetTransform().SetOffset(Vector3(0, 15, 6.5f));
+	if (rotation == 90)
+		cube->GetTransform().SetOffset(Vector3(6.5f, 15, 0));
+	if (rotation == 180)
+		cube->GetTransform().SetOffset(Vector3(0, 15, -6.5f));
+	if (rotation == 270)
+		cube->GetTransform().SetOffset(Vector3(-6.5f, 15, 0));
 
 	#ifdef _WIN64
 		cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, OGLTexture::RGBATextureEmpty(corridorWallAlertTex->GetHeight()/16, corridorWallAlertTex->GetWidth()/16), basicShader));
@@ -483,11 +491,18 @@ PowerUp*    LevelLoader::AddPowerUpToWorld(const Vector3& position, const PowerU
 
 	SetFieldsForSphere(powerup, position, CollisionLayer::LAYER_FOUR, radius, true, true, false, false, 0);
 	if (powerup) powerup->GetRenderObject()->SetColour(colour);
-
+	
 	GameWorld::AddGameObject(powerup);
 	NetworkedGame::AddPowerUp(powerup);
 
 	return powerup;
+}
+
+Projectile* LevelLoader::SpawnProjectile(Player* owner, const float& initialSpeed, const float& meshSize) {
+#ifndef _ORBIS
+	AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + "gun_fire.ogg", owner->GetTransform().GetPosition(), 0.3f);
+#endif // !_ORBIS
+	return SpawnProjectile((GameObject*)owner, owner->GetCam()->GetPitch(), owner->GetPlayerID(), initialSpeed, meshSize);
 }
 
 Projectile* LevelLoader::AddProjectileToWorld(GameObject* owner, float pitch, int playerID, const float& initialSpeed, const float& meshSize) {
@@ -495,11 +510,13 @@ Projectile* LevelLoader::AddProjectileToWorld(GameObject* owner, float pitch, in
 
 	Vector3 ownerRot = owner->GetTransform().GetOrientation().ToEuler();
 
-	Vector3 camForwardVector = (Matrix4::Rotation(ownerRot.y, Vector3(0, 1, 0)) * Matrix4::Rotation(pitch, Vector3(1, 0, 0)) * Vector3(0, 0, -1)).Normalised();
+	Vector3 camForwardVector = (Matrix4::Rotation(ownerRot.y, Vector3(0,1,0)) * Matrix4::Rotation(pitch, Vector3(1,0,0)) * Vector3(0,0,-1)).Normalised();
+	Vector3 camRightVector = Vector3::Cross(camForwardVector, Vector3(0, 1, 0)).Normalised();
+	Vector3 camUpVector = Vector3::Cross(camForwardVector, -camRightVector).Normalised();
 
 	Projectile* projectile = new Projectile(renderer, playerID);
 
-	SphereVolume* volume = new SphereVolume(meshSize * 1.4);// / 2.0f * meshSize * 1.3f);
+	SphereVolume* volume = new SphereVolume(meshSize * 0.8);// / 2.0f * meshSize * 1.3f);
 	projectile->SetBoundingVolume((CollisionVolume*)volume);
 
 	projectile->GetTransform()
@@ -513,8 +530,15 @@ Projectile* LevelLoader::AddProjectileToWorld(GameObject* owner, float pitch, in
 	projectile->GetPhysicsObject()->InitSphereInertia();
 
 	float velocityDueToMovement = Vector3::Dot(camForwardVector, owner->GetPhysicsObject()->GetLinearVelocity());
+	
+	float angle1 = float((rand() % 200) - 100) / (66.67f);
+	float angle2 = float((rand() % 200) - 100) / (66.67f);
+
 	if (velocityDueToMovement < 0.0f) velocityDueToMovement = 0.0f;
-	projectile->GetPhysicsObject()->AddAcceleration(camForwardVector * (initialSpeed + velocityDueToMovement));
+
+	projectile->GetPhysicsObject()->AddAcceleration(Matrix4::Rotation(angle1, camUpVector) * Matrix4::Rotation(angle2, camRightVector)*camForwardVector * (initialSpeed + velocityDueToMovement));
+	//projectile->GetPhysicsObject()->AddAcceleration(camForwardVector * (initialSpeed + velocityDueToMovement));
+	
 	projectile->GetTransform().SetOrientation(Quaternion(Matrix3::Rotation(-acos(Vector3::Dot(Vector3(0, 1, 0), camForwardVector)) * 180.0f / 3.14f, Vector3::Cross(camForwardVector, Vector3(0, 1, 0)).Normalised())));
 
 	projectile->GetPhysicsObject()->SetLinearDamping(0.1f);
