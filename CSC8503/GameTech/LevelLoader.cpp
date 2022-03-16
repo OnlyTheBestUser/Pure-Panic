@@ -210,6 +210,10 @@ Projectile* LevelLoader::SpawnProjectile(Player* owner, const float& initialSpee
 }
 
 Projectile* LevelLoader::SpawnProjectile(GameObject* owner, float pitch, int playerID, const float& initialSpeed, const float& meshSize) {
+	#ifndef _ORBIS
+		AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + "gun_fire.ogg", owner->GetTransform().GetPosition(), 0.3f);
+	#endif // !_ORBIS
+
 	return singleton->AddProjectileToWorld(owner, pitch, playerID, initialSpeed, meshSize);
 }
 
@@ -496,13 +500,6 @@ PowerUp*    LevelLoader::AddPowerUpToWorld(const Vector3& position, const PowerU
 	NetworkedGame::AddPowerUp(powerup);
 
 	return powerup;
-}
-
-Projectile* LevelLoader::SpawnProjectile(Player* owner, const float& initialSpeed, const float& meshSize) {
-#ifndef _ORBIS
-	AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + "gun_fire.ogg", owner->GetTransform().GetPosition(), 0.3f);
-#endif // !_ORBIS
-	return SpawnProjectile((GameObject*)owner, owner->GetCam()->GetPitch(), owner->GetPlayerID(), initialSpeed, meshSize);
 }
 
 Projectile* LevelLoader::AddProjectileToWorld(GameObject* owner, float pitch, int playerID, const float& initialSpeed, const float& meshSize) {
