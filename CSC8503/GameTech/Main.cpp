@@ -7,17 +7,18 @@ size_t       sceLibcHeapSize = 256 * 1024 * 1024;	/* Set up heap area upper limi
 #include "../../Plugins/PlayStation4/PS4Input.h"
 #include "../../Common/Window.h"
 
-#include "TutorialGame.h"
-
 #include "../CSC8503Common/StateMachine.h"
 #include "../CSC8503Common/StateTransition.h"
 #include "../CSC8503Common/State.h"
 
 #include "../CSC8503Common/NavigationGrid.h"
 
+#include "TutorialGame.h"
 #include "NetworkedGame.h"
 #include "TutorialGame.h"
 #include "MainMenu.h"
+#include "LoadingScreen.h"
+
 #include "../CSC8503Common/BehaviourAction.h"
 #include "../CSC8503Common/BehaviourSequence.h"
 #include "../CSC8503Common/BehaviourSelector.h"
@@ -29,31 +30,34 @@ size_t       sceLibcHeapSize = 256 * 1024 * 1024;	/* Set up heap area upper limi
 #include "Thread.h"
 #include "MutexClass.h"
 
-//vector<string> sharedBuffer;	// shared thread buffer
 vector<TutorialGame*> sharedGameBuffer;	// shared thread buffer
 bool doneLoading = true;	// shared thread buffer
+//LoadingScreen* ls;		// global shared load screen
 MutexClass mutex;		// global mutex object
 
 class Loader : public Thread
 {
+public:
+	void AssignLoadScreen(LoadingScreen* l) { ls = l; }
 protected:
 	virtual void Run();
+	LoadingScreen* ls;
 };
-class MainMenuInitialiser : public Thread
-{
-protected:
-	virtual void Run();
-};
-class NetworkedGameInitialiser : public Thread
-{
-protected:
-	virtual void Run();
-};
-class SplitscreenGameInitialiser : public Thread
-{
-protected:
-	virtual void Run();
-};
+//class MainMenuInitialiser : public Thread
+//{
+//protected:
+//	virtual void Run();
+//};
+//class NetworkedGameInitialiser : public Thread
+//{
+//protected:
+//	virtual void Run();
+//};
+//class SplitscreenGameInitialiser : public Thread
+//{
+//protected:
+//	virtual void Run();
+//};
 
 /*void Consumer::Run()
 {
@@ -83,42 +87,42 @@ void Loader::Run()
 		}
 		else
 		{
-			std::cout << "LOADING" << std::endl;
+			//std::cout << "LOADING" << std::endl;
+			ls->UpdateGame(0.01f);
 		}
 		mutex.UnlockMutex();
 	}
 }
-void MainMenuInitialiser::Run()
-{
-	std::cout << "MAIN MENU INIT" << std::endl;
-	MainMenu* mm = new MainMenu();
-	mutex.LockMutex();
-	sharedGameBuffer.push_back(mm);
-	completed = true;
-	mutex.UnlockMutex();
-	std::cout << "MAIN MENU FINISH" << std::endl;
-}
-void NetworkedGameInitialiser::Run()
-{
-	std::cout << "NETWORKED GAME INIT" << std::endl;
-	NetworkedGame* ng = new NetworkedGame();
-	mutex.LockMutex();
-	sharedGameBuffer.push_back(ng);
-	completed = true;
-	mutex.UnlockMutex();
-	std::cout << "NETWORKED GAME FINISH" << std::endl;
-}
-void SplitscreenGameInitialiser::Run()
-{
-	std::cout << "TUTORIAL GAME INIT" << std::endl;
-	TutorialGame* tg = new TutorialGame();
-	mutex.LockMutex();
-	sharedGameBuffer.push_back(tg);
-	completed = true;
-	mutex.UnlockMutex();
-	std::cout << "TUTORIAL GAME FINISH" << std::endl;
-}
-
+//void MainMenuInitialiser::Run()
+//{
+//	std::cout << "MAIN MENU INIT" << std::endl;
+//	MainMenu* mm = new MainMenu();
+//	mutex.LockMutex();
+//	sharedGameBuffer.push_back(mm);
+//	completed = true;
+//	mutex.UnlockMutex();
+//	std::cout << "MAIN MENU FINISH" << std::endl;
+//}
+//void NetworkedGameInitialiser::Run()
+//{
+//	std::cout << "NETWORKED GAME INIT" << std::endl;
+//	NetworkedGame* ng = new NetworkedGame();
+//	mutex.LockMutex();
+//	sharedGameBuffer.push_back(ng);
+//	completed = true;
+//	mutex.UnlockMutex();
+//	std::cout << "NETWORKED GAME FINISH" << std::endl;
+//}
+//void SplitscreenGameInitialiser::Run()
+//{
+//	std::cout << "TUTORIAL GAME INIT" << std::endl;
+//	TutorialGame* tg = new TutorialGame();
+//	mutex.LockMutex();
+//	sharedGameBuffer.push_back(tg);
+//	completed = true;
+//	mutex.UnlockMutex();
+//	std::cout << "TUTORIAL GAME FINISH" << std::endl;
+//}
 
 using namespace NCL;
 using namespace CSC8503;
@@ -242,6 +246,49 @@ protected:
 	MainMenu* m;
 };
 
+class Loading : public PushdownState
+{
+public:
+	Loading(LoadingScreen* l) : ls(l) {};
+	PushdownResult OnUpdate(float dt, PushdownState** newState) override 
+	{
+		if (!threadMade)
+		{
+			doneLoading = false;
+			loadThread.AssignLoadScreen(ls);
+			loadThread.Start();
+			threadMade = true;
+		}
+
+		m = new MainMenu();
+		ng = new NetworkedGame();
+		tg = new TutorialGame();
+
+		mutex.LockMutex();
+		doneLoading = true;
+		mutex.UnlockMutex();
+		loadThread.Join();
+
+		mutex.LockMutex();
+		if (doneLoading)
+		{
+			*newState = new Menu(m, tg, ng);
+			return PushdownResult::Push;
+		}
+		mutex.UnlockMutex();
+		return PushdownResult::NoChange;
+	}
+
+protected:
+	bool threadMade = false;
+
+	Loader loadThread;
+	LoadingScreen* ls;
+	TutorialGame* tg;
+	NetworkedGame* ng;
+	MainMenu* m;
+};
+
 /*
 
 The main function should look pretty familar to you!
@@ -276,28 +323,15 @@ int main() {
 	float totalTime = 0.0f;
 	int totalFrames = 0;
 
-	doneLoading = false;
+	//ls = new LoadingScreen();
+	w->SetTitle("Loading");
 
-	Loader loadThread;
-	//MainMenuInitialiser mmi;
-	//NetworkedGameInitialiser ngi;
-	//SplitscreenGameInitialiser sgi;
+	LoadingScreen* l = new LoadingScreen();
+	PushdownMachine p = new Loading(l);
 
-	loadThread.Start();
 
-	MainMenu* m = new MainMenu();
-
-	NetworkedGame* h = new NetworkedGame();
-
-	TutorialGame* g = new TutorialGame();
-
-	mutex.LockMutex();
-	doneLoading = true;
-	mutex.UnlockMutex();
-
-	loadThread.Join();
-
-	//PushdownMachine p = new Menu(m, g, h);
+	//delete ls;
+	
 		
 	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
 	float smallestFrameRate = 144.0f;
@@ -337,11 +371,11 @@ int main() {
 			curTimeWait = avgTimeWait;
 		}
 
-		g->UpdateGame(dt);
+		//m->UpdateGame(dt);
 
-		/*if (!p.Update(dt)) {
+		if (!p.Update(dt)) {
 			return 0;
-		}*/
+		}
 	}
 	Window::DestroyGameWindow();
 }

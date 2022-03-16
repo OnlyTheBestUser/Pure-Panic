@@ -53,7 +53,7 @@ namespace NCL {
 			}
 
 			void PaintObject();
-
+			
 		protected:
 			InputHandler* inputHandler;
 

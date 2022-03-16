@@ -51,6 +51,9 @@
     <ClCompile Include="MutexClass.cpp">
       <Filter>Threading</Filter>
     </ClCompile>
+    <ClCompile Include="LoadingScreen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TutorialGame.h">
@@ -79,6 +82,9 @@
     </ClInclude>
     <ClInclude Include="MutexClass.h">
       <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="LoadingScreen.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
