@@ -77,8 +77,14 @@ namespace NCL {
 			void DebugDrawVelocity(const Vector3& vel, Transform* worldTransform);
 			void DebugDrawObjectInfo(const GameObject* obj);
 			void UpdateBGM();
+			void UpdateScores(float dt);
 
 			StateGameObject* testStateObject;
+			int currentObj;
+
+
+
+			float timeSinceLastScoreUpdate;
 
 			Renderer*			renderer;
 			PhysicsSystem*		physics;

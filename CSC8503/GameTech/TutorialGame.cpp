@@ -184,6 +184,30 @@ void TutorialGame::UpdateGameWorld(float dt)
 	world->UpdateWorld(dt);
 
 	gameManager->Update(dt);
+
+	UpdateScores(dt);
+}
+
+void TutorialGame::UpdateScores(float dt) {
+	timeSinceLastScoreUpdate += dt;
+	if (timeSinceLastScoreUpdate > 0.0001f) {
+		GameObjectIterator start;
+		GameObjectIterator cur;
+		GameObjectIterator end;
+		world->GetPaintableObjectIterators(start, end);
+		cur = start;
+		for (int i = 0; i < currentObj; i++) {
+			cur++;
+			if (cur == end) {
+				currentObj = 0;
+				cur = start;
+			}
+		}
+		// Need to score the texture here.
+		std::cout << (*cur)->GetRenderObject()->GetPaintMask() << "\n";
+		currentObj++;
+		timeSinceLastScoreUpdate = 0;
+	}
 }
 
 void TutorialGame::DebugDrawCollider(const CollisionVolume* c, Transform* worldTransform) {

@@ -4,6 +4,7 @@
 #include "CollisionDetection.h"
 #include "Octree.h"
 #include "NavigationGrid.h"
+#include <map>
 
 namespace NCL {
 		class Camera;
@@ -55,6 +56,12 @@ namespace NCL {
 				GameObjectIterator& first,
 				GameObjectIterator& last) const;
 
+			void GetPaintableObjectIterators(
+				GameObjectIterator& first,
+				GameObjectIterator& last) const;
+
+			bool GetScoreForObject(GameObject* object, Vector2& outScore);
+
 			void GetConstraintIterators(
 				std::vector<Constraint*>::const_iterator& first,
 				std::vector<Constraint*>::const_iterator& last) const;
@@ -64,6 +71,8 @@ namespace NCL {
 
 		protected:
 			std::vector<GameObject*> gameObjects;
+			std::vector<GameObject*> paintableObjects;
+			std::map<GameObject*, Vector2> paintableObjectScores;
 			std::vector<GameObject*> toDeleteGameObjects;
 			std::vector<GameObject*> toRemoveGameObjects;
 			std::vector<Constraint*> constraints;
