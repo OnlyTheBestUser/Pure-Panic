@@ -266,7 +266,7 @@ void Renderer::Paint(const RenderObject* paintable, Vector3& barycentric, Vector
 void Renderer::ApplyPaintToMasks() {
 #ifdef _WIN64
 	rendererAPI->SetDepth(false);
-	rendererAPI->SetBlend(true, RendererAPI::BlendType::ONE, RendererAPI::BlendType::ALPHA);
+	rendererAPI->SetBlend(true, RendererAPI::BlendType::ONE, RendererAPI::BlendType::ONE_MINUS_ALPHA);
 
 	maskShader->BindShader();
 
@@ -299,7 +299,7 @@ void Renderer::ApplyPaintToMasks() {
 		maskShader->UpdateUniformVector2("textureSize", Vector2(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight()));
 		float scale = 400.0f / (400.0f / 1.0f);
 		maskShader->UpdateUniformVector3("textureScale", i.object->GetTransform()->GetScale());
-		maskShader->UpdateUniformFloat("radius", 5.0f);
+		maskShader->UpdateUniformFloat("radius", i.radius);
 		maskShader->UpdateUniformFloat("hardness", i.hardness);
 		maskShader->UpdateUniformFloat("strength", i.strength);
 		maskShader->UpdateUniformVector4("colour", i.colour);

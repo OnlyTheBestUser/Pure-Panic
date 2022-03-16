@@ -57,6 +57,10 @@ namespace NCL {
 				NONE,
 				ONE,
 				ALPHA,
+				ONE_MINUS_ALPHA,
+				SRC_COLOR,
+				ONE_MINUS_SRC_COLOR,
+
 			};
 			virtual void SetBlend(bool blend, BlendType srcFunc = BlendType::ONE, BlendType dstFunc = BlendType::NONE) = 0;
 

@@ -141,7 +141,7 @@ void LevelLoader::ReadInLevelFile(std::string filename) {
 					AddWallHammerToWorld(Vec3FromStr(lineContents[1]), std::stoi(lineContents[2]));
 				}
 				else if (lineContents[0] == "PAINT_WALL") {
-					AddPaintWallToWorld(Vec3FromStr(lineContents[1]), Vector3(5, 5, 4), std::stoi(lineContents[2]));
+					AddPaintWallToWorld(Vec3FromStr(lineContents[1]), Vector3(5, 5, 4), std::stoi(lineContents[2]), lineContents[0]);
 				}
 			}
 		}
@@ -232,7 +232,7 @@ GameObject* LevelLoader::AddDummyPlayerToWorld(const Vector3& position)
 }
 
 GameObject* LevelLoader::AddFloorToWorld(const Maths::Vector3& position) {
-	GameObject* floor = new GameObject("Floor");
+	GameObject* floor = new GameObject("Floor", 1.5f);
 
 	Vector3 floorSize = Vector3(250, 1, 250);
 	AABBVolume* volume = new AABBVolume(floorSize);
@@ -336,7 +336,7 @@ GameObject* LevelLoader::AddLongWallToWorld(const Vector3& position, Vector3 dim
 
 GameObject* LevelLoader::AddPaintWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name)
 {
-	GameObject* cube = new GameObject(name);
+	GameObject* cube = new GameObject(name, 12.0f);
 	OBBVolume* volume = new OBBVolume(dimensions + Vector3(0, 10, -2));
 	cube->SetBoundingVolume((CollisionVolume*)volume);
 
@@ -346,13 +346,13 @@ GameObject* LevelLoader::AddPaintWallToWorld(const Vector3& position, Vector3 di
 		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
 
 	if (rotation == 0)
-		cube->GetTransform().SetOffset(Vector3(0, 15, 6));
+		cube->GetTransform().SetOffset(Vector3(0, 15, 6.5f));
 	if (rotation == 90)
-		cube->GetTransform().SetOffset(Vector3(6, 15, 0));
+		cube->GetTransform().SetOffset(Vector3(6.5f, 15, 0));
 	if (rotation == 180)
-		cube->GetTransform().SetOffset(Vector3(0, 15, -6));
+		cube->GetTransform().SetOffset(Vector3(0, 15, -6.5f));
 	if (rotation == 270)
-		cube->GetTransform().SetOffset(Vector3(-6, 15, 0));
+		cube->GetTransform().SetOffset(Vector3(-6.5f, 15, 0));
 
 #ifdef _WIN64
 	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, OGLTexture::RGBATextureEmpty(corridorWallAlertTex->GetHeight()/16, corridorWallAlertTex->GetWidth()/16), basicShader));
@@ -587,7 +587,7 @@ Projectile* LevelLoader::SpawnProjectile(GameObject* owner, float pitch, int pla
 
 	Projectile* projectile = new Projectile(*world, renderer, playerID);
 
-	SphereVolume* volume = new SphereVolume(meshSize * 1.4);// / 2.0f * meshSize * 1.3f);
+	SphereVolume* volume = new SphereVolume(meshSize * 0.8);// / 2.0f * meshSize * 1.3f);
 	projectile->SetBoundingVolume((CollisionVolume*)volume);
 
 	projectile->GetTransform()
