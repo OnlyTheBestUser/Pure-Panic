@@ -311,17 +311,13 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	levelManager->ReadInLevelFile(NCL::Assets::DATADIR + "../../Assets/Maps/map1.txt");
-	Player* player = levelManager->SpawnPlayer(Vector3(0, 5, 0));
+	levelLoader->ReadInLevelFile(NCL::Assets::DATADIR + "../../Assets/Maps/map1.txt");
+	Player* player = levelLoader->AddPlayerToWorld(Vector3(0, 5, 0));
+	
+	powerups.emplace_back(levelLoader->AddPowerUpToWorld(Vector3(0, 5, 20), PowerUpType::SpeedBoost));
+	powerups.emplace_back(levelLoader->AddPowerUpToWorld(Vector3(0, 5, 30), PowerUpType::FireRate));
+	powerups.emplace_back(levelLoader->AddPowerUpToWorld(Vector3(0, 5, 40), PowerUpType::Heal));
 
-	//Command* f = new MoveForwardCommand(player);
-	//Command* b = new MoveBackwardCommand(player);
-	//Command* l = new MoveLeftCommand(player);
-	//Command* r = new MoveRightCommand(player);
-	//inputHandler->BindButton(FORWARD, f);
-	//inputHandler->BindButton(BACK, b);
-	//inputHandler->BindButton(LEFT, l);
-	//inputHandler->BindButton(RIGHT, r);
 	AxisCommand* m = new MoveCommand(player);
 	inputHandler->BindAxis(0, m);
 

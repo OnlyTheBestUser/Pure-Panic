@@ -9,7 +9,6 @@
     <ClCompile Include="InputHandler.cpp" />
     <ClCompile Include="NavigationGrid.cpp" />
     <ClCompile Include="NavigationMesh.cpp" />
-    <ClCompile Include="PaintManager.cpp" />
     <ClCompile Include="PCInput.cpp" />
     <ClCompile Include="PhysicsObject.cpp" />
     <ClCompile Include="PhysicsSystem.cpp" />
@@ -39,14 +38,12 @@
     <ClInclude Include="GameActor.h" />
     <ClInclude Include="InputBase.h" />
     <ClInclude Include="InputHandler.h" />
-    <ClInclude Include="MoveForwardCommand.h" />
     <ClInclude Include="InputList.h" />
     <ClInclude Include="NavigationGrid.h" />
     <ClInclude Include="NavigationMap.h" />
     <ClInclude Include="NavigationMesh.h" />
     <ClInclude Include="NavigationPath.h" />
     <ClInclude Include="OBBVolume.h" />
-    <ClInclude Include="PaintManager.h" />
     <ClInclude Include="PCInput.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PowerUp.h" />
@@ -250,9 +247,6 @@
     <ClInclude Include="InputList.h">
       <Filter>Input Handling</Filter>
     </ClInclude>
-    <ClInclude Include="PaintManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameWorld.cpp">
@@ -311,9 +305,6 @@
     </ClCompile>
     <ClCompile Include="PCInput.cpp">
       <Filter>Input Handling</Filter>
-    </ClCompile>
-    <ClCompile Include="PaintManager.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GameClient.cpp">
       <Filter>Networking</Filter>

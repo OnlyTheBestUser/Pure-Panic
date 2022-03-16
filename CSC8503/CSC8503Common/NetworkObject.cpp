@@ -1,4 +1,4 @@
-#ifndef _ORBIS
+
 #include "NetworkObject.h"
 
 using namespace NCL;
@@ -74,4 +74,3 @@ void NetworkObject::UpdateStateHistory(int minID) {
 		}
 	}
 }
-#endif

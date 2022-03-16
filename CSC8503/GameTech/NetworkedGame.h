@@ -8,11 +8,8 @@ namespace NCL {
 		class GameClient;
 		class NetworkPlayer;
 
-#ifndef _ORBIS
+
 		class NetworkedGame : public TutorialGame, public PacketReceiver {
-#else
-		class NetworkedGame : public TutorialGame {
-#endif
 		public:
 			NetworkedGame();
 			~NetworkedGame();
@@ -26,9 +23,7 @@ namespace NCL {
 
 			void StartLevel();
 
-#ifndef _ORBIS
 			void ReceivePacket(int type, GamePacket* payload, int source) override;
-#endif
 
 			void OnPlayerCollision(NetworkPlayer* a, NetworkPlayer* b);
 
@@ -62,13 +57,11 @@ namespace NCL {
 			Player* localPlayer;
 
 			// Packet Handling Functions
-#ifndef _ORBIS
+
 			void HandleClientPacket(ClientPacket* packet);
-#endif
 			void AddNewPlayerToServer(int clientID, int lastID);
 			void Fire(GameObject* owner, float pitch, int clientID);
 
-#ifndef _ORBIS
 			bool CheckExists(IDPacket* packet);
 
 			void HandleFullState(FullPacket* packet);
@@ -76,7 +69,7 @@ namespace NCL {
 			void HandleAssignID(AssignIDPacket* packet);
 			void HandlePlayerConnect(NewPlayerPacket* packet);
 			void HandlePlayerDisconnect(PlayerDisconnectPacket* packet);
-#endif
+			void HandlePowerUp(PowerUpPacket* packet);
 		};
 	}
 }

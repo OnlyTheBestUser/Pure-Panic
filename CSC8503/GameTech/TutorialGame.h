@@ -82,9 +82,10 @@ namespace NCL {
 			Renderer*			renderer;
 			PhysicsSystem*		physics;
 			GameWorld*			world;
-			NCL::AudioManager*		audio;
-			BGMManager*	bgm;
+			NCL::AudioManager*	audio;
+			BGMManager*			bgm;
 			LevelManager*		levelManager;
+			vector<PowerUp*>	powerups;
 
 			GameState state;
 

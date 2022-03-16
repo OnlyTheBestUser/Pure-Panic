@@ -17,10 +17,14 @@ namespace NCL {
 		class PowerUp : public GameObject
 		{
 		public:
-			~PowerUp() {}
+			virtual ~PowerUp() {}
+
+			bool pickedUp = false;
+			bool networked = false;
 
 		protected:
 			PowerUp(PowerUpType powerType) : GameObject("PowerUp"), powerUpType(powerType) {
+			//PowerUp(PowerUpType powerType, GameWorld& gw, bool networked = false) : GameObject("PowerUp"), powerUpType(powerType), gameWorld(gw) {
 				powerupDuration = 5.0f;
 			}
 

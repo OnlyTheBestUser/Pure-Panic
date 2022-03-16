@@ -16,6 +16,7 @@ namespace NCL {
 					if (player->GetCurrentPowerup() != PowerUpType::None) return;
 					((Player*)otherObject)->IncreaseSpeed(increaseInSpeed, powerupDuration);
 					GameWorld::RemoveGameObject(this, true);
+					pickedUp = true;
 				}
 			}
 		private:

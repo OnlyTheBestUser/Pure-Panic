@@ -1,7 +1,9 @@
 #pragma once
+#include <enet/enet.h>
 #ifndef _ORBIS
 #include <winsock2.h>
-#include <enet/enet.h>
+#endif
+
 #include <map>
 #include <string>
 
@@ -14,6 +16,7 @@ enum BasicNetworkMessages {
 	Full_State,		//Full transform etc
 	Received_State, //received from a client, informs that its received packet n
 	Fire_State,
+	PowerUp_State,
 	Player_Connected,
 	Player_Disconnected,
 	Assign_ID,
@@ -126,4 +129,3 @@ protected:
 
 	std::multimap<int, PacketReceiver*> packetHandlers;
 };
-#endif

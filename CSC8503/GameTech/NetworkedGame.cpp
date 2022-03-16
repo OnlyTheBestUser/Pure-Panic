@@ -12,7 +12,6 @@ using namespace CSC8503;
 
 NetworkedGame* NetworkedGame::singleton = nullptr;
 
-#ifndef _ORBIS
 struct MessagePacket : public GamePacket {
 	short playerID;
 	short messageID;
@@ -22,15 +21,13 @@ struct MessagePacket : public GamePacket {
 		size = sizeof(short) * 2;
 	}
 };
-#endif
 
 NetworkedGame::NetworkedGame() {
 	thisServer = nullptr;
 	thisClient = nullptr;
 
-#ifndef _ORBIS
 	NetworkBase::Initialise();
-#endif
+
 	timeToNextPacket = 0.0f;
 	packetsToSnapshot = 0;
 
@@ -43,18 +40,19 @@ NetworkedGame::~NetworkedGame() {
 }
 
 void NetworkedGame::StartAsServer() {
-#ifndef _ORBIS
+
 	thisServer = new GameServer(NetworkBase::GetDefaultPort(), 4);
 
 	thisServer->RegisterPacketHandler(Received_State, this);
+	thisServer->RegisterPacketHandler(PowerUp_State, this);
 
 	SpawnPlayer();
 	StartLevel();
-#endif
+
 }
 
 void NetworkedGame::StartAsClient(char a, char b, char c, char d) {
-#ifndef _ORBIS
+
 	thisClient = new GameClient();
 	thisClient->Connect(a, b, c, d, NetworkBase::GetDefaultPort());
 
@@ -64,7 +62,8 @@ void NetworkedGame::StartAsClient(char a, char b, char c, char d) {
 	thisClient->RegisterPacketHandler(Player_Connected, this);
 	thisClient->RegisterPacketHandler(Player_Disconnected, this);
 	thisClient->RegisterPacketHandler(Assign_ID, this);
-#endif
+	thisClient->RegisterPacketHandler(PowerUp_State, this);
+
 }
 
 void NetworkedGame::UpdateGame(float dt) {
@@ -79,7 +78,6 @@ void NetworkedGame::UpdateGame(float dt) {
 		timeToNextPacket += 1.0f / 60.0f; //60hz server/client update
 	}
 
-#ifndef _ORBIS
 	if (!thisServer && Window::GetKeyboard()->KeyPressed(KeyboardKeys::F9)) {
 		StartAsServer();
 		std::cout << "Server start" << std::endl;
@@ -88,13 +86,24 @@ void NetworkedGame::UpdateGame(float dt) {
 		StartAsClient(127, 0, 0, 1);
 		std::cout << "Client start" << std::endl;
 	}
-#endif
+
+	for (auto x : powerups) {
+		if (x->pickedUp) {
+			PowerUpPacket powerUpPacket;
+			powerUpPacket.worldID = x->GetWorldID();
+			powerUpPacket.clientID = playerID;
+			if(thisClient)
+				thisClient->SendPacket(powerUpPacket);
+			if (thisServer)
+				thisServer->SendGlobalPacket(powerUpPacket);
+		}
+	}
 
 	TutorialGame::UpdateGame(dt);
 }
 
 void NetworkedGame::UpdateAsServer(float dt) {
-#ifndef _ORBIS
+
 	thisServer->UpdateServer();
 
 	if (localPlayer->IsFiring()) {
@@ -104,13 +113,12 @@ void NetworkedGame::UpdateAsServer(float dt) {
 		thisServer->SendGlobalPacket(*newPacket);
 		delete newPacket;
 	}
-#endif
 
 	BroadcastSnapshot();
 }
 
 void NetworkedGame::UpdateAsClient(float dt) {
-#ifndef _ORBIS
+
 	thisClient->UpdateClient();
 
 	if (!localPlayer)
@@ -132,7 +140,7 @@ void NetworkedGame::UpdateAsClient(float dt) {
 	newPacket.firing = localPlayer->IsFiring();
 
 	thisClient->SendPacket(newPacket);
-#endif
+
 }
 
 void NetworkedGame::BroadcastSnapshot() {
@@ -147,13 +155,12 @@ void NetworkedGame::BroadcastSnapshot() {
 		if (!o || o == nullptr) {
 			continue;
 		}
-#ifndef _ORBIS
+
 		GamePacket* newPacket = nullptr;
 		if (o->WritePacket(&newPacket)) {
 			thisServer->SendGlobalPacket(*newPacket);
 			delete newPacket;
 		}
-#endif
 	}
 }
 
@@ -170,8 +177,9 @@ void NetworkedGame::StartLevel() {
 	// Reset the level
 	// Start timer
 }
-#ifndef _ORBIS
+
 void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
+
 	//SERVER version of the game will receive these from the clients
 	if (type == Received_State) {
 		ClientPacket* realPacket = (ClientPacket*)payload;
@@ -203,7 +211,11 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
 	case(Fire_State):
 		HandleFireState((FirePacket*)payload);
 		return;
+	case(PowerUp_State):
+		HandlePowerUp((PowerUpPacket*)payload);
+		return;
 	}
+
 }
 
 void NetworkedGame::OnPlayerCollision(NetworkPlayer* a, NetworkPlayer* b) {
@@ -332,6 +344,19 @@ void NetworkedGame::HandlePlayerDisconnect(PlayerDisconnectPacket* packet) {
 	RemovePlayerFromServer(packet->clientID);
 }
 
+void NetworkedGame::HandlePowerUp(PowerUpPacket* packet)
+{
+	for (PowerUp* x : powerups) {
+		if (x->GetWorldID() == packet->worldID) {
+			world->RemoveGameObject(x);
+		}
+	}
+
+	if (thisServer) {
+		thisServer->SendGlobalPacket(*(GamePacket*)packet);
+	}
+}
+
 void NetworkedGame::RemovePlayerFromServer(int clientID) {
 	delete networkObjects[clientID];
 	networkObjects[clientID] = nullptr;
@@ -346,4 +371,3 @@ void NetworkedGame::RemovePlayerFromServer(int clientID) {
 		serverPlayers.erase(sInd);
 	}
 }
-#endif
