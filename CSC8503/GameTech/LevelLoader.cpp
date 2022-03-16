@@ -314,11 +314,12 @@ GameObject* LevelLoader::AddPaintWallToWorld(const Vector3& position, Vector3 di
 	if (rotation == 270)
 		cube->GetTransform().SetOffset(Vector3(-6.5f, 15, 0));
 
-#ifdef _WIN64
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, OGLTexture::RGBATextureEmpty(corridorWallAlertTex->GetHeight() / 16, corridorWallAlertTex->GetWidth() / 16), basicShader));
-#else
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, basicShader));
-#endif
+	#ifdef _WIN64
+		cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, OGLTexture::RGBATextureEmpty(corridorWallAlertTex->GetHeight() / 16, corridorWallAlertTex->GetWidth() / 16), basicShader));
+	#else
+		cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, basicShader));
+	#endif
+
 	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
 
 	cube->GetPhysicsObject()->SetInverseMass(0.0f);
@@ -555,10 +556,10 @@ Projectile* LevelLoader::AddProjectileToWorld(GameObject* owner, float pitch, in
 	return projectile;
 }
 
-Vector3 LevelLoader::AddSpawnPointToWorld(const Vector3& position)
-{
+Vector3     LevelLoader::AddSpawnPointToWorld(const Vector3& position) {
+	NetworkedGame::AddSpawnPoint(position);
 
-	return Vector3();
+	return position;
 }
 
 void LevelLoader::SetFieldsForSphere(GameObject* sphere, const Vector3& position, CollisionLayer layers, float radius, bool isTrigger, bool dynamic, bool rubber, bool hollow, float inverseMass, float elasticity, float lDamping, float friction) {

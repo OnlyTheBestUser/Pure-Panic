@@ -104,8 +104,6 @@ namespace NCL {
 
 			bool won = false;
 			Player* player1 = nullptr;
-
-			vector<Vector3> playerSpawnPositions;
 		};
 	}
 }
