@@ -346,13 +346,13 @@ GameObject* LevelLoader::AddPaintWallToWorld(const Vector3& position, Vector3 di
 		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
 
 	if (rotation == 0)
-		cube->GetTransform().SetOffset(Vector3(0, 15, 6));
+		cube->GetTransform().SetOffset(Vector3(0, 15, 6.5f));
 	if (rotation == 90)
-		cube->GetTransform().SetOffset(Vector3(6, 15, 0));
+		cube->GetTransform().SetOffset(Vector3(6.5f, 15, 0));
 	if (rotation == 180)
-		cube->GetTransform().SetOffset(Vector3(0, 15, -6));
+		cube->GetTransform().SetOffset(Vector3(0, 15, -6.5f));
 	if (rotation == 270)
-		cube->GetTransform().SetOffset(Vector3(-6, 15, 0));
+		cube->GetTransform().SetOffset(Vector3(-6.5f, 15, 0));
 
 #ifdef _WIN64
 	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, OGLTexture::RGBATextureEmpty(corridorWallAlertTex->GetHeight()/16, corridorWallAlertTex->GetWidth()/16), basicShader));
