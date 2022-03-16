@@ -578,6 +578,8 @@ Projectile* LevelLoader::SpawnProjectile(GameObject* owner, float pitch, int pla
 	Vector3 ownerRot = owner->GetTransform().GetOrientation().ToEuler();
 
 	Vector3 camForwardVector = (Matrix4::Rotation(ownerRot.y, Vector3(0,1,0)) * Matrix4::Rotation(pitch, Vector3(1,0,0)) * Vector3(0,0,-1)).Normalised();
+	Vector3 camRightVector = Vector3::Cross(camForwardVector, Vector3(0, 1, 0)).Normalised();
+	Vector3 camUpVector = Vector3::Cross(camForwardVector, -camRightVector).Normalised();
 
 	Projectile* projectile = new Projectile(*world, renderer, playerID);
 
@@ -595,8 +597,15 @@ Projectile* LevelLoader::SpawnProjectile(GameObject* owner, float pitch, int pla
 	projectile->GetPhysicsObject()->InitSphereInertia();
 
 	float velocityDueToMovement = Vector3::Dot(camForwardVector, owner->GetPhysicsObject()->GetLinearVelocity());
+	
+	float angle1 = float((rand() % 200) - 100) / (66.67f);
+	float angle2 = float((rand() % 200) - 100) / (66.67f);
+
 	if (velocityDueToMovement < 0.0f) velocityDueToMovement = 0.0f;
-	projectile->GetPhysicsObject()->AddAcceleration(camForwardVector * (initialSpeed + velocityDueToMovement));
+
+	projectile->GetPhysicsObject()->AddAcceleration(Matrix4::Rotation(angle1, camUpVector) * Matrix4::Rotation(angle2, camRightVector)*camForwardVector * (initialSpeed + velocityDueToMovement));
+	//projectile->GetPhysicsObject()->AddAcceleration(camForwardVector * (initialSpeed + velocityDueToMovement));
+	
 	projectile->GetTransform().SetOrientation(Quaternion(Matrix3::Rotation(-acos(Vector3::Dot(Vector3(0, 1, 0), camForwardVector)) * 180.0f / 3.14f, Vector3::Cross(camForwardVector, Vector3(0, 1, 0)).Normalised())));
 
 	projectile->GetPhysicsObject()->SetLinearDamping(0.1f);
