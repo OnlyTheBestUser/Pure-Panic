@@ -61,7 +61,7 @@ namespace NCL {
 			void SetFieldsForCapsule(GameObject* sphere, const Vector3& position, CollisionLayer layers, float halfHeight, float radius, bool isTrigger = false, bool dynamic = false, 
 				float inverseMass = DEF_MASS, float elasticity = DEF_ELASTICITY, float lDamping = DEF_LDAMPING, float friction = DEF_FRICTION);
 
-			void SetFields(GameObject* obj, CollisionVolume* volume, const Vector3& position, const Vector3& dimensions, bool isTrigger);
+			void SetMiscFields(GameObject* obj, CollisionVolume* volume, const Vector3& position, const Vector3& dimensions, bool isTrigger);
 			PhysicsObject* GetPhysicsObject(Transform* transform, CollisionVolume* volume, int layers, bool dynamic, float inverseMass, float elasticity, float lDamping, float friction);
 			RenderObject* GetRenderObject(Transform* transform, MeshGeometry* mesh, TextureBase* texture, ShaderBase* shader, Vector4 colour = Vector4(1,1,1,1));
 

@@ -244,7 +244,7 @@ void NetworkedGame::AddNewPlayerToServer(int clientID, int lastID)
 {
 	clientHistory.insert(std::pair<int, int>(clientID, lastID));
 
-	GameObject* client = levelManager->SpawnDummyPlayer(Vector3(clientID * 5, 10, 0));
+	GameObject* client = LevelManager::SpawnDummyPlayer(Vector3(clientID * 5, 10, 0));
 	client->SetNetworkObject(new NetworkObject(*client, clientID));
 	client->GetPhysicsObject()->SetDynamic(true);
 	client->GetPhysicsObject()->SetGravity(false);
@@ -259,7 +259,7 @@ void NetworkedGame::AddNewPlayerToServer(int clientID, int lastID)
 
 void NetworkedGame::Fire(GameObject* owner, float pitch, int clientID)
 {
-	levelManager->SpawnProjectile(owner, pitch, clientID);
+	LevelManager::SpawnProjectile(owner, pitch, clientID);
 	FirePacket newPacket;
 	newPacket.clientID = clientID;
 	newPacket.pitch = pitch;
@@ -285,7 +285,7 @@ bool NetworkedGame::CheckExists(IDPacket* packet)
 		networkObjects.resize(packet->clientID + 1);
 	}
 	if (!networkObjects[packet->clientID]) {
-		GameObject* p = levelManager->SpawnDummyPlayer(Vector3(packet->clientID * 5, 10, 0));
+		GameObject* p = LevelManager::SpawnDummyPlayer(Vector3(packet->clientID * 5, 10, 0));
 		p->GetPhysicsObject()->SetDynamic(true);
 		p->GetPhysicsObject()->SetGravity(false);
 		p->SetNetworkObject(new NetworkObject(*p, packet->clientID));
@@ -300,7 +300,7 @@ void NetworkedGame::HandleFireState(FirePacket* packet)
 		return;
 	auto obj = networkObjects[packet->clientID];
 	if (obj)
-		levelManager->SpawnProjectile(&obj->object, packet->pitch, packet->clientID);
+		LevelManager::SpawnProjectile(&obj->object, packet->pitch, packet->clientID);
 }
 
 void NetworkedGame::HandleAssignID(AssignIDPacket* packet)
@@ -317,7 +317,7 @@ void NetworkedGame::HandlePlayerConnect(NewPlayerPacket* packet)
 	std::cout << "_Player ID: " << packet->clientID << std::endl;
 
 	if (packet->clientID != playerID) {
-		GameObject* newPlayer = levelManager->SpawnDummyPlayer(Vector3(10, 15, 10));
+		GameObject* newPlayer = LevelManager::SpawnDummyPlayer(Vector3(10, 15, 10));
 		newPlayer->SetNetworkObject(new NetworkObject(*newPlayer, packet->clientID));
 		newPlayer->GetPhysicsObject()->SetDynamic(true);
 		std::cout << "Player Spawned with Network ID: " << newPlayer->GetNetworkObject()->GetNetID() << "." << std::endl;

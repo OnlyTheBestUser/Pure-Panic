@@ -227,7 +227,7 @@ GameObject* LevelManager::AddAABBWallToWorld(const Vector3& position, Vector3 di
 	GameObject* cube = new GameObject(name);
 	CollisionVolume* volume = (CollisionVolume*) new AABBVolume(dimensions);
 
-	SetFields(cube, volume, position, dimensions * 2, false);
+	SetMiscFields(cube, volume, position, dimensions * 2, false);
 	cube->SetPhysicsObject(GetPhysicsObject(&cube->GetTransform(), volume, CollisionLayer::LAYER_ONE, false, 0, DEF_ELASTICITY, DEF_LDAMPING, DEF_FRICTION));
 
 	cube->GetPhysicsObject()->InitCubeInertia();
@@ -242,7 +242,7 @@ GameObject* LevelManager::AddOBBWallToWorld(const Vector3& position, Vector3 dim
 	GameObject* cube = new GameObject(name);
 	CollisionVolume* volume = (CollisionVolume*) new OBBVolume(dimensions + Vector3(2, 10, 0));
 
-	SetFields(cube, volume, position, dimensions * 2, false);
+	SetMiscFields(cube, volume, position, dimensions * 2, false);
 
 	cube->SetPhysicsObject(GetPhysicsObject(&cube->GetTransform(), volume, CollisionLayer::LAYER_ONE, false, 0, DEF_ELASTICITY, DEF_LDAMPING, DEF_FRICTION));
 	cube->GetPhysicsObject()->InitCubeInertia();
@@ -294,7 +294,7 @@ GameObject* LevelManager::AddPaintWallToWorld(const Vector3& position, Vector3 d
 	GameObject* cube = new GameObject(name);
 	CollisionVolume* volume = (CollisionVolume*) new OBBVolume(dimensions + Vector3(2, 10, 0));
 
-	SetFields(cube, volume, position, dimensions * 2, false);
+	SetMiscFields(cube, volume, position, dimensions * 2, false);
 
 	cube->SetPhysicsObject(GetPhysicsObject(&cube->GetTransform(), volume, CollisionLayer::LAYER_ONE, false, 0, DEF_ELASTICITY, DEF_LDAMPING, DEF_FRICTION));
 	cube->GetPhysicsObject()->InitCubeInertia();
@@ -447,8 +447,8 @@ GameObject* LevelManager::AddPlayerObjectToWorld(const Vector3& position, GameOb
 
 	CapsuleVolume* volume = new CapsuleVolume(0.85f * meshSize, 0.3f * meshSize);
 
-	SetFields(character, volume, position, Vector3(meshSize, meshSize, meshSize), false);
-	character->SetPhysicsObject(GetPhysicsObject(&character->GetTransform(), volume, CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE, true, 5.0f, DEF_ELASTICITY, 3.0f, false));
+	SetMiscFields(character, volume, position, Vector3(meshSize, meshSize, meshSize), false);
+	character->SetPhysicsObject(GetPhysicsObject(&character->GetTransform(), volume, CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE, true, 20.0f, DEF_ELASTICITY, 3.0f, false));
 	character->SetRenderObject(GetRenderObject(&character->GetTransform(), charMeshA, nullptr, basicShader, Vector4(0.5,1,0.5,1)));
 
 	character->GetPhysicsObject()->InitSphereInertia();
@@ -530,7 +530,7 @@ Projectile* LevelManager::AddProjectileToWorld(GameObject* owner, float pitch, i
 void LevelManager::SetFieldsForSphere(GameObject* sphere, const Vector3& position, CollisionLayer layers, float radius, bool isTrigger, bool dynamic, bool rubber, bool hollow, float inverseMass, float elasticity, float lDamping, float friction) {
 	CollisionVolume* volume = (CollisionVolume*) new SphereVolume(radius);
 	
-	SetFields(sphere, volume, position, Vector3(radius, radius, radius), isTrigger);
+	SetMiscFields(sphere, volume, position, Vector3(radius, radius, radius), isTrigger);
 	sphere->SetRenderObject(GetRenderObject(&sphere->GetTransform(), sphereMesh, basicTex, basicShader));
 	sphere->SetPhysicsObject(GetPhysicsObject(&sphere->GetTransform(), volume, layers, dynamic, inverseMass, rubber ? 0.9f : 0.2, lDamping, friction));
 
@@ -541,7 +541,7 @@ void LevelManager::SetFieldsForSphere(GameObject* sphere, const Vector3& positio
 void LevelManager::SetFieldsForCube(GameObject* cube, const Vector3& position, Vector3 dimensions, CollisionLayer layers, bool isTrigger, bool dynamic, bool OBB, float inverseMass, float elasticity, float lDamping, float friction) {
 	CollisionVolume* volume = OBB ? (CollisionVolume*) new OBBVolume(dimensions) : (CollisionVolume*) new AABBVolume(dimensions);
 
-	SetFields(cube, volume, position, dimensions * 2, isTrigger);
+	SetMiscFields(cube, volume, position, dimensions * 2, isTrigger);
 	cube->SetPhysicsObject(GetPhysicsObject(&cube->GetTransform(), volume, layers, dynamic, inverseMass, elasticity, lDamping, friction));
 
 	#ifdef _WIN64
@@ -556,7 +556,7 @@ void LevelManager::SetFieldsForCube(GameObject* cube, const Vector3& position, V
 void LevelManager::SetFieldsForCapsule(GameObject* capsule, const Vector3& position, CollisionLayer layers, float halfHeight, float radius, bool isTrigger, bool dynamic, float inverseMass, float elasticity, float lDamping, float friction) {
 	CapsuleVolume* volume = new CapsuleVolume(halfHeight, radius);
 
-	SetFields(capsule, volume, position, Vector3(radius * 2, halfHeight, radius * 2), isTrigger);
+	SetMiscFields(capsule, volume, position, Vector3(radius * 2, halfHeight, radius * 2), isTrigger);
 
 	capsule->SetPhysicsObject(GetPhysicsObject(&capsule->GetTransform(), volume, layers, dynamic, inverseMass, elasticity, lDamping, friction));
 	capsule->SetRenderObject(GetRenderObject(&capsule->GetTransform(), capsuleMesh, basicTex, basicShader));
@@ -564,7 +564,7 @@ void LevelManager::SetFieldsForCapsule(GameObject* capsule, const Vector3& posit
 	capsule->GetPhysicsObject()->InitCubeInertia();
 }
 
-void LevelManager::SetFields(GameObject* obj, CollisionVolume* volume, const Vector3& position, const Vector3& dimensions, bool isTrigger) {
+void LevelManager::SetMiscFields(GameObject* obj, CollisionVolume* volume, const Vector3& position, const Vector3& dimensions, bool isTrigger) {
 	obj->SetBoundingVolume(volume);
 	obj->SetTrigger(isTrigger);
 	obj->GetTransform()
