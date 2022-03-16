@@ -28,6 +28,7 @@ TutorialGame::TutorialGame()	{
 	audio->Initialize();
 	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_01.ogg", true, false, false);
 	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_02.ogg", true, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "gun_fire.ogg", true, false, false);
 	audio->LoadSound(Assets::AUDIODIR + "menu_music.ogg", false, true, true);
 
 	bgm = new BGMManager(audio);
