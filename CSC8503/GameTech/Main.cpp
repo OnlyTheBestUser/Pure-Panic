@@ -31,18 +31,19 @@ size_t       sceLibcHeapSize = 256 * 1024 * 1024;	/* Set up heap area upper limi
 
 //vector<string> sharedBuffer;	// shared thread buffer
 vector<TutorialGame*> sharedGameBuffer;	// shared thread buffer
+bool doneLoading = true;	// shared thread buffer
 MutexClass mutex;		// global mutex object
 
-/*class Producer : public Thread
+class Loader : public Thread
 {
 protected:
 	virtual void Run();
 };
-class Consumer : public Thread
+class MainMenuInitialiser : public Thread
 {
 protected:
 	virtual void Run();
-};*/
+};
 class NetworkedGameInitialiser : public Thread
 {
 protected:
@@ -54,14 +55,7 @@ protected:
 	virtual void Run();
 };
 
-/*void Producer::Run()
-{
-	mutex.LockMutex();
-	sharedBuffer.push_back("Producer");
-	completed = true;
-	mutex.UnlockMutex();
-}
-void Consumer::Run()
+/*void Consumer::Run()
 {
 	bool done = false;
 	while (!done)
@@ -76,21 +70,53 @@ void Consumer::Run()
 		mutex.UnlockMutex();
 	}
 }*/
+void Loader::Run()
+{
+	bool done = false;
+	while (!done)
+	{
+		mutex.LockMutex();
+		if (doneLoading)
+		{
+			done = true;
+			completed = true;
+		}
+		else
+		{
+			std::cout << "LOADING" << std::endl;
+		}
+		mutex.UnlockMutex();
+	}
+}
+void MainMenuInitialiser::Run()
+{
+	std::cout << "MAIN MENU INIT" << std::endl;
+	MainMenu* mm = new MainMenu();
+	mutex.LockMutex();
+	sharedGameBuffer.push_back(mm);
+	completed = true;
+	mutex.UnlockMutex();
+	std::cout << "MAIN MENU FINISH" << std::endl;
+}
 void NetworkedGameInitialiser::Run()
 {
+	std::cout << "NETWORKED GAME INIT" << std::endl;
 	NetworkedGame* ng = new NetworkedGame();
 	mutex.LockMutex();
 	sharedGameBuffer.push_back(ng);
 	completed = true;
 	mutex.UnlockMutex();
+	std::cout << "NETWORKED GAME FINISH" << std::endl;
 }
 void SplitscreenGameInitialiser::Run()
 {
+	std::cout << "TUTORIAL GAME INIT" << std::endl;
 	TutorialGame* tg = new TutorialGame();
 	mutex.LockMutex();
 	sharedGameBuffer.push_back(tg);
 	completed = true;
 	mutex.UnlockMutex();
+	std::cout << "TUTORIAL GAME FINISH" << std::endl;
 }
 
 
@@ -164,7 +190,6 @@ public:
 			return PushdownResult::Push;
 		}
 		
-
 		if (g->GetPaused()) {
 			*newState = new PauseGame(g);
 			return PushdownResult::Push;
@@ -188,19 +213,19 @@ public:
 	PushdownResult OnUpdate(float dt, PushdownState** newState) override {
 		m->UpdateGame(dt);
 
-		/*if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM1)) {
-			*newState = new Game(f);
+		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM1)) {
+			*newState = new Game(tg);
 			return PushdownResult::Push;
 		}
 
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM2)) {
-			*newState = new Game(h);
+			*newState = new Game(ng);
 			return PushdownResult::Push;
 		}
 
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
 			return PushdownResult::Exit;
-		}*/
+		}
 
 		if (m->GetPaused()) {
 			
@@ -239,7 +264,6 @@ int main() {
 	Ps4AudioSystem* audioSystem = new Ps4AudioSystem(8);
 #endif
 
-		
 	if (!w->HasInitialised()) {
 		return -1;
 	}	
@@ -252,41 +276,29 @@ int main() {
 	float totalTime = 0.0f;
 	int totalFrames = 0;
 
-	/*Producer prod;
-	Consumer cons;*/
-	NetworkedGameInitialiser ngi;
-	SplitscreenGameInitialiser sgi;
+	doneLoading = false;
 
-	std::cout << "		Networked Game State: " << ngi.GetThreadState() << std::endl;
-	std::cout << "		SplitScreen Game State: " << sgi.GetThreadState() << std::endl;
+	Loader loadThread;
+	//MainMenuInitialiser mmi;
+	//NetworkedGameInitialiser ngi;
+	//SplitscreenGameInitialiser sgi;
 
-	/*cons.Start();
-	Sleep(1000);
-	prod.Start();*/
-	ngi.Start();
-	sgi.Start();
-
-	std::cout << "		Networked Game State: " << ngi.GetThreadState() << std::endl;
-	std::cout << "		SplitScreen Game State: " << sgi.GetThreadState() << std::endl;
-
-	/*prod.Join();
-	cons.Join();*/
-	ngi.Join();
-	sgi.Join();
-
-	std::cout << "		Networked Game State: " << ngi.GetThreadState() << std::endl;
-	std::cout << "		SplitScreen Game State: " << sgi.GetThreadState() << std::endl;
+	loadThread.Start();
 
 	MainMenu* m = new MainMenu();
-	
-	/*TutorialGame* g = new TutorialGame();
 
 	NetworkedGame* h = new NetworkedGame();
 
-	PushdownMachine p = new Menu(m, g, h);*/
-	
-	
-	
+	TutorialGame* g = new TutorialGame();
+
+	mutex.LockMutex();
+	doneLoading = true;
+	mutex.UnlockMutex();
+
+	loadThread.Join();
+
+	//PushdownMachine p = new Menu(m, g, h);
+		
 	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
 	float smallestFrameRate = 144.0f;
 	while (w->UpdateWindow()) { //&& !w->GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
@@ -295,7 +307,6 @@ int main() {
 			break;
 #endif
 
-		//DisplayPathfinding();
 		float dt = w->GetTimer()->GetTimeDeltaSeconds();
 		if (dt > 0.1f) {
 			std::cout << "Skipping large time delta" << std::endl;
@@ -326,11 +337,11 @@ int main() {
 			curTimeWait = avgTimeWait;
 		}
 
-		m->UpdateGame(dt);
+		g->UpdateGame(dt);
 
-		//if (!p.Update(dt)) {
-		//	return 0;
-		//}
+		/*if (!p.Update(dt)) {
+			return 0;
+		}*/
 	}
 	Window::DestroyGameWindow();
 }
