@@ -221,7 +221,7 @@
     <ClInclude Include="BGMManager.h" />
     <ClInclude Include="CapsuleVolume.h" />
     <ClInclude Include="Command.h" />
-    <ClInclude Include="FIreRate.h" />
+    <ClInclude Include="FireRate.h" />
     <ClInclude Include="GameActor.h" />
     <ClInclude Include="GameClient.h" />
     <ClInclude Include="GameServer.h" />

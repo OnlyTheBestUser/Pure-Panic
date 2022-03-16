@@ -51,6 +51,7 @@ namespace NCL {
 			GameObject* AddPlayerObjectToWorld(const Vector3& position, GameObject* character);
 			PowerUp*    AddPowerUpToWorld     (const Vector3& position, const PowerUpType& ability, const float& radius = 1.0f);
 			Projectile* AddProjectileToWorld  (GameObject* owner, float pitch, int playerID, const float& initialSpeed = PROJ_SPEED, const float& meshSize = PROJ_SIZE);
+			Vector3		AddSpawnPointToWorld  (const Vector3& position);
 
 			void SetFieldsForCube(GameObject* sphere, const Vector3& position, Vector3 dimensions, CollisionLayer layers, bool isTrigger = false, bool dynamic = false, bool OBB = false, 
 				float inverseMass = DEF_MASS, float elasticity = DEF_ELASTICITY, float lDamping = DEF_LDAMPING, float friction = DEF_FRICTION);

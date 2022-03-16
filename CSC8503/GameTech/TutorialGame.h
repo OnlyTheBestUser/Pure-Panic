@@ -77,15 +77,12 @@ namespace NCL {
 			void DebugDrawObjectInfo(const GameObject* obj);
 			void UpdateBGM();
 
-			StateGameObject* testStateObject;
-
 			Renderer*			renderer;
 			PhysicsSystem*		physics;
 			GameWorld*			world;
 			NCL::AudioManager*	audio;
 			BGMManager*			bgm;
 			LevelManager*		levelManager;
-			vector<PowerUp*>	powerups;
 
 			GameState state;
 

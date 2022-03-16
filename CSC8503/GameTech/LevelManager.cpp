@@ -4,6 +4,7 @@
 #include <string>
 
 #include "LevelManager.h"
+#include "NetworkedGame.h"
 #include "../CSC8503Common/GameWorld.h"
 #include "../../Common/TextureLoader.h"
 #include "../../Common/Assets.h"
@@ -480,13 +481,11 @@ PowerUp*    LevelManager::AddPowerUpToWorld(const Vector3& position, const Power
 		break;
 	}
 
-	if (powerup == nullptr) {
-		return powerup;
-	}
-
-	SetFieldsForSphere(powerup, position, CollisionLayer::LAYER_FOUR, radius, true, false, false, false, 0);
+	SetFieldsForSphere(powerup, position, CollisionLayer::LAYER_FOUR, radius, true, true, false, false, 0);
+	if (powerup) powerup->GetRenderObject()->SetColour(colour);
 
 	GameWorld::AddGameObject(powerup);
+	NetworkedGame::AddPowerUp(powerup);
 
 	return powerup;
 }
@@ -525,6 +524,12 @@ Projectile* LevelManager::AddProjectileToWorld(GameObject* owner, float pitch, i
 	GameWorld::AddGameObject(projectile);
 
 	return projectile;
+}
+
+Vector3 LevelManager::AddSpawnPointToWorld(const Vector3& position)
+{
+
+	return Vector3();
 }
 
 void LevelManager::SetFieldsForSphere(GameObject* sphere, const Vector3& position, CollisionLayer layers, float radius, bool isTrigger, bool dynamic, bool rubber, bool hollow, float inverseMass, float elasticity, float lDamping, float friction) {

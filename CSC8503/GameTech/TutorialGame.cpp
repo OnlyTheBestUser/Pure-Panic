@@ -40,8 +40,6 @@ TutorialGame::TutorialGame()	{
 
 	inSelectionMode = false;
 
-	testStateObject = nullptr;
-
 	state = PLAY;
 
 	timer = new Timer(abs(60.0f));
@@ -103,8 +101,6 @@ TutorialGame::TutorialGame()	{
 	inputHandler->BindButton(START_TIMER, startTimer);
 
 #pragma endregion
-
-	InitialiseAssets();
 }
 
 void TutorialGame::InitialiseAssets() {
@@ -311,12 +307,12 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	levelLoader->ReadInLevelFile(NCL::Assets::DATADIR + "../../Assets/Maps/map1.txt");
-	Player* player = levelLoader->AddPlayerToWorld(Vector3(0, 5, 0));
+	levelManager->ReadInLevelFile(NCL::Assets::DATADIR + "../../Assets/Maps/map1.txt");
+	Player* player = levelManager->SpawnPlayer(Vector3(0, 5, 0));
 	
-	powerups.emplace_back(levelLoader->AddPowerUpToWorld(Vector3(0, 5, 20), PowerUpType::SpeedBoost));
-	powerups.emplace_back(levelLoader->AddPowerUpToWorld(Vector3(0, 5, 30), PowerUpType::FireRate));
-	powerups.emplace_back(levelLoader->AddPowerUpToWorld(Vector3(0, 5, 40), PowerUpType::Heal));
+	//powerups.emplace_back(levelManager->AddPowerUpToWorld(Vector3(0, 5, 20), PowerUpType::SpeedBoost));
+	//powerups.emplace_back(levelManager->AddPowerUpToWorld(Vector3(0, 5, 30), PowerUpType::FireRate));
+	//powerups.emplace_back(levelManager->AddPowerUpToWorld(Vector3(0, 5, 40), PowerUpType::Heal));
 
 	AxisCommand* m = new MoveCommand(player);
 	inputHandler->BindAxis(0, m);

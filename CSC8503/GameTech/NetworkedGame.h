@@ -30,6 +30,7 @@ namespace NCL {
 			void RemovePlayerFromServer(int clientID);
 
 			static NetworkedGame* GetInstance() { return singleton; }
+			static void AddPowerUp(PowerUp* powerup) { singleton->powerups.emplace_back(powerup); }
 
 		protected:
 			void UpdateAsServer(float dt);
@@ -48,6 +49,7 @@ namespace NCL {
 			int playerID;
 
 			std::vector<NetworkObject*> networkObjects;
+			std::vector<PowerUp*>		powerups;
 
 			// client ID, last ID
 			std::map<int, int> clientHistory;

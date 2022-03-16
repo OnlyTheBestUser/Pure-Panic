@@ -32,6 +32,8 @@ NetworkedGame::NetworkedGame() {
 	packetsToSnapshot = 0;
 
 	singleton = this;
+
+	InitialiseAssets();
 }
 
 NetworkedGame::~NetworkedGame() {
