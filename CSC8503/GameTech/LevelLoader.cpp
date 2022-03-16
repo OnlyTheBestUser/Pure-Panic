@@ -296,13 +296,14 @@ GameObject* LevelLoader::AddLongWallToWorld(const Vector3& position, Vector3 dim
 
 GameObject* LevelLoader::AddPaintWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name)
 {
-	GameObject* cube = new GameObject(name);
-	CollisionVolume* volume = (CollisionVolume*) new OBBVolume(dimensions + Vector3(2, 10, 0));
+	GameObject* cube = new GameObject(name, 12.0f);
+	OBBVolume* volume = new OBBVolume(dimensions + Vector3(0, 10, -2));
+	cube->SetBoundingVolume((CollisionVolume*)volume);
 
-	SetMiscFields(cube, volume, position, dimensions * 2, false);
-
-	cube->SetPhysicsObject(GetPhysicsObject(&cube->GetTransform(), volume, CollisionLayer::LAYER_ONE, false, 0, DEF_ELASTICITY, DEF_LDAMPING, DEF_FRICTION));
-	cube->GetPhysicsObject()->InitCubeInertia();
+	cube->GetTransform()
+		.SetPosition(position)
+		.SetScale(dimensions * 2)
+		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
 
 	if (rotation == 0)
 		cube->GetTransform().SetOffset(Vector3(0, 15, 6.5f));
@@ -313,11 +314,18 @@ GameObject* LevelLoader::AddPaintWallToWorld(const Vector3& position, Vector3 di
 	if (rotation == 270)
 		cube->GetTransform().SetOffset(Vector3(-6.5f, 15, 0));
 
-	#ifdef _WIN64
-		cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, OGLTexture::RGBATextureEmpty(corridorWallAlertTex->GetHeight()/16, corridorWallAlertTex->GetWidth()/16), basicShader));
-	#else
-		cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, basicShader));
-	#endif
+#ifdef _WIN64
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, OGLTexture::RGBATextureEmpty(corridorWallAlertTex->GetHeight() / 16, corridorWallAlertTex->GetWidth() / 16), basicShader));
+#else
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, basicShader));
+#endif
+	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
+
+	cube->GetPhysicsObject()->SetInverseMass(0.0f);
+	cube->GetPhysicsObject()->InitCubeInertia();
+
+	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	cube->GetPhysicsObject()->SetDynamic(false);
 
 	GameWorld::AddGameObject(cube);
 
