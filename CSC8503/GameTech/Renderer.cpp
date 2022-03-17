@@ -246,6 +246,48 @@ void Renderer::RenderObjects() {
 	}
 }
 
+Vector2 Renderer::CountPaintMask(TextureBase* paintMask, Vector2 prevScores, Vector4 team1Colour, Vector4 team2Colour) {
+
+	paintMask->Bind();
+
+	int pixelDataSize = paintMask->GetHeight() * paintMask->GetWidth() * 4;
+
+	GLubyte* data = new GLubyte[pixelDataSize];
+	glGetTextureImage(((OGLTexture*)paintMask)->GetObjectID(), 0, GL_RGBA, GL_UNSIGNED_BYTE, pixelDataSize * 4, data);
+
+	int team1Score = 0;
+	int team2Score = 0;
+
+	for (size_t x= 0;x < paintMask->GetWidth(); x++){
+		for (size_t y = 0; y < paintMask->GetHeight(); y++) {
+			float r, g, b, a; // or GLubyte r, g, b, a;
+
+			size_t elmes_per_line = paintMask->GetWidth() * 4; // elements per line = 256 * "RGBA"
+
+			size_t row = y * elmes_per_line;
+			size_t col = x * 4;
+
+			r = static_cast<float>(data[row + col] / 255.0f);
+			g = static_cast<float>(data[row + col+1] / 255.0f);
+			b = static_cast<float>(data[row + col+2] / 255.0f);
+			a = static_cast<float>(data[row + col+3] / 255.0f);
+			
+			if (a != 1.0f) {
+				continue;
+			}
+
+			Vector3 curCol = Vector3(r, g, b);
+			//std::cout << "(" << r << "," << g << "," << b << "," << a <<")\n";
+			Vector3 team1Pixel = curCol - Vector3(team1Colour.x, team1Colour.y, team1Colour.z);
+			Vector3 team2Pixel = curCol - Vector3(team2Colour.x, team2Colour.y, team2Colour.z);
+
+			(team1Pixel.LengthSquared() < team2Pixel.LengthSquared()) ? (team1Score++) : (team2Score++);
+		}
+		
+	}
+	return Vector2(team1Score - prevScores.x , team2Score - prevScores.y);
+}
+
 void Renderer::Paint(const RenderObject* paintable, Vector3& barycentric, Vector3& colpos, Vector2& texUV_a, Vector2& texUV_b, Vector2& texUV_c, float radius, float hardness, float strength, NCL::Maths::Vector4 colour)
 {
 	PaintInstance pi;

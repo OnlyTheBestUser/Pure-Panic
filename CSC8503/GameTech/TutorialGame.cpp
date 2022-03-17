@@ -190,7 +190,7 @@ void TutorialGame::UpdateGameWorld(float dt)
 
 void TutorialGame::UpdateScores(float dt) {
 	timeSinceLastScoreUpdate += dt;
-	if (timeSinceLastScoreUpdate > 0.0001f) {
+	if (timeSinceLastScoreUpdate > 0.0000000000001f) {
 		GameObjectIterator start;
 		GameObjectIterator cur;
 		GameObjectIterator end;
@@ -203,8 +203,20 @@ void TutorialGame::UpdateScores(float dt) {
 				cur = start;
 			}
 		}
+
+		if ((*cur)->GetPaintRadius() == 0) {
+			currentObj++;
+			return;
+		}
 		// Need to score the texture here.
-		std::cout << (*cur)->GetRenderObject()->GetPaintMask() << "\n";
+		Vector2 scoreDif = renderer->CountPaintMask((*cur)->GetRenderObject()->GetPaintMask(), world->GetScore((*cur)), Vector4(0.3, 0, 0.5, 1), Vector4(0.250, 0.878, 0.815, 1));
+		if ((*cur)->GetPaintRadius() != 0){
+			scoreDif = scoreDif / (*cur)->GetPaintRadius();
+		}
+		world->UpdateScore((*cur), scoreDif);
+		std::cout << (*cur)->GetName() << "\n" << "Team 1: " << scoreDif.x << "\n" << "Team 2: " << scoreDif.y << "\n\n";
+
+
 		currentObj++;
 		timeSinceLastScoreUpdate = 0;
 	}

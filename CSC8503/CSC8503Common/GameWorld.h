@@ -60,6 +60,10 @@ namespace NCL {
 				GameObjectIterator& first,
 				GameObjectIterator& last) const;
 
+			void UpdateScore(GameObject* paintableScore, Vector2 scoreChange);
+
+			Vector2 GetScore(GameObject* paintableScore);
+
 			bool GetScoreForObject(GameObject* object, Vector2& outScore);
 
 			void GetConstraintIterators(

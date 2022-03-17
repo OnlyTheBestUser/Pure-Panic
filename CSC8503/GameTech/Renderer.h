@@ -26,6 +26,7 @@ namespace NCL {
 			void Paint(const RenderObject* paintable, Vector3& pos, Vector3& colpos, Vector2& texUV_a, Vector2& texUV_b, Vector2& texUV_c, float radius = 1.0f, float hardness = .5f, float strength = 0.5f, Vector4 color = Vector4(0,0,0,0));
 			Maths::Vector2 GetUVCoord(const RenderObject* paintable, NCL::Maths::Vector3 pos); // Gets where the uv point on a texture is given the object and collision position
 			void ApplyPaintToMasks();
+			Vector2 CountPaintMask(TextureBase* paintMask, Vector2 prevScores, Vector4 team1Colour, Vector4 team2Colour);
 
 			void RenderShadows();
 			void RenderSkybox();

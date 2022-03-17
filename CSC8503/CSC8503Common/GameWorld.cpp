@@ -106,6 +106,14 @@ void GameWorld::GetPaintableObjectIterators(
 	last = paintableObjects.end();
 }
 
+void GameWorld::UpdateScore(GameObject* paintableScore, Vector2 scoreChange) {
+	paintableObjectScores[paintableScore] + scoreChange;
+}
+
+Vector2 GameWorld::GetScore(GameObject* paintableScore) {
+	return paintableObjectScores[paintableScore];
+}
+
 void GameWorld::OperateOnContents(GameObjectFunc f) {
 	for (GameObject* g : gameObjects) {
 		f(g);
