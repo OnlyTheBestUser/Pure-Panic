@@ -18,6 +18,7 @@
 #include "../../Plugins/OpenGLRendering/OGLMesh.h"
 #include "../../Plugins/OpenGLRendering/OGLShader.h"
 #include "../../Plugins/OpenGLRendering/OGLTexture.h"
+#include "../CSC8503Common/AudioManager.h"
 #endif
 
 using namespace NCL;
@@ -140,7 +141,7 @@ void LevelLoader::ReadInLevelFile(std::string filename) {
 					AddWallHammerToWorld(Vec3FromStr(lineContents[1]), std::stoi(lineContents[2]));
 				}
 				else if (lineContents[0] == "PAINT_WALL") {
-					AddPaintWallToWorld(Vec3FromStr(lineContents[1]), Vector3(5, 5, 4), std::stoi(lineContents[2]));
+					AddPaintWallToWorld(Vec3FromStr(lineContents[1]), Vector3(5, 5, 4), std::stoi(lineContents[2]), lineContents[0]);
 				}
 			}
 		}
@@ -172,7 +173,7 @@ Player* LevelLoader::AddPlayerToWorld(const Vector3& position) {
 	float meshSize = 3.0f;
 	float inverseMass = 5.0f;
 
-	Player* character = new Player(world->GetMainCamera(), this, world, "Player");
+	Player* character = new Player(world->GetMainCamera(), this, world, "Player", position);
 
 	CapsuleVolume* volume = new CapsuleVolume(0.85f * meshSize, 0.3f * meshSize);
 	character->SetBoundingVolume((CollisionVolume*)volume);
@@ -231,7 +232,7 @@ GameObject* LevelLoader::AddDummyPlayerToWorld(const Vector3& position)
 }
 
 GameObject* LevelLoader::AddFloorToWorld(const Maths::Vector3& position) {
-	GameObject* floor = new GameObject("Floor");
+	GameObject* floor = new GameObject("Floor", 1.5f);
 
 	Vector3 floorSize = Vector3(250, 1, 250);
 	AABBVolume* volume = new AABBVolume(floorSize);
@@ -335,7 +336,7 @@ GameObject* LevelLoader::AddLongWallToWorld(const Vector3& position, Vector3 dim
 
 GameObject* LevelLoader::AddPaintWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name)
 {
-	GameObject* cube = new GameObject(name);
+	GameObject* cube = new GameObject(name, 12.0f);
 	OBBVolume* volume = new OBBVolume(dimensions + Vector3(0, 10, -2));
 	cube->SetBoundingVolume((CollisionVolume*)volume);
 
@@ -345,13 +346,13 @@ GameObject* LevelLoader::AddPaintWallToWorld(const Vector3& position, Vector3 di
 		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
 
 	if (rotation == 0)
-		cube->GetTransform().SetOffset(Vector3(0, 15, 6));
+		cube->GetTransform().SetOffset(Vector3(0, 15, 6.5f));
 	if (rotation == 90)
-		cube->GetTransform().SetOffset(Vector3(6, 15, 0));
+		cube->GetTransform().SetOffset(Vector3(6.5f, 15, 0));
 	if (rotation == 180)
-		cube->GetTransform().SetOffset(Vector3(0, 15, -6));
+		cube->GetTransform().SetOffset(Vector3(0, 15, -6.5f));
 	if (rotation == 270)
-		cube->GetTransform().SetOffset(Vector3(-6, 15, 0));
+		cube->GetTransform().SetOffset(Vector3(-6.5f, 15, 0));
 
 #ifdef _WIN64
 	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, OGLTexture::RGBATextureEmpty(corridorWallAlertTex->GetHeight()/16, corridorWallAlertTex->GetWidth()/16), basicShader));
@@ -568,6 +569,9 @@ GameObject* LevelLoader::AddCapsuleToWorld(const Maths::Vector3& position, float
 }
 
 Projectile* LevelLoader::SpawnProjectile(Player* owner, const float& initialSpeed, const float& meshSize) {
+#ifndef _ORBIS
+	AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + "gun_fire.ogg", owner->GetTransform().GetPosition(), 0.3f);
+#endif // !_ORBIS
 	return SpawnProjectile((GameObject*)owner, owner->GetCam()->GetPitch(), owner->GetPlayerID(), initialSpeed, meshSize);
 }
 
@@ -578,10 +582,12 @@ Projectile* LevelLoader::SpawnProjectile(GameObject* owner, float pitch, int pla
 	Vector3 ownerRot = owner->GetTransform().GetOrientation().ToEuler();
 
 	Vector3 camForwardVector = (Matrix4::Rotation(ownerRot.y, Vector3(0,1,0)) * Matrix4::Rotation(pitch, Vector3(1,0,0)) * Vector3(0,0,-1)).Normalised();
+	Vector3 camRightVector = Vector3::Cross(camForwardVector, Vector3(0, 1, 0)).Normalised();
+	Vector3 camUpVector = Vector3::Cross(camForwardVector, -camRightVector).Normalised();
 
 	Projectile* projectile = new Projectile(*world, renderer, playerID);
 
-	SphereVolume* volume = new SphereVolume(meshSize * 1.4);// / 2.0f * meshSize * 1.3f);
+	SphereVolume* volume = new SphereVolume(meshSize * 0.8);// / 2.0f * meshSize * 1.3f);
 	projectile->SetBoundingVolume((CollisionVolume*)volume);
 
 	projectile->GetTransform()
@@ -595,8 +601,15 @@ Projectile* LevelLoader::SpawnProjectile(GameObject* owner, float pitch, int pla
 	projectile->GetPhysicsObject()->InitSphereInertia();
 
 	float velocityDueToMovement = Vector3::Dot(camForwardVector, owner->GetPhysicsObject()->GetLinearVelocity());
+	
+	float angle1 = float((rand() % 200) - 100) / (66.67f);
+	float angle2 = float((rand() % 200) - 100) / (66.67f);
+
 	if (velocityDueToMovement < 0.0f) velocityDueToMovement = 0.0f;
-	projectile->GetPhysicsObject()->AddAcceleration(camForwardVector * (initialSpeed + velocityDueToMovement));
+
+	projectile->GetPhysicsObject()->AddAcceleration(Matrix4::Rotation(angle1, camUpVector) * Matrix4::Rotation(angle2, camRightVector)*camForwardVector * (initialSpeed + velocityDueToMovement));
+	//projectile->GetPhysicsObject()->AddAcceleration(camForwardVector * (initialSpeed + velocityDueToMovement));
+	
 	projectile->GetTransform().SetOrientation(Quaternion(Matrix3::Rotation(-acos(Vector3::Dot(Vector3(0, 1, 0), camForwardVector)) * 180.0f / 3.14f, Vector3::Cross(camForwardVector, Vector3(0, 1, 0)).Normalised())));
 
 	projectile->GetPhysicsObject()->SetLinearDamping(0.1f);

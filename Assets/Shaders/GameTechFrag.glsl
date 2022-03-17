@@ -25,11 +25,6 @@ in Vertex
 
 out vec4 fragColor;
 
-float mask(vec3 position, vec3 center, float radius, float hardness){
-    float m = distance(center, position);
-    return 1 - smoothstep(radius * hardness, radius, m);    
-}
-
 void main(void)
 {
 	float shadow = 1.0; // New !
@@ -54,13 +49,11 @@ void main(void)
 	}
 
 	if(hasPaintMask) {
-		    vec3 col = texture(paintMaskTex, IN.texCoord).rgb;
+		    vec4 col = texture(paintMaskTex, IN.texCoord).rgba;
             //float f = mask(i.worldPos, _PainterPosition, _Radius, _Hardness);
             //float edge = f * _Strength;
                //return lerp(col, _PainterColor, edge);
-			if (col.r > 0.1 || col.g > 0.01 || col.b > 0.01){
-			albedo.rgb = col;
-			}
+			albedo.rgb = (albedo.rgb * (1-col.a)) + (vec3(col.r, col.g, col.b) * col.a);
 	}
 	
 	albedo.rgb = pow(albedo.rgb, vec3(2.2));

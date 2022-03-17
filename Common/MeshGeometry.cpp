@@ -234,17 +234,15 @@ bool MeshGeometry::GetTriangleUV(unsigned int i, Vector2& va, Vector2& vb, Vecto
 
 
 bool MeshGeometry::GetNormalForTri(unsigned int i, Vector3& n) const {
-	Vector3 a, b, c;
+	unsigned int a, b, c;
 
-	bool hasTri = GetTriangle(i, a, b, c);
+	bool hasTri = GetVertexIndicesForTri(i, a, b, c);
 	if (!hasTri) {
 		return false;
 	}
 
-	Vector3 ba = b - a;
-	Vector3 ca = c - a;
-	n = Vector3::Cross(ba, ca);
-	n.Normalise();
+	n = normals[a];
+
 	return true;
 }
 
