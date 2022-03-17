@@ -11,10 +11,12 @@ namespace NCL {
 			~LoadingScreen();
 
 			void UpdateGame(float dt);
+			void UpdateProgress(float progress) { progression = progress; }
 
 		protected:
-			void InitCamera();
 			void InitWorld();
+
+			float progression = 0.0f;
 
 			GameWorld* world;
 			Renderer* renderer;

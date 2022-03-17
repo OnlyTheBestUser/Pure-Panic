@@ -8,7 +8,6 @@ LoadingScreen::LoadingScreen()
 	renderer = new Renderer(*world);
 	Debug::SetRenderer(renderer);
 
-	InitCamera();
 	InitWorld();
 }
 LoadingScreen::~LoadingScreen()
@@ -17,24 +16,16 @@ LoadingScreen::~LoadingScreen()
 	delete world;
 }
 
-void LoadingScreen::InitCamera() {
-	world->GetMainCamera()->SetNearPlane(0.1f);
-	world->GetMainCamera()->SetFarPlane(500.0f);
-	world->GetMainCamera()->SetPitch(-15.0f);
-	world->GetMainCamera()->SetYaw(315.0f);
-	world->GetMainCamera()->SetPosition(Vector3(-60, 40, 60));
-}
 void LoadingScreen::InitWorld()
 {
-	world->ClearAndErase();
-	world->GetMainCamera()->LockCamera();
+	//world->ClearAndErase();
 }
 
 void LoadingScreen::UpdateGame(float dt)
 {
 	Debug::SetRenderer(renderer);
-	renderer->DrawString("Loading", Vector2(22, 30), Debug::MAGENTA, 30.0f);
-	std::cout << "LOADING" << std::endl;
+	renderer->DrawString("Loading: " + std::to_string(progression) + "%", Vector2(30, 50), Debug::WHITE, 30.0f);
+	std::cout << "LOADING: " << progression << "%" << std::endl;
 
 	renderer->Update(dt);
 	Debug::FlushRenderables(dt);

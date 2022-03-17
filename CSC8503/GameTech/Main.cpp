@@ -87,7 +87,7 @@ void Loader::Run()
 		}
 		else
 		{
-			//std::cout << "LOADING" << std::endl;
+			ls->UpdateProgress(progression);
 			ls->UpdateGame(0.01f);
 		}
 		mutex.UnlockMutex();
@@ -261,8 +261,11 @@ public:
 		}
 
 		m = new MainMenu();
+		loadThread.AddToThreadCompletion(33.3f);
 		ng = new NetworkedGame();
+		loadThread.AddToThreadCompletion(33.3f);
 		tg = new TutorialGame();
+		loadThread.AddToThreadCompletion(33.3f);
 
 		mutex.LockMutex();
 		doneLoading = true;
@@ -272,15 +275,22 @@ public:
 		mutex.LockMutex();
 		if (doneLoading)
 		{
+			goToMenu = true;
+		}
+		mutex.UnlockMutex();
+
+		if (goToMenu)
+		{
 			*newState = new Menu(m, tg, ng);
 			return PushdownResult::Push;
 		}
-		mutex.UnlockMutex();
+
 		return PushdownResult::NoChange;
 	}
 
 protected:
 	bool threadMade = false;
+	bool goToMenu = false;
 
 	Loader loadThread;
 	LoadingScreen* ls;
@@ -323,15 +333,10 @@ int main() {
 	float totalTime = 0.0f;
 	int totalFrames = 0;
 
-	//ls = new LoadingScreen();
 	w->SetTitle("Loading");
 
 	LoadingScreen* l = new LoadingScreen();
-	PushdownMachine p = new Loading(l);
-
-
-	//delete ls;
-	
+	PushdownMachine p = new Loading(l);	
 		
 	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
 	float smallestFrameRate = 144.0f;
@@ -371,7 +376,7 @@ int main() {
 			curTimeWait = avgTimeWait;
 		}
 
-		//m->UpdateGame(dt);
+		//l->UpdateGame(dt);
 
 		if (!p.Update(dt)) {
 			return 0;

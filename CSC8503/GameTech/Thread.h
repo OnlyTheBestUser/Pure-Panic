@@ -9,6 +9,7 @@ public:
 	virtual void Start();
 	virtual void Join();
 	bool GetThreadState() { return completed; }
+	void AddToThreadCompletion(float progress) { progression += progress; }
 	virtual DWORD GetId() const { return tid; }
 
 protected:
@@ -17,6 +18,7 @@ protected:
 	HANDLE thread_handle;
 	DWORD tid; 
 	bool completed = false;
+	float progression = 0.0f;
 
 private:
 	Thread(const Thread& src);

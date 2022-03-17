@@ -34,7 +34,7 @@ TutorialGame::TutorialGame()	{
 	bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 3.0f);
 #endif
 
-	levelLoader = new LevelLoader(world, physics, renderer);
+	//levelLoader = new LevelLoader(world, physics, renderer);
 
 	forceMagnitude = 30.0f;
 	useGravity = true;
