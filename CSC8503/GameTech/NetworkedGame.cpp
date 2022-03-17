@@ -32,6 +32,9 @@ NetworkedGame::NetworkedGame() {
 	packetsToSnapshot = 0;
 
 	instance = this;
+
+	// Create commands to start game
+	
 }
 
 NetworkedGame::~NetworkedGame() {

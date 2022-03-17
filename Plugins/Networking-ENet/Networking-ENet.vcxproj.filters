@@ -39,6 +39,9 @@
     <ClCompile Include="win32.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="unix.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\enet\callbacks.h">

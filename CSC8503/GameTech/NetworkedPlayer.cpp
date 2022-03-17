@@ -12,12 +12,3 @@ NetworkPlayer::NetworkPlayer(NetworkedGame* game, int num) {
 NetworkPlayer::~NetworkPlayer() {
 
 }
-
-void NetworkPlayer::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vector3 localB, Vector3 normal) {
-	if (game) {
-		if (dynamic_cast<NetworkPlayer*>(otherObject))
-		{
-			game->OnPlayerCollision(this, (NetworkPlayer*)otherObject);
-		}
-	}
-}
