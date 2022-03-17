@@ -173,9 +173,9 @@ void NetworkedGame::SpawnPlayer() {
 #endif
 	localPlayer->GetPhysicsObject()->SetDynamic(true);
 
-	int index = playerID == 0 ? 0 : playerID % playerSpawnPositions.size();
+	int index = playerID == 0 ? 0 : playerID % spawnPoints.size();
 	
-	Vector3 spawnPos = playerSpawnPositions[index];
+	Vector3 spawnPos = spawnPoints[index];
 
 	localPlayer->GetTransform().SetPosition(spawnPos);
 	localPlayer->SetSpawn(spawnPos);

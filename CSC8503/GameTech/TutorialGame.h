@@ -65,11 +65,6 @@ namespace NCL {
 
 			virtual void InitWorld();
 
-			/*void InitSphereGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, float radius);
-			void InitCapsuleGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing);
-			void InitMixedGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing);
-			void InitCubeGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, const Maths::Vector3& cubeDims);*/
-	
 			bool SelectObject();
 			void MoveSelectedObject(float dt);
 			void DebugObjectMovement();
