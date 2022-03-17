@@ -8,7 +8,6 @@ namespace NCL {
 		class GameClient;
 		class NetworkPlayer;
 
-
 		class NetworkedGame : public TutorialGame, public PacketReceiver {
 		public:
 			NetworkedGame();
@@ -52,7 +51,7 @@ namespace NCL {
 
 			std::vector<NetworkObject*> networkObjects;
 			std::vector<PowerUp*>		powerups;
-			vector<Vector3>				spawnPoints;
+			std::vector<Vector3>		spawnPoints;
 
 			// client ID, last ID
 			std::map<int, int> clientHistory;
