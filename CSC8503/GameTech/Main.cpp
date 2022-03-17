@@ -59,21 +59,6 @@ protected:
 //	virtual void Run();
 //};
 
-/*void Consumer::Run()
-{
-	bool done = false;
-	while (!done)
-	{
-		mutex.LockMutex();
-		if (sharedBuffer.size() > 0)
-		{
-			std::cout << "Got message: " << sharedBuffer.front() << std::endl;
-			done = true;
-			completed = true;
-		}
-		mutex.UnlockMutex();
-	}
-}*/
 void Loader::Run()
 {
 	bool done = false;
@@ -262,15 +247,14 @@ public:
 		ls->UpdateGame(dt);
 
 		m = new MainMenu();
-		loadThread.AddToThreadCompletion(33.3f);
 		ls->UpdateProgress(33.3f);
 		ls->UpdateGame(dt);
+
 		ng = new NetworkedGame();
-		loadThread.AddToThreadCompletion(33.3f);
 		ls->UpdateProgress(66.6f);
 		ls->UpdateGame(dt);
+
 		tg = new TutorialGame();
-		loadThread.AddToThreadCompletion(33.3f);
 		ls->UpdateProgress(99.9f);
 		ls->UpdateGame(dt);
 
