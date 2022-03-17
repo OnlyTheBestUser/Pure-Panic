@@ -52,8 +52,8 @@ namespace NCL {
 				return colour;
 			}
 
-			void SetVisibility(float alpha) {
-				colour.w = alpha;
+			void SetVisibility(bool IsVisible) {
+				colour.w = int(IsVisible);
 			}
 
 		protected:

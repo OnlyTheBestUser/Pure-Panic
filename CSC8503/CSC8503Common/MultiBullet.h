@@ -19,7 +19,7 @@ namespace NCL {
 					IsPicked = true;// gameWorld.RemoveGameObject(this, true);
 					reappearAfter = REAPPEAR_AFTER_DURATION;
 
-					GetRenderObject()->SetVisibility(0.f);
+					GetRenderObject()->SetVisibility(false);
 				}
 			}
 

@@ -28,7 +28,7 @@ namespace NCL {
 				if (IsPicked) {
 					reappearAfter -= dt;
 					if (reappearAfter <= 0.f) {
-						GetRenderObject()->SetVisibility(1.f);
+						GetRenderObject()->SetVisibility(true);
 						IsPicked = false;	
 					}
 				}
