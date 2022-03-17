@@ -88,7 +88,7 @@ void Loader::Run()
 		else
 		{
 			ls->UpdateProgress(progression);
-			ls->UpdateGame(0.01f);
+			//ls->UpdateGame(0.01f);
 		}
 		mutex.UnlockMutex();
 	}
@@ -259,13 +259,20 @@ public:
 			loadThread.Start();
 			threadMade = true;
 		}
+		ls->UpdateGame(dt);
 
 		m = new MainMenu();
 		loadThread.AddToThreadCompletion(33.3f);
+		ls->UpdateProgress(33.3f);
+		ls->UpdateGame(dt);
 		ng = new NetworkedGame();
 		loadThread.AddToThreadCompletion(33.3f);
+		ls->UpdateProgress(66.6f);
+		ls->UpdateGame(dt);
 		tg = new TutorialGame();
 		loadThread.AddToThreadCompletion(33.3f);
+		ls->UpdateProgress(99.9f);
+		ls->UpdateGame(dt);
 
 		mutex.LockMutex();
 		doneLoading = true;
