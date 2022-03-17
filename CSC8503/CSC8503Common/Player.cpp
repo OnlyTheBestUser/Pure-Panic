@@ -77,9 +77,9 @@ float Player::CheckDistToGround()
 	const CollisionVolume* volume = GetBoundingVolume();
 	switch (GetBoundingVolume()->type)
 	{
-	case VolumeType::AABB: distToGround -= ((const AABBVolume&)* volume).GetHalfDimensions().y; break;
-	case VolumeType::OBB: distToGround -= ((const OBBVolume&)* volume).GetHalfDimensions().y; break;
-	case VolumeType::Sphere: distToGround -= ((const SphereVolume&)* volume).GetRadius(); break;
+	case VolumeType::AABB:    distToGround -= ((const AABBVolume&)*    volume).GetHalfDimensions().y; break;
+	case VolumeType::OBB:     distToGround -= ((const OBBVolume&)*     volume).GetHalfDimensions().y; break;
+	case VolumeType::Sphere:  distToGround -= ((const SphereVolume&)*  volume).GetRadius(); break;
 	case VolumeType::Capsule: distToGround -= ((const CapsuleVolume&)* volume).GetHalfHeight(); break;
 	}
 
