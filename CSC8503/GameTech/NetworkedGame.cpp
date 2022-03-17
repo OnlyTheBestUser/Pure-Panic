@@ -172,7 +172,13 @@ void NetworkedGame::SpawnPlayer() {
 	localPlayer->SetNetworkObject(new NetworkObject(*localPlayer, playerID));
 #endif
 	localPlayer->GetPhysicsObject()->SetDynamic(true);
-	localPlayer->GetTransform().SetPosition(Vector3(playerID * 5, 10, 0));
+
+	int index = playerID == 0 ? 0 : playerID % playerSpawnPositions.size();
+	
+	Vector3 spawnPos = playerSpawnPositions[index];
+
+	localPlayer->GetTransform().SetPosition(spawnPos);
+	localPlayer->SetSpawn(spawnPos);
 }
 
 void NetworkedGame::StartLevel() {
@@ -192,30 +198,30 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
 	//CLIENT version of the game will receive these from the servers
 	// Connection / Initialisation packets
 	switch (type) {
-	case(Assign_ID):
-		HandleAssignID((AssignIDPacket*)payload);
-		return;
-	case(Player_Connected):
-		HandlePlayerConnect((NewPlayerPacket*)payload);
-		return;
-	case(Player_Disconnected):
-		HandlePlayerDisconnect((PlayerDisconnectPacket*)payload);
-		return;
+		case(Assign_ID):
+			HandleAssignID((AssignIDPacket*)payload);
+			return;
+		case(Player_Connected):
+			HandlePlayerConnect((NewPlayerPacket*)payload);
+			return;
+		case(Player_Disconnected):
+			HandlePlayerDisconnect((PlayerDisconnectPacket*)payload);
+			return;
 	}
 
 	if (!CheckExists((IDPacket*)payload))
 		return;
 
 	switch (type) {
-	case(Full_State):
-		HandleFullState((FullPacket*)payload);
-		return;
-	case(Fire_State):
-		HandleFireState((FirePacket*)payload);
-		return;
-	case(PowerUp_State):
-		HandlePowerUp((PowerUpPacket*)payload);
-		return;
+		case(Full_State):
+			HandleFullState((FullPacket*)payload);
+			return;
+		case(Fire_State):
+			HandleFireState((FirePacket*)payload);
+			return;
+		case(PowerUp_State):
+			HandlePowerUp((PowerUpPacket*)payload);
+			return;
 	}
 
 }
@@ -321,6 +327,7 @@ void NetworkedGame::HandleAssignID(AssignIDPacket* packet)
 {
 	std::cout << "ID Assigned: " << packet->clientID << std::endl;
 	playerID = packet->clientID;
+
 	SpawnPlayer();
 	localPlayer->SetPlayerID(playerID);
 }

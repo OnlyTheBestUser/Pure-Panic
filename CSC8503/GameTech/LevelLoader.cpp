@@ -162,6 +162,9 @@ void LevelLoader::ReadInLevelFile(std::string filename) {
 				else if (lineContents[0] == "POWERUP") {
 					singleton->AddPowerUpToWorld(Vec3FromStr(lineContents[1]), (const PowerUpType) std::stoi(lineContents[2]));
 				}
+				else if (lineContents[0] == "SPAWNPOINT") {
+					singleton->AddSpawnPointToWorld(Vec3FromStr(lineContents[1]));
+				}
 			}
 		}
 
