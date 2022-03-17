@@ -318,6 +318,7 @@ void TutorialGame::InitWorld() {
 	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 20), PowerUpType::SpeedBoost);
 	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 30), PowerUpType::FireRate);
 	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 40), PowerUpType::Heal);
+	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 50), PowerUpType::MultiBullet);
 
 	AxisCommand* m = new MoveCommand(player);
 	inputHandler->BindAxis(0, m);
