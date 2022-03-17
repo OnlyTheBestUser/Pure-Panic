@@ -1,4 +1,4 @@
-#ifndef _ORBIS
+
 #pragma once
 #include <thread>
 #include <atomic>
@@ -47,4 +47,3 @@ namespace NCL {
 		};
 	}
 }
-#endif

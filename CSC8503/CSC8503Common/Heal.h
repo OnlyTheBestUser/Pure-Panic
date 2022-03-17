@@ -14,7 +14,8 @@ namespace NCL {
 					Player* player = ((Player*)otherObject);
 					if (player->GetCurrentPowerup() != PowerUpType::None) return;
 					((Player*)otherObject)->IncreaseHealth(healthTake);
-					gameWorld.RemoveGameObject(this, true);
+					pickedUp = true;
+					gameWorld.RemoveGameObject(this);
 				}
 			}
 

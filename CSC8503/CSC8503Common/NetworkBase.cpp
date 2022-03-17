@@ -1,4 +1,4 @@
-#ifndef _ORBIS
+
 #include "NetworkBase.h"
 #include <enet/enet.h>
 #include <iostream>
@@ -36,4 +36,3 @@ bool NetworkBase::ProcessPacket(GamePacket* packet, int peerID) {
 	std::cout << __FUNCTION__ << " no handler for packet type " << packet->type << std::endl;
 	return false;
 }
-#endif
