@@ -138,6 +138,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>($ProjectDir)\include\enet;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -190,6 +191,7 @@
     <ClCompile Include="packet.c" />
     <ClCompile Include="peer.c" />
     <ClCompile Include="protocol.c" />
+    <ClCompile Include="unix.c" />
     <ClCompile Include="win32.c" />
   </ItemGroup>
   <ItemGroup>

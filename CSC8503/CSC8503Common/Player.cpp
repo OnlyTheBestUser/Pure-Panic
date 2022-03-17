@@ -89,7 +89,8 @@ float Player::CheckDistToGround()
 void Player::Fire() {
 	if (timeSincePrevShot > fireRate)
 	{
-		LevelLoader::SpawnProjectile(this);
+		for(int i = 0; i < bulletsPerShot; ++i)
+			LevelLoader::SpawnProjectile(this);
 		timeSincePrevShot = 0.0f;
 		fired = true;
 	}

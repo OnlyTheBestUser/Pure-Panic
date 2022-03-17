@@ -489,20 +489,23 @@ PowerUp*    LevelLoader::AddPowerUpToWorld(const Vector3& position, const PowerU
 	PowerUp* powerup = nullptr;
 	Vector4 colour;
 
-	switch (ability) 
-	{
-	case (PowerUpType::FireRate):
-		powerup = new FireRate();
-		colour = Debug::YELLOW;
-		break;
-	case (PowerUpType::Heal):
-		powerup = new Heal();
-		colour = Debug::RED;
-		break;
-	case (PowerUpType::SpeedBoost):
-		powerup = new SpeedBoost();
-		colour = Debug::CYAN;
-		break;
+	switch (ability) {
+		case(PowerUpType::FireRate):
+			powerup = new FireRate();
+			colour = Debug::YELLOW;
+			break;
+		case(PowerUpType::Heal):
+			powerup = new Heal();
+			colour = Debug::RED;
+			break;
+		case(PowerUpType::SpeedBoost):
+			powerup = new SpeedBoost();
+			colour = Debug::CYAN;
+			break;
+		case(PowerUpType::MultiBullet):
+			powerup = new MultiBullet();
+			colour = Debug::GREEN;
+			break;
 	}
 
 	SetFieldsForSphere(powerup, position, CollisionLayer::LAYER_FOUR, radius, true, true, false, false, 0);

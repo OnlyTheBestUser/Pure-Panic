@@ -52,6 +52,10 @@ namespace NCL {
 				return colour;
 			}
 
+			void SetVisibility(bool IsVisible) {
+				colour.w = int(IsVisible);
+			}
+
 		protected:
 			MeshGeometry*	mesh;
 			TextureBase*	texture;
