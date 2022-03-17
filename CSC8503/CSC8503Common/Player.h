@@ -8,6 +8,8 @@
 #include <chrono>
 #include <algorithm>
 
+const int BULLETS_PER_SHOT = 1;
+
 namespace NCL {
     using namespace Maths;
     namespace CSC8503 {
@@ -132,6 +134,8 @@ namespace NCL {
 			int GetPlayerID() const { return playerID; }
 			void SetPlayerID(int x) { playerID = x; }
 
+			void FireDeathProjectiles();
+
         protected:
 			float CheckDistToGround();
 
@@ -147,7 +151,7 @@ namespace NCL {
 			float defaultFireRate = 0.2f;
 			float defaultCurSpeed = 80.0f;
 			float fireRate = 0.2f;
-			int bulletsPerShot = 1;
+			int bulletsPerShot = BULLETS_PER_SHOT;
 			float timeSincePrevShot = 0.0f;
 			float powerupTime = 0.0f;
 			float curSpeed = 80.0f;
