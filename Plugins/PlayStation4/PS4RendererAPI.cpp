@@ -273,6 +273,17 @@ void NCL::PS4::PS4RendererAPI::SetRenderBuffer(PS4ScreenBuffer*buffer, bool clea
 	ClearBuffer(clearColour, clearDepth, clearStencil);
 }
 
+void NCL::PS4::PS4RendererAPI::SetPaintBuffer(Gnm::RenderTarget target) {
+	currentGFXContext->setRenderTargetMask(0xF);
+	currentGFXContext->setRenderTarget(0, &target);
+	currentGFXContext->setDepthRenderTarget(NULL);
+
+	currentGFXContext->setupScreenViewport(0, 0, target.getWidth(), target.getHeight(), 0.5f, 0.5f);
+	currentGFXContext->setScreenScissor(0, 0, target.getWidth(), target.getHeight());
+	currentGFXContext->setWindowScissor(0, 0, target.getWidth(), target.getHeight(), sce::Gnm::WindowOffsetMode::kWindowOffsetDisable);
+	currentGFXContext->setGenericScissor(0, 0, target.getWidth(), target.getHeight(), sce::Gnm::WindowOffsetMode::kWindowOffsetDisable);
+}
+
 void NCL::PS4::PS4RendererAPI::ClearBuffer(bool colour, bool depth, bool stencil) {
 	if (colour) {
 		//Vector4 defaultClearColour(rand() / (float)RAND_MAX, rand() / (float)RAND_MAX, rand() / (float)RAND_MAX, 1.0f);
@@ -324,7 +335,11 @@ void NCL::PS4::PS4RendererAPI::BindFrameBuffer()
 void NCL::PS4::PS4RendererAPI::BindFrameBuffer(const FrameBufferBase* fbo)
 {
 	const ::PS4::PS4FrameBuffer* buffer = static_cast<const NCL::PS4::PS4FrameBuffer*>(fbo);
-	SetRenderBuffer(buffer->GetBuffer(), true, false, false);
+	//PS4ScreenBuffer* test = new PS4ScreenBuffer();
+	//test->colourTarget = buffer->renderTarget;
+
+	//SetRenderBuffer(test, false, false, false);
+	SetPaintBuffer(buffer->renderTarget);
 }
 
 void NCL::PS4::PS4RendererAPI::SetDepth(bool d) {

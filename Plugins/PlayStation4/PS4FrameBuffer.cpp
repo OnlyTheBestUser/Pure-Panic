@@ -27,17 +27,15 @@ void NCL::PS4::PS4FrameBuffer::AddTexture(int width, int height) {
 
 void NCL::PS4::PS4FrameBuffer::AddTexture(TextureBase* tex) {
 	PS4Texture* ps4Tex = static_cast<PS4Texture*>(tex);
-	buffer->colourTarget.initFromTexture(&ps4Tex->GetAPITexture(), 1);
+	this->tex = ps4Tex;
+	renderTarget.initFromTexture(&ps4Tex->apiTexture, 1);
+	renderTarget.setWidth(ps4Tex->apiTexture.getWidth());
+	renderTarget.setHeight(ps4Tex->apiTexture.getHeight());
 }
 
 NCL::Rendering::TextureBase* NCL::PS4::PS4FrameBuffer::GetTexture() const
 {
-	return PS4Texture::GenTexFromBuffer(buffer->colourTarget);
-}
-
-PS4ScreenBuffer* NCL::PS4::PS4FrameBuffer::GetBuffer() const
-{
-	return buffer;
+	return PS4Texture::GenTexFromBuffer(renderTarget);
 }
 #endif
 

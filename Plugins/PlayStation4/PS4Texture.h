@@ -10,6 +10,8 @@ namespace NCL::PS4 {
 	{
 	public:
 		friend class PS4RendererAPI;
+		friend class PS4FrameBuffer;
+		friend class Renderer;
 
 		~PS4Texture();
 
@@ -24,9 +26,12 @@ namespace NCL::PS4 {
 			return apiTexture;
 		}
 
+		sce::Gnm::RenderTarget target;
+
 	protected:
 		PS4Texture();
 		sce::Gnm::Texture apiTexture;
+
 	};
 }
 #endif

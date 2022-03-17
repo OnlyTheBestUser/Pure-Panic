@@ -12,6 +12,7 @@
 #include "PS4Frame.h"
 #include "PS4Texture.h"
 #include "../../Common/Window.h"
+#include "../../CSC8503/GameTech/Renderer.h"
 
 using namespace sce;
 using namespace Gnmx;
@@ -51,6 +52,7 @@ namespace NCL::PS4 {
 	friend class PS4Shader;
 	friend class PS4Texture;
 	friend class PS4FrameBuffer;
+	friend class NCL::Rendering::Renderer;
 	public:
 		PS4RendererAPI(Window& window);
 		~PS4RendererAPI();
@@ -66,6 +68,7 @@ namespace NCL::PS4 {
 		void	SwapCommandBuffer();
 		void	SetRenderBuffer(PS4ScreenBuffer*buffer, bool clearColour, bool clearDepth, bool clearStencil);
 		PS4ScreenBuffer* GenerateScreenBuffer(uint width, uint height, bool colour = true, bool depth = true, bool stencil = false);
+		void SetPaintBuffer(Gnm::RenderTarget target);
 
 		//Render commands
 		void DrawMesh(MeshGeometry* mesh) override;

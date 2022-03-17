@@ -8,6 +8,7 @@ namespace NCL {
         class PS4FrameBuffer : public FrameBufferBase
         {
         friend class PS4RendererAPI;
+        friend class PS4Texture;
         public:
             PS4FrameBuffer();
             ~PS4FrameBuffer();
@@ -17,9 +18,9 @@ namespace NCL {
             virtual void AddTexture(TextureBase* text) override;
             virtual TextureBase* GetTexture() const override;
 
-            PS4ScreenBuffer* GetBuffer() const;
         protected:
-            PS4ScreenBuffer* buffer;
+            Gnm::RenderTarget renderTarget;
+            PS4Texture* tex;
         };
     }
 }

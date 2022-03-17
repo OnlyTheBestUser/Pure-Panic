@@ -31,24 +31,29 @@ void PS4Texture::Bind(int slot) const {
 
 PS4Texture* NCL::PS4::PS4Texture::EmptyTex(int width, int height)
 {
-	Gnm::DataFormat form = {};
-	
 	PS4Texture* tex = new PS4Texture();
-	tex->apiTexture.initAs2d(width, height, 1, form, Gnm::TileMode::kTileModeThin_2dThin, Gnm::NumFragments::kNumFragments1);
 
-	tex->width  = tex->apiTexture.getWidth();
+
+	PS4::PS4ScreenBuffer* buffer = ((PS4RendererAPI*)RendererBase::rendererAPI)->GenerateScreenBuffer(width, height, true, false, false);
+	tex->target = buffer->colourTarget;
+
+	tex->apiTexture.initFromRenderTarget(&buffer->colourTarget, false);
+	tex->width = tex->apiTexture.getWidth();
 	tex->height = tex->apiTexture.getHeight();
 	//tex->bpp	= tex->apiTexture.getDepth();
 
 	tex->apiTexture.setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
+
 	return tex;
 }
 
 PS4Texture* NCL::PS4::PS4Texture::GenTexFromBuffer(const sce::Gnm::RenderTarget& fbo)
 {
-	PS4Texture* tex;
+	PS4Texture* tex = new PS4Texture;
 
 	tex->apiTexture.initFromRenderTarget(&fbo, false);
+	tex->width = tex->apiTexture.getWidth();
+	tex->height = tex->apiTexture.getHeight();
 
 	return tex;
 }

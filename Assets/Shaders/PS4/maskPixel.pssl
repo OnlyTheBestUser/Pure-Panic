@@ -34,6 +34,10 @@ ConstantBuffer colour
 };
 
 
+SamplerState samp0 : register(s0);
+
+Texture2D colorMap : register( t0 );
+
 struct VS_OUTPUT
 {
 	float4 Position		: S_POSITION;
@@ -43,18 +47,19 @@ struct VS_OUTPUT
 
 float4 main(VS_OUTPUT In) : S_TARGET_OUTPUT
 {
+	float4 albedo = colorMap.Sample(samp0, In.UV.xy);
+
 	float avgScale = (m_textureScale.x + m_textureScale.y + m_textureScale.z) / 3;
 
-	float m = distance(float2(0,0) / m_viewport, m_uvHitPoint);
+	float m = distance(In.Position / m_viewport, m_uvHitPoint);
     float f = 1 - smoothstep(m_radius/avgScale * m_hardness, m_radius/avgScale, m);  
 
     float edge = f * m_strength;
 
-	float4 fragColour = float4(1,1,1,1);
-    //fragColour.rgb = lerp(fragColour.rgb, m_colour.rgb, edge);
-    //fragColour.a = 1;
+    albedo.rgb = lerp(albedo.rgb, m_colour.rgb, edge);
+    albedo.a = 1;
 
-	fragColour.rgb = float4(0,1,0,1);
+	//albedo.rgb = float3(1,0,1);
 
-	return fragColour;
+	return albedo;
 }
