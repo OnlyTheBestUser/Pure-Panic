@@ -15,7 +15,8 @@ namespace NCL {
 					Player* player = ((Player*)otherObject);
 					if (player->GetCurrentPowerup() != PowerUpType::None) return;
 					((Player*)otherObject)->IncreaseSpeed(increaseInSpeed, powerupDuration);
-					gameWorld.RemoveGameObject(this, true);
+					pickedUp = true;
+					gameWorld.RemoveGameObject(this);
 				}
 			}
 		private:

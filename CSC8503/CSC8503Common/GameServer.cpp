@@ -1,4 +1,4 @@
-#ifndef _ORBIS
+
 #include "GameServer.h"
 #include "GameWorld.h"
 #include "../GameTech/NetworkedGame.h"
@@ -132,4 +132,3 @@ void GameServer::UpdateServer() {
 void GameServer::SetGameWorld(GameWorld& g) {
 	gameWorld = &g;
 }
-#endif

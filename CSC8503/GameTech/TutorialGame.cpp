@@ -35,8 +35,6 @@ TutorialGame::TutorialGame()	{
 	bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 3.0f);
 #endif
 
-	levelLoader = new LevelLoader(world, physics, renderer);
-
 	forceMagnitude = 30.0f;
 	useGravity = true;
 	physics->UseGravity(useGravity);
@@ -315,19 +313,12 @@ void TutorialGame::InitWorld() {
 	physics->Clear();
 
 	levelLoader->ReadInLevelFile(NCL::Assets::DATADIR + "../../Assets/Maps/map1.txt");
+  
 	Player* player = levelLoader->AddPlayerToWorld(Vector3(0, 5, 0)); // #TODO Use playerSpawnPositions 
 	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 20), PowerUpType::SpeedBoost);
 	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 30), PowerUpType::FireRate);
 	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 40), PowerUpType::Heal);
 
-	//Command* f = new MoveForwardCommand(player);
-	//Command* b = new MoveBackwardCommand(player);
-	//Command* l = new MoveLeftCommand(player);
-	//Command* r = new MoveRightCommand(player);
-	//inputHandler->BindButton(FORWARD, f);
-	//inputHandler->BindButton(BACK, b);
-	//inputHandler->BindButton(LEFT, l);
-	//inputHandler->BindButton(RIGHT, r);
 	AxisCommand* m = new MoveCommand(player);
 	inputHandler->BindAxis(0, m);
 
