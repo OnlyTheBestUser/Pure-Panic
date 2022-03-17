@@ -91,7 +91,7 @@ void NetworkedGame::UpdateGame(float dt) {
 	}
 
 	for (auto x : powerups) {
-		if (x->pickedUp) {
+		if (x->IsPickedUp()) {
 			PowerUpPacket powerUpPacket;
 			powerUpPacket.worldID = x->GetWorldID();
 			powerUpPacket.clientID = playerID;
