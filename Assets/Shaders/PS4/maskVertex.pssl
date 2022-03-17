@@ -12,7 +12,8 @@ struct VS_INPUT
 
 struct VS_OUTPUT
 {
-	float3 WorldPos		: TEXCOORD1;
+	float4 Position		: S_POSITION;
+	float3 WorldPos		: COLOR0;
 	float2 UV			: TEXCOORD0;
 };
 
@@ -20,6 +21,7 @@ VS_OUTPUT main(VS_INPUT Input)
 {
 	VS_OUTPUT Output;
 
+	Output.Position = float4(Input.Position, 1.0);
 	Output.WorldPos = mul(m_modelMatrix, float4(Input.Position.xyz, 1)).xyz;
 	Output.UV = Input.UV;
 

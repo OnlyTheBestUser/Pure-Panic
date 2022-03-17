@@ -36,7 +36,8 @@ ConstantBuffer colour
 
 struct VS_OUTPUT
 {
-	float3 WorldPos		: TEXCOORD1;
+	float4 Position		: S_POSITION;
+	float3 WorldPos		: COLOR0;
 	float2 UV			: TEXCOORD0;
 };
 
@@ -50,8 +51,10 @@ float4 main(VS_OUTPUT In) : S_TARGET_OUTPUT
     float edge = f * m_strength;
 
 	float4 fragColour = float4(1,1,1,1);
-    fragColour.rgb = lerp(fragColour.rgb, m_colour.rgb, edge);
-    fragColour.a = 1;
+    //fragColour.rgb = lerp(fragColour.rgb, m_colour.rgb, edge);
+    //fragColour.a = 1;
+
+	fragColour.rgb = float4(0,1,0,1);
 
 	return fragColour;
 }
