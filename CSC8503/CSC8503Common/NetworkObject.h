@@ -1,4 +1,3 @@
-#ifndef _ORBIS
 #pragma once
 #include "GameObject.h"
 #include "NetworkBase.h"
@@ -22,6 +21,16 @@ namespace NCL {
 			FirePacket() {
 				type = Fire_State;
 				size = sizeof(FirePacket) - sizeof(GamePacket);
+			}
+		};
+
+
+		struct PowerUpPacket : public IDPacket {
+			int worldID;
+
+			PowerUpPacket() {
+				type = PowerUp_State;
+				size = sizeof(PowerUpPacket) - sizeof(GamePacket);
 			}
 		};
 
@@ -79,5 +88,4 @@ namespace NCL {
 		};
 	}
 }
-#endif
 

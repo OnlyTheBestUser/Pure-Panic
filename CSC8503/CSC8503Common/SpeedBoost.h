@@ -8,7 +8,7 @@ namespace NCL {
 		class SpeedBoost : public PowerUp
 		{
 		public:
-			SpeedBoost(GameWorld& gw, float speedIncreasedBy = 1.5f) : PowerUp(PowerUpType::SpeedBoost, gw), increaseInSpeed(speedIncreasedBy) {}
+			SpeedBoost(float speedIncreasedBy = 1.5f) : PowerUp(PowerUpType::SpeedBoost), increaseInSpeed(speedIncreasedBy) {}
 
 			void OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vector3 localB, Vector3 normal) override {
 				if (!IsPicked && otherObject->GetName() == "Player") {
@@ -17,7 +17,7 @@ namespace NCL {
 					if (player->GetCurrentPowerup() != PowerUpType::None) return;
 					((Player*)otherObject)->IncreaseSpeed(increaseInSpeed, powerupDuration);
 
-					IsPicked = true;// gameWorld.RemoveGameObject(this, true);
+					IsPicked = true;
 					reappearAfter = REAPPEAR_AFTER_DURATION;
 
 					GetRenderObject()->SetVisibility(false);

@@ -22,7 +22,9 @@ namespace NCL {
 		class PowerUp : public GameObject
 		{
 		public:
-			~PowerUp() {}
+			virtual ~PowerUp() {}
+
+			bool networked = false;
 
 			virtual void Update(float dt) override {
 				if (IsPicked) {
@@ -34,8 +36,12 @@ namespace NCL {
 				}
 			}
 
+			bool IsPickedUp() const {
+				return IsPicked;
+			}
+
 		protected:
-			PowerUp(PowerUpType powerType, GameWorld& gw) : GameObject("PowerUp"), powerUpType(powerType), gameWorld(gw) {
+			PowerUp(PowerUpType powerType, bool networked = false) : GameObject("PowerUp"), powerUpType(powerType) {
 				powerupDuration = POWERUP_DURATION;
 				reappearAfter = REAPPEAR_AFTER_DURATION;
 				IsPicked = false;
@@ -43,7 +49,6 @@ namespace NCL {
 
 			PowerUpType powerUpType;
 			float powerupDuration;
-			GameWorld& gameWorld;
 
 			bool IsPicked;
 			float reappearAfter;
