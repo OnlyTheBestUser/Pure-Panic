@@ -72,6 +72,7 @@ namespace NCL {
 			{
 				fireRate = defaultFireRate;
 				curSpeed = defaultCurSpeed;
+				bulletsPerShot = defaultBulletsPerShot;
 				currentPowerUp = PowerUpType::None;
 			}
 
@@ -151,7 +152,9 @@ namespace NCL {
 			float defaultFireRate = 0.2f;
 			float defaultCurSpeed = 80.0f;
 			float fireRate = 0.2f;
-			int bulletsPerShot = BULLETS_PER_SHOT;
+			int defaultBulletsPerShot = 1;
+			int bulletsPerShot = defaultBulletsPerShot;
+
 			float timeSincePrevShot = 0.0f;
 			float powerupTime = 0.0f;
 			float curSpeed = 80.0f;

@@ -1,22 +1,63 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="LevelLoader.cpp" />
-    <ClCompile Include="Main.cpp" />
-    <ClCompile Include="MainMenu.cpp" />
-    <ClCompile Include="NetworkedGame.cpp" />
-    <ClCompile Include="NetworkedPlayer.cpp" />
-    <ClCompile Include="Renderer.cpp" />
-    <ClCompile Include="RendererBase.cpp" />
-    <ClCompile Include="TutorialGame.cpp" />
+    <ClCompile Include="Renderer.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="RendererBase.cpp">
+      <Filter>Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MainMenu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkedGame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkedPlayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TutorialGame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="LevelLoader.h" />
-    <ClInclude Include="MainMenu.h" />
-    <ClInclude Include="NetworkedGame.h" />
-    <ClInclude Include="NetworkedPlayer.h" />
-    <ClInclude Include="Renderer.h" />
-    <ClInclude Include="RendererBase.h" />
-    <ClInclude Include="TutorialGame.h" />
+    <ClInclude Include="Renderer.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="RendererBase.h">
+      <Filter>Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MainMenu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkedGame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkedPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TutorialGame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Renderers">
+      <UniqueIdentifier>{6b948179-b9f7-47fd-8331-89b49380fcf1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{91bab995-b9b4-48aa-b1b7-30015ff0e104}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{703444ae-8037-4a5c-8b01-81b85cff2836}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

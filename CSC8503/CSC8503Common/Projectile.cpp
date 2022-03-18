@@ -3,8 +3,8 @@
 #include "../CSC8503Common/AudioManager.h"
 #include "../../Common/Assets.h"
 
-const Vector4 COLOUR_A = Vector4(1, 0, 0, 1);//Vector4(0.3, 0, 0.5, 1);
-const Vector4 COLOUR_B = Vector4(0, 1, 0, 1);// Vector4(0.250, 0.878, 0.815, 1);
+const Vector4 COLOUR_A = Vector4(0.011, 0.988, 0.941, 1); // Turquoise
+const Vector4 COLOUR_B = Vector4(1, 0.039, 0.941, 1); // Pink
 
 void Projectile::Update(float dt) {
 	Vector3 velocityDir = (this->GetPhysicsObject()->GetLinearVelocity()).Normalised();
@@ -25,13 +25,14 @@ void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vecto
 
 	Ray ray(this->GetTransform().GetPosition() - this->GetPhysicsObject()->GetLinearVelocity().Normalised(), this->GetPhysicsObject()->GetLinearVelocity());
 	ray.SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
-	//Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
+
 	RayCollision closestCollision;
 	if (gameWorld.Raycast(ray, closestCollision, true)) {
 		RenderObject* test = ((GameObject*)closestCollision.node)->GetRenderObject();
 		
 		//Debug::DrawArrow(ray.GetPosition(), ray.GetPosition() + ray.GetDirection(), Vector4(1, 1, 1, 1), 1.0f);
 		//Debug::DrawSphere(closestCollision.collidedAt, 0.5, Vector4(1, 0, 0, 1), 0.2f);
+		
 		if (test) {
 			if (test->GetPaintMask() != nullptr) {
 
@@ -60,17 +61,16 @@ void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vecto
 				if (IsDeathProjectile)
 					colour = Vector4(0, 0, 0, 1);
 				
-				// Get the uv from the ray
-				renderInst->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, ((GameObject*)closestCollision.node)->GetPaintRadius(), 0.7, 1, colour);
+				float randRad = ((GameObject*)closestCollision.node)->GetPaintRadius() + (((static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * 2.0f) - 1.0f) * ((GameObject*)closestCollision.node)->GetPaintRadius() * 0.25f;
 
-				//float randRad = ((GameObject*)closestCollision.node)->GetPaintRadius() + (((static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * 2.0f) - 1.0f) * ((GameObject*)closestCollision.node)->GetPaintRadius() * 0.25f;
-				
-				//uncomment for rainbow gun lmao
+				// Get the uv from the ray
+				renderInst->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, randRad, 0.7, 1, colour);
+
+				// Debug Rainbow Gun
 				//renderInst->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, randRad, 0.7, 1, Vector4(static_cast <float> (rand()) / static_cast <float> (RAND_MAX) , static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX), 1));
 			}
 		}
 	}
-
 	gameWorld.RemoveGameObject(this, true);
 	std::cout << "Destroyed" << std::endl;
 }
