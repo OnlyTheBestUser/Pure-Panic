@@ -16,10 +16,7 @@ namespace NCL {
 					if (player->GetCurrentPowerup() != PowerUpType::None) return;
 					((Player*)otherObject)->ActivateMultiBullet(BulletsPerShot, powerupDuration);
 
-					IsPicked = true;
-					reappearAfter = REAPPEAR_AFTER_DURATION;
-
-					GetRenderObject()->SetVisibility(false);
+					PickUp();
 				}
 			}
 
