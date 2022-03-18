@@ -33,6 +33,8 @@ namespace NCL {
 
 			static TextureBase* RGBATextureEmpty(int width, int height);
 
+			void ResetTexture() override;
+
 			GLuint GetObjectID() const	{
 				return texID;
 			}

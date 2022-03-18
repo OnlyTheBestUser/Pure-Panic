@@ -43,6 +43,10 @@ void main(void)
 	float sFactor = pow ( rFactor , 80.0 );
 	
 	vec4 albedo = IN.colour;
+
+	if (albedo.a < 0.01){
+		discard;
+	}
 	
 	if(hasTexture) {
 	 albedo *= texture(mainTex, IN.texCoord);

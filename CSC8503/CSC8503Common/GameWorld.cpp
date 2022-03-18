@@ -40,7 +40,20 @@ void GameWorld::ClearAndErase() {
 
 void GameWorld::AddGameObject(GameObject* o) {
 	singleton->gameObjects.emplace_back(o);
-	o->SetWorldID(singleton->worldIDCounter++);
+	if (o->GetRenderObject() != nullptr && (o->IsPaintable()) && (o->GetPaintRadius() != 0)) {
+		singleton->paintableObjects.emplace_back(o);
+		singleton->paintableObjectScores.insert({ o, Vector2(0,0) });
+	}
+	o->SetWorldID(worldIDCounter++);
+}
+
+bool GameWorld::GetScoreForObject(GameObject* object, Vector2& outScore) {
+	auto it = paintableObjectScores.find(object);
+	if (it != paintableObjectScores.end()) {
+		outScore = (*it).second;
+		return true;
+	}
+	return false;
 }
 
 void GameWorld::RemoveGameObject(GameObject* o, bool andDelete) {
@@ -50,6 +63,10 @@ void GameWorld::RemoveGameObject(GameObject* o, bool andDelete) {
 		if (o->GetWorldID() == obj->GetWorldID())
 		{
 			return;
+		}
+		if (o->GetRenderObject() != nullptr && (o->IsPaintable())) {
+			paintableObjects.erase(std::remove(paintableObjects.begin(), paintableObjects.end(), o), paintableObjects.end());
+			paintableObjectScores.erase(o);
 		}
 	}
 	singleton->toRemoveGameObjects.emplace_back(o);
@@ -80,6 +97,22 @@ void GameWorld::GetObjectIterators(
 
 	first	= gameObjects.begin();
 	last	= gameObjects.end();
+}
+
+void GameWorld::GetPaintableObjectIterators(
+	GameObjectIterator& first,
+	GameObjectIterator& last) const {
+
+	first = paintableObjects.begin();
+	last = paintableObjects.end();
+}
+
+void GameWorld::UpdateScore(GameObject* paintableScore, Vector2 scoreChange) {
+	paintableObjectScores[paintableScore] + scoreChange;
+}
+
+Vector2 GameWorld::GetScore(GameObject* paintableScore) {
+	return paintableObjectScores[paintableScore];
 }
 
 void GameWorld::OperateOnContents(GameObjectFunc f) {
