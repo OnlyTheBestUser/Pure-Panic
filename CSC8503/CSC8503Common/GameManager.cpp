@@ -5,9 +5,9 @@ void GameManager::Update(const float& dt) {
 	timer->Update(dt);
 
 	if (timer->GetState() == TimerStates::Ended) {
-		if (Teams[A].RoundScore > Teams[B].RoundScore)
+		if (Teams[A].score > Teams[B].score)
 			Debug::Print("Team A Wins", { 30.f, 70.f });
-		else if (Teams[A].RoundScore < Teams[B].RoundScore)
+		else if (Teams[A].score < Teams[B].score)
 			Debug::Print("Team B Wins", { 30.f, 70.f });
 		else
 			Debug::Print("Tie", { 30.f, 70.f });
@@ -23,12 +23,18 @@ void GameManager::PlacePlayersToSpawnPositions() {
 	}
 }
 
-void GameManager::HandleScoresAfterRound() {
-	Teams[A].TotalScore += Teams[A].RoundScore;
-	Teams[B].TotalScore += Teams[B].RoundScore;
+void GameManager::UpdateScores(Vector2 scores) {
+	Teams[0].score += scores.x;
+	Teams[1].score += scores.y;
+	std::cout << CalcCurrentScoreRatio() << "\n";
+}
 
-	Teams[A].RoundScore = 0.f;
-	Teams[B].RoundScore = 0.f;
+Vector2 GameManager::CalcCurrentScoreRatio() {
+	float tempTotal = Teams[0].score + Teams[1].score;
+	return (tempTotal == 0) ? Vector2(0,0) : Vector2(Teams[0].score / tempTotal, Teams[1].score / tempTotal);
+}
+
+void GameManager::HandleScoresAfterRound() {
 }
 
 void GameManager::StartRound() {
