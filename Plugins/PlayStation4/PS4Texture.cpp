@@ -29,6 +29,10 @@ void PS4Texture::Bind(int slot) const {
 	((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->setSamplers(Gnm::kShaderStagePs, slot, 1, &trilinearSampler);
 }
 
+void PS4Texture::ResetTexture() {
+
+}
+
 PS4Texture* PS4Texture::LoadTextureFromFile(const std::string& filename) {
 	std::ifstream file(filename, std::ios::binary);
 
