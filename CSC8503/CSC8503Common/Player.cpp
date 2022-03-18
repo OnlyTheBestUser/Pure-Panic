@@ -95,10 +95,7 @@ void Player::Fire() {
 	if (timeSincePrevShot > fireRate)
 	{
 		for (int i = 0; i < bulletsPerShot; ++i) {
-			auto spawnedProjectile = levelLoader->SpawnProjectile(this);
-			if (IsDead()) {
-				spawnedProjectile->SetAsDeathProjectile();
-			}
+			levelLoader->SpawnProjectile(this, IsDead());
 		}
 		timeSincePrevShot = 0.0f;
 		fired = true;

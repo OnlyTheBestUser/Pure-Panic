@@ -568,14 +568,14 @@ GameObject* LevelLoader::AddCapsuleToWorld(const Maths::Vector3& position, float
 	return capsule;
 }
 
-Projectile* LevelLoader::SpawnProjectile(Player* owner, const float& initialSpeed, const float& meshSize) {
+Projectile* LevelLoader::SpawnProjectile(Player* owner, const bool& IsPlayerDead, const float& initialSpeed, const float& meshSize) {
 #ifndef _ORBIS
 	AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + "gun_fire.ogg", owner->GetTransform().GetPosition(), 0.3f);
 #endif // !_ORBIS
-	return SpawnProjectile((GameObject*)owner, owner->GetCam()->GetPitch(), owner->GetPlayerID(), initialSpeed, meshSize);
+	return SpawnProjectile((GameObject*)owner, IsPlayerDead, owner->GetCam()->GetPitch(), owner->GetPlayerID(), initialSpeed, meshSize);
 }
 
-Projectile* LevelLoader::SpawnProjectile(GameObject* owner, float pitch, int playerID, const float& initialSpeed, const float& meshSize)
+Projectile* LevelLoader::SpawnProjectile(GameObject* owner, const bool& IsPlayerDead, float pitch, int playerID, const float& initialSpeed, const float& meshSize)
 {
 	float inverseMass = 1.0f;
 
@@ -586,6 +586,9 @@ Projectile* LevelLoader::SpawnProjectile(GameObject* owner, float pitch, int pla
 	Vector3 camUpVector = Vector3::Cross(camForwardVector, -camRightVector).Normalised();
 
 	Projectile* projectile = new Projectile(*world, renderer, playerID);
+
+	if (IsPlayerDead)
+		projectile->SetAsDeathProjectile();
 
 	SphereVolume* volume = new SphereVolume(meshSize * 0.8);// / 2.0f * meshSize * 1.3f);
 	projectile->SetBoundingVolume((CollisionVolume*)volume);
