@@ -334,11 +334,7 @@ void NCL::PS4::PS4RendererAPI::BindFrameBuffer()
 
 void NCL::PS4::PS4RendererAPI::BindFrameBuffer(const FrameBufferBase* fbo)
 {
-	const ::PS4::PS4FrameBuffer* buffer = static_cast<const NCL::PS4::PS4FrameBuffer*>(fbo);
-	//PS4ScreenBuffer* test = new PS4ScreenBuffer();
-	//test->colourTarget = buffer->renderTarget;
-
-	//SetRenderBuffer(test, false, false, false);
+	const NCL::PS4::PS4FrameBuffer* buffer = static_cast<const NCL::PS4::PS4FrameBuffer*>(fbo);
 	SetPaintBuffer(buffer->renderTarget);
 }
 

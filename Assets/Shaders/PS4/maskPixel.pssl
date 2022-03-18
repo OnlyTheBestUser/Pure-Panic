@@ -33,11 +33,6 @@ ConstantBuffer colour
 	float4 m_colour;
 };
 
-
-SamplerState samp0 : register(s0);
-
-Texture2D colorMap : register( t0 );
-
 struct VS_OUTPUT
 {
 	float4 Position		: S_POSITION;
@@ -47,7 +42,7 @@ struct VS_OUTPUT
 
 float4 main(VS_OUTPUT In) : S_TARGET_OUTPUT
 {
-	float4 albedo = colorMap.Sample(samp0, In.UV.xy);
+	float4 albedo = float4(0,0,0,0);
 
 	float avgScale = (m_textureScale.x + m_textureScale.y + m_textureScale.z) / 3;
 
@@ -57,6 +52,9 @@ float4 main(VS_OUTPUT In) : S_TARGET_OUTPUT
     float edge = f * m_strength;
 
     albedo.rgb = lerp(albedo.rgb, m_colour.rgb, edge);
+	if (albedo.rgb == float3(0,0,0)){
+		discard;
+	}
     albedo.a = 1;
 
 	//albedo.rgb = float3(1,0,1);

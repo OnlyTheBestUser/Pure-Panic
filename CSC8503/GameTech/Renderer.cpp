@@ -133,8 +133,6 @@ void Renderer::BuildObjectList() {
 			}
 		}
 	);
-
-	bool a = true;
 }
 
 
@@ -280,28 +278,20 @@ void Renderer::ApplyPaintToMasks() {
 
 	maskShader->BindShader();
 
-#ifdef _ORBIS
-	PS4::PS4RendererAPI* rend = ((PS4::PS4RendererAPI*)NCL::Rendering::RendererBase::rendererAPI);
-#endif
 	Vector2 currentSize;
 	for (const auto& i : paintInstances) {
 		if (i.object->GetPaintMask() == nullptr) continue;
 #ifdef _WIN64
 		OGLFrameBuffer maskFBO;
-		maskFBO.AddTexture((OGLTexture*)(i.object->GetPaintMask()));
+#elif _ORBIS
+		PS4::PS4FrameBuffer maskFBO;
 #endif
-#ifdef _ORBIS
-		//PS4::PS4FrameBuffer maskFBO;
-		//maskFBO.AddTexture(i.object->GetPaintMask());
-		PS4::PS4Texture* ps4Tex = static_cast<PS4::PS4Texture*>(i.object->GetPaintMask());
-		ps4Tex->Bind(0);
-#endif
+		maskFBO.AddTexture((i.object->GetPaintMask()));
 		if (Vector2(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight()) != currentSize) {
 			currentSize = Vector2(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight());
 			rendererAPI->SetViewportSize(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight());
 		}
 
-		// Update uniforms here
 		maskShader->UpdateUniformMatrix4("modelMatrix", i.object->GetTransform()->GetMatrix());
 		maskShader->UpdateUniformVector3("barycentricCoord", i.barycentric);
 		maskShader->UpdateUniformVector3("collisionPoint", i.colPoint);
@@ -323,20 +313,18 @@ void Renderer::ApplyPaintToMasks() {
 		maskShader->UpdateUniformFloat("strength", i.strength);
 		maskShader->UpdateUniformVector4("colour", i.colour);
 
-
-#ifndef _ORBIS
 		rendererAPI->BindFrameBuffer(&maskFBO);
-#endif
-		rend->SetPaintBuffer(ps4Tex->target);
-
-		uint64_t textureSizeInBytes;
-		Gnm::AlignmentType textureAlignment;
-		GpuAddress::computeTotalTiledTextureSize(&textureSizeInBytes, &textureAlignment, &ps4Tex->GetAPITexture());
 
 		rendererAPI->SetCullFace(false);
 		rendererAPI->DrawMesh(skyboxMesh);
 
-		rend->currentGFXContext->waitForGraphicsWrites(
+#ifdef _ORBIS
+		PS4::PS4Texture* ps4Tex = static_cast<PS4::PS4Texture*>(i.object->GetPaintMask());
+		uint64_t textureSizeInBytes;
+		Gnm::AlignmentType textureAlignment;
+		GpuAddress::computeTotalTiledTextureSize(&textureSizeInBytes, &textureAlignment, &ps4Tex->GetAPITexture());
+		
+		((PS4::PS4RendererAPI*)NCL::Rendering::RendererBase::rendererAPI)->currentGFXContext->waitForGraphicsWrites(
 			ps4Tex->GetAPITexture().getBaseAddress256ByteBlocks(),
 			(textureSizeInBytes + 255) / 256,
 			Gnm::kWaitTargetSlotCb1,
@@ -344,16 +332,14 @@ void Renderer::ApplyPaintToMasks() {
 			Gnm::kExtendedCacheActionFlushAndInvalidateCbCache,
 			Gnm::kStallCommandBufferParserDisable
 		);
+#endif
 
 	}
 	rendererAPI->SetBlend(false, RendererAPI::BlendType::ONE, RendererAPI::BlendType::NONE);
 	rendererAPI->SetDepth(true);
 	rendererAPI->SetViewportSize(rendererAPI->GetCurrentWidth(), rendererAPI->GetCurrentHeight());
-#ifdef _ORBIS
-	rend->SetRenderBuffer(rend->screenBuffers[rend->currentScreenBuffer], true, false, false);
-#else
 	rendererAPI->BindFrameBuffer();
-#endif
+	rendererAPI->SetCullFace(true);
 	rendererAPI->ClearBuffer(true, true, true);
 	
 	paintInstances.clear();
