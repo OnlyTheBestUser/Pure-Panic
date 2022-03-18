@@ -350,7 +350,7 @@ void NetworkedGame::HandlePowerUp(PowerUpPacket* packet)
 {
 	for (PowerUp* x : powerups) {
 		if (x->GetWorldID() == packet->worldID) {
-			world->RemoveGameObject(x);
+			x->PickUp();
 		}
 	}
 
