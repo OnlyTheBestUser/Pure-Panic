@@ -51,6 +51,13 @@ namespace NCL {
 				currentPowerUp = PowerUpType::FireRate;
 			}
 
+			void ActivateMultiBullet(const int& NoOfBullets, const float& duration) {
+				if (NoOfBullets <= 0) return;
+				bulletsPerShot = NoOfBullets;
+				powerupTime = duration;
+				currentPowerUp = PowerUpType::MultiBullet;
+			}
+
 			void IncreaseHealth(const float& increaseHealthBy) {
 				if (increaseHealthBy <= 0) return;
 				health += increaseHealthBy;
@@ -63,6 +70,7 @@ namespace NCL {
 			{
 				fireRate = defaultFireRate;
 				curSpeed = defaultCurSpeed;
+				bulletsPerShot = defaultBulletsPerShot;
 				currentPowerUp = PowerUpType::None;
 			}
 
@@ -140,6 +148,8 @@ namespace NCL {
 			float defaultFireRate = 0.2f;
 			float defaultCurSpeed = 80.0f;
 			float fireRate = 0.2f;
+			int defaultBulletsPerShot = 1;
+			int bulletsPerShot = defaultBulletsPerShot;
 			float timeSincePrevShot = 0.0f;
 			float powerupTime = 0.0f;
 			float curSpeed = 80.0f;

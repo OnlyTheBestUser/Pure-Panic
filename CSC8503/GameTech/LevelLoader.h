@@ -6,6 +6,7 @@
 #include "../CSC8503Common/FireRate.h"
 #include "../CSC8503Common/Heal.h"
 #include "../CSC8503Common/SpeedBoost.h"
+#include "../CSC8503Common/MultiBullet.h"
 
 
 namespace NCL {
