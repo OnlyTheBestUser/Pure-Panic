@@ -87,7 +87,7 @@ void NetworkedGame::UpdateGame(float dt) {
 		std::cout << "Server start" << std::endl;
 	}
 	if (!thisClient && Window::GetKeyboard()->KeyPressed(KeyboardKeys::F10)) {
-		StartAsClient(10, 70, 32, 241);
+		StartAsClient(127, 0, 0, 1);
 		std::cout << "Client start" << std::endl;
 	}
 
@@ -178,6 +178,9 @@ void NetworkedGame::SpawnPlayer() {
 void NetworkedGame::StartLevel() {
 	// Reset the level
 	// Start timer
+
+	// TODO Start Game with Command for Game Manager
+	// When Game Manager is over, send win states.
 }
 
 void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
