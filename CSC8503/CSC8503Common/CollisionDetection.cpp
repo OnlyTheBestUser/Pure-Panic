@@ -319,32 +319,31 @@ bool CollisionDetection::GetBarycentricFromRay(const Ray ray, const RenderObject
 
 	for (int i = 0; i < (indicies.size()) / 3; i++) {
 
-		Triangle tri;
-		Vector3 norm;
-		RayCollision collision;
+		Triangle currentTri;
+		Vector3 currentNorm;
+		RayCollision currentCollision;
 
-		mesh->GetTriangle(i, tri.pos_a, tri.pos_b, tri.pos_c);
-		mesh->GetTriangleUV(i, tri.texUV_a, tri.texUV_b, tri.texUV_c);
-		mesh->GetNormalForTri(i, norm);
+		mesh->GetTriangle(i, currentTri.pos_a, currentTri.pos_b, currentTri.pos_c);
+		mesh->GetTriangleUV(i, currentTri.texUV_a, currentTri.texUV_b, currentTri.texUV_c);
+		mesh->GetNormalForTri(i, currentNorm);
 
-		norm = obj.GetTransform()->GetOrientation() * norm;
-		tri.pos_a = obj.GetTransform()->GetMatrix() * tri.pos_a;
-		tri.pos_b = obj.GetTransform()->GetMatrix() * tri.pos_b;
-		tri.pos_c = obj.GetTransform()->GetMatrix() * tri.pos_c;
+		currentNorm = obj.GetTransform()->GetOrientation() * currentNorm;
+		currentTri.pos_a = obj.GetTransform()->GetMatrix() * currentTri.pos_a;
+		currentTri.pos_b = obj.GetTransform()->GetMatrix() * currentTri.pos_b;
+		currentTri.pos_c = obj.GetTransform()->GetMatrix() * currentTri.pos_c;
 
-		if (RayTriangleIntersection(ray, tri, norm, collision, obj.GetTransform()->GetMatrix())) {
-			float rayDist = (collision.collidedAt - ray.GetPosition()).Length();
+		if (RayTriangleIntersection(ray, currentTri, currentNorm, currentCollision, obj.GetTransform()->GetMatrix())) {
+			float rayDist = (currentCollision.collidedAt - ray.GetPosition()).Length();
 			if (rayDist < distance) {
-				closest = tri;
-				closestnorm = norm;
-				closestcollision = collision.collidedAt;
+				closest = currentTri;
+				closestnorm = currentNorm;
+				closestcollision = currentCollision.collidedAt;
 				distance = rayDist;
 			}
 		}
 	}
 	//Debug::DrawArrow(closestcollision, closestcollision + closestnorm, Vector4(0,1,0,1), 1.0f);
 
-	// If no mesh collided then return
 	if (distance == FLT_MAX) {
 		return false;
 	}
