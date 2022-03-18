@@ -277,11 +277,12 @@ NCL::Maths::Vector2 Renderer::CountPaintMask(TextureBase* paintMask, NCL::Maths:
 	int team1Score = 0;
 	int team2Score = 0;
 
+	//Read data from paint mask for scoring
 	for (size_t x= 0;x < paintMask->GetWidth(); x++){
 		for (size_t y = 0; y < paintMask->GetHeight(); y++) {
-			float r, g, b, a; // or GLubyte r, g, b, a;
+			float r, g, b, a;
 
-			size_t elmes_per_line = paintMask->GetWidth() * 4; // elements per line = 256 * "RGBA"
+			size_t elmes_per_line = paintMask->GetWidth() * 4;
 
 			size_t row = y * elmes_per_line;
 			size_t col = x * 4;
@@ -295,8 +296,8 @@ NCL::Maths::Vector2 Renderer::CountPaintMask(TextureBase* paintMask, NCL::Maths:
 				continue;
 			}
 
+			//Check if the colour is closer to team a or team b
 			Vector3 curCol = Vector3(r, g, b);
-			//std::cout << "(" << r << "," << g << "," << b << "," << a <<")\n";
 			Vector3 team1Pixel = curCol - Vector3(team1Colour.x, team1Colour.y, team1Colour.z);
 			Vector3 team2Pixel = curCol - Vector3(team2Colour.x, team2Colour.y, team2Colour.z);
 

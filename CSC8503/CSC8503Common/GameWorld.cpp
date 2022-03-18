@@ -39,7 +39,7 @@ void GameWorld::ClearAndErase() {
 
 void GameWorld::AddGameObject(GameObject* o) {
 	gameObjects.emplace_back(o);
-	if (o->GetRenderObject() != nullptr && (o->IsPaintable())) {
+	if (o->GetRenderObject() != nullptr && (o->IsPaintable()) && (o->GetPaintRadius() != 0)) {
 		paintableObjects.emplace_back(o);
 		paintableObjectScores.insert({ o, Vector2(0,0) });
 	}
