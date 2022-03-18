@@ -32,6 +32,8 @@ namespace NCL {
 			void RenderSkybox();
 			void RenderObjects();
 
+			void ClearPaint();
+
 
 			// Debug
 			Maths::Matrix4 SetupDebugLineMatrix() const override;

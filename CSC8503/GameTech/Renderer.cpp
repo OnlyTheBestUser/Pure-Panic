@@ -247,6 +247,20 @@ void Renderer::RenderObjects() {
 	}
 }
 
+void NCL::Rendering::Renderer::ClearPaint()
+{
+	GameObjectIterator start;
+	GameObjectIterator cur;
+	GameObjectIterator end;
+	gameWorld.GetPaintableObjectIterators(start, end);
+	cur = start;
+
+	while (cur != end) {
+		(*cur)->GetRenderObject()->SetMaskTexture(OGLTexture::RGBATextureEmpty((*cur)->GetRenderObject()->GetDefaultTexture()->GetWidth() / 16, (*cur)->GetRenderObject()->GetDefaultTexture()->GetHeight() / 16));
+		cur++;
+	}
+}
+
 NCL::Maths::Vector2 Renderer::CountPaintMask(TextureBase* paintMask, NCL::Maths::Vector2 prevScores, NCL::Maths::Vector4 team1Colour, NCL::Maths::Vector4 team2Colour) {
 
 #ifdef _ORBIS

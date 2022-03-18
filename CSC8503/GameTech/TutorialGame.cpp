@@ -130,6 +130,7 @@ void TutorialGame::UpdateGame(float dt) {
 	case RESET: {
 		InitCamera();
 		InitWorld();
+		renderer->ClearPaint();
 		selectionObject = nullptr;
 		break;
 	}
@@ -223,6 +224,7 @@ void TutorialGame::UpdateScores(float dt) {
 
 void TutorialGame::DebugDrawCollider(const CollisionVolume* c, Transform* worldTransform) {
 	Vector4 col = Vector4(1, 0, 0, 1);
+
 	if (c == nullptr)
 		return;
 	switch (c->type) {
