@@ -31,7 +31,7 @@ void GameManager::UpdateScores(Vector2 scores) {
 
 Vector2 GameManager::CalcCurrentScoreRatio() {
 	float tempTotal = Teams[0].score + Teams[1].score;
-	return Vector2(Teams[0].score / tempTotal, Teams[1].score / tempTotal);
+	return (tempTotal == 0) ? Vector2(0,0) : Vector2(Teams[0].score / tempTotal, Teams[1].score / tempTotal);
 }
 
 void GameManager::HandleScoresAfterRound() {
