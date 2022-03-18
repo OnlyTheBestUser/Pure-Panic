@@ -16,10 +16,12 @@ namespace NCL {
 			virtual ~TextureBase();
 
 			virtual void Bind(int slot = 0) const = 0;
+			virtual void ResetTexture() = 0;
 
 			int GetWidth() { return width; }
 			int GetHeight() { return height;  }
 			TextureType GetType() { return type; }
+
 		protected:
 			TextureBase();
 
