@@ -257,7 +257,7 @@ void Renderer::RenderObjects() {
 	}
 }
 
-void Renderer::Paint(const RenderObject* paintable, Vector3& barycentric, Vector3& colpos, Vector2& texUV_a, Vector2& texUV_b, Vector2& texUV_c, float radius, float hardness, float strength, NCL::Maths::Vector4 colour)
+void Renderer::Paint(const RenderObject* paintable, Maths::Vector3& barycentric, Maths::Vector3& colpos, Maths::Vector2& texUV_a, Maths::Vector2& texUV_b, Maths::Vector2& texUV_c, float radius, float hardness, float strength, NCL::Maths::Vector4 colour)
 {
 	PaintInstance pi;
 	pi.object = paintable;
