@@ -19,6 +19,7 @@
 #include "../../Plugins/OpenGLRendering/OGLTexture.h"
 #include "../../Plugins/OpenGLRendering/OGLUniformBuffer.h"
 using namespace NCL;
+using namespace Maths;
 using namespace Rendering;
 using namespace CSC8503;
 
@@ -246,7 +247,68 @@ void Renderer::RenderObjects() {
 	}
 }
 
-void Renderer::Paint(const RenderObject* paintable, Vector3& barycentric, Vector3& colpos, Vector2& texUV_a, Vector2& texUV_b, Vector2& texUV_c, float radius, float hardness, float strength, NCL::Maths::Vector4 colour)
+void NCL::Rendering::Renderer::ClearPaint()
+{
+	GameObjectIterator start;
+	GameObjectIterator cur;
+	GameObjectIterator end;
+	gameWorld.GetPaintableObjectIterators(start, end);
+	cur = start;
+
+	while (cur != end) {
+		(*cur)->GetRenderObject()->SetMaskTexture(OGLTexture::RGBATextureEmpty((*cur)->GetRenderObject()->GetDefaultTexture()->GetWidth() / 16, (*cur)->GetRenderObject()->GetDefaultTexture()->GetHeight() / 16));
+		cur++;
+	}
+}
+
+NCL::Maths::Vector2 Renderer::CountPaintMask(TextureBase* paintMask, NCL::Maths::Vector2 prevScores, NCL::Maths::Vector4 team1Colour, NCL::Maths::Vector4 team2Colour) {
+
+#ifdef _ORBIS
+	return prevScores;
+#endif
+
+	paintMask->Bind();
+
+	int pixelDataSize = paintMask->GetHeight() * paintMask->GetWidth() * 4;
+
+	GLubyte* data = new GLubyte[pixelDataSize];
+	glGetTextureImage(((OGLTexture*)paintMask)->GetObjectID(), 0, GL_RGBA, GL_UNSIGNED_BYTE, pixelDataSize * 4, data);
+
+	int team1Score = 0;
+	int team2Score = 0;
+
+	//Read data from paint mask for scoring
+	for (size_t x= 0;x < paintMask->GetWidth(); x++){
+		for (size_t y = 0; y < paintMask->GetHeight(); y++) {
+			float r, g, b, a;
+
+			size_t elmes_per_line = paintMask->GetWidth() * 4;
+
+			size_t row = y * elmes_per_line;
+			size_t col = x * 4;
+
+			r = static_cast<float>(data[row + col] / 255.0f);
+			g = static_cast<float>(data[row + col+1] / 255.0f);
+			b = static_cast<float>(data[row + col+2] / 255.0f);
+			a = static_cast<float>(data[row + col+3] / 255.0f);
+			
+			if (a != 1.0f) {
+				continue;
+			}
+
+			//Check if the colour is closer to team a or team b
+			Vector3 curCol = Vector3(r, g, b);
+			Vector3 team1Pixel = curCol - Vector3(team1Colour.x, team1Colour.y, team1Colour.z);
+			Vector3 team2Pixel = curCol - Vector3(team2Colour.x, team2Colour.y, team2Colour.z);
+
+			(team1Pixel.LengthSquared() < team2Pixel.LengthSquared()) ? (team1Score++) : (team2Score++);
+		}
+		
+	}
+	return Vector2(team1Score - prevScores.x , team2Score - prevScores.y);
+}
+
+void Renderer::Paint(const RenderObject* paintable, NCL::Maths::Vector3& barycentric, NCL::Maths::Vector3& colpos, NCL::Maths::Vector2& texUV_a, NCL::Maths::Vector2& texUV_b, NCL::Maths::Vector2& texUV_c, float radius, float hardness, float strength, NCL::Maths::Vector4 colour)
 {
 	PaintInstance pi;
 	pi.object = paintable;

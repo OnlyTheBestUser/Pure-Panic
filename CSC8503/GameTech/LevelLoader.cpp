@@ -627,16 +627,20 @@ PowerUp* LevelLoader::AddPowerUpToWorld(const Vector3& position, const PowerUpTy
 
 	switch (ability) {
 	case(PowerUpType::FireRate):
-		powerup = new FireRate(*world);
+		powerup = new FireRate();
 		colour = Debug::YELLOW;
 		break;
 	case(PowerUpType::Heal):
-		powerup = new Heal(*world);
+		powerup = new Heal();
 		colour = Debug::RED;
 		break;
 	case(PowerUpType::SpeedBoost):
-		powerup = new SpeedBoost(*world);
+		powerup = new SpeedBoost();
 		colour = Debug::CYAN;
+		break;
+	case(PowerUpType::MultiBullet):
+		powerup = new MultiBullet();
+		colour = Debug::GREEN;
 		break;
 	}
 
