@@ -19,6 +19,7 @@
 #include "../../Plugins/OpenGLRendering/OGLTexture.h"
 #include "../../Plugins/OpenGLRendering/OGLUniformBuffer.h"
 using namespace NCL;
+using namespace Maths;
 using namespace Rendering;
 using namespace CSC8503;
 
@@ -246,7 +247,11 @@ void Renderer::RenderObjects() {
 	}
 }
 
-Vector2 Renderer::CountPaintMask(TextureBase* paintMask, Vector2 prevScores, Vector4 team1Colour, Vector4 team2Colour) {
+NCL::Maths::Vector2 Renderer::CountPaintMask(TextureBase* paintMask, NCL::Maths::Vector2 prevScores, NCL::Maths::Vector4 team1Colour, NCL::Maths::Vector4 team2Colour) {
+
+#ifdef _ORBIS
+	return prevScores;
+#endif
 
 	paintMask->Bind();
 
@@ -288,7 +293,7 @@ Vector2 Renderer::CountPaintMask(TextureBase* paintMask, Vector2 prevScores, Vec
 	return Vector2(team1Score - prevScores.x , team2Score - prevScores.y);
 }
 
-void Renderer::Paint(const RenderObject* paintable, Vector3& barycentric, Vector3& colpos, Vector2& texUV_a, Vector2& texUV_b, Vector2& texUV_c, float radius, float hardness, float strength, NCL::Maths::Vector4 colour)
+void Renderer::Paint(const RenderObject* paintable, NCL::Maths::Vector3& barycentric, NCL::Maths::Vector3& colpos, NCL::Maths::Vector2& texUV_a, NCL::Maths::Vector2& texUV_b, NCL::Maths::Vector2& texUV_c, float radius, float hardness, float strength, NCL::Maths::Vector4 colour)
 {
 	PaintInstance pi;
 	pi.object = paintable;

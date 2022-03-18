@@ -215,7 +215,7 @@ void TutorialGame::UpdateScores(float dt) {
 		world->UpdateScore((*cur), scoreDif);
 		//std::cout << (*cur)->GetName() << "\n" << "Team 1: " << scoreDif.x << "\n" << "Team 2: " << scoreDif.y << "\n\n";
 
-
+		gameManager->UpdateScores(scoreDif);
 		currentObj++;
 		timeSinceLastScoreUpdate = 0;
 	}
