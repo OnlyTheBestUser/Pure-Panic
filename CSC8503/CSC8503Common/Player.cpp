@@ -88,7 +88,7 @@ void Player::Fire() {
 	if (timeSincePrevShot > fireRate)
 	{
 		for(int i = 0; i < bulletsPerShot; ++i)
-			levelLoader->SpawnProjectile(this);
+			levelLoader->SpawnProjectile(this, (currentPowerUp == PowerUpType::MultiBullet));
 		timeSincePrevShot = 0.0f;
 		fired = true;
 	}
