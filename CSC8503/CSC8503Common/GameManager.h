@@ -16,8 +16,7 @@ namespace NCL {
 		};
 
 		struct TeamInfo {
-			float RoundScore = 0.f;
-			float TotalScore = 0.f;
+			float score = 0.0f;
 			std::vector<Player*> TeamPlayers;
 		};
 
@@ -36,9 +35,9 @@ namespace NCL {
 				return timer;
 			}
 
-			void UpdateTeamScore(const float& score, const TeamTypes& t) {
-				Teams[t].RoundScore = score;
-			}
+			void UpdateScores(Vector2 scores);
+
+			Vector2 CalcCurrentScoreRatio();
 
 			void AddPlayerToTeam(Player* player,const TeamTypes& t) {
 				Teams[t].TeamPlayers.push_back(player);

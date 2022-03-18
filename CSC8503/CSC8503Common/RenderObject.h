@@ -23,6 +23,10 @@ namespace NCL {
 				texture = t;
 			}
 
+			void SetMaskTexture(TextureBase* t) {
+				paintMask = t;
+			}
+
 			TextureBase* GetDefaultTexture() const {
 				return texture;
 			}
@@ -30,7 +34,6 @@ namespace NCL {
 			TextureBase* GetPaintMask() const {
 				return paintMask;
 			}
-
 
 			MeshGeometry*	GetMesh() const {
 				return mesh;

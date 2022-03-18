@@ -86,7 +86,7 @@ void NetworkedGame::UpdateGame(float dt) {
 		std::cout << "Server start" << std::endl;
 	}
 	if (!thisClient && Window::GetKeyboard()->KeyPressed(KeyboardKeys::F10)) {
-		StartAsClient(127, 0, 0, 1);
+		StartAsClient(10, 70, 32, 241);
 		std::cout << "Client start" << std::endl;
 	}
 
