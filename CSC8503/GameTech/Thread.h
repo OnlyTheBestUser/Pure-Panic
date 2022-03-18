@@ -9,7 +9,7 @@ public:
 	virtual void Start();
 	virtual void Join();
 	bool GetThreadState() { return completed; }
-	void AddToThreadCompletion(float progress) { progression += progress; }
+	void AddToThreadProgress(float progress) { progression += progress; }
 	virtual DWORD GetId() const { return tid; }
 
 protected:

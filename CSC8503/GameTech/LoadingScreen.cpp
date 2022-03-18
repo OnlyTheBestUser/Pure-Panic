@@ -7,8 +7,6 @@ LoadingScreen::LoadingScreen()
 	world = new GameWorld();
 	renderer = new Renderer(*world);
 	Debug::SetRenderer(renderer);
-
-	InitWorld();
 }
 LoadingScreen::~LoadingScreen()
 {
@@ -16,14 +14,10 @@ LoadingScreen::~LoadingScreen()
 	delete world;
 }
 
-void LoadingScreen::InitWorld()
-{
-	//world->ClearAndErase();
-}
-
 void LoadingScreen::UpdateGame(float dt)
 {
 	Debug::SetRenderer(renderer);
+	progression += dt * 10;
 	renderer->DrawString("Loading: " + std::to_string(progression) + "%", Vector2(30, 50), Debug::WHITE, 30.0f);
 	std::cout << "LOADING: " << progression << "%" << std::endl;
 

@@ -34,6 +34,9 @@ vector<TutorialGame*> sharedGameBuffer;	// shared thread buffer
 bool doneLoading = true;	// shared thread buffer
 //LoadingScreen* ls;		// global shared load screen
 MutexClass mutex;		// global mutex object
+MainMenu* tmm;
+TutorialGame* ttg;
+NetworkedGame* tng;
 
 class Loader : public Thread
 {
@@ -43,21 +46,21 @@ protected:
 	virtual void Run();
 	LoadingScreen* ls;
 };
-//class MainMenuInitialiser : public Thread
-//{
-//protected:
-//	virtual void Run();
-//};
-//class NetworkedGameInitialiser : public Thread
-//{
-//protected:
-//	virtual void Run();
-//};
-//class SplitscreenGameInitialiser : public Thread
-//{
-//protected:
-//	virtual void Run();
-//};
+class MainMenuInitialiser : public Thread
+{
+protected:
+	virtual void Run();
+};
+class NetworkedGameInitialiser : public Thread
+{
+protected:
+	virtual void Run();
+};
+class SplitscreenGameInitialiser : public Thread
+{
+protected:
+	virtual void Run();
+};
 
 void Loader::Run()
 {
@@ -73,41 +76,39 @@ void Loader::Run()
 		else
 		{
 			ls->UpdateProgress(progression);
-			//ls->UpdateGame(0.01f);
 		}
 		mutex.UnlockMutex();
 	}
 }
-//void MainMenuInitialiser::Run()
-//{
-//	std::cout << "MAIN MENU INIT" << std::endl;
-//	MainMenu* mm = new MainMenu();
-//	mutex.LockMutex();
-//	sharedGameBuffer.push_back(mm);
-//	completed = true;
-//	mutex.UnlockMutex();
-//	std::cout << "MAIN MENU FINISH" << std::endl;
-//}
-//void NetworkedGameInitialiser::Run()
-//{
-//	std::cout << "NETWORKED GAME INIT" << std::endl;
-//	NetworkedGame* ng = new NetworkedGame();
-//	mutex.LockMutex();
-//	sharedGameBuffer.push_back(ng);
-//	completed = true;
-//	mutex.UnlockMutex();
-//	std::cout << "NETWORKED GAME FINISH" << std::endl;
-//}
-//void SplitscreenGameInitialiser::Run()
-//{
-//	std::cout << "TUTORIAL GAME INIT" << std::endl;
-//	TutorialGame* tg = new TutorialGame();
-//	mutex.LockMutex();
-//	sharedGameBuffer.push_back(tg);
-//	completed = true;
-//	mutex.UnlockMutex();
-//	std::cout << "TUTORIAL GAME FINISH" << std::endl;
-//}
+void MainMenuInitialiser::Run()
+{
+	std::cout << "MAIN MENU INIT" << std::endl;
+	// TODO ---------------------------------------------------------------------------------------
+	// Attempt to make new MainMenu before locking mutex and passing variable to the global object
+	mutex.LockMutex();
+	tmm = new MainMenu();
+	mutex.UnlockMutex();
+	completed = true;
+	std::cout << "MAIN MENU FINISH" << std::endl;
+}
+void NetworkedGameInitialiser::Run()
+{
+	std::cout << "NETWORKED GAME INIT" << std::endl;
+	mutex.LockMutex();
+	tng = new NetworkedGame();
+	mutex.UnlockMutex();
+	completed = true;
+	std::cout << "NETWORKED GAME FINISH" << std::endl;
+}
+void SplitscreenGameInitialiser::Run()
+{
+	std::cout << "TUTORIAL GAME INIT" << std::endl;
+	mutex.LockMutex();
+	ttg = new TutorialGame();
+	mutex.UnlockMutex();
+	completed = true;
+	std::cout << "TUTORIAL GAME FINISH" << std::endl;
+}
 
 using namespace NCL;
 using namespace CSC8503;
@@ -200,6 +201,7 @@ public:
 	Menu(MainMenu* m, TutorialGame* g, NetworkedGame* h) : m(m), tg(g), ng(h) {};
 
 	PushdownResult OnUpdate(float dt, PushdownState** newState) override {
+		std::cout << "MENU" << std::endl;
 		m->UpdateGame(dt);
 
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM1)) {
@@ -237,39 +239,61 @@ public:
 	Loading(LoadingScreen* l) : ls(l) {};
 	PushdownResult OnUpdate(float dt, PushdownState** newState) override 
 	{
+		ls->UpdateGame(dt);
+
 		if (!threadMade)
 		{
 			doneLoading = false;
 			loadThread.AssignLoadScreen(ls);
 			loadThread.Start();
+			menuThread.Start();
+			networkedThread.Start();
+			splitscreenThread.Start();
 			threadMade = true;
 		}
-		ls->UpdateGame(dt);
 
-		m = new MainMenu();
-		ls->UpdateProgress(33.3f);
-		ls->UpdateGame(dt);
-
-		ng = new NetworkedGame();
-		ls->UpdateProgress(66.6f);
-		ls->UpdateGame(dt);
-
-		tg = new TutorialGame();
-		ls->UpdateProgress(99.9f);
-		ls->UpdateGame(dt);
-
-		mutex.LockMutex();
-		doneLoading = true;
-		mutex.UnlockMutex();
-		loadThread.Join();
-
-		mutex.LockMutex();
-		if (doneLoading)
+		if (menuThread.GetThreadState())
 		{
+			loadThread.AddToThreadProgress(33.0f);
+			mutex.LockMutex();
+			m = &(*tmm);
+			mutex.UnlockMutex();
+			menuLoaded = true;
+		}
+
+		if (networkedThread.GetThreadState())
+		{
+			loadThread.AddToThreadProgress(33.0f);
+			mutex.LockMutex();
+			ng = &(*tng);
+			mutex.UnlockMutex();
+			networkLoaded = true;
+		}
+
+		if (splitscreenThread.GetThreadState())
+		{
+			loadThread.AddToThreadProgress(33.0f);
+			mutex.LockMutex();
+			tg = &(*ttg);
+			mutex.UnlockMutex();
+			splitscreenLoaded = true;
+		}
+
+
+		if (menuLoaded && networkLoaded && splitscreenLoaded)
+		{
+			mutex.LockMutex();
+			doneLoading = true;
+			mutex.UnlockMutex();
+
+			loadThread.Join();
+			menuThread.Join();
+			networkedThread.Join();
+			splitscreenThread.Join();
+
 			goToMenu = true;
 		}
-		mutex.UnlockMutex();
-
+		
 		if (goToMenu)
 		{
 			*newState = new Menu(m, tg, ng);
@@ -284,6 +308,14 @@ protected:
 	bool goToMenu = false;
 
 	Loader loadThread;
+	MainMenuInitialiser menuThread;
+	NetworkedGameInitialiser networkedThread;
+	SplitscreenGameInitialiser splitscreenThread;
+
+	bool menuLoaded = false;
+	bool networkLoaded = false;
+	bool splitscreenLoaded = false;
+
 	LoadingScreen* ls;
 	TutorialGame* tg;
 	NetworkedGame* ng;

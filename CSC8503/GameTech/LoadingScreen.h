@@ -14,8 +14,6 @@ namespace NCL {
 			void UpdateProgress(float progress) { progression = progress; }
 
 		protected:
-			void InitWorld();
-
 			float progression = 0.0f;
 
 			GameWorld* world;
