@@ -46,7 +46,7 @@ void Player::Update(float dt)
 	}
 
 	// Check if grounded, if so don't apply more gravity
-	if (distanceToGround < 1.1f && force.y <= 0.0f)
+	if (distanceToGround < 1.5f && force.y <= 0.0f)
 	{
 		Vector3 currentVel = GetPhysicsObject()->GetLinearVelocity();
 		GetPhysicsObject()->SetLinearVelocity(Vector3(currentVel.x, 0.0f, currentVel.z));

@@ -44,7 +44,7 @@ void GameWorld::AddGameObject(GameObject* o) {
 		singleton->paintableObjects.emplace_back(o);
 		singleton->paintableObjectScores.insert({ o, Vector2(0,0) });
 	}
-	o->SetWorldID(worldIDCounter++);
+	o->SetWorldID(singleton->worldIDCounter++);
 }
 
 bool GameWorld::GetScoreForObject(GameObject* object, Vector2& outScore) {
@@ -65,8 +65,8 @@ void GameWorld::RemoveGameObject(GameObject* o, bool andDelete) {
 			return;
 		}
 		if (o->GetRenderObject() != nullptr && (o->IsPaintable())) {
-			paintableObjects.erase(std::remove(paintableObjects.begin(), paintableObjects.end(), o), paintableObjects.end());
-			paintableObjectScores.erase(o);
+			singleton->paintableObjects.erase(std::remove(singleton->paintableObjects.begin(), singleton->paintableObjects.end(), o), singleton->paintableObjects.end());
+			singleton->paintableObjectScores.erase(o);
 		}
 	}
 	singleton->toRemoveGameObjects.emplace_back(o);
