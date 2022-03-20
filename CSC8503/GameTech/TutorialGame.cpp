@@ -316,9 +316,9 @@ void TutorialGame::InitWorld() {
 
 	levelLoader->ReadInLevelFile(NCL::Assets::DATADIR + "../../Assets/Maps/map1.txt");
 	Player* player = levelLoader->AddPlayerToWorld(Vector3(0, 5, 0)); // #TODO Use playerSpawnPositions 
-	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 20), PowerUpType::SpeedBoost);
-	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 30), PowerUpType::FireRate);
-	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 40), PowerUpType::Heal);
+	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 15), PowerUpType::SpeedBoost);
+	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 20), PowerUpType::FireRate);
+	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 25), PowerUpType::Heal);
 
 	//Command* f = new MoveForwardCommand(player);
 	//Command* b = new MoveBackwardCommand(player);
