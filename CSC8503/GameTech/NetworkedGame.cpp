@@ -1,4 +1,3 @@
-#ifndef _ORBIS
 #include "NetworkedGame.h"
 #include "NetworkedPlayer.h"
 #include "../CSC8503Common/GameServer.h"
@@ -425,4 +424,3 @@ void NetworkedGame::RemovePlayerFromServer(int clientID) {
 		serverPlayers.erase(sInd);
 	}
 }
-#endif
