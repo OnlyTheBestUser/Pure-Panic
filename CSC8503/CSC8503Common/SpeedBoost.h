@@ -21,6 +21,7 @@ namespace NCL {
 					reappearAfter = REAPPEAR_AFTER_DURATION;
 
 					GetRenderObject()->SetVisibility(false);
+					PickUp();
 				}
 			}
 		private:
