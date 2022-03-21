@@ -56,6 +56,8 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 	//maskFBO->AddTexture(2048 / 4, 2048 / 4);
 	maskShader = new OGLShader("MaskVertex.glsl", "MaskFragment.glsl");
 
+	uiShader = new OGLShader("UIVert.glsl", "UIFrag.glsl");
+
 	// Uniform block bindings
 	camBuffer = new OGLUniformBuffer(sizeof(CameraMatrix), 0);
 
@@ -147,6 +149,7 @@ void Renderer::RenderScene() {
 
 	RenderSkybox();
 	RenderObjects();
+	DrawGUI();
 }
 
 void Renderer::RenderShadows() {
@@ -379,6 +382,22 @@ void Renderer::ApplyPaintToMasks() {
 	paintInstances.clear();
 }
 
+void Renderer::DrawGUI() {
+	uiShader->BindShader();
+	uiShader->UpdateUniformMatrix4("viewProjMatrix", Matrix4::Orthographic(-1, 1.0f, 1, 0, 0, 1));
+
+	rendererAPI->SetCullFace(false);
+	rendererAPI->SetBlend(false);
+	rendererAPI->SetDepth(false);
+
+	rendererAPI->DrawMesh(skyboxMesh);
+
+
+	rendererAPI->SetCullFace(true);
+	rendererAPI->SetBlend(true);
+	rendererAPI->SetDepth(true);
+}
+
 Maths::Vector2 Renderer::GetUVCoord(const RenderObject* paintable, NCL::Maths::Vector3 pos) {
 	const vector<Vector3> vertices = paintable->GetMesh()->GetPositionData();
 
@@ -412,4 +431,3 @@ Maths::Matrix4 Renderer::SetupDebugLineMatrix()	const {
 Maths::Matrix4 Renderer::SetupDebugStringMatrix()	const {
 	return Matrix4::Orthographic(-1, 1.0f, 100, 0, 0, 100);
 }
-
