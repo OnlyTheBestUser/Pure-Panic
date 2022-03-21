@@ -55,10 +55,9 @@ namespace NCL {
 
 			PowerUpType powerUpType;
 			float powerupDuration;
-
+			
 			bool IsPicked;
 			float reappearAfter;
-
 		};
 	}
 }
