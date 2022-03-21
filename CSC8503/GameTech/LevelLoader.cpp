@@ -317,12 +317,11 @@ GameObject* LevelLoader::AddPaintWallToWorld(const Vector3& position, Vector3 di
 	if (rotation == 270)
 		cube->GetTransform().SetOffset(Vector3(-6.5f, 15, 0));
 
-	#ifdef _WIN64
-		cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, OGLTexture::RGBATextureEmpty(corridorWallAlertTex->GetHeight() / 16, corridorWallAlertTex->GetWidth() / 16), basicShader));
-	#else
-		cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, basicShader));
-	#endif
-
+#ifdef _WIN64
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, OGLTexture::RGBATextureEmpty(corridorWallAlertTex->GetHeight()/16, corridorWallAlertTex->GetWidth()/16), basicShader));
+#else
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, PS4::PS4Texture::EmptyTex(corridorWallAlertTex->GetHeight() / 16, corridorWallAlertTex->GetWidth() / 16), basicShader));
+#endif
 	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
 
 	cube->GetPhysicsObject()->SetInverseMass(0.0f);
@@ -587,8 +586,8 @@ void LevelLoader::SetFieldsForCube(GameObject* cube, const Vector3& position, Ve
 
 	#ifdef _WIN64
 		cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, OGLTexture::RGBATextureEmpty(basicTex->GetWidth(), basicTex->GetHeight()), basicShader));
-	#else
-		cube->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
+	#elif _ORBIS
+		cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, PS4::PS4Texture::EmptyTex(basicTex->GetWidth(), basicTex->GetHeight()),basicShader));
 	#endif
 	
 	cube->GetPhysicsObject()->InitCubeInertia();
