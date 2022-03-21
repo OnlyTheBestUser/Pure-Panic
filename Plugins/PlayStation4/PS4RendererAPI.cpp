@@ -377,8 +377,7 @@ void NCL::PS4::PS4RendererAPI::SetBlend(bool b, BlendType srcFunc, BlendType dst
 	blend.init();
 	blend.setBlendEnable(b);
 	blend.setColorEquation(toPSenum(srcFunc), Gnm::BlendFunc::kBlendFuncAdd, toPSenum(dstFunc));
-	blend.setAlphaEquation(toPSenum(BlendType::ONE), Gnm::BlendFunc::kBlendFuncAdd, toPSenum(BlendType::NONE));
-	blend.setSeparateAlphaEnable(true);
+	blend.setSeparateAlphaEnable(false);
 	currentGFXContext->setBlendControl(0, blend);
 }
 

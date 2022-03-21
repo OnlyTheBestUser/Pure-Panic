@@ -247,10 +247,12 @@ void Renderer::RenderObjects() {
 		shader->UpdateUniformMatrix4("invModelMatrix", modelMatrix.Inverse());
 #ifdef _WIN64
 		shader->UpdateUniformMatrix4("shadowMatrix", fullShadowMat);
-
+#endif
 		shader->UpdateUniformVector4("objectColour", i->GetColour());
 		shader->UpdateUniformInt("hasVertexColours", !(*i).GetMesh()->GetColourData().empty());
-#endif
+
+
+
 
 		rendererAPI->DrawMeshAndSubMesh((*i).GetMesh());
 	}
