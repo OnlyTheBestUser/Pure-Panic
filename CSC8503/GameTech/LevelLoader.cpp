@@ -568,16 +568,18 @@ GameObject* LevelLoader::AddCapsuleToWorld(const Maths::Vector3& position, float
 	return capsule;
 }
 
-Projectile* LevelLoader::SpawnProjectile(Player* owner, const float& initialSpeed, const float& meshSize) {
+Projectile* LevelLoader::SpawnProjectile(Player* owner, const bool& NeedBulletSpread, const float& initialSpeed, const float& meshSize) {
 #ifndef _ORBIS
 	AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + "gun_fire.ogg", owner->GetTransform().GetPosition(), 0.3f);
 #endif // !_ORBIS
-	return SpawnProjectile((GameObject*)owner, owner->GetCam()->GetPitch(), owner->GetPlayerID(), initialSpeed, meshSize);
+	return SpawnProjectile((GameObject*)owner, NeedBulletSpread, owner->GetCam()->GetPitch(), owner->GetPlayerID(), initialSpeed, meshSize);
 }
 
-Projectile* LevelLoader::SpawnProjectile(GameObject* owner, float pitch, int playerID, const float& initialSpeed, const float& meshSize)
+Projectile* LevelLoader::SpawnProjectile(GameObject* owner, const bool& NeedBulletSpread, float pitch, int playerID, const float& initialSpeed, const float& meshSize)
 {
 	float inverseMass = 1.0f;
+
+	const int SPREAD_ANGLE_CONST = 400;
 
 	Vector3 ownerRot = owner->GetTransform().GetOrientation().ToEuler();
 
@@ -602,8 +604,21 @@ Projectile* LevelLoader::SpawnProjectile(GameObject* owner, float pitch, int pla
 
 	float velocityDueToMovement = Vector3::Dot(camForwardVector, owner->GetPhysicsObject()->GetLinearVelocity());
 	
-	float angle1 = float((rand() % 200) - 100) / (66.67f);
-	float angle2 = float((rand() % 200) - 100) / (66.67f);
+	//#TODO
+	//Few sets of fixed random angle for normal firing (based on bullet counter placed in player class)
+	//Random spawn fine if multibullet powerup but increase spread
+	float angle1 = 0.f, angle2=0.f;
+	float angleArr[7] = { -1.f, 1.f, -0.2f, 0.3f, 0.7f, -0.8f, 1.5f};
+
+	if (NeedBulletSpread) {
+		angle1 = float((rand() % SPREAD_ANGLE_CONST) - SPREAD_ANGLE_CONST / 2) / (66.67f);
+		angle2 = float((rand() % SPREAD_ANGLE_CONST) - SPREAD_ANGLE_CONST / 2) / (66.67f);
+	}
+	else {
+		int index = ((Player*)owner)->BulletCounter % 7;
+		angle1 = angleArr[index];
+		angle2 = angleArr[6 - index];
+	}
 
 	if (velocityDueToMovement < 0.0f) velocityDueToMovement = 0.0f;
 

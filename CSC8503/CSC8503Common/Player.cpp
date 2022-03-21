@@ -87,8 +87,11 @@ float Player::CheckDistToGround()
 void Player::Fire() {
 	if (timeSincePrevShot > fireRate)
 	{
-		for(int i = 0; i < bulletsPerShot; ++i)
-			levelLoader->SpawnProjectile(this);
+		for (int i = 0; i < bulletsPerShot; ++i)
+		{
+			levelLoader->SpawnProjectile(this, ((currentPowerUp == PowerUpType::MultiBullet) || IsDead()));
+			++BulletCounter;
+		}
 		timeSincePrevShot = 0.0f;
 		fired = true;
 	}
@@ -109,6 +112,7 @@ bool Player::IsDead(){
 void Player::Respawn(){
 	GetTransform().SetPosition(spawnPos);
 	health = maxHealth;
+	BulletCounter = 0;
 }
 
 void Player::Reset() 
