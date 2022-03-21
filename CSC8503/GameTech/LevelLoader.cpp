@@ -141,7 +141,7 @@ void LevelLoader::ReadInLevelFile(std::string filename) {
 					AddWallHammerToWorld(Vec3FromStr(lineContents[1]), std::stoi(lineContents[2]));
 				}
 				else if (lineContents[0] == "PAINT_WALL") {
-					AddPaintWallToWorld(Vec3FromStr(lineContents[1]), Vector3(5, 5, 4), std::stoi(lineContents[2]), lineContents[0]);
+					AddPaintWallToWorld(Vec3FromStr(lineContents[1]), Vector3(5, 4.2, 4), std::stoi(lineContents[2]), lineContents[0]);
 				}
 			}
 		}
@@ -234,7 +234,7 @@ GameObject* LevelLoader::AddDummyPlayerToWorld(const Vector3& position)
 GameObject* LevelLoader::AddFloorToWorld(const Maths::Vector3& position) {
 	GameObject* floor = new GameObject("Floor", 1.5f);
 
-	Vector3 floorSize = Vector3(250, 1, 250);
+	Vector3 floorSize = Vector3(160, 1, 160);
 	AABBVolume* volume = new AABBVolume(floorSize);
 	floor->SetBoundingVolume((CollisionVolume*)volume);
 	floor->GetTransform()
@@ -319,7 +319,7 @@ GameObject* LevelLoader::AddLongWallToWorld(const Vector3& position, Vector3 dim
 	{
 		for (int i = -dimensions.z; i < dimensions.z; i += 10)
 		{
-			AddRenderPartToWorld(Vector3(position.x, position.y, position.z + i), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallAlertTex);
+			AddRenderPartToWorld(Vector3(position.x, position.y, position.z + i), Vector3(5, 4, 4), rotation, corridorWallStraight, corridorWallAlertTex);
 		}
 		return physicalObject;
 	}
@@ -327,7 +327,7 @@ GameObject* LevelLoader::AddLongWallToWorld(const Vector3& position, Vector3 dim
 	{
 		for (int i = -dimensions.x; i < dimensions.x; i += 10)
 		{
-			AddRenderPartToWorld(Vector3(position.x + i, position.y, position.z), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallAlertTex);
+			AddRenderPartToWorld(Vector3(position.x + i, position.y, position.z), Vector3(5, 4, 4), rotation, corridorWallStraight, corridorWallAlertTex);
 		}
 		return physicalObject;
 	}
