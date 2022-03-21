@@ -17,14 +17,11 @@ namespace NCL {
 			void SendPacket(GamePacket& payload);
 
 			void UpdateClient();
-		protected:
-			//void ThreadedUpdate();
 
+		protected:
 #ifndef ORBISNET
 			ENetPeer* netPeer;
 #endif
-			//std::atomic<bool>	threadAlive;
-			//std::thread			updateThread;
 		};
 	}
 }

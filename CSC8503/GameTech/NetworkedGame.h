@@ -64,7 +64,8 @@ namespace NCL {
 
 			void HandleClientPacket(ClientPacket* packet);
 			void AddNewPlayerToServer(int clientID, int lastID);
-			void Fire(GameObject* owner, float pitch, int clientID);
+			void ServerFire(GameObject* owner, float pitch, int bulletCounter, bool spread, int clientID);
+			void Fire(GameObject* owner, bool spread, int bulletCounter, float pitch, int clientID);
 
 			bool CheckExists(IDPacket* packet);
 
