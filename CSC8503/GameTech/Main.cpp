@@ -30,13 +30,10 @@ size_t       sceLibcHeapSize = 256 * 1024 * 1024;	/* Set up heap area upper limi
 #include "Thread.h"
 #include "MutexClass.h"
 
-vector<TutorialGame*> sharedGameBuffer;	// shared thread buffer
 bool doneLoading = true;	// shared thread buffer
-//LoadingScreen* ls;		// global shared load screen
 MutexClass mutex;		// global mutex object
-MainMenu* tmm;
-TutorialGame* ttg;
-NetworkedGame* tng;
+HDC mainHdc;
+HGLRC mainHglrc;
 
 class Loader : public Thread
 {
@@ -46,25 +43,30 @@ protected:
 	virtual void Run();
 	LoadingScreen* ls;
 };
-class MainMenuInitialiser : public Thread
-{
-protected:
-	virtual void Run();
-};
-class NetworkedGameInitialiser : public Thread
-{
-protected:
-	virtual void Run();
-};
-class SplitscreenGameInitialiser : public Thread
-{
-protected:
-	virtual void Run();
-};
+//class MainMenuInitialiser : public Thread
+//{
+//protected:
+//	virtual void Run();
+//};
+//class NetworkedGameInitialiser : public Thread
+//{
+//protected:
+//	virtual void Run();
+//};
+//class SplitscreenGameInitialiser : public Thread
+//{
+//protected:
+//	virtual void Run();
+//};
 
 void Loader::Run()
 {
 	bool done = false;
+
+	wglMakeCurrent(NULL, NULL);
+	HGLRC hglrc = wglCreateContext(wglGetCurrentDC());
+	wglMakeCurrent(wglGetCurrentDC(), hglrc);
+
 	while (!done)
 	{
 		mutex.LockMutex();
@@ -72,43 +74,48 @@ void Loader::Run()
 		{
 			done = true;
 			completed = true;
+			wglDeleteContext(hglrc);
 		}
 		else
 		{
+			//wglMakeCurrent(wglGetCurrentDC(), wglGetCurrentContext());
+			progression += 0.17f;
+			std::cout << "LOADING: " << progression << "%" << std::endl;
 			ls->UpdateProgress(progression);
+			ls->UpdateGame(0);
 		}
 		mutex.UnlockMutex();
 	}
 }
-void MainMenuInitialiser::Run()
-{
-	std::cout << "MAIN MENU INIT" << std::endl;
-	// TODO ---------------------------------------------------------------------------------------
-	// Attempt to make new MainMenu before locking mutex and passing variable to the global object
-	mutex.LockMutex();
-	tmm = new MainMenu();
-	mutex.UnlockMutex();
-	completed = true;
-	std::cout << "MAIN MENU FINISH" << std::endl;
-}
-void NetworkedGameInitialiser::Run()
-{
-	std::cout << "NETWORKED GAME INIT" << std::endl;
-	mutex.LockMutex();
-	tng = new NetworkedGame();
-	mutex.UnlockMutex();
-	completed = true;
-	std::cout << "NETWORKED GAME FINISH" << std::endl;
-}
-void SplitscreenGameInitialiser::Run()
-{
-	std::cout << "TUTORIAL GAME INIT" << std::endl;
-	mutex.LockMutex();
-	ttg = new TutorialGame();
-	mutex.UnlockMutex();
-	completed = true;
-	std::cout << "TUTORIAL GAME FINISH" << std::endl;
-}
+//void MainMenuInitialiser::Run()
+//{
+//	std::cout << "MAIN MENU INIT" << std::endl;
+//	// TODO ---------------------------------------------------------------------------------------
+//	// Attempt to make new MainMenu before locking mutex and passing variable to the global object
+//	mutex.LockMutex();
+//	tmm = new MainMenu();
+//	mutex.UnlockMutex();
+//	completed = true;
+//	std::cout << "MAIN MENU FINISH" << std::endl;
+//}
+//void NetworkedGameInitialiser::Run()
+//{
+//	std::cout << "NETWORKED GAME INIT" << std::endl;
+//	mutex.LockMutex();
+//	tng = new NetworkedGame();
+//	mutex.UnlockMutex();
+//	completed = true;
+//	std::cout << "NETWORKED GAME FINISH" << std::endl;
+//}
+//void SplitscreenGameInitialiser::Run()
+//{
+//	std::cout << "TUTORIAL GAME INIT" << std::endl;
+//	mutex.LockMutex();
+//	ttg = new TutorialGame();
+//	mutex.UnlockMutex();
+//	completed = true;
+//	std::cout << "TUTORIAL GAME FINISH" << std::endl;
+//}
 
 using namespace NCL;
 using namespace CSC8503;
@@ -201,7 +208,6 @@ public:
 	Menu(MainMenu* m, TutorialGame* g, NetworkedGame* h) : m(m), tg(g), ng(h) {};
 
 	PushdownResult OnUpdate(float dt, PushdownState** newState) override {
-		std::cout << "MENU" << std::endl;
 		m->UpdateGame(dt);
 
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM1)) {
@@ -239,61 +245,41 @@ public:
 	Loading(LoadingScreen* l) : ls(l) {};
 	PushdownResult OnUpdate(float dt, PushdownState** newState) override 
 	{
-		ls->UpdateGame(dt);
+		wglMakeCurrent(NULL, NULL);
 
 		if (!threadMade)
 		{
 			doneLoading = false;
 			loadThread.AssignLoadScreen(ls);
 			loadThread.Start();
-			menuThread.Start();
-			networkedThread.Start();
-			splitscreenThread.Start();
 			threadMade = true;
 		}
 
-		if (menuThread.GetThreadState())
-		{
-			loadThread.AddToThreadProgress(33.0f);
-			mutex.LockMutex();
-			m = &(*tmm);
-			mutex.UnlockMutex();
-			menuLoaded = true;
-		}
+		//ls->UpdateGame(dt);
 
-		if (networkedThread.GetThreadState())
-		{
-			loadThread.AddToThreadProgress(33.0f);
-			mutex.LockMutex();
-			ng = &(*tng);
-			mutex.UnlockMutex();
-			networkLoaded = true;
-		}
+		m = new MainMenu();
+		ls->UpdateProgress(33.3f);
+		//ls->UpdateGame(dt);
 
-		if (splitscreenThread.GetThreadState())
-		{
-			loadThread.AddToThreadProgress(33.0f);
-			mutex.LockMutex();
-			tg = &(*ttg);
-			mutex.UnlockMutex();
-			splitscreenLoaded = true;
-		}
+		ng = new NetworkedGame();
+		ls->UpdateProgress(66.6f);
+		//ls->UpdateGame(dt);
 
+		tg = new TutorialGame();
+		ls->UpdateProgress(99.9f);
+		//ls->UpdateGame(dt);
 
-		if (menuLoaded && networkLoaded && splitscreenLoaded)
-		{
-			mutex.LockMutex();
-			doneLoading = true;
-			mutex.UnlockMutex();
+		mutex.LockMutex();
+		doneLoading = true;
+		mutex.UnlockMutex();
 
-			loadThread.Join();
-			menuThread.Join();
-			networkedThread.Join();
-			splitscreenThread.Join();
+		//loadThread.Join();
 
-			goToMenu = true;
-		}
-		
+		goToMenu = true;
+				
+		//wglMakeCurrent(mainHdc, mainHglrc);
+		wglMakeCurrent(wglGetCurrentDC(), wglGetCurrentContext());
+
 		if (goToMenu)
 		{
 			*newState = new Menu(m, tg, ng);
@@ -308,9 +294,6 @@ protected:
 	bool goToMenu = false;
 
 	Loader loadThread;
-	MainMenuInitialiser menuThread;
-	NetworkedGameInitialiser networkedThread;
-	SplitscreenGameInitialiser splitscreenThread;
 
 	bool menuLoaded = false;
 	bool networkLoaded = false;
@@ -338,6 +321,8 @@ hide or show the
 int main() {
 #ifdef _WIN64
 	Window* w = Window::CreateGameWindow("CSC8503 Game technology!", 1280, 720);
+	mainHdc = wglGetCurrentDC();
+	mainHglrc = wglGetCurrentContext();
 #endif
 #ifdef _ORBIS
 	Window* w = (PS4Window*)Window::CreateGameWindow("PS4 Example Code", 1920, 1080);
