@@ -16,10 +16,6 @@ namespace NCL {
 					if (player->GetCurrentPowerup() != PowerUpType::None) return;
 					((Player*)otherObject)->IncreaseHealth(healthTake);
 					
-					IsPicked = true;
-					reappearAfter = REAPPEAR_AFTER_DURATION;
-
-					GetRenderObject()->SetVisibility(false);
 					PickUp();
 				}
 			}
