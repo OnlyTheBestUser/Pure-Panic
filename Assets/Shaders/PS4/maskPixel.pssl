@@ -40,22 +40,20 @@ struct VS_OUTPUT
 	float2 UV			: TEXCOORD0;
 };
 
+float mask(float2 _position, float2 _center, float _radius, float _hardness){
+    float m = distance(_center, _position);
+    return 1 - smoothstep(_radius * _hardness, _radius, m);    
+}
+
 float4 main(VS_OUTPUT In) : S_TARGET_OUTPUT
 {
-	float4 albedo = float4(0,0,0,0);
-
-	float avgScale = (m_textureScale.x + m_textureScale.y + m_textureScale.z) / 3;
-
-	float m = distance(In.Position / m_viewport, m_uvHitPoint);
-    float f = 1 - smoothstep(m_radius/avgScale * m_hardness, m_radius/avgScale, m);  
-
+	float f = mask(In.Position.xy / m_viewport, m_uvHitPoint, m_radius/100, m_hardness);
     float edge = f * m_strength;
 
-    albedo.rgb = lerp(albedo.rgb, m_colour.rgb, edge);
-	if (albedo.rgb == float3(0,0,0)){
+    float4 albedo = lerp(float4(0,0,0,0), m_colour, edge);
+	if (albedo.a == 0){
 		discard;
 	}
-    albedo.a = 1;
 
 	//albedo.rgb = float3(1,0,1);
 

@@ -359,6 +359,15 @@ void NCL::PS4::PS4RendererAPI::SetBlend(bool b, BlendType srcFunc, BlendType dst
 		case BlendType::ALPHA:
 			return Gnm::BlendMultiplier::kBlendMultiplierSrcAlpha;
 			break;
+		case BlendType::ONE_MINUS_ALPHA:
+			return Gnm::BlendMultiplier::kBlendMultiplierOneMinusSrcAlpha;
+			break;
+		case BlendType::SRC_COLOR:
+			return Gnm::BlendMultiplier::kBlendMultiplierSrcColor;
+			break;
+		case BlendType::ONE_MINUS_SRC_COLOR:
+			return Gnm::BlendMultiplier::kBlendMultiplierOneMinusSrcColor;
+			break;
 		default:
 			break;
 		}

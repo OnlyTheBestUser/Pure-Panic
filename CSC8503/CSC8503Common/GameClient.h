@@ -20,7 +20,9 @@ namespace NCL {
 		protected:
 			//void ThreadedUpdate();
 
+#ifndef ORBISNET
 			ENetPeer* netPeer;
+#endif
 			//std::atomic<bool>	threadAlive;
 			//std::thread			updateThread;
 		};

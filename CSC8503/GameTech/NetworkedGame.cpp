@@ -80,6 +80,7 @@ void NetworkedGame::UpdateGame(float dt) {
 		timeToNextPacket += 1.0f / 60.0f; //60hz server/client update
 	}
 
+#ifndef ORBISNET
 	if (!thisServer && Window::GetKeyboard()->KeyPressed(KeyboardKeys::F9)) {
 		StartAsServer();
 		std::cout << "Server start" << std::endl;
@@ -88,6 +89,7 @@ void NetworkedGame::UpdateGame(float dt) {
 		StartAsClient(127, 0, 0, 1);
 		std::cout << "Client start" << std::endl;
 	}
+#endif
 
 	for (auto x : powerups) {
 		if (x->IsPickedUp()) {
@@ -96,8 +98,10 @@ void NetworkedGame::UpdateGame(float dt) {
 			powerUpPacket.clientID = playerID;
 			if(thisClient)
 				thisClient->SendPacket(powerUpPacket);
+#ifndef ORBISNET
 			if (thisServer)
 				thisServer->SendGlobalPacket(powerUpPacket);
+#endif
 		}
 	}
 
@@ -112,7 +116,9 @@ void NetworkedGame::UpdateAsServer(float dt) {
 		FirePacket* newPacket = new FirePacket();
 		newPacket->clientID = localPlayer->GetNetworkObject()->GetNetID();
 		newPacket->pitch = localPlayer->GetCam()->GetPitch();
+#ifndef ORBISNET
 		thisServer->SendGlobalPacket(*newPacket);
+#endif
 		delete newPacket;
 	}
 
@@ -160,7 +166,9 @@ void NetworkedGame::BroadcastSnapshot() {
 
 		GamePacket* newPacket = nullptr;
 		if (o->WritePacket(&newPacket)) {
+#ifndef ORBISNET
 			thisServer->SendGlobalPacket(*newPacket);
+#endif
 			delete newPacket;
 		}
 	}
@@ -283,7 +291,9 @@ void NetworkedGame::Fire(GameObject* owner, float pitch, int clientID)
 	FirePacket newPacket;
 	newPacket.clientID = clientID;
 	newPacket.pitch = pitch;
+#ifndef ORBISNET
 	thisServer->SendGlobalPacket(newPacket); 
+#endif
 }
 
 void NetworkedGame::HandleFullState(FullPacket* packet)
@@ -362,7 +372,9 @@ void NetworkedGame::HandlePowerUp(PowerUpPacket* packet)
 	}
 
 	if (thisServer) {
+#ifndef ORBISNET
 		thisServer->SendGlobalPacket(*(GamePacket*)packet);
+#endif
 	}
 }
 
