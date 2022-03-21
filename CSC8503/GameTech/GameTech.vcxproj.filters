@@ -1,18 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Main.cpp" />
-    <ClCompile Include="MainMenu.cpp" />
-    <ClCompile Include="NetworkedGame.cpp" />
-    <ClCompile Include="NetworkedPlayer.cpp" />
-    <ClCompile Include="Renderer.cpp" />
-    <ClCompile Include="RendererBase.cpp" />
-    <ClCompile Include="TutorialGame.cpp" />
-    <ClCompile Include="LevelLoader.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="TutorialGame.cpp">
-    </ClCompile>
     <ClCompile Include="Renderer.cpp">
       <Filter>Renderers</Filter>
     </ClCompile>
@@ -39,6 +27,7 @@
     </ClCompile>
     <ClCompile Include="RendererBase.cpp">
       <Filter>Renderers</Filter>
+    </ClCompile>
     <ClCompile Include="TutorialGame.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
