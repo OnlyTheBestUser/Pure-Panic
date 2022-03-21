@@ -370,6 +370,34 @@ GameObject* LevelLoader::AddPaintWallToWorld(const Vector3& position, Vector3 di
 	return cube;
 }
 
+GameObject* LevelLoader::AddAssetToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture, const Vector3& phyLocation, const Vector3& phyDimensions, const float& paintRad, const string& name) {
+	GameObject* cube = new GameObject(name, paintRad);
+	AABBVolume* volume = new AABBVolume(phyDimensions);
+	cube->SetBoundingVolume((CollisionVolume*)volume);
+
+	cube->GetTransform()
+		.SetPosition(position)
+		.SetScale(dimensions * 2)
+		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0))
+		.SetOffset(phyLocation - position);
+
+#ifdef _WIN64
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, OGLTexture::RGBATextureEmpty(texture->GetWidth() / 16, texture->GetHeight() / 16), basicShader));
+#endif
+#ifdef _ORBIS
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, basicShader));
+#endif
+
+	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
+	cube->GetPhysicsObject()->SetInverseMass(0.0f);
+	cube->GetPhysicsObject()->InitCubeInertia();
+
+	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	cube->GetPhysicsObject()->SetDynamic(false);
+	world->AddGameObject(cube);
+	return cube;
+}
+
 void LevelLoader::AddCornerWallToWorld(const Vector3& position, Vector3 dimensions, int rotation)
 {
 	Vector3 location = position + Vector3(0, 15, 0);
@@ -413,9 +441,8 @@ void LevelLoader::AddSecurityCameraToWorld(const Vector3& position, int rotation
 		location += Vector3(4, 0, 0);
 	}
 
-	GameObject* physicalObject = AddAABBWallToWorld(location, dimensions, rotation, "Security Camera");
-	physicalObject->GetPhysicsObject()->Sleep();
-	AddRenderPartToWorld(position, Vector3(5, 5, 5), rotation, securityCamera, securityCameraTex);
+	AddAssetToWorld(position, Vector3(5, 5, 5), rotation, securityCamera, securityCameraTex, location, dimensions, 10.f, "Security Camera")
+		->GetPhysicsObject()->Sleep();
 	return;
 }
 
@@ -444,9 +471,8 @@ void LevelLoader::AddWallHammerToWorld(const Vector3& position, int rotation)
 		location += Vector3(5.5, 0, -0.25);
 	}
 
-	GameObject* physicalObject = AddAABBWallToWorld(location, dimensions, rotation, "Wall Hammer");
-	physicalObject->GetPhysicsObject()->Sleep();
-	AddRenderPartToWorld(position, Vector3(10, 10, 6), rotation, corridorWallHammer, corridorWallHammerTex);
+	AddAssetToWorld(position, Vector3(10, 10, 6), rotation, corridorWallHammer, corridorWallHammerTex, location, dimensions, 10.f, "Wall Hammer")
+		->GetPhysicsObject()->Sleep();
 	return;
 }
 
