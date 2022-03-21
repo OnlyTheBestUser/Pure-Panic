@@ -12,7 +12,6 @@ void Timer::Update(const float& dt) {
 		}
 	}
 	else if (state == TimerStates::Ended) {
-		Debug::Print("Game Ended", Vector2(30.0f, 50.0f), 50.0f, Debug::RED);
 	}
 	Debug::Print(std::to_string(int(timeLeft)), Vector2(92.0f, 10.0f), 30.0f, Debug::BLACK);
 }
