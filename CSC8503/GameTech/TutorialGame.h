@@ -4,7 +4,7 @@
 #include "../CSC8503Common/Player.h"
 #include "../CSC8503Common/AudioManager.h"
 #include "../CSC8503Common/BGMManager.h"
-#include "..//CSC8503Common/Timer.h"
+#include "../CSC8503Common/GameManager.h"
 //#include "../CSC8503Common/Projectile.h"
 
 namespace NCL {
@@ -38,6 +38,7 @@ namespace NCL {
 				state = RESET;
 				quit = false;
 				pause = false;
+				InitialiseAssets();
 			}
 
 			bool Win() const { 
@@ -76,8 +77,14 @@ namespace NCL {
 			void DebugDrawVelocity(const Vector3& vel, Transform* worldTransform);
 			void DebugDrawObjectInfo(const GameObject* obj);
 			void UpdateBGM();
+			void UpdateScores(float dt);
 
 			StateGameObject* testStateObject;
+			int currentObj;
+
+
+
+			float timeSinceLastScoreUpdate;
 
 			Renderer*			renderer;
 			PhysicsSystem*		physics;
@@ -85,8 +92,10 @@ namespace NCL {
 			NCL::AudioManager*		audio;
 			BGMManager*	bgm;
 			LevelLoader*		levelLoader;
+			vector<PowerUp*>	powerups;
 
 			GameState state;
+			GameManager* gameManager;
 
 			void UpdateGameWorld(float dt);
 			void UpdatePauseScreen(float dt);
@@ -105,7 +114,7 @@ namespace NCL {
 			bool won = false;
 			Player* player1 = nullptr;
 
-			Timer* timer;
+			vector<Vector3> playerSpawnPositions;
 		};
 	}
 }

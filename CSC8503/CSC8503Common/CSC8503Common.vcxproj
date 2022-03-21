@@ -114,7 +114,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">
     <IncludePath>$(IncludePath)</IncludePath>
-    <IncludePath>$(SolutionDir)ORBIS_Debug;$(IncludePath);$(SolutionDir)Plugins\FMod\PS4\api\core\inc\;$(SolutionDir)Plugins\FMod\PS4\api\studio\inc\</IncludePath>
+    <IncludePath>$(SolutionDir)ORBIS_Debug;$(IncludePath);$(SolutionDir)Plugins\FMod\PS4\api\core\inc\;$(SolutionDir)Plugins\FMod\PS4\api\studio\inc\;$(SolutionDir)\Plugins\Networking-ENet\include</IncludePath>
     <LibraryPath>$(SolutionDir)ORBIS_Debug;$(SolutionDir)Plugins\FMod\PS4\api\core\lib\;$(SolutionDir)Plugins\FMod\PS4\api\studio\lib\;</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -224,12 +224,13 @@
     <ClInclude Include="FIreRate.h" />
     <ClInclude Include="GameActor.h" />
     <ClInclude Include="GameClient.h" />
+    <ClInclude Include="GameManager.h" />
     <ClInclude Include="GameServer.h" />
     <ClInclude Include="Heal.h" />
     <ClInclude Include="InputBase.h" />
     <ClInclude Include="InputHandler.h" />
-    <ClInclude Include="MoveForwardCommand.h" />
     <ClInclude Include="InputList.h" />
+    <ClInclude Include="MultiBullet.h" />
     <ClInclude Include="NavigationGrid.h" />
     <ClInclude Include="NavigationMap.h" />
     <ClInclude Include="NavigationMesh.h" />
@@ -272,6 +273,7 @@
     <ClCompile Include="CollisionDetection.cpp" />
     <ClCompile Include="Debug.cpp" />
     <ClCompile Include="GameClient.cpp" />
+    <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameServer.cpp" />
     <ClCompile Include="GameWorld.cpp" />

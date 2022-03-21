@@ -5,23 +5,23 @@
 
 namespace NCL {
 	namespace CSC8503 {
-		class SpeedBoost : public PowerUp
-		{
+		class MultiBullet : public PowerUp {
 		public:
-			SpeedBoost(float speedIncreasedBy = 1.5f) : PowerUp(PowerUpType::SpeedBoost), increaseInSpeed(speedIncreasedBy) {}
+			MultiBullet(const int& NoOfBullets = 5) : PowerUp(PowerUpType::MultiBullet), BulletsPerShot(NoOfBullets) {}
 
 			void OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vector3 localB, Vector3 normal) override {
 				if (!IsPicked && otherObject->GetName() == "Player") {
-					
+
 					Player* player = ((Player*)otherObject);
 					if (player->GetCurrentPowerup() != PowerUpType::None) return;
-					((Player*)otherObject)->IncreaseSpeed(increaseInSpeed, powerupDuration);
-					
+					((Player*)otherObject)->ActivateMultiBullet(BulletsPerShot, powerupDuration);
+
 					PickUp();
 				}
 			}
+
 		private:
-			float increaseInSpeed;
+			int BulletsPerShot;
 		};
 	}
 }

@@ -1,5 +1,4 @@
 #pragma once
-#ifndef _ORBIS
 #include "NetworkBase.h"
 #include <stdint.h>
 #include <thread>
@@ -27,5 +26,4 @@ namespace NCL {
 		};
 	}
 }
-#endif
 

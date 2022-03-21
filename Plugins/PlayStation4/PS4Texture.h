@@ -16,6 +16,7 @@ namespace NCL::PS4 {
 		~PS4Texture();
 
 		virtual void Bind(int slot = 0) const override;
+		virtual void ResetTexture() override;
 
 		static PS4Texture* EmptyTex(int width, int height);
 		static PS4Texture* GenTexFromBuffer(const sce::Gnm::RenderTarget& fbo);

@@ -187,6 +187,15 @@ void OGLRendererAPI::SetBlend(bool b, RendererAPI::BlendType srcFunc, BlendType 
 		case BlendType::ALPHA:
 			return GL_SRC_ALPHA;
 			break;
+		case BlendType::ONE_MINUS_ALPHA:
+			return GL_ONE_MINUS_SRC_ALPHA;
+			break;
+		case BlendType::SRC_COLOR:
+			return GL_SRC_COLOR;
+			break;
+		case BlendType::ONE_MINUS_SRC_COLOR:
+			return GL_ONE_MINUS_SRC_COLOR;
+			break;
 		default:
 			break;
 		}

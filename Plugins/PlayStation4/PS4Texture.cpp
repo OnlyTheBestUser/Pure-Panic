@@ -58,6 +58,10 @@ PS4Texture* NCL::PS4::PS4Texture::GenTexFromBuffer(const sce::Gnm::RenderTarget&
 	return tex;
 }
 
+void PS4Texture::ResetTexture() {
+
+}
+
 PS4Texture* PS4Texture::LoadTextureFromFile(const std::string& filename) {
 	std::ifstream file(filename, std::ios::binary);
 
