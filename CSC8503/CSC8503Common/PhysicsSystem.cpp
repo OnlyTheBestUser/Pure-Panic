@@ -349,6 +349,7 @@ void PhysicsSystem::BroadPhase() {
 			for (auto j = list.begin(); j != list.end(); j++) {
 				info.a = std::min((*i).object, (*j).object);
 				info.b = std::max((*i).object, (*j).object);
+
 				if (ValidCollisionLayers(info.a->GetCollisionLayers(), info.b->GetCollisionLayers())) {
 					broadphaseCollisions.insert(info);
 				}

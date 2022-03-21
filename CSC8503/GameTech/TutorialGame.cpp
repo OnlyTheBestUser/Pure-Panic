@@ -21,8 +21,9 @@ TutorialGame::TutorialGame()	{
 	world			= new GameWorld();
 	renderer		= new Renderer(*world);
 	physics			= new PhysicsSystem(*world);
-	levelLoader		= new LevelLoader(world, physics, renderer);
+	levelLoader		= new LevelLoader(physics, renderer);
 	gameManager		= new GameManager(this);
+	
 #ifndef _ORBIS
 	audio = NCL::AudioManager::GetInstance();
 	audio->Initialize();
@@ -40,8 +41,6 @@ TutorialGame::TutorialGame()	{
 	physics->UseGravity(useGravity);
 
 	inSelectionMode = false;
-
-	testStateObject = nullptr;
 
 	state = PLAY;
 
@@ -87,28 +86,23 @@ TutorialGame::TutorialGame()	{
 	Command* toggleDebug = new ToggleBoolCommand(&debugDraw);
 	Command* togglePause = new ToggleBoolCommand(&pause);
 	Command* toggleMouse = new ToggleMouseCommand(&inSelectionMode);
+	Command* resetWorld = new ResetWorldCommand(&state);
 	Command* quitCommand = new QuitCommand(&quit, &pause);
 	//Command* paintFireCommand = new PaintFireCommand(this);
 	Command* startTimer = new StartTimerCommand(gameManager->GetTimer());
+	
 	inputHandler->BindButton(TOGGLE_GRAV, toggleGrav);
 	inputHandler->BindButton(TOGGLE_DEBUG, toggleDebug);
 	inputHandler->BindButton(TOGGLE_PAUSE, togglePause);
+	inputHandler->BindButton(RESET_WORLD, resetWorld);
 	inputHandler->BindButton(QUIT, quitCommand);
 	//inputHandler->BindButton(FIRE, paintFireCommand);
 	inputHandler->BindButton(TOGGLE_MOUSE, toggleMouse);
 	inputHandler->BindButton(START_TIMER, startTimer);
 
 #pragma endregion
-
-	InitialiseAssets();
 }
-/*
 
-Each of the little demo scenarios used in the game uses the same 2 meshes,
-and the same texture and shader. There's no need to ever load in anything else
-for this module, even in the coursework, but you can add it if you like!
-
-*/
 void TutorialGame::InitialiseAssets() {
 	InitCamera();
 	InitWorld();
@@ -132,6 +126,7 @@ void TutorialGame::UpdateGame(float dt) {
 		InitWorld();
 		renderer->ClearPaint();
 		selectionObject = nullptr;
+		state = PLAY;
 		break;
 	}
 	}
@@ -352,13 +347,8 @@ void TutorialGame::InitWorld() {
 	physics->Clear();
 
 	levelLoader->ReadInLevelFile(NCL::Assets::DATADIR + "../../Assets/Maps/map1.txt");
-  
-	Player* player = levelLoader->AddPlayerToWorld(Vector3(0, 5, 0)); // #TODO Use playerSpawnPositions 
-	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 20), PowerUpType::SpeedBoost);
-	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 30), PowerUpType::FireRate);
-	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 40), PowerUpType::Heal);
-	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 50), PowerUpType::MultiBullet);
-
+	Player* player = levelLoader->SpawnPlayer(Vector3(0, 5, 0));
+	
 	AxisCommand* m = new MoveCommand(player);
 	inputHandler->BindAxis(0, m);
 
@@ -377,13 +367,11 @@ void TutorialGame::InitWorld() {
 	Command* f = new FireCommand(player);
 	inputHandler->BindButton(FIRE, f);
 
-	/*GameObject* cap1 = levelLoader->AddCapsuleToWorld(Vector3(15, 15, 0), 3.0f, 1.5f);
+	/*GameObject* cap1 = LevelLoader->AddCapsuleToWorld(Vector3(15, 15, 0), 3.0f, 1.5f);
 	cap1->GetPhysicsObject()->SetDynamic(true);
 	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);*/
 
 	player1 = player;
-
-	//Projectile* spit = AddProjectileToWorld(Vector3(5, 5, 0), 0.3f, 1.0f);
 
 	physics->BuildStaticList();
 }

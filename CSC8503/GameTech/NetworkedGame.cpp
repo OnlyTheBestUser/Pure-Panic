@@ -10,7 +10,7 @@
 using namespace NCL;
 using namespace CSC8503;
 
-NetworkedGame* NetworkedGame::instance = nullptr;
+NetworkedGame* NetworkedGame::singleton = nullptr;
 
 struct MessagePacket : public GamePacket {
 	short playerID;
@@ -31,10 +31,9 @@ NetworkedGame::NetworkedGame() {
 	timeToNextPacket = 0.0f;
 	packetsToSnapshot = 0;
 
-	instance = this;
+	singleton = this;
 
-	// Create commands to start game
-	
+	InitialiseAssets();
 }
 
 NetworkedGame::~NetworkedGame() {
@@ -86,7 +85,7 @@ void NetworkedGame::UpdateGame(float dt) {
 		std::cout << "Server start" << std::endl;
 	}
 	if (!thisClient && Window::GetKeyboard()->KeyPressed(KeyboardKeys::F10)) {
-		StartAsClient(10, 70, 32, 241);
+		StartAsClient(127, 0, 0, 1);
 		std::cout << "Client start" << std::endl;
 	}
 
@@ -169,9 +168,17 @@ void NetworkedGame::BroadcastSnapshot() {
 
 void NetworkedGame::SpawnPlayer() {
 	localPlayer = player1;
-	localPlayer->SetNetworkObject(new NetworkObject(*localPlayer, playerID, world));
+#ifndef _ORBIS
+	localPlayer->SetNetworkObject(new NetworkObject(*localPlayer, playerID));
+#endif
 	localPlayer->GetPhysicsObject()->SetDynamic(true);
-	localPlayer->GetTransform().SetPosition(Vector3(playerID * 5, 10, 0));
+
+	int index = playerID == 0 ? 0 : playerID % spawnPoints.size();
+	
+	Vector3 spawnPos = spawnPoints[index];
+
+	localPlayer->GetTransform().SetPosition(spawnPos);
+	localPlayer->SetSpawn(spawnPos);
 }
 
 void NetworkedGame::StartLevel() {
@@ -191,30 +198,30 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
 	//CLIENT version of the game will receive these from the servers
 	// Connection / Initialisation packets
 	switch (type) {
-	case(Assign_ID):
-		HandleAssignID((AssignIDPacket*)payload);
-		return;
-	case(Player_Connected):
-		HandlePlayerConnect((NewPlayerPacket*)payload);
-		return;
-	case(Player_Disconnected):
-		HandlePlayerDisconnect((PlayerDisconnectPacket*)payload);
-		return;
+		case(Assign_ID):
+			HandleAssignID((AssignIDPacket*)payload);
+			return;
+		case(Player_Connected):
+			HandlePlayerConnect((NewPlayerPacket*)payload);
+			return;
+		case(Player_Disconnected):
+			HandlePlayerDisconnect((PlayerDisconnectPacket*)payload);
+			return;
 	}
 
 	if (!CheckExists((IDPacket*)payload))
 		return;
 
 	switch (type) {
-	case(Full_State):
-		HandleFullState((FullPacket*)payload);
-		return;
-	case(Fire_State):
-		HandleFireState((FirePacket*)payload);
-		return;
-	case(PowerUp_State):
-		HandlePowerUp((PowerUpPacket*)payload);
-		return;
+		case(Full_State):
+			HandleFullState((FullPacket*)payload);
+			return;
+		case(Fire_State):
+			HandleFireState((FirePacket*)payload);
+			return;
+		case(PowerUp_State):
+			HandlePowerUp((PowerUpPacket*)payload);
+			return;
 	}
 
 }
@@ -257,8 +264,8 @@ void NetworkedGame::AddNewPlayerToServer(int clientID, int lastID)
 {
 	clientHistory.insert(std::pair<int, int>(clientID, lastID));
 
-	GameObject* client = levelLoader->AddDummyPlayerToWorld(Vector3(clientID * 5, 10, 0));
-	client->SetNetworkObject(new NetworkObject(*client, clientID, world));
+	GameObject* client = LevelLoader::SpawnDummyPlayer(Vector3(clientID * 5, 10, 0));
+	client->SetNetworkObject(new NetworkObject(*client, clientID));
 	client->GetPhysicsObject()->SetDynamic(true);
 	client->GetPhysicsObject()->SetGravity(false);
 
@@ -272,7 +279,7 @@ void NetworkedGame::AddNewPlayerToServer(int clientID, int lastID)
 
 void NetworkedGame::Fire(GameObject* owner, float pitch, int clientID)
 {
-	levelLoader->SpawnProjectile(owner, pitch, clientID);
+	LevelLoader::SpawnProjectile(owner, pitch, clientID);
 	FirePacket newPacket;
 	newPacket.clientID = clientID;
 	newPacket.pitch = pitch;
@@ -290,7 +297,7 @@ void NetworkedGame::HandleFullState(FullPacket* packet)
 	}
 }
 
-bool NCL::CSC8503::NetworkedGame::CheckExists(IDPacket* packet)
+bool NetworkedGame::CheckExists(IDPacket* packet)
 {
 	if (packet->clientID == playerID)
 		return false;
@@ -298,10 +305,10 @@ bool NCL::CSC8503::NetworkedGame::CheckExists(IDPacket* packet)
 		networkObjects.resize(packet->clientID + 1);
 	}
 	if (!networkObjects[packet->clientID]) {
-		GameObject* p = levelLoader->AddDummyPlayerToWorld(Vector3(packet->clientID * 5, 10, 0));
+		GameObject* p = LevelLoader::SpawnDummyPlayer(Vector3(packet->clientID * 5, 10, 0));
 		p->GetPhysicsObject()->SetDynamic(true);
 		p->GetPhysicsObject()->SetGravity(false);
-		p->SetNetworkObject(new NetworkObject(*p, packet->clientID, world));
+		p->SetNetworkObject(new NetworkObject(*p, packet->clientID));
 		networkObjects[packet->clientID] = p->GetNetworkObject();
 	}
 	return true;
@@ -313,13 +320,14 @@ void NetworkedGame::HandleFireState(FirePacket* packet)
 		return;
 	auto obj = networkObjects[packet->clientID];
 	if (obj)
-		levelLoader->SpawnProjectile(&obj->object, packet->pitch, packet->clientID);
+		LevelLoader::SpawnProjectile(&obj->object, packet->pitch, packet->clientID);
 }
 
 void NetworkedGame::HandleAssignID(AssignIDPacket* packet)
 {
 	std::cout << "ID Assigned: " << packet->clientID << std::endl;
 	playerID = packet->clientID;
+
 	SpawnPlayer();
 	localPlayer->SetPlayerID(playerID);
 }
@@ -330,8 +338,8 @@ void NetworkedGame::HandlePlayerConnect(NewPlayerPacket* packet)
 	std::cout << "_Player ID: " << packet->clientID << std::endl;
 
 	if (packet->clientID != playerID) {
-		GameObject* newPlayer = levelLoader->AddDummyPlayerToWorld(Vector3(10, 15, 10));
-		newPlayer->SetNetworkObject(new NetworkObject(*newPlayer, packet->clientID, world));
+		GameObject* newPlayer = LevelLoader::SpawnDummyPlayer(Vector3(10, 15, 10));
+		newPlayer->SetNetworkObject(new NetworkObject(*newPlayer, packet->clientID));
 		newPlayer->GetPhysicsObject()->SetDynamic(true);
 		std::cout << "Player Spawned with Network ID: " << newPlayer->GetNetworkObject()->GetNetID() << "." << std::endl;
 		if (!(packet->clientID < networkObjects.size())) {

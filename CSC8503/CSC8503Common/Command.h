@@ -3,7 +3,6 @@
 #include "PhysicsSystem.h"
 #include "InputBase.h"
 #include "../GameTech/TutorialGame.h"
-
 #include "Timer.h"
 
 namespace NCL {
@@ -21,7 +20,6 @@ namespace NCL {
 		};
 
 #pragma region Actor Commands
-
 		class MoveCommand : public AxisCommand {
 		public:
 			MoveCommand(GameActor* actor) : actor(actor){};
@@ -99,7 +97,6 @@ namespace NCL {
 		protected:
 			GameActor* actor;
 		};
-
 #pragma endregion
 
 #pragma region World Commands
@@ -150,6 +147,17 @@ namespace NCL {
 			protected:
 				bool* paused;
 				bool* quit;
+		};
+
+		class ResetWorldCommand : public Command {
+		public:
+			ResetWorldCommand(GameState* s) : state(s) {};
+			virtual ~ResetWorldCommand() {};
+			void execute() {
+				*state = RESET;
+			}
+		protected:
+			GameState* state;
 		};
 
 		class ToggleMouseCommand : public Command {

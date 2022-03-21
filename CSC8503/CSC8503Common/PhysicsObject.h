@@ -60,7 +60,6 @@ namespace NCL {
 
 			void AddTorque(const Vector3& torque);
 
-
 			void ClearForces();
 
 			void SetLinearVelocity(const Vector3& v) {
