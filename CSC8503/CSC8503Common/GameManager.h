@@ -35,6 +35,10 @@ namespace NCL {
 				return timer;
 			}
 
+			bool IsTimerFinished() {
+				return timer->GetState() == TimerStates::Ended;
+			}
+
 			void UpdateScores(Vector2 scores);
 
 			Vector2 CalcCurrentScoreRatio();

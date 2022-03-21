@@ -69,6 +69,7 @@ namespace NCL {
 			bool CheckExists(IDPacket* packet);
 
 			void HandleFullState(FullPacket* packet);
+			void HandleGameState(GameStatePacket* packet);
 			void HandleFireState(FirePacket* packet);
 			void HandleAssignID(AssignIDPacket* packet);
 			void HandlePlayerConnect(NewPlayerPacket* packet);

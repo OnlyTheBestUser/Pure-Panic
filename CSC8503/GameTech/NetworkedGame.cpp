@@ -65,7 +65,7 @@ void NetworkedGame::StartAsClient(char a, char b, char c, char d) {
 	thisClient->RegisterPacketHandler(Player_Disconnected, this);
 	thisClient->RegisterPacketHandler(Assign_ID, this);
 	thisClient->RegisterPacketHandler(PowerUp_State, this);
-
+	thisClient->RegisterPacketHandler(Game_State, this);
 }
 
 void NetworkedGame::UpdateGame(float dt) {
@@ -115,6 +115,19 @@ void NetworkedGame::UpdateAsServer(float dt) {
 		thisServer->SendGlobalPacket(*newPacket);
 		delete newPacket;
 	}
+
+	if (gameManager->IsTimerFinished()) {
+		GameStatePacket* newPacket = new GameStatePacket();
+
+		newPacket->gameover = true;
+
+		Vector2 scores = gameManager->CalcCurrentScoreRatio();
+		newPacket->team1Score = scores.x;
+		newPacket->team2Score = scores.y;
+
+		thisServer->SendGlobalPacket(*newPacket);
+	}
+
 
 	BroadcastSnapshot();
 }
@@ -182,8 +195,9 @@ void NetworkedGame::SpawnPlayer() {
 }
 
 void NetworkedGame::StartLevel() {
-	// Reset the level
-	// Start timer
+	gameManager->StartRound();
+
+
 }
 
 void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
@@ -206,6 +220,9 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
 			return;
 		case(Player_Disconnected):
 			HandlePlayerDisconnect((PlayerDisconnectPacket*)payload);
+			return;
+		case(Game_State):
+			HandleGameState((GameStatePacket*)payload);
 			return;
 	}
 
@@ -294,6 +311,12 @@ void NetworkedGame::HandleFullState(FullPacket* packet)
 	if (packet->clientID < (int)networkObjects.size()) {
 		if (networkObjects[packet->clientID])
 			networkObjects[packet->clientID]->ReadPacket(*packet);
+	}
+}
+
+void NetworkedGame::HandleGameState(GameStatePacket* packet) {
+	if (packet->gameover) {
+		Debug::Print("Game Ended", Vector2(30.0f, 50.0f), 50.0f, Debug::RED);
 	}
 }
 

@@ -15,6 +15,18 @@ namespace NCL {
 			}
 		};
 
+
+		struct GameStatePacket : public GamePacket {
+			bool	gameover;
+			float	team1Score;
+			float	team2Score;
+
+			GameStatePacket() {
+				type = Game_State;
+				size = sizeof(GameStatePacket) - sizeof(GamePacket);
+			}
+		};
+
 		struct FirePacket : public IDPacket {
 			float	pitch;
 
