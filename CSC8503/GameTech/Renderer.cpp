@@ -265,7 +265,7 @@ void NCL::Rendering::Renderer::ClearPaint()
 	cur = start;
 
 	while (cur != end) {
-		(*cur)->GetRenderObject()->SetMaskTexture(OGLTexture::RGBATextureEmpty((*cur)->GetRenderObject()->GetDefaultTexture()->GetWidth() / 16, (*cur)->GetRenderObject()->GetDefaultTexture()->GetHeight() / 16));
+		(*cur)->GetRenderObject()->GetPaintMask()->ResetTexture();
 		cur++;
 	}
 }
@@ -274,12 +274,11 @@ NCL::Maths::Vector2 Renderer::CountPaintMask(TextureBase* paintMask, NCL::Maths:
 
 #ifdef _ORBIS
 	return prevScores;
-#endif
+#elif _WIN64
 
 	paintMask->Bind();
 
 	int pixelDataSize = paintMask->GetHeight() * paintMask->GetWidth() * 4;
-
 	GLubyte* data = new GLubyte[pixelDataSize];
 	glGetTextureImage(((OGLTexture*)paintMask)->GetObjectID(), 0, GL_RGBA, GL_UNSIGNED_BYTE, pixelDataSize * 4, data);
 
@@ -315,6 +314,7 @@ NCL::Maths::Vector2 Renderer::CountPaintMask(TextureBase* paintMask, NCL::Maths:
 		
 	}
 	return Vector2(team1Score - prevScores.x , team2Score - prevScores.y);
+#endif
 }
 
 void Renderer::Paint(const RenderObject* paintable, NCL::Maths::Vector3& barycentric, NCL::Maths::Vector3& colpos, NCL::Maths::Vector2& texUV_a, NCL::Maths::Vector2& texUV_b, NCL::Maths::Vector2& texUV_c, float radius, float hardness, float strength, NCL::Maths::Vector4 colour)

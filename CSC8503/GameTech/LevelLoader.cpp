@@ -587,7 +587,7 @@ void LevelLoader::SetFieldsForCube(GameObject* cube, const Vector3& position, Ve
 	#ifdef _WIN64
 		cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, OGLTexture::RGBATextureEmpty(basicTex->GetWidth(), basicTex->GetHeight()), basicShader));
 	#elif _ORBIS
-		cube->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, PS4::PS4Texture::EmptyTex(basicTex->GetWidth(), basicTex->GetHeight()),basicShader));
+		cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, PS4::PS4Texture::EmptyTex(basicTex->GetWidth(), basicTex->GetHeight()),basicShader));
 	#endif
 	
 	cube->GetPhysicsObject()->InitCubeInertia();
