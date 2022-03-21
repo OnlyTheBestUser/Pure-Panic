@@ -17,12 +17,9 @@ namespace NCL {
 			void SendPacket(GamePacket& payload);
 
 			void UpdateClient();
-		protected:
-			//void ThreadedUpdate();
 
+		protected:
 			ENetPeer* netPeer;
-			//std::atomic<bool>	threadAlive;
-			//std::thread			updateThread;
 		};
 	}
 }

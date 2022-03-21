@@ -98,7 +98,6 @@ void Player::Fire() {
 	else {
 		fired = false;
 	}
-
 }
 
 bool Player::IsDead(){

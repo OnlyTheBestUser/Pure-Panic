@@ -30,7 +30,7 @@ namespace NCL {
 			GameObject* AddCapsuleToWorld(const Maths::Vector3& position, float halfHeight, float radius, float inverseMass = 10.0f);
 			
 			Projectile* SpawnProjectile(Player* owner, const bool& NeedBulletSpread, const float& initialSpeed = 70.0f, const float& meshSize = 0.5f);
-			Projectile* SpawnProjectile(GameObject* owner, const bool& NeedBulletSpread, float pitch, int playerID, const float& initialSpeed = 70.0f, const float& meshSize = 0.5f);
+			Projectile* SpawnProjectile(GameObject* owner, const bool& NeedBulletSpread, const int bulletIndex, float pitch, int playerID, const float& initialSpeed = 70.0f, const float& meshSize = 0.5f);
 
 		protected:
 			GameObject* AddFloorToWorld(const Vector3& position);

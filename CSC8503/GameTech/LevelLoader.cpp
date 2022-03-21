@@ -572,11 +572,12 @@ Projectile* LevelLoader::SpawnProjectile(Player* owner, const bool& NeedBulletSp
 #ifndef _ORBIS
 	AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + "gun_fire.ogg", owner->GetTransform().GetPosition(), 0.3f);
 #endif // !_ORBIS
-	return SpawnProjectile((GameObject*)owner, NeedBulletSpread, owner->GetCam()->GetPitch(), owner->GetPlayerID(), initialSpeed, meshSize);
+	return SpawnProjectile((GameObject*)owner, NeedBulletSpread, owner->BulletCounter, owner->GetCam()->GetPitch(), owner->GetPlayerID(), initialSpeed, meshSize);
 }
 
-Projectile* LevelLoader::SpawnProjectile(GameObject* owner, const bool& NeedBulletSpread, float pitch, int playerID, const float& initialSpeed, const float& meshSize)
+Projectile* LevelLoader::SpawnProjectile(GameObject* owner, const bool& NeedBulletSpread, const int bulletIndex, float pitch, int playerID, const float& initialSpeed, const float& meshSize)
 {
+
 	float inverseMass = 1.0f;
 
 	const int SPREAD_ANGLE_CONST = 400;
@@ -615,9 +616,8 @@ Projectile* LevelLoader::SpawnProjectile(GameObject* owner, const bool& NeedBull
 		angle2 = float((rand() % SPREAD_ANGLE_CONST) - SPREAD_ANGLE_CONST / 2) / (66.67f);
 	}
 	else {
-		int index = ((Player*)owner)->BulletCounter % 7;
-		angle1 = angleArr[index];
-		angle2 = angleArr[6 - index];
+		angle1 = angleArr[bulletIndex % 7];
+		angle2 = angleArr[6 - (bulletIndex % 7)];
 	}
 
 	if (velocityDueToMovement < 0.0f) velocityDueToMovement = 0.0f;
