@@ -5,8 +5,7 @@
 
 namespace NCL {
 	namespace CSC8503 {
-		class SpeedBoost : public PowerUp
-		{
+		class SpeedBoost : public PowerUp {
 		public:
 			SpeedBoost(float speedIncreasedBy = 1.5f) : PowerUp(PowerUpType::SpeedBoost), increaseInSpeed(speedIncreasedBy) {}
 
