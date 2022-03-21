@@ -37,6 +37,7 @@
     <ClInclude Include="BehaviourSequence.h" />
     <ClInclude Include="CapsuleVolume.h" />
     <ClInclude Include="Command.h" />
+    <ClInclude Include="FireRate.h" />
     <ClInclude Include="GameActor.h" />
     <ClInclude Include="InputBase.h" />
     <ClInclude Include="InputHandler.h" />
@@ -70,9 +71,6 @@
     <ClInclude Include="Transform.h" />
     <ClInclude Include="Timer.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FIreRate.h">
-      <Filter>Gameplay</Filter>
     </ClInclude>
     <ClInclude Include="Heal.h">
       <Filter>Gameplay</Filter>

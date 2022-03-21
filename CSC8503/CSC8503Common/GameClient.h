@@ -19,7 +19,9 @@ namespace NCL {
 			void UpdateClient();
 
 		protected:
+#ifndef ORBISNET
 			ENetPeer* netPeer;
+#endif
 		};
 	}
 }

@@ -1,0 +1,61 @@
+ConstantBuffer uvHitPoint
+{
+	float2 m_uvHitPoint;
+};
+
+ConstantBuffer viewport
+{
+	float2 m_viewport;
+};
+
+ConstantBuffer textureScale
+{
+	float3 m_textureScale;
+};
+
+ConstantBuffer radius
+{
+	float m_radius;
+};
+
+ConstantBuffer hardness
+{
+	float m_hardness;
+};
+
+ConstantBuffer strength
+{
+	float m_strength;
+};
+
+ConstantBuffer colour
+{
+	float4 m_colour;
+};
+
+struct VS_OUTPUT
+{
+	float4 Position		: S_POSITION;
+	float3 WorldPos		: COLOR0;
+	float2 UV			: TEXCOORD0;
+};
+
+float mask(float2 _position, float2 _center, float _radius, float _hardness){
+    float m = distance(_center, _position);
+    return 1 - smoothstep(_radius * _hardness, _radius, m);    
+}
+
+float4 main(VS_OUTPUT In) : S_TARGET_OUTPUT
+{
+	float f = mask(In.Position.xy / m_viewport, m_uvHitPoint, m_radius/100, m_hardness);
+    float edge = f * m_strength;
+
+    float4 albedo = lerp(float4(0,0,0,0), m_colour, edge);
+	if (albedo.a == 0){
+		discard;
+	}
+
+	//albedo.rgb = float3(1,0,1);
+
+	return albedo;
+}
