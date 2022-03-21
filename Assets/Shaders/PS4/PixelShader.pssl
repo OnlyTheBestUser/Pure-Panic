@@ -26,11 +26,18 @@ ConstantBuffer lightColour{
 	float4 LightColour;
 };
 
+ConstantBuffer hasPaintMask
+{
+	int m_usePaintMask;
+};
+
 SamplerState samp0 : register(s0);
 
 Texture2D colorMap : register( t0 );
 
+SamplerState samp1: register(s2);
 
+Texture2D mask : register( t2 );
 
 struct VS_OUTPUT
 {
@@ -51,8 +58,16 @@ float4 main(VS_OUTPUT In) : S_TARGET_OUTPUT
 	float rFactor = max (0.0 , dot(halfDir , In.Normal ));
 	float sFactor = pow ( rFactor , 80.0 );
 
-	float4 albedo = colorMap.Sample(samp0, In.UV.xy);
+	float4 albedo = colorMap.Sample(samp1, In.UV.xy);
 	albedo.rgb = pow(albedo.rgb, float3(2.2));
+
+	if (m_usePaintMask == 1){
+		float4 maskAlbedo = mask.Sample(samp1, In.UV.xy);
+		if (maskAlbedo.r > 0.01 || maskAlbedo.g > 0.01 || maskAlbedo.b > 0.01){
+			albedo.rgb = maskAlbedo.rgb;
+		}
+	}
+
 	float4 colour = albedo * 0.05f;
 	colour.a = 1;
 	colour.rgb += albedo.rgb * LightColour.rgb * lambert;

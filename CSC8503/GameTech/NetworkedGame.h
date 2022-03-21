@@ -8,7 +8,6 @@ namespace NCL {
 		class GameClient;
 		class NetworkPlayer;
 
-
 		class NetworkedGame : public TutorialGame, public PacketReceiver {
 		public:
 			NetworkedGame();
@@ -29,7 +28,10 @@ namespace NCL {
 
 			void RemovePlayerFromServer(int clientID);
 
-			static NetworkedGame* GetInstance() { return instance; }
+			static NetworkedGame* GetInstance() { return singleton; }
+
+			static void AddPowerUp(PowerUp* powerup) { singleton->powerups.emplace_back(powerup); }
+			static void AddSpawnPoint(Vector3 pos) { singleton->spawnPoints.emplace_back(pos); }
 
 		protected:
 			void UpdateAsServer(float dt);
@@ -37,7 +39,7 @@ namespace NCL {
 
 			void BroadcastSnapshot();
 
-			static NetworkedGame* instance;
+			static NetworkedGame* singleton;
 			std::map<int, int> stateIDs;
 
 			GameServer* thisServer;
@@ -48,6 +50,8 @@ namespace NCL {
 			int playerID;
 
 			std::vector<NetworkObject*> networkObjects;
+			std::vector<PowerUp*>		powerups;
+			std::vector<Vector3>		spawnPoints;
 
 			// client ID, last ID
 			std::map<int, int> clientHistory;

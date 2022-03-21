@@ -11,7 +11,7 @@ namespace NCL {
 		class Projectile : public GameObject
 		{
 		public:
-			Projectile(GameWorld& gWorld, Renderer* rend, const int& playerID = 0, const float& damageValue = 10.0f): GameObject("projectile"), renderInst(rend), gameWorld(gWorld), damagePerShot(damageValue), ownerPlayerID(playerID) {
+			Projectile(Renderer* rend, const int& playerID = 0, const float& damageValue = 10.0f): GameObject("projectile"), renderInst(rend), damagePerShot(damageValue), ownerPlayerID(playerID) {
 				this->SetTrigger(true);
 			};
 			~Projectile() {}
@@ -26,7 +26,6 @@ namespace NCL {
 
 		private:
 			float lifeSpan = 5.0f;
-			GameWorld& gameWorld;
 			Renderer* renderInst;
 			int ownerPlayerID;
 			float damagePerShot;
