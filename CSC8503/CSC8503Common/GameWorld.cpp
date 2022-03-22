@@ -46,15 +46,6 @@ void GameWorld::AddGameObject(GameObject* o) {
 	o->SetWorldID(worldIDCounter++);
 }
 
-bool GameWorld::GetScoreForObject(GameObject* object, Vector2& outScore) {
-	auto it = paintableObjectScores.find(object);
-	if (it != paintableObjectScores.end()) {
-		outScore = (*it).second;
-		return true;
-	}
-	return false;
-}
-
 void GameWorld::RemoveGameObject(GameObject* o, bool andDelete) {
 	// Check if object is already added to vector, sometimes gets double added
 	for (auto obj : toRemoveGameObjects)
@@ -110,7 +101,7 @@ void GameWorld::UpdateScore(GameObject* paintableScore, Vector2 scoreChange) {
 	paintableObjectScores[paintableScore] + scoreChange;
 }
 
-Vector2 GameWorld::GetScore(GameObject* paintableScore) {
+Vector2 GameWorld::GetScoreForObject(GameObject* paintableScore) {
 	return paintableObjectScores[paintableScore];
 }
 

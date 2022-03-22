@@ -10,6 +10,7 @@
 #include "../../Common/SimpleFont.h"
 #include "../../Common/TextureLoader.h"
 #include "../../Common/MeshGeometry.h"
+#include "../CSC8503Common/GameManager.h"
 
 
 
@@ -37,6 +38,12 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 	skyboxMesh->SetVertexPositions({ Vector3(-1, 1,-1), Vector3(-1,-1,-1) , Vector3(1,-1,-1) , Vector3(1,1,-1) });
 	skyboxMesh->SetVertexIndices({ 0,1,2,2,3,0 });
 	skyboxMesh->UploadToGPU();
+
+	uiMesh = new OGLMesh();
+	uiMesh->SetVertexPositions({ Vector3(-0.5f, 0.2f,-0.5f), Vector3(-0.5f,0.1f,-0.5f) , Vector3(0.5f,0.1f,-0.5f) , Vector3(0.5f,0.2f,-0.5f) });
+	uiMesh->SetVertexIndices({ 0,1,2,2,3,0 });
+	uiMesh->UploadToGPU();
+	//ui = new RenderObject(nullptr, uiMesh, nullptr, uiShader);
 
 	ForceValidDebugState(true);
 
@@ -384,13 +391,18 @@ void Renderer::ApplyPaintToMasks() {
 
 void Renderer::DrawGUI() {
 	uiShader->BindShader();
-	uiShader->UpdateUniformMatrix4("viewProjMatrix", Matrix4::Orthographic(-1, 1.0f, 1, 0, 0, 1));
 
 	rendererAPI->SetCullFace(false);
 	rendererAPI->SetBlend(false);
 	rendererAPI->SetDepth(false);
 
-	rendererAPI->DrawMesh(skyboxMesh);
+	
+	uiShader->UpdateUniformMatrix4("viewProjMatrix", Matrix4::Translation(Vector3(0, 1, 0)) * Matrix4::Orthographic(-1, 1.0f, 1, -1, -1, 1));
+	uiShader->UpdateUniformVector2("ratio", scores);
+	uiShader->UpdateUniformVector4("team1Colour", GameManager::team1Colour);
+	uiShader->UpdateUniformVector4("team2Colour", GameManager::team2Colour);
+	uiShader->UpdateUniformVector2("screenSize", Vector2(rendererAPI->GetCurrentWidth(), rendererAPI->GetCurrentHeight()));
+	rendererAPI->DrawMesh(uiMesh);
 
 
 	rendererAPI->SetCullFace(true);

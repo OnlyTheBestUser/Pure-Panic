@@ -39,6 +39,8 @@ namespace NCL {
 			// Debug
 			Maths::Matrix4 SetupDebugLineMatrix() const override;
 			Maths::Matrix4 SetupDebugStringMatrix() const override;
+
+			Vector2 scores;
 		protected:
 
 			struct PaintInstance {
@@ -67,6 +69,8 @@ namespace NCL {
 			ShaderBase* maskShader;
 
 			ShaderBase* uiShader;
+			MeshGeometry* uiMesh;
+			RenderObject* ui;
 
 			ShaderBase* skyboxShader;
 			MeshGeometry* skyboxMesh;

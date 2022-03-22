@@ -141,6 +141,7 @@ void TutorialGame::UpdateGame(float dt) {
 	renderer->Update(dt);
 
 	Debug::FlushRenderables(dt);
+	renderer->scores = gameManager->CalcCurrentScoreRatio();
 	renderer->Render();
 }
 
@@ -209,7 +210,7 @@ void TutorialGame::UpdateScores(float dt) {
 			return;
 		}
 		// Need to score the texture here.
-		Vector2 scoreDif = renderer->CountPaintMask((*cur)->GetRenderObject()->GetPaintMask(), world->GetScore((*cur)), Vector4(0.3, 0, 0.5, 1), Vector4(0.250, 0.878, 0.815, 1));
+		Vector2 scoreDif = renderer->CountPaintMask((*cur)->GetRenderObject()->GetPaintMask(), world->GetScoreForObject((*cur)), GameManager::team1Colour, GameManager::team2Colour);
 		if ((*cur)->GetPaintRadius() != 0){
 			scoreDif = scoreDif / (*cur)->GetPaintRadius();
 		}
