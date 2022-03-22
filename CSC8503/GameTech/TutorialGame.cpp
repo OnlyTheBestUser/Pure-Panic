@@ -300,14 +300,6 @@ void TutorialGame::UpdateKeys() {
 void TutorialGame::DebugObjectMovement() {
 	//If we've selected an object, we can manipulate it with some key presses
 	if (inSelectionMode && selectionObject) {
-		//Twist the selected object!
-		//if (Window::GetKeyboard()->KeyDown(KeyboardKeys::LEFT)) {
-		//	selectionObject->GetPhysicsObject()->AddTorque(Vector3(-10, 0, 0));
-		//}
-
-		//if (Window::GetKeyboard()->KeyDown(KeyboardKeys::RIGHT)) {
-		//	selectionObject->GetPhysicsObject()->AddTorque(Vector3(10, 0, 0));
-		//}
 
 		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::NUM7)) {
 			selectionObject->GetPhysicsObject()->AddTorque(Vector3(0, 10, 0));
@@ -316,18 +308,6 @@ void TutorialGame::DebugObjectMovement() {
 		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::NUM8)) {
 			selectionObject->GetPhysicsObject()->AddTorque(Vector3(0, -10, 0));
 		}
-
-		//if (Window::GetKeyboard()->KeyDown(KeyboardKeys::RIGHT)) {
-		//	selectionObject->GetPhysicsObject()->AddTorque(Vector3(10, 0, 0));
-		//}
-
-		//if (Window::GetKeyboard()->KeyDown(KeyboardKeys::UP)) {
-		//	selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 0, -10));
-		//}
-
-		//if (Window::GetKeyboard()->KeyDown(KeyboardKeys::DOWN)) {
-		//	selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 0, 10));
-		//}
 
 		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::NUM5)) {
 			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, -10, 0));
@@ -376,6 +356,8 @@ void TutorialGame::InitWorld() {
 
 	GameObject* x = LevelLoader::SpawnAIEnemy(Vector3(20, 5, 20), player1);
 	x->GetPhysicsObject()->SetGravity(false);
+	x->GetPhysicsObject()->SetLinearDamping(0.6f);
+	x->GetPhysicsObject()->SetFriction(false);
 
 	physics->BuildStaticList();
 }
