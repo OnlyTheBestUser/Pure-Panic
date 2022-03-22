@@ -42,6 +42,7 @@ namespace NCL {
 			void AddCornerWallToWorld(const Vector3& position, Vector3 dimensions, int rotation);
 			void AddSecurityCameraToWorld(const Vector3& position, int rotation);
 			void AddWallHammerToWorld(const Vector3& position, int rotation);
+			void AddThroneToWorld(const Vector3& position, int rotation);
 
 			GameObject* AddRenderPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture);
 			GameObject* AddAssetToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture, const Vector3& phyLocation, const Vector3& phyDimensions, const float& paintRad = 3.f, const string& name = "PaintableAsset");
@@ -73,6 +74,8 @@ namespace NCL {
 			TextureBase*  corridorWallHammerTex		= nullptr;
 			MeshGeometry* securityCamera			= nullptr;
 			TextureBase*  securityCameraTex			= nullptr;
+			MeshGeometry* sanctumThrone				= nullptr;
+			TextureBase*  sanctumThroneTex			= nullptr;
 
 			MeshGeometry* sphereMesh				= nullptr;
 			MeshGeometry* cubeMesh					= nullptr;

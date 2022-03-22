@@ -42,6 +42,7 @@ LevelLoader::LevelLoader(GameWorld* world, PhysicsSystem* physics, Renderer* ren
 	loadFunc("security.msh", &enemyMesh);
 	loadFunc("coin.msh", &bonusMesh);
 	loadFunc("capsule.msh", &capsuleMesh);
+	loadFunc("SanctumThrone.msh", &sanctumThrone);
 	loadFunc("Corridor_Floor_Basic.msh", &corridorFloor);
 	loadFunc("Corridor_Wall_Alert.msh", &corridorWallAlert);
 	loadFunc("Corridor_Wall_Corner_In_Both.msh", &corridorWallCorner);
@@ -66,6 +67,7 @@ LevelLoader::LevelLoader(GameWorld* world, PhysicsSystem* physics, Renderer* ren
 	loadTexFunc("Corridor_Walls_Redux_Colour", &corridorWallStraightTex);
 	loadTexFunc("checkerboard", &corridorWallHammerTex);
 	loadTexFunc("checkerboard", &basicTex);
+	loadTexFunc("InSanct_Max_Throne_B_Colour", &sanctumThroneTex);
 #ifdef _WIN64
 	basicTex = (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
 	basicShader = new OGLShader("GameTechVert.glsl", "GameTechFrag.glsl");
@@ -142,6 +144,9 @@ void LevelLoader::ReadInLevelFile(std::string filename) {
 				}
 				else if (lineContents[0] == "PAINT_WALL") {
 					AddPaintWallToWorld(Vec3FromStr(lineContents[1]), Vector3(5, 4.2, 4), std::stoi(lineContents[2]), lineContents[0]);
+				}
+				else if (lineContents[0] == "THRONE") {
+					AddThroneToWorld(Vec3FromStr(lineContents[1]), std::stoi(lineContents[2]));
 				}
 			}
 		}
@@ -472,6 +477,16 @@ void LevelLoader::AddWallHammerToWorld(const Vector3& position, int rotation)
 	}
 
 	AddAssetToWorld(position, Vector3(10, 10, 6), rotation, corridorWallHammer, corridorWallHammerTex, location, dimensions, 10.f, "Wall Hammer")
+		->GetPhysicsObject()->Sleep();
+	return;
+}
+
+void LevelLoader::AddThroneToWorld(const Vector3& position, int rotation)
+{
+	Vector3 location = position + Vector3(0, 4, 0);
+	Vector3 dimensions = Vector3(2, 4, 2);
+
+	AddAssetToWorld(position, Vector3(1.5f, 1.5f, 1.5f), rotation, sanctumThrone, sanctumThroneTex, location, dimensions, 10.f, "Sanctum Throne")
 		->GetPhysicsObject()->Sleep();
 	return;
 }
