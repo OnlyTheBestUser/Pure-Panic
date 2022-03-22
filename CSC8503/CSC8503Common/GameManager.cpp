@@ -24,8 +24,8 @@ void GameManager::PlacePlayersToSpawnPositions() {
 }
 
 void GameManager::UpdateScores(Vector2 scores) {
-	Teams[0].score += scores.x;
-	Teams[1].score += scores.y;
+	Teams[0].score = scores.x;
+	Teams[1].score = scores.y;
 	//std::cout << CalcCurrentScoreRatio() << "\n";
 }
 

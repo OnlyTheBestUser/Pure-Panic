@@ -13,6 +13,7 @@
 #include "../../Common/Assets.h"
 
 #include "../CSC8503Common/InputList.h"
+#include "../CSC8503Common/SimpleAI.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -372,6 +373,9 @@ void TutorialGame::InitWorld() {
 	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);*/
 
 	player1 = player;
+
+	GameObject* x = LevelLoader::SpawnAIEnemy(Vector3(20, 5, 20), player1);
+	x->GetPhysicsObject()->SetGravity(false);
 
 	physics->BuildStaticList();
 }

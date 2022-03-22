@@ -29,7 +29,8 @@ namespace NCL {
 
 			static Player*     SpawnPlayer(const Vector3& position);
 			static GameObject* SpawnDummyPlayer(const Vector3& position);
-			
+			static GameObject* SpawnAIEnemy(const Vector3& position, GameObject* target = nullptr);
+
 			static Projectile* SpawnProjectile(Player* owner, const bool& NeedBulletSpread, const float& initialSpeed = PROJ_SPEED, const float& meshSize = PROJ_SIZE);
 			static Projectile* SpawnProjectile(GameObject* owner, const bool& NeedBulletSpread, const int bulletIndex, float pitch, int playerID, const float& initialSpeed = PROJ_SPEED, const float& meshSize = PROJ_SIZE);
 

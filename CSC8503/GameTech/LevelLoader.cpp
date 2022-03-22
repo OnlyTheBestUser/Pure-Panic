@@ -18,6 +18,7 @@
 	#include "../../Plugins/OpenGLRendering/OGLShader.h"
 	#include "../../Plugins/OpenGLRendering/OGLTexture.h"
 #endif
+#include "../CSC8503Common/SimpleAI.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -164,6 +165,9 @@ void LevelLoader::ReadInLevelFile(std::string filename) {
 				}
 				else if (lineContents[0] == "SPAWNPOINT") {
 					singleton->AddSpawnPointToWorld(Vec3FromStr(lineContents[1]));
+				} 
+				else if (lineContents[0] == "AI_ENEMY") {
+					singleton->SpawnAIEnemy(Vec3FromStr(lineContents[1]));
 				}
 			}
 		}
@@ -204,6 +208,14 @@ Player* LevelLoader::SpawnPlayer(const Vector3& position) {
 
 GameObject* LevelLoader::SpawnDummyPlayer(const Vector3& position) {
 	GameObject* character = new GameObject("Dummy");
+
+	return singleton->AddPlayerObjectToWorld(position, character);
+}
+
+GameObject* LevelLoader::SpawnAIEnemy(const Vector3& position, GameObject* target)
+{
+	SimpleAI* character = new SimpleAI();
+	character->SetTarget(target);
 
 	return singleton->AddPlayerObjectToWorld(position, character);
 }
@@ -460,7 +472,7 @@ GameObject* LevelLoader::AddPlayerObjectToWorld(const Vector3& position, GameObj
 	CapsuleVolume* volume = new CapsuleVolume(0.85f * meshSize, 0.3f * meshSize);
 
 	SetMiscFields(character, volume, position, Vector3(meshSize, meshSize, meshSize), false);
-	character->SetPhysicsObject(GetPhysicsObject(&character->GetTransform(), volume, CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE, true, 20.0f, DEF_ELASTICITY, 3.0f, false));
+	character->SetPhysicsObject(GetPhysicsObject(&character->GetTransform(), volume, CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE, true, 5.0f, DEF_ELASTICITY, 3.0f, false));
 	character->SetRenderObject(GetRenderObject(&character->GetTransform(), charMeshA, nullptr, basicShader, Vector4(0.5,1,0.5,1)));
 
 	character->GetPhysicsObject()->InitSphereInertia();
