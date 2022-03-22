@@ -4,6 +4,8 @@
 #include "../../Common/ShaderBase.h"
 #include "../../Common/Vector4.h"
 
+constexpr int TEXTURE_AMOUNT = 2;
+
 namespace NCL {
 	using namespace NCL::Rendering;
 
@@ -15,12 +17,11 @@ namespace NCL {
 		class RenderObject
 		{
 		public:
-			RenderObject(Transform* parentTransform, MeshGeometry* mesh, TextureBase* tex, ShaderBase* shader);
-			RenderObject(Transform* parentTransform, MeshGeometry* mesh, TextureBase* tex, TextureBase* paintMask, ShaderBase* shader);
+			RenderObject(Transform* parentTransform, MeshGeometry* mesh, TextureBase* tex, ShaderBase* shader, TextureBase* paintMask = nullptr, TextureBase* normal = nullptr);
 			virtual ~RenderObject();
 
 			void SetDefaultTexture(TextureBase* t) {
-				texture = t;
+				texture[0] = t;
 			}
 
 			void SetMaskTexture(TextureBase* t) {
@@ -28,7 +29,11 @@ namespace NCL {
 			}
 
 			TextureBase* GetDefaultTexture() const {
-				return texture;
+				return texture[0];
+			}
+
+			TextureBase* GetNormalMap() const {
+				return texture[1];
 			}
 
 			TextureBase* GetPaintMask() const {
@@ -61,7 +66,7 @@ namespace NCL {
 
 		protected:
 			MeshGeometry*	mesh;
-			TextureBase*	texture;
+			TextureBase*	texture[2];
 			TextureBase*	paintMask;
 			ShaderBase*		shader;
 			Transform*		transform;

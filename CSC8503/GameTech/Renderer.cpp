@@ -230,6 +230,8 @@ void Renderer::RenderObjects() {
 
 		if ((*i).GetDefaultTexture()) (*i).GetDefaultTexture()->Bind(0);
 		shader->UpdateUniformInt("hasTexture", (*i).GetDefaultTexture() ? 1 : 0);
+		if ((*i).GetNormalMap()) (*i).GetNormalMap()->Bind(3);
+		shader->UpdateUniformInt("hasNormal", (*i).GetNormalMap() ? 1 : 0);
 #ifdef _WIN64
 		if (shadowFBO->GetTexture()) shadowFBO->GetTexture()->Bind(1);
 #endif
