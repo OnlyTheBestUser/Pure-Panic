@@ -17,8 +17,19 @@ void Thread::Start()
 		0,		// Use default creation flags
 		&tid);
 }
-
 void Thread::Join()
 {
 	WaitForSingleObject(thread_handle, INFINITE);
+}
+
+void Thread::SetRendererContext()
+{
+	wglMakeCurrent(NULL, NULL);
+	hglrc = wglCreateContext(hdc);
+	wglMakeCurrent(hdc, hglrc);
+}
+void Thread::ClearRendererContext()
+{
+	wglMakeCurrent(NULL, NULL);
+	wglDeleteContext(hglrc);
 }

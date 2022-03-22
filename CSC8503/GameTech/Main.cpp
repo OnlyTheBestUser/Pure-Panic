@@ -62,10 +62,9 @@ protected:
 void Loader::Run()
 {
 	bool done = false;
-
-	wglMakeCurrent(NULL, NULL);
-	HGLRC hglrc = wglCreateContext(wglGetCurrentDC());
-	wglMakeCurrent(wglGetCurrentDC(), hglrc);
+	
+	AssignHDC(wglGetCurrentDC());
+	SetRendererContext();
 
 	while (!done)
 	{
@@ -74,13 +73,11 @@ void Loader::Run()
 		{
 			done = true;
 			completed = true;
-			wglDeleteContext(hglrc);
+			ClearRendererContext();
 		}
 		else
 		{
-			//wglMakeCurrent(wglGetCurrentDC(), wglGetCurrentContext());
 			progression += 0.17f;
-			std::cout << "LOADING: " << progression << "%" << std::endl;
 			ls->UpdateProgress(progression);
 			ls->UpdateGame(0);
 		}
@@ -245,14 +242,14 @@ public:
 	Loading(LoadingScreen* l) : ls(l) {};
 	PushdownResult OnUpdate(float dt, PushdownState** newState) override 
 	{
-		wglMakeCurrent(NULL, NULL);
 
 		if (!threadMade)
 		{
 			doneLoading = false;
+			wglMakeCurrent(NULL, NULL);
 			loadThread.AssignLoadScreen(ls);
 			loadThread.Start();
-			threadMade = true;
+			threadMade = true; 
 		}
 
 		//ls->UpdateGame(dt);
@@ -278,7 +275,7 @@ public:
 		goToMenu = true;
 				
 		//wglMakeCurrent(mainHdc, mainHglrc);
-		wglMakeCurrent(wglGetCurrentDC(), wglGetCurrentContext());
+		//wglMakeCurrent(wglGetCurrentDC(), wglGetCurrentContext());
 
 		if (goToMenu)
 		{
@@ -321,8 +318,6 @@ hide or show the
 int main() {
 #ifdef _WIN64
 	Window* w = Window::CreateGameWindow("CSC8503 Game technology!", 1280, 720);
-	mainHdc = wglGetCurrentDC();
-	mainHglrc = wglGetCurrentContext();
 #endif
 #ifdef _ORBIS
 	Window* w = (PS4Window*)Window::CreateGameWindow("PS4 Example Code", 1920, 1080);
@@ -335,6 +330,9 @@ int main() {
 	srand(time(NULL));
 	w->ShowOSPointer(false);
 	w->LockMouseToWindow(true);
+
+	mainHdc = wglGetCurrentDC();
+	mainHglrc = wglGetCurrentContext();
 
 	float avgTimeWait = 3.0f;
 	float curTimeWait = 3.0f;
