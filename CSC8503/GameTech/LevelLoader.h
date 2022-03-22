@@ -46,7 +46,8 @@ namespace NCL {
 
 			void AddCornerWallToWorld    (const Vector3& position, Vector3 dimensions, int rotation);
 			void AddSecurityCameraToWorld(const Vector3& position, int rotation);
-			void AddWallHammerToWorld    (const Vector3& position, int rotation);
+			void AddWallHammerToWorld(const Vector3& position, int rotation);
+			void AddThroneToWorld(const Vector3& position, int rotation);
 
 			GameObject* AddRenderPartToWorld  (const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture);
 			GameObject* AddPlayerObjectToWorld(const Vector3& position, GameObject* character);
@@ -99,6 +100,8 @@ namespace NCL {
 			TextureBase*  corridorWallHammerTex		= nullptr;
 			MeshGeometry* securityCamera			= nullptr;
 			TextureBase*  securityCameraTex			= nullptr;
+			MeshGeometry* sanctumThrone				= nullptr;
+			TextureBase*  sanctumThroneTex			= nullptr;
 
 			MeshGeometry* sphereMesh				= nullptr;
 			MeshGeometry* cubeMesh					= nullptr;

@@ -46,6 +46,7 @@ LevelLoader::LevelLoader(PhysicsSystem* physics, Renderer* renderer) : physics(p
 	loadFunc("security.msh", &enemyMesh);
 	loadFunc("coin.msh", &bonusMesh);
 	loadFunc("capsule.msh", &capsuleMesh);
+	loadFunc("SanctumThrone.msh", &sanctumThrone);
 	loadFunc("Corridor_Floor_Basic.msh", &corridorFloor);
 	loadFunc("Corridor_Wall_Alert.msh", &corridorWallAlert);
 	loadFunc("Corridor_Wall_Corner_In_Both.msh", &corridorWallCorner);
@@ -72,20 +73,24 @@ LevelLoader::LevelLoader(PhysicsSystem* physics, Renderer* renderer) : physics(p
 	loadTexFunc("Corridor_Walls_Redux_Colour", &corridorWallStraightTex);
 	loadTexFunc("checkerboard", &corridorWallHammerTex);
 	loadTexFunc("checkerboard", &basicTex);
-
-	#ifdef _ORBIS
-		basicTex = PS4::PS4Texture::LoadTextureFromFile(NCL::Assets::TEXTUREDIR + "checkerboard.gnf");
-		basicShader = PS4::PS4Shader::GenerateShader(
-			NCL::Assets::SHADERDIR + "PS4/VertexShader.sb",
-			NCL::Assets::SHADERDIR + "PS4/PixelShader.sb"
-		);
-
-		playerTex = basicTex;
+	loadTexFunc("InSanct_Max_Throne_B_Colour", &sanctumThroneTex);
+#ifdef _WIN64
+	basicTex = (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
+	basicShader = new OGLShader("GameTechVert.glsl", "GameTechFrag.glsl");
+	playerTex = (OGLTexture*)TextureLoader::LoadAPITexture("me.png");
+#endif
+#ifdef _ORBIS
+	basicTex = PS4::PS4Texture::LoadTextureFromFile(NCL::Assets::TEXTUREDIR + "checkerboard.gnf");
+	basicShader = PS4::PS4Shader::GenerateShader(
+		NCL::Assets::SHADERDIR + "PS4/VertexShader.sb",
+		NCL::Assets::SHADERDIR + "PS4/PixelShader.sb"
+	);
+	playerTex = basicTex;
 	#else
 		basicTex = (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
 		basicShader = new OGLShader("GameTechVert.glsl", "GameTechFrag.glsl");
 		playerTex = (OGLTexture*)TextureLoader::LoadAPITexture("me.png");
-	#endif
+#endif
 }
 
 LevelLoader::~LevelLoader() {
@@ -164,6 +169,9 @@ void LevelLoader::ReadInLevelFile(std::string filename) {
 				}
 				else if (lineContents[0] == "SPAWNPOINT") {
 					singleton->AddSpawnPointToWorld(Vec3FromStr(lineContents[1]));
+				}
+				else if (lineContents[0] == "THRONE") {
+					AddThroneToWorld(Vec3FromStr(lineContents[1]), std::stoi(lineContents[2]));
 				}
 			}
 		}
@@ -437,6 +445,16 @@ void		LevelLoader::AddWallHammerToWorld(const Vector3& position, int rotation)
 	}
 
 	AddAssetToWorld(position, Vector3(10, 10, 6), rotation, corridorWallHammer, corridorWallHammerTex, location, dimensions, 10.f, "Wall Hammer")
+		->GetPhysicsObject()->Sleep();
+	return;
+}
+
+void LevelLoader::AddThroneToWorld(const Vector3& position, int rotation)
+{
+	Vector3 location = position + Vector3(0, 4, 0);
+	Vector3 dimensions = Vector3(2, 4, 2);
+
+	AddAssetToWorld(position, Vector3(1.5f, 1.5f, 1.5f), rotation, sanctumThrone, sanctumThroneTex, location, dimensions, 10.f, "Sanctum Throne")
 		->GetPhysicsObject()->Sleep();
 	return;
 }
