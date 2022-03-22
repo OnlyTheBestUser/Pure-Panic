@@ -122,9 +122,9 @@ void TutorialGame::UpdateGame(float dt) {
 	case PAUSE: UpdatePauseScreen(dt); break;
 	case WIN: UpdateWinScreen(dt); break;
 	case RESET: {
+		renderer->ClearPaint();
 		InitCamera();
 		InitWorld();
-		renderer->ClearPaint();
 		selectionObject = nullptr;
 		state = PLAY;
 		break;

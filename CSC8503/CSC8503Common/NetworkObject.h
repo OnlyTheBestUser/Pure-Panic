@@ -15,11 +15,17 @@ namespace NCL {
 			}
 		};
 
+		enum SetGameState {
+			Game_Start,
+			Game_Update,
+			Game_Over,
+			Game_Reset
+		};
 
 		struct GameStatePacket : public GamePacket {
-			bool	gameover;
+			int		state;
 			float	team1Score;
-			float	team2Score;
+			float 	team2Score;
 
 			GameStatePacket() {
 				type = Game_State;

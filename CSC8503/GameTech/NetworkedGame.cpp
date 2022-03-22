@@ -49,7 +49,6 @@ void NetworkedGame::StartAsServer() {
 	thisServer->RegisterPacketHandler(PowerUp_State, this);
 
 	SpawnPlayer();
-	StartLevel();
 
 }
 
@@ -88,6 +87,13 @@ void NetworkedGame::UpdateGame(float dt) {
 		StartAsClient(127, 0, 0, 1);
 		std::cout << "Client start" << std::endl;
 	}
+	if (!thisClient && thisServer && Window::GetKeyboard()->KeyPressed(KeyboardKeys::F11)) {
+		StartLevel();
+	}
+	if (thisServer && Window::GetKeyboard()->KeyPressed(KeyboardKeys::F8)) {
+		SendResetGamePacket();
+		ResetLevel();
+	}
 
 	for (auto x : powerups) {
 		if (x->IsPickedUp()) {
@@ -117,17 +123,11 @@ void NetworkedGame::UpdateAsServer(float dt) {
 	}
 
 	if (gameManager->IsTimerFinished()) {
-		GameStatePacket* newPacket = new GameStatePacket();
-
-		newPacket->gameover = true;
-
-		Vector2 scores = gameManager->CalcCurrentScoreRatio();
-		newPacket->team1Score = scores.x;
-		newPacket->team2Score = scores.y;
-
-		thisServer->SendGlobalPacket(*newPacket);
+		SendEndGamePacket();
 	}
-
+	else {
+		SendUpdateGamePacket();
+	}
 
 	BroadcastSnapshot();
 }
@@ -196,12 +196,17 @@ void NetworkedGame::SpawnPlayer() {
 
 void NetworkedGame::StartLevel() {
 	gameManager->StartRound();
+	SendStartGamePacket();
+}
 
-
+void NetworkedGame::ResetLevel() {
+	renderer->ClearPaint();
+	gameManager->GetTimer()->ResetTimer();
+	gameManager->SetScores(Vector2(0, 0));
+	gameManager->printResults = false;
 }
 
 void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
-
 	//SERVER version of the game will receive these from the clients
 	if (type == Received_State) {
 		ClientPacket* realPacket = (ClientPacket*)payload;
@@ -308,15 +313,26 @@ void NetworkedGame::HandleFullState(FullPacket* packet)
 	if (packet->clientID == playerID)
 		return;
 
-	if (packet->clientID < (int)networkObjects.size()) {
+	if (packet->clientID < (int) networkObjects.size()) {
 		if (networkObjects[packet->clientID])
 			networkObjects[packet->clientID]->ReadPacket(*packet);
 	}
 }
 
 void NetworkedGame::HandleGameState(GameStatePacket* packet) {
-	if (packet->gameover) {
-		Debug::Print("Game Ended", Vector2(30.0f, 50.0f), 50.0f, Debug::RED);
+	switch (packet->state) {
+	case Game_Reset:
+		ResetLevel();
+		return;
+	case Game_Start:
+		gameManager->StartRound();
+		return;
+	case Game_Update:
+		gameManager->SetScores(Vector2(packet->team1Score, packet->team2Score));
+		return;
+	case Game_Over:
+		gameManager->printResults = true;
+		return;
 	}
 }
 
@@ -329,7 +345,6 @@ bool NetworkedGame::CheckExists(IDPacket* packet)
 	}
 	if (!networkObjects[packet->clientID]) {
 		GameObject* p = LevelLoader::SpawnDummyPlayer(Vector3(packet->clientID * 5, 10, 0));
-		p->GetPhysicsObject()->SetDynamic(true);
 		p->GetPhysicsObject()->SetGravity(false);
 		p->SetNetworkObject(new NetworkObject(*p, packet->clientID));
 		networkObjects[packet->clientID] = p->GetNetworkObject();
@@ -402,4 +417,49 @@ void NetworkedGame::RemovePlayerFromServer(int clientID) {
 	if (sInd != serverPlayers.end()) {
 		serverPlayers.erase(sInd);
 	}
+}
+
+void NetworkedGame::SendResetGamePacket() {
+	GameStatePacket newPacket;
+
+	newPacket.state = Game_Reset;
+	newPacket.team1Score = 0;
+	newPacket.team2Score = 0;
+
+	thisServer->SendGlobalPacket(newPacket);
+}
+
+void NetworkedGame::SendStartGamePacket() {
+	GameStatePacket newPacket;
+
+	newPacket.state = Game_Start;
+	newPacket.team1Score = 0;
+	newPacket.team2Score = 0;
+
+	thisServer->SendGlobalPacket(newPacket);
+}
+
+void NetworkedGame::SendUpdateGamePacket() {
+	GameStatePacket newPacket;
+
+	newPacket.state = Game_Update;
+
+	Vector2 scores = gameManager->GetScores();
+	newPacket.team1Score = scores.x;
+	newPacket.team2Score = scores.y;
+
+	thisServer->SendGlobalPacket(newPacket);
+}
+
+void NetworkedGame::SendEndGamePacket() {
+	GameStatePacket newPacket;
+
+	newPacket.state = Game_Over;
+
+	Vector2 scores = gameManager->GetScores();
+	newPacket.team1Score = scores.x;
+	newPacket.team2Score = scores.y;
+
+	thisServer->SendGlobalPacket(newPacket);
+	gameManager->printResults = true;
 }

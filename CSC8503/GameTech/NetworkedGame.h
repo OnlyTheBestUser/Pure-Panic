@@ -19,14 +19,15 @@ namespace NCL {
 			void UpdateGame(float dt) override;
 
 			void SpawnPlayer();
-
 			void StartLevel();
+			void ResetLevel();
 
 			void ReceivePacket(int type, GamePacket* payload, int source) override;
 
 			void OnPlayerCollision(NetworkPlayer* a, NetworkPlayer* b);
 
 			void RemovePlayerFromServer(int clientID);
+
 
 			static NetworkedGame* GetInstance() { return singleton; }
 
@@ -75,6 +76,11 @@ namespace NCL {
 			void HandlePlayerConnect(NewPlayerPacket* packet);
 			void HandlePlayerDisconnect(PlayerDisconnectPacket* packet);
 			void HandlePowerUp(PowerUpPacket* packet);
+
+			void SendResetGamePacket();
+			void SendStartGamePacket();
+			void SendUpdateGamePacket();
+			void SendEndGamePacket();
 		};
 	}
 }
