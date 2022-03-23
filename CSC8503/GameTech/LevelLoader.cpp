@@ -162,7 +162,7 @@ void LevelLoader::ReadInLevelFile(std::string filename) {
 					singleton->AddCapsuleToWorld(Vec3FromStr(lineContents[1]), std::stof(lineContents[2]), std::stof(lineContents[3]), std::stof(lineContents[4]));
 				}
 				else if (lineContents[0] == "PAINT_WALL") {
-					singleton->AddPaintWallToWorld(Vec3FromStr(lineContents[1]), Vector3(5, 5, 4), std::stoi(lineContents[2]), lineContents[0]);
+					singleton->AddPaintWallToWorld(Vec3FromStr(lineContents[1]), Vector3(5, 4.2, 4), std::stoi(lineContents[2]), lineContents[0]);
 				}
 				else if (lineContents[0] == "POWERUP") {
 					singleton->AddPowerUpToWorld(Vec3FromStr(lineContents[1]), (const PowerUpType) std::stoi(lineContents[2]));
@@ -171,7 +171,7 @@ void LevelLoader::ReadInLevelFile(std::string filename) {
 					singleton->AddSpawnPointToWorld(Vec3FromStr(lineContents[1]));
 				}
 				else if (lineContents[0] == "THRONE") {
-					AddThroneToWorld(Vec3FromStr(lineContents[1]), std::stoi(lineContents[2]), Vec3FromStr(lineContents[3]));
+					singleton->AddThroneToWorld(Vec3FromStr(lineContents[1]), std::stoi(lineContents[2]), Vec3FromStr(lineContents[3]));
 				}
 			}
 		}
@@ -230,7 +230,7 @@ Projectile* LevelLoader::SpawnProjectile(GameObject* owner, float pitch, int pla
 
 GameObject* LevelLoader::AddFloorToWorld(const Vector3& position) {
 	GameObject* floor = new GameObject("Floor", 1.5f);
-	Vector3 floorSize = Vector3(250, 1, 250);
+	Vector3 floorSize = Vector3(160, 1, 160);
 
 	SetFieldsForCube(floor, position, floorSize, CollisionLayer::LAYER_ONE, false, false, false, 0, DEF_ELASTICITY, DEF_LDAMPING, DEF_FRICTION);
 
@@ -367,7 +367,7 @@ GameObject* LevelLoader::AddAssetToWorld(const Vector3& position, Vector3 dimens
 
 	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	cube->GetPhysicsObject()->SetDynamic(false);
-	world->AddGameObject(cube);
+	GameWorld::AddGameObject(cube);
 	return cube;
 }
 
