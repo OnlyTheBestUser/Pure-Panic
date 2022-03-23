@@ -171,7 +171,7 @@ void LevelLoader::ReadInLevelFile(std::string filename) {
 					singleton->AddSpawnPointToWorld(Vec3FromStr(lineContents[1]));
 				}
 				else if (lineContents[0] == "THRONE") {
-					AddThroneToWorld(Vec3FromStr(lineContents[1]), std::stoi(lineContents[2]));
+					AddThroneToWorld(Vec3FromStr(lineContents[1]), std::stoi(lineContents[2]), Vec3FromStr(lineContents[3]));
 				}
 			}
 		}
