@@ -1,8 +1,15 @@
 #include "Player.h"
 #include "../GameTech/LevelLoader.h"
+#include "GameManager.h"
 
 using namespace NCL;
 using namespace CSC8503;
+
+Player::Player(Camera* camera, LevelLoader* lvlLoader, GameWorld* world, string name, Vector3 ch) : GameActor(name), checkpoint(ch), spawnPos(ch), levelLoader(lvlLoader), world(world) {
+	this->camera = camera;
+	camLocked = true;
+	playerID = 0;
+};
 
 void Player::OnCollisionBegin(GameObject* other, Vector3 localA, Vector3 localB, Vector3 normal)
 {
@@ -12,6 +19,10 @@ void Player::OnCollisionBegin(GameObject* other, Vector3 localA, Vector3 localB,
 			DealDamage(projectile->GetDamage());
 		}
 	}
+}
+
+void Player::SetColour(Vector4 col) {
+	this->renderObject->SetColour(GameManager::GetColourForID(playerID));
 }
 
 void Player::Update(float dt)
@@ -109,6 +120,11 @@ bool Player::IsDead(){
 void Player::Respawn(){
 	GetTransform().SetPosition(spawnPos);
 	health = maxHealth;
+}
+
+void Player::SetPlayerID(int playerID){
+	SetColour(GameManager::GetColourForID(playerID));
+	this->playerID = playerID;
 }
 
 void Player::Reset() 

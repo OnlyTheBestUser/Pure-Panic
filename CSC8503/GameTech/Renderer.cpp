@@ -39,10 +39,16 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 	skyboxMesh->SetVertexIndices({ 0,1,2,2,3,0 });
 	skyboxMesh->UploadToGPU();
 
-	uiMesh = new OGLMesh();
-	uiMesh->SetVertexPositions({ Vector3(-0.5f, 0.2f,-0.5f), Vector3(-0.5f,0.1f,-0.5f) , Vector3(0.5f,0.1f,-0.5f) , Vector3(0.5f,0.2f,-0.5f) });
-	uiMesh->SetVertexIndices({ 0,1,2,2,3,0 });
-	uiMesh->UploadToGPU();
+	uiBarMesh = new OGLMesh();
+	uiBarMesh->SetVertexPositions({ Vector3(-0.5f, 0.2f,-0.5f), Vector3(-0.5f,0.1f,-0.5f) , Vector3(0.5f,0.1f,-0.5f) , Vector3(0.5f,0.2f,-0.5f) });
+	uiBarMesh->SetVertexIndices({ 0,1,2,2,3,0 });
+	uiBarMesh->UploadToGPU();
+
+	uiCrosshairMesh = new OGLMesh();
+	uiCrosshairMesh->SetVertexPositions({ Vector3(-0.025f, 0.2f,-0.025f), Vector3(-0.025f,0.1f,-0.025f) , Vector3(0.025f,0.1f,-0.025f) , Vector3(0.025f,0.2f,-0.025f) });
+	uiCrosshairMesh->SetVertexTextureCoords({ Vector2(0,0), Vector2(0,1), Vector2(1,1) , Vector2(1,0) });
+	uiCrosshairMesh->SetVertexIndices({ 0,1,2,2,3,0 });
+	uiCrosshairMesh->UploadToGPU();
 	//ui = new RenderObject(nullptr, uiMesh, nullptr, uiShader);
 
 	ForceValidDebugState(true);
@@ -55,7 +61,7 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 		"/Cubemap/skyrender0002.png",
 		"/Cubemap/skyrender0005.png"
 	);
-
+	
 	shadowFBO = new OGLFrameBuffer();
 	shadowFBO->AddTexture();
 
@@ -63,8 +69,11 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 	//maskFBO->AddTexture(2048 / 4, 2048 / 4);
 	maskShader = new OGLShader("MaskVertex.glsl", "MaskFragment.glsl");
 
-	uiShader = new OGLShader("UIVert.glsl", "UIFrag.glsl");
+	uiBarShader = new OGLShader("UIBarVert.glsl", "UIBarFrag.glsl");
 
+
+	crosshairTex = OGLTexture::RGBATextureFromFilename("crosshair.png");
+	uiCrosshairShader = new OGLShader("UICrosshairVert.glsl", "UICrosshairFrag.glsl");
 	// Uniform block bindings
 	camBuffer = new OGLUniformBuffer(sizeof(CameraMatrix), 0);
 
@@ -390,23 +399,32 @@ void Renderer::ApplyPaintToMasks() {
 }
 
 void Renderer::DrawGUI() {
-	uiShader->BindShader();
+	uiBarShader->BindShader();
 
 	rendererAPI->SetCullFace(false);
 	rendererAPI->SetBlend(false);
 	rendererAPI->SetDepth(false);
 
 	
-	uiShader->UpdateUniformMatrix4("viewProjMatrix", Matrix4::Translation(Vector3(0, 1, 0)) * Matrix4::Orthographic(-1, 1.0f, 1, -1, -1, 1));
-	uiShader->UpdateUniformVector2("ratio", scores);
-	uiShader->UpdateUniformVector4("team1Colour", GameManager::team1Colour);
-	uiShader->UpdateUniformVector4("team2Colour", GameManager::team2Colour);
-	uiShader->UpdateUniformVector2("screenSize", Vector2(rendererAPI->GetCurrentWidth(), rendererAPI->GetCurrentHeight()));
-	rendererAPI->DrawMesh(uiMesh);
+	uiBarShader->UpdateUniformMatrix4("viewProjMatrix", Matrix4::Translation(Vector3(0, 1, 0)) * Matrix4::Orthographic(-1, 1.0f, 1, -1, -1, 1));
+	uiBarShader->UpdateUniformVector2("ratio", scores);
+	uiBarShader->UpdateUniformVector4("team1Colour", GameManager::team1Colour);
+	uiBarShader->UpdateUniformVector4("team2Colour", GameManager::team2Colour);
+	uiBarShader->UpdateUniformVector2("screenSize", Vector2(rendererAPI->GetCurrentWidth(), rendererAPI->GetCurrentHeight()));
+	rendererAPI->DrawMesh(uiBarMesh);
+
+	rendererAPI->SetBlend(true, RendererAPI::BlendType::ONE, RendererAPI::BlendType::ONE_MINUS_ALPHA);
+
+	crosshairTex->Bind(0);
+	uiCrosshairShader->BindShader();
+	uiCrosshairShader->UpdateUniformMatrix4("viewProjMatrix", Matrix4::Translation(Vector3(0, 0.1f, 0)) * Matrix4::Orthographic(-1, 1.0f, 1, -1, -1, 1));
+	uiCrosshairShader->UpdateUniformVector4("colour", playerColour);
+	rendererAPI->DrawMesh(uiCrosshairMesh);
 
 
+
+	rendererAPI->SetBlend(false, RendererAPI::BlendType::ONE, RendererAPI::BlendType::NONE);
 	rendererAPI->SetCullFace(true);
-	rendererAPI->SetBlend(true);
 	rendererAPI->SetDepth(true);
 }
 

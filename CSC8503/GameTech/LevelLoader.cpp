@@ -7,6 +7,7 @@
 #include "../CSC8503Common/GameWorld.h"
 #include "../../Common/TextureLoader.h"
 #include "../../Common/Assets.h"
+#include "../CSC8503Common/GameManager.h"
 
 #ifdef _ORBIS
 #include "../../Plugins/PlayStation4/PS4Mesh.h"
@@ -183,6 +184,7 @@ Player* LevelLoader::AddPlayerToWorld(const Vector3& position) {
 		.SetPosition(position);
 
 	character->SetRenderObject(new RenderObject(&character->GetTransform(), charMeshA, nullptr, basicShader));
+	character->SetColour(GameManager::GetColourForID(character->GetPlayerID()));
 	character->SetPhysicsObject(new PhysicsObject(&character->GetTransform(), character->GetBoundingVolume()));
 
 	character->GetPhysicsObject()->SetInverseMass(inverseMass);
@@ -595,6 +597,7 @@ Projectile* LevelLoader::SpawnProjectile(GameObject* owner, float pitch, int pla
 		.SetPosition((owner->GetTransform().GetPosition() + Vector3(0, 2.5f, 0)) + camForwardVector * 5.0f); //+ offset);
 
 	projectile->SetRenderObject(new RenderObject(&projectile->GetTransform(), capsuleMesh, nullptr, basicShader));
+	projectile->GetRenderObject()->SetColour(GameManager::GetColourForID(playerID));
 	projectile->SetPhysicsObject(new PhysicsObject(&projectile->GetTransform(), projectile->GetBoundingVolume()));
 
 	projectile->GetPhysicsObject()->SetInverseMass(inverseMass);

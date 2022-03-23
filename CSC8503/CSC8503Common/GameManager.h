@@ -43,6 +43,9 @@ namespace NCL {
 				Teams[t].TeamPlayers.push_back(player);
 			}
 
+			static Vector4 GetColourForID(int playerID);
+
+
 			void StartRound();
 
 			static Vector4 team1Colour;

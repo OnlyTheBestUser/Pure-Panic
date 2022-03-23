@@ -27,6 +27,10 @@ void GameManager::PlacePlayersToSpawnPositions() {
 	}
 }
 
+Vector4 GameManager::GetColourForID(int playerID) {
+	return playerID % 2 == 0 ? GameManager::team1Colour : GameManager::team2Colour;
+}
+
 void GameManager::UpdateScores(Vector2 scores) {
 	Teams[0].score += scores.x;
 	Teams[1].score += scores.y;

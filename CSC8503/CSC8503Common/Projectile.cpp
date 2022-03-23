@@ -42,23 +42,15 @@ void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vecto
 				Vector3 barycentric;
 				CollisionDetection::GetBarycentricFromRay(ray, *test, texUV_a, texUV_b, texUV_c, barycentric, collisionPoint);
 
-				Vector4 colour;
-				if (GetOwnerPlayerID() % 2 == 0) {
-					// Turquoise
-					colour = GameManager::team2Colour;
-				}
-				else {
-					// Pink
-					colour = GameManager::team2Colour;
-				}
+				Vector4 colour = GameManager::GetColourForID(GetOwnerPlayerID());
 				
 				float randRad = ((GameObject*)closestCollision.node)->GetPaintRadius() + (((static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * 2.0f) - 1.0f) * ((GameObject*)closestCollision.node)->GetPaintRadius() * 0.25f;
 
 				// Get the uv from the ray
-				//renderInst->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, randRad, 0.7, 1, colour);
+				renderInst->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, randRad, 0.7, 1, colour);
 
 				// Debug Rainbow Gun
-				renderInst->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, randRad, 0.7, 1, Vector4(static_cast <float> (rand()) / static_cast <float> (RAND_MAX) , static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX), 1));
+				//renderInst->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, randRad, 0.7, 1, Vector4(static_cast <float> (rand()) / static_cast <float> (RAND_MAX) , static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX), 1));
 			}
 		}
 	}

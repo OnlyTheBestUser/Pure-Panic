@@ -124,10 +124,12 @@ TutorialGame::~TutorialGame() {
 void TutorialGame::UpdateGame(float dt) {
 	Debug::SetRenderer(renderer);
 	switch (state) {
-	case PLAY: UpdateGameWorld(dt); break;
+	case PLAY: 
+		UpdateGameWorld(dt); break;
 	case PAUSE: UpdatePauseScreen(dt); break;
 	case WIN: UpdateWinScreen(dt); break;
 	case RESET: {
+		renderer->playerColour = player1->GetPlayerID() % 2 == 0 ? GameManager::team2Colour : GameManager::team1Colour;
 		InitCamera();
 		InitWorld();
 		renderer->ClearPaint();
@@ -383,6 +385,7 @@ void TutorialGame::InitWorld() {
 	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);*/
 
 	player1 = player;
+	renderer->playerColour = GameManager::GetColourForID(player1->GetPlayerID());
 
 	//Projectile* spit = AddProjectileToWorld(Vector3(5, 5, 0), 0.3f, 1.0f);
 
