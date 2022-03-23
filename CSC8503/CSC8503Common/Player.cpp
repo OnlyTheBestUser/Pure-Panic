@@ -38,7 +38,7 @@ void Player::Update(float dt)
 	float distanceToGround = CheckDistToGround();
 
 	// For smooth jump mechanism
-	if (distanceToGround < 1.5f) {
+	if (distanceToGround < 0.1f) {
 		canJump = true;
 	}
 	else {
@@ -46,7 +46,7 @@ void Player::Update(float dt)
 	}
 
 	// Check if grounded, if so don't apply more gravity
-	if (distanceToGround < 1.5f && force.y <= 0.0f)
+	if (distanceToGround < 0.1f && force.y <= 0.0f)
 	{
 		Vector3 currentVel = GetPhysicsObject()->GetLinearVelocity();
 		GetPhysicsObject()->SetLinearVelocity(Vector3(currentVel.x, 0.0f, currentVel.z));
@@ -71,7 +71,7 @@ float Player::CheckDistToGround()
 {
 	Ray ray(GetTransform().GetPosition(), Vector3(0, -1, 0));
 	RayCollision closestCollision;
-	GameWorld::Raycast(ray, closestCollision, true);
+	GameWorld::RaycastIgnoreObject(this, ray, closestCollision, true);
 	float distToGround = GetTransform().GetPosition().y - closestCollision.collidedAt.y;
 
 	const CollisionVolume* volume = GetBoundingVolume();
@@ -80,7 +80,7 @@ float Player::CheckDistToGround()
 	case VolumeType::AABB:    distToGround -= ((const AABBVolume&)*    volume).GetHalfDimensions().y; break;
 	case VolumeType::OBB:     distToGround -= ((const OBBVolume&)*     volume).GetHalfDimensions().y; break;
 	case VolumeType::Sphere:  distToGround -= ((const SphereVolume&)*  volume).GetRadius(); break;
-	case VolumeType::Capsule: distToGround -= ((const CapsuleVolume&)* volume).GetHalfHeight(); break;
+	case VolumeType::Capsule: distToGround -= ((const CapsuleVolume&)* volume).GetHalfHeight() + ((const CapsuleVolume&)* volume).GetRadius(); break;
 	}
 
 	return distToGround;
