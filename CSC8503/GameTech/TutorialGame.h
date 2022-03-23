@@ -53,6 +53,10 @@ namespace NCL {
 				return quit;
 			}
 
+			void SetQuit(bool quit) {
+				this->quit = quit;
+			}
+
 			void PaintObject();
 
 		protected:

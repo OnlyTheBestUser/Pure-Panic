@@ -2,9 +2,8 @@
 using namespace NCL;
 using namespace CSC8503;
 
-MainMenu::MainMenu(TutorialGame* start, TutorialGame* training) : renderer(RendererBase()) {
-	levelState = new LevelState(start);
-	trainingState = new LevelState(training);
+MainMenu::MainMenu(TutorialGame* start, TutorialGame* training) 
+	: renderer(RendererBase()), networkedLevel(start), trainingLevel(training) {
 	pushMachine = new PushdownMachine((PushdownState*)this);
 }
 
@@ -28,9 +27,9 @@ PushdownState::PushdownResult MainMenu::OnUpdate(float dt, PushdownState** newSt
 		}
 	};
 
-	drawMenuOption("Start Networked Game", {30,10}, selectedItem, 0);
-	drawMenuOption("Start Training Game", { 30,30 }, selectedItem, 1);
-	drawMenuOption("Quit", { 30,50 }, selectedItem, 2);
+	drawMenuOption("Start Networked Game", {30,50}, selectedItem, 0);
+	drawMenuOption("Start Training Game", { 30,60 }, selectedItem, 1);
+	drawMenuOption("Quit", { 30,70 }, selectedItem, 2);
 
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::C)) {
 		switch (selectedItem)
@@ -39,15 +38,15 @@ PushdownState::PushdownResult MainMenu::OnUpdate(float dt, PushdownState** newSt
 			return PushdownState::PushdownResult::NoChange;
 			break;
 		case 0:
-			*newState = (LevelState*)levelState;
+			*newState = new LevelState(networkedLevel);
 			return PushdownState::PushdownResult::Push;
 			break;
 		case 1:
-			*newState = (LevelState*)trainingState;
+			*newState = new LevelState(trainingLevel);
 			return PushdownState::PushdownResult::Push;
 			break;
 		case 2:
-			return PushdownState::PushdownResult::NoChange;
+			return PushdownState::PushdownResult::Exit;
 			break;
 		}
 	}

@@ -127,6 +127,7 @@ void TutorialGame::UpdateGame(float dt) {
 		renderer->ClearPaint();
 		selectionObject = nullptr;
 		state = PLAY;
+		quit = false;
 		break;
 	}
 	}

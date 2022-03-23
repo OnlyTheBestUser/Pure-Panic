@@ -16,10 +16,12 @@ namespace NCL {
 				if (!level)
 					return PushdownResult::Pop;
 
-				level->UpdateGame(dt);
-
-				if (level->GetQuit())
+				if (level->GetQuit()) {
+					level->SetQuit(false);
 					return PushdownResult::Pop;
+				}
+
+				level->UpdateGame(dt);
 				
 
 				return PushdownState::PushdownResult::NoChange;
@@ -40,8 +42,8 @@ namespace NCL {
 			InputHandler* inputHandler;
 			RendererBase renderer;
 
-			LevelState* levelState;
-			LevelState* trainingState;
+			TutorialGame* networkedLevel;
+			TutorialGame* trainingLevel;
 			PushdownMachine* pushMachine;
 
 			int selectedItem = 0;

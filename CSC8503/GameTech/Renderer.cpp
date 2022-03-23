@@ -257,14 +257,15 @@ void Renderer::RenderObjects() {
 void NCL::Rendering::Renderer::ClearPaint()
 {
 	GameObjectIterator start;
-	GameObjectIterator cur;
 	GameObjectIterator end;
 	gameWorld.GetPaintableObjectIterators(start, end);
-	cur = start;
 
-	while (cur != end) {
-		(*cur)->GetRenderObject()->GetPaintMask()->ResetTexture();
-		cur++;
+	for (auto it = start; it != end; ++it){
+		if (!(*it)->GetRenderObject()) return;
+
+		if ((*it)->GetRenderObject()->GetPaintMask()) return;
+
+		(*it)->GetRenderObject()->GetPaintMask()->ResetTexture();
 	}
 }
 
