@@ -27,88 +27,6 @@ size_t       sceLibcHeapSize = 256 * 1024 * 1024;	/* Set up heap area upper limi
 #include "../CSC8503Common/PushdownMachine.h"
 #include <iostream>
 
-#include "Thread.h"
-#include "MutexClass.h"
-
-vector<TutorialGame*> sharedGameBuffer;	// shared thread buffer
-bool doneLoading = true;	// shared thread buffer
-//LoadingScreen* ls;		// global shared load screen
-MutexClass mutex;		// global mutex object
-
-class Loader : public Thread
-{
-public:
-	void AssignLoadScreen(LoadingScreen* l) { ls = l; }
-protected:
-	virtual void Run();
-	LoadingScreen* ls;
-};
-//class MainMenuInitialiser : public Thread
-//{
-//protected:
-//	virtual void Run();
-//};
-//class NetworkedGameInitialiser : public Thread
-//{
-//protected:
-//	virtual void Run();
-//};
-//class SplitscreenGameInitialiser : public Thread
-//{
-//protected:
-//	virtual void Run();
-//};
-
-void Loader::Run()
-{
-	bool done = false;
-	while (!done)
-	{
-		mutex.LockMutex();
-		if (doneLoading)
-		{
-			done = true;
-			completed = true;
-		}
-		else
-		{
-			ls->UpdateProgress(progression);
-			//ls->UpdateGame(0.01f);
-		}
-		mutex.UnlockMutex();
-	}
-}
-//void MainMenuInitialiser::Run()
-//{
-//	std::cout << "MAIN MENU INIT" << std::endl;
-//	MainMenu* mm = new MainMenu();
-//	mutex.LockMutex();
-//	sharedGameBuffer.push_back(mm);
-//	completed = true;
-//	mutex.UnlockMutex();
-//	std::cout << "MAIN MENU FINISH" << std::endl;
-//}
-//void NetworkedGameInitialiser::Run()
-//{
-//	std::cout << "NETWORKED GAME INIT" << std::endl;
-//	NetworkedGame* ng = new NetworkedGame();
-//	mutex.LockMutex();
-//	sharedGameBuffer.push_back(ng);
-//	completed = true;
-//	mutex.UnlockMutex();
-//	std::cout << "NETWORKED GAME FINISH" << std::endl;
-//}
-//void SplitscreenGameInitialiser::Run()
-//{
-//	std::cout << "TUTORIAL GAME INIT" << std::endl;
-//	TutorialGame* tg = new TutorialGame();
-//	mutex.LockMutex();
-//	sharedGameBuffer.push_back(tg);
-//	completed = true;
-//	mutex.UnlockMutex();
-//	std::cout << "TUTORIAL GAME FINISH" << std::endl;
-//}
-
 using namespace NCL;
 using namespace CSC8503;
 using namespace NCL;
@@ -237,53 +155,17 @@ public:
 	Loading(LoadingScreen* l) : ls(l) {};
 	PushdownResult OnUpdate(float dt, PushdownState** newState) override 
 	{
-		if (!threadMade)
-		{
-			doneLoading = false;
-			loadThread.AssignLoadScreen(ls);
-			loadThread.Start();
-			threadMade = true;
-		}
-		ls->UpdateGame(dt);
+		LoadingScreen::UpdateGame(dt);
 
 		m = new MainMenu();
-		ls->UpdateProgress(33.3f);
-		ls->UpdateGame(dt);
-
 		ng = new NetworkedGame();
-		ls->UpdateProgress(66.6f);
-		ls->UpdateGame(dt);
-
 		tg = new TutorialGame();
-		ls->UpdateProgress(99.9f);
-		ls->UpdateGame(dt);
-
-		mutex.LockMutex();
-		doneLoading = true;
-		mutex.UnlockMutex();
-		loadThread.Join();
-
-		mutex.LockMutex();
-		if (doneLoading)
-		{
-			goToMenu = true;
-		}
-		mutex.UnlockMutex();
-
-		if (goToMenu)
-		{
-			*newState = new Menu(m, tg, ng);
-			return PushdownResult::Push;
-		}
-
-		return PushdownResult::NoChange;
+		
+		*newState = new Menu(m, tg, ng);
+		return PushdownResult::Push;
 	}
 
 protected:
-	bool threadMade = false;
-	bool goToMenu = false;
-
-	Loader loadThread;
 	LoadingScreen* ls;
 	TutorialGame* tg;
 	NetworkedGame* ng;

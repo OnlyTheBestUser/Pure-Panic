@@ -11,17 +11,25 @@
 #include "../CSC8503Common/GameActor.h"
 #include "../CSC8503Common/Command.h"
 #include "../../Common/Assets.h"
-
 #include "../CSC8503Common/InputList.h"
+#include "LoadingScreen.h"
 
 using namespace NCL;
 using namespace CSC8503;
 
 TutorialGame::TutorialGame()	{
 	world			= new GameWorld();
+	LoadingScreen::AddProgress(4.0f);
+	LoadingScreen::UpdateGame(0.0f);
 	renderer		= new Renderer(*world);
+	LoadingScreen::AddProgress(4.0f);
+	LoadingScreen::UpdateGame(0.0f);
 	physics			= new PhysicsSystem(*world);
+	LoadingScreen::AddProgress(8.0f);
+	LoadingScreen::UpdateGame(0.0f);
 	levelLoader		= new LevelLoader(world, physics, renderer);
+	LoadingScreen::AddProgress(17.0f);
+	LoadingScreen::UpdateGame(0.0f);
 
 #ifndef _ORBIS
 	audio = NCL::AudioManager::GetInstance();
