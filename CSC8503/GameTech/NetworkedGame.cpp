@@ -79,6 +79,7 @@ void NetworkedGame::UpdateGame(float dt) {
 		timeToNextPacket += 1.0f / 60.0f; //60hz server/client update
 	}
 
+#ifndef ORBISNET
 	if (!thisServer && Window::GetKeyboard()->KeyPressed(KeyboardKeys::F9)) {
 		StartAsServer();
 		std::cout << "Server start" << std::endl;
@@ -93,6 +94,7 @@ void NetworkedGame::UpdateGame(float dt) {
 	if (thisServer && Window::GetKeyboard()->KeyPressed(KeyboardKeys::F8)) {
 		SendResetGamePacket();
 	}
+#endif
 
 	for (auto x : powerups) {
 		if (x->IsPickedUp()) {
@@ -101,8 +103,10 @@ void NetworkedGame::UpdateGame(float dt) {
 			powerUpPacket.clientID = playerID;
 			if(thisClient)
 				thisClient->SendPacket(powerUpPacket);
+#ifndef ORBISNET
 			if (thisServer)
 				thisServer->SendGlobalPacket(powerUpPacket);
+#endif
 		}
 	}
 
@@ -117,7 +121,13 @@ void NetworkedGame::UpdateAsServer(float dt) {
 		FirePacket* newPacket = new FirePacket();
 		newPacket->clientID = localPlayer->GetNetworkObject()->GetNetID();
 		newPacket->pitch = localPlayer->GetCam()->GetPitch();
+		newPacket->bulletCounter = localPlayer->BulletCounter;
+		newPacket->spread = (localPlayer->GetCurrentPowerup() == PowerUpType::MultiBullet);
+    
+#ifndef ORBISNET
 		thisServer->SendGlobalPacket(*newPacket);
+#endif
+    
 		delete newPacket;
 	}
 
@@ -152,6 +162,13 @@ void NetworkedGame::UpdateAsClient(float dt) {
 	newPacket.pitch = localPlayer->GetCam()->GetPitch();
 
 	newPacket.firing = localPlayer->IsFiring();
+	newPacket.spread = (localPlayer->GetCurrentPowerup() == PowerUpType::MultiBullet);
+
+	newPacket.bulletCounter = localPlayer->BulletCounter;
+
+	if (newPacket.firing) {
+		std::cout << "Client: " << newPacket.bulletCounter << std::endl;
+	}
 
 	thisClient->SendPacket(newPacket);
 
@@ -172,7 +189,9 @@ void NetworkedGame::BroadcastSnapshot() {
 
 		GamePacket* newPacket = nullptr;
 		if (o->WritePacket(&newPacket)) {
+#ifndef ORBISNET
 			thisServer->SendGlobalPacket(*newPacket);
+#endif
 			delete newPacket;
 		}
 	}
@@ -273,7 +292,8 @@ void NetworkedGame::HandleClientPacket(ClientPacket* packet)
 			obj->second->GetTransform().SetPosition(pos);
 			obj->second->GetTransform().SetOrientation(Quaternion::EulerAnglesToQuaternion(0, packet->yaw, 0));
 			if (packet->firing) {
-				Fire(obj->second, packet->pitch, packet->clientID);
+				std::cout << "Handle Client Packet: " << packet->bulletCounter << std::endl;
+				ServerFire(obj->second, packet->pitch, packet->bulletCounter, packet->spread, packet->clientID);
 			}
 		}
 	}
@@ -299,13 +319,31 @@ void NetworkedGame::AddNewPlayerToServer(int clientID, int lastID)
 	std::cout << "New player added to server: ClientID (" << clientID << "), LastID(" << lastID << ")\n";
 }
 
-void NetworkedGame::Fire(GameObject* owner, float pitch, int clientID)
+void NetworkedGame::ServerFire(GameObject* owner, float pitch, int bulletCounter, bool spread, int clientID)
 {
-	LevelLoader::SpawnProjectile(owner, pitch, clientID);
+	Fire(owner, spread, bulletCounter, pitch, clientID);
+	std::cout << "ServerFire: " << bulletCounter << std::endl;
 	FirePacket newPacket;
 	newPacket.clientID = clientID;
 	newPacket.pitch = pitch;
+	newPacket.bulletCounter = bulletCounter;
+	newPacket.spread = spread;
+#ifndef ORBISNET
 	thisServer->SendGlobalPacket(newPacket); 
+#endif
+  
+}
+
+void NetworkedGame::Fire(GameObject* owner, bool spread, int bulletCounter, float pitch, int clientID)
+{
+	int num = 1;
+	if (spread) {
+		num = 5;
+	}
+
+	for (int i = 0; i < num; i++) {
+		LevelLoader::SpawnProjectile(owner, spread, bulletCounter, pitch, clientID);
+	}
 }
 
 void NetworkedGame::HandleFullState(FullPacket* packet)
@@ -358,8 +396,9 @@ void NetworkedGame::HandleFireState(FirePacket* packet)
 	if (packet->clientID == playerID)
 		return;
 	auto obj = networkObjects[packet->clientID];
-	if (obj)
-		LevelLoader::SpawnProjectile(&obj->object, packet->pitch, packet->clientID);
+	if (obj) {
+		Fire(&obj->object, packet->spread, packet->bulletCounter, packet->pitch, packet->clientID);
+	}
 }
 
 void NetworkedGame::HandleAssignID(AssignIDPacket* packet)
@@ -395,13 +434,16 @@ void NetworkedGame::HandlePlayerDisconnect(PlayerDisconnectPacket* packet) {
 void NetworkedGame::HandlePowerUp(PowerUpPacket* packet)
 {
 	for (PowerUp* x : powerups) {
+		std::cout << "p" << std::endl;
 		if (x->GetWorldID() == packet->worldID) {
-			world->RemoveGameObject(x);
+			x->PickUp();
 		}
 	}
 
 	if (thisServer) {
+#ifndef ORBISNET
 		thisServer->SendGlobalPacket(*(GamePacket*)packet);
+#endif
 	}
 }
 

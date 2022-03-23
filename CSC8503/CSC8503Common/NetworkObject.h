@@ -35,6 +35,8 @@ namespace NCL {
 
 		struct FirePacket : public IDPacket {
 			float	pitch;
+			bool	spread;
+			int		bulletCounter;
 
 			FirePacket() {
 				type = Fire_State;
@@ -58,6 +60,8 @@ namespace NCL {
 			float	pos[3];
 			float	pitch, yaw;
 			bool	firing;
+			bool	spread;
+			int		bulletCounter;
 
 			ClientPacket() {
 				type = Received_State;

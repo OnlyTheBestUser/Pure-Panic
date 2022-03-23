@@ -2,7 +2,8 @@
 #include "Debug.h"
 #include <algorithm>
 
-using namespace NCL::CSC8503;
+using namespace NCL;
+using namespace CSC8503;
 
 void Timer::Update(const float& dt) {
 	if (state == TimerStates::Running) {

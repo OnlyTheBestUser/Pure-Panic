@@ -247,10 +247,12 @@ void Renderer::RenderObjects() {
 		shader->UpdateUniformMatrix4("invModelMatrix", modelMatrix.Inverse());
 #ifdef _WIN64
 		shader->UpdateUniformMatrix4("shadowMatrix", fullShadowMat);
-
+#endif
 		shader->UpdateUniformVector4("objectColour", i->GetColour());
 		shader->UpdateUniformInt("hasVertexColours", !(*i).GetMesh()->GetColourData().empty());
-#endif
+
+
+
 
 		rendererAPI->DrawMeshAndSubMesh((*i).GetMesh());
 	}
@@ -313,6 +315,7 @@ NCL::Maths::Vector2 Renderer::CountPaintMask(TextureBase* paintMask, NCL::Maths:
 		}
 		
 	}
+	delete[] data;
 	return Vector2(team1Score - prevScores.x , team2Score - prevScores.y);
 #endif
 }

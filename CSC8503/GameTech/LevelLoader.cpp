@@ -208,18 +208,6 @@ GameObject* LevelLoader::SpawnDummyPlayer(const Vector3& position) {
 	return singleton->AddPlayerObjectToWorld(position, character);
 }
 
-Projectile* LevelLoader::SpawnProjectile(Player* owner, const float& initialSpeed, const float& meshSize) {
-	return SpawnProjectile((GameObject*)owner, owner->GetCam()->GetPitch(), owner->GetPlayerID(), initialSpeed, meshSize);
-}
-
-Projectile* LevelLoader::SpawnProjectile(GameObject* owner, float pitch, int playerID, const float& initialSpeed, const float& meshSize) {
-	#ifndef _ORBIS
-		AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + "gun_fire.ogg", owner->GetTransform().GetPosition(), 0.3f);
-	#endif // !_ORBIS
-
-	return singleton->AddProjectileToWorld(owner, pitch, playerID, initialSpeed, meshSize);
-}
-
 GameObject* LevelLoader::AddFloorToWorld(const Vector3& position) {
 	GameObject* floor = new GameObject("Floor", 1.5f);
 	Vector3 floorSize = Vector3(250, 1, 250);
@@ -302,7 +290,7 @@ GameObject* LevelLoader::AddPaintWallToWorld(const Vector3& position, Vector3 di
 	GameObject* cube = new GameObject(name, 12.0f);
 	OBBVolume* volume = new OBBVolume(dimensions + Vector3(0, 10, -2));
 	cube->SetBoundingVolume((CollisionVolume*)volume);
-
+	
 	cube->GetTransform()
 		.SetPosition(position)
 		.SetScale(dimensions * 2)
@@ -329,7 +317,7 @@ GameObject* LevelLoader::AddPaintWallToWorld(const Vector3& position, Vector3 di
 
 	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	cube->GetPhysicsObject()->SetDynamic(false);
-
+	cube->GetPhysicsObject()->SetElasticity(0.0f);
 	GameWorld::AddGameObject(cube);
 
 	return cube;
@@ -429,7 +417,7 @@ GameObject* LevelLoader::AddRenderPartToWorld(const Vector3& position, Vector3 d
 	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, OGLTexture::RGBATextureEmpty(texture->GetWidth()/16,texture->GetHeight()/16), basicShader));
 #endif
 #ifdef _ORBIS
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, basicShader));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, PS4::PS4Texture::EmptyTex(texture->GetWidth() / 16, texture->GetHeight() / 16), basicShader));
 #endif
 
 	GameWorld::AddGameObject(cube);
@@ -512,12 +500,25 @@ PowerUp*    LevelLoader::AddPowerUpToWorld(const Vector3& position, const PowerU
 	
 	GameWorld::AddGameObject(powerup);
 	NetworkedGame::AddPowerUp(powerup);
-
 	return powerup;
 }
 
-Projectile* LevelLoader::AddProjectileToWorld(GameObject* owner, float pitch, int playerID, const float& initialSpeed, const float& meshSize) {
-	float inverseMass = 1.0f;
+Projectile* LevelLoader::SpawnProjectile(Player* owner, const bool& NeedBulletSpread, const float& initialSpeed, const float& meshSize) {
+	return SpawnProjectile((GameObject*)owner, NeedBulletSpread, owner->BulletCounter, owner->GetCam()->GetPitch(), owner->GetPlayerID(), initialSpeed, meshSize);
+}
+
+Projectile* LevelLoader::SpawnProjectile(GameObject* owner, const bool& NeedBulletSpread, const int bulletIndex, float pitch, int playerID, const float& initialSpeed, const float& meshSize)
+{
+  #ifndef _ORBIS
+	AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + "gun_fire.ogg", owner->GetTransform().GetPosition(), 0.3f);
+#endif // !_ORBIS
+  return singleton->AddProjectileToWorld(owner, NeedBulletSpread, bulletIndex, pitch, playerID, initialSpeed, meshSize);
+}
+
+Projectile* LevelLoader::AddProjectileToWorld(GameObject* owner, const bool& NeedBulletSpread, const int bulletIndex, float pitch, int playerID, const float& initialSpeed, const float& meshSize) {
+  float inverseMass = 1.0f;
+
+	const int SPREAD_ANGLE_CONST = 400;
 
 	Vector3 ownerRot = owner->GetTransform().GetOrientation().ToEuler();
 
@@ -542,8 +543,20 @@ Projectile* LevelLoader::AddProjectileToWorld(GameObject* owner, float pitch, in
 
 	float velocityDueToMovement = Vector3::Dot(camForwardVector, owner->GetPhysicsObject()->GetLinearVelocity());
 	
-	float angle1 = float((rand() % 200) - 100) / (66.67f);
-	float angle2 = float((rand() % 200) - 100) / (66.67f);
+	//#TODO
+	//Few sets of fixed random angle for normal firing (based on bullet counter placed in player class)
+	//Random spawn fine if multibullet powerup but increase spread
+	float angle1 = 0.f, angle2=0.f;
+	float angleArr[7] = { -1.f, 1.f, -0.2f, 0.3f, 0.7f, -0.8f, 1.5f};
+
+	if (NeedBulletSpread) {
+		angle1 = float((rand() % SPREAD_ANGLE_CONST) - SPREAD_ANGLE_CONST / 2) / (66.67f);
+		angle2 = float((rand() % SPREAD_ANGLE_CONST) - SPREAD_ANGLE_CONST / 2) / (66.67f);
+	}
+	else {
+		angle1 = angleArr[bulletIndex % 7];
+		angle2 = angleArr[6 - (bulletIndex % 7)];
+	}
 
 	if (velocityDueToMovement < 0.0f) velocityDueToMovement = 0.0f;
 

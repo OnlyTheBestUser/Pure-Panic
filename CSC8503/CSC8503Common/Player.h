@@ -136,6 +136,8 @@ namespace NCL {
 			int GetPlayerID() const { return playerID; }
 			void SetPlayerID(int x) { playerID = x; }
 
+			int BulletCounter = 0;
+
         protected:
 
 			void SprayBullets();

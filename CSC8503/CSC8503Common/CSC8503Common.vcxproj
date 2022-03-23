@@ -114,7 +114,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">
     <IncludePath>$(IncludePath)</IncludePath>
-    <IncludePath>$(SolutionDir)ORBIS_Debug;$(IncludePath);$(SolutionDir)Plugins\FMod\PS4\api\core\inc\;$(SolutionDir)Plugins\FMod\PS4\api\studio\inc\;$(SolutionDir)\Plugins\Networking-ENet\include</IncludePath>
+    <IncludePath>$(SolutionDir)ORBIS_Debug;$(IncludePath);$(SolutionDir)Plugins\FMod\PS4\api\core\inc\;$(SolutionDir)Plugins\FMod\PS4\api\studio\inc\</IncludePath>
     <LibraryPath>$(SolutionDir)ORBIS_Debug;$(SolutionDir)Plugins\FMod\PS4\api\core\lib\;$(SolutionDir)Plugins\FMod\PS4\api\studio\lib\;</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
