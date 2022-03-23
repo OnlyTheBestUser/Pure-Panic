@@ -481,12 +481,13 @@ void LevelLoader::AddWallHammerToWorld(const Vector3& position, int rotation)
 	return;
 }
 
-void LevelLoader::AddThroneToWorld(const Vector3& position, int rotation)
+void LevelLoader::AddThroneToWorld(const Vector3& position, int rotation, const Vector3& scale)
 {
 	Vector3 location = position + Vector3(0, 4, 0);
-	Vector3 dimensions = Vector3(2, 4, 2);
+	Vector3 phyDimensions = Vector3(2, 4, 2) * scale;
+	Vector3 meshDimensions = Vector3(1.5f, 1.5f, 1.5f) * scale;
 
-	AddAssetToWorld(position, Vector3(1.5f, 1.5f, 1.5f), rotation, sanctumThrone, sanctumThroneTex, location, dimensions, 10.f, "Sanctum Throne")
+	AddAssetToWorld(position, meshDimensions, rotation, sanctumThrone, sanctumThroneTex, location, phyDimensions, 10.f, "Sanctum Throne")
 		->GetPhysicsObject()->Sleep();
 	return;
 }
