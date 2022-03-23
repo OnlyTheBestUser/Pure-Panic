@@ -174,7 +174,7 @@ void LevelLoader::ReadInLevelFile(std::string filename) {
 					singleton->AddThroneToWorld(Vec3FromStr(lineContents[1]), std::stoi(lineContents[2]), Vec3FromStr(lineContents[3]));
 				}
 				else if (lineContents[0] == "PILLAR") {
-					AddPillarToWorld(Vec3FromStr(lineContents[1]), Vec3FromStr(lineContents[2]), std::stoi(lineContents[3]));
+					singleton->AddPillarToWorld(Vec3FromStr(lineContents[1]), Vec3FromStr(lineContents[2]), std::stoi(lineContents[3]));
 				}
 			}
 		}
@@ -263,7 +263,7 @@ GameObject* LevelLoader::AddPillarToWorld(const Vector3& position, Vector3 dimen
 
 	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	cube->GetPhysicsObject()->SetDynamic(false);
-	world->AddGameObject(cube);
+	GameWorld::AddGameObject(cube);
 	return cube;
 }
 
