@@ -33,6 +33,8 @@ namespace NCL {
 			static Projectile* SpawnProjectile(Player* owner, const bool& NeedBulletSpread, const float& initialSpeed = PROJ_SPEED, const float& meshSize = PROJ_SIZE);
 			static Projectile* SpawnProjectile(GameObject* owner, const bool& NeedBulletSpread, const int bulletIndex, float pitch, int playerID, const float& initialSpeed = PROJ_SPEED, const float& meshSize = PROJ_SIZE);
 
+			Projectile* SpawnProjectile(Player* owner, const bool& IsPlayerDead, const float& initialSpeed = PROJ_SPEED, const float& meshSize = PROJ_SIZE);
+
 		protected:
 			GameObject* AddFloorToWorld    (const Vector3& position);
 			GameObject* AddAABBWallToWorld (const Vector3& position, Vector3 dimensions, int rotation, string name = "AABBWall");

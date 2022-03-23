@@ -3,6 +3,8 @@
 #include "../CSC8503Common/AudioManager.h"
 #include "../../Common/Assets.h"
 
+const Vector4 COLOUR_A = Vector4(0.011, 0.988, 0.941, 1); // Turquoise
+const Vector4 COLOUR_B = Vector4(1, 0.039, 0.941, 1); // Pink
 
 void Projectile::Update(float dt) {
 	Vector3 velocityDir = (this->GetPhysicsObject()->GetLinearVelocity()).Normalised();
@@ -36,15 +38,25 @@ void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vecto
 				Vector3 barycentric;
 				CollisionDetection::GetBarycentricFromRay(ray, *test, texUV_a, texUV_b, texUV_c, barycentric, collisionPoint);
 
+				if (IsDeathProjectile)
+					std::cout << "\n OwnerPlayerID: " << GetOwnerPlayerID() << std::endl;
+
 				Vector4 colour;
 				if (GetOwnerPlayerID() % 2 == 0) {
-					// Turquoise
-					colour = Vector4(0.011, 0.988, 0.941, 1);
+					if (IsDeathProjectile) {
+						colour = COLOUR_B;
+					}
+					else colour = COLOUR_A;
 				}
 				else {
-					// Pink
-					colour = Vector4(1, 0.039, 0.941, 1);
+					if (IsDeathProjectile) {
+						colour = COLOUR_A;
+					}
+					else colour = COLOUR_B;
 				}
+
+				if (IsDeathProjectile)
+					colour = Vector4(0, 0, 0, 1);
 				
 				float randRad = ((GameObject*)closestCollision.node)->GetPaintRadius() + (((static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * 2.0f) - 1.0f) * ((GameObject*)closestCollision.node)->GetPaintRadius() * 0.25f;
 
@@ -56,6 +68,5 @@ void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vecto
 			}
 		}
 	}
-	
 	GameWorld::RemoveGameObject(this, true);
 }

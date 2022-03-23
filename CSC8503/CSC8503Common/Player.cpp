@@ -61,10 +61,17 @@ void Player::Update(float dt)
 	force = Vector3(0, 0, 0);
 	
 	if (IsDead()) {
+		FireDeathProjectiles();
 		Respawn();
 	}
 
 	Debug::Print("Health: " + std::to_string(health), { 50.0f,90.0f });
+}
+
+void Player::FireDeathProjectiles() {
+	bulletsPerShot = 10;
+	camera->ChangePitch(90.0f);
+	Fire();
 }
 
 float Player::CheckDistToGround()
@@ -104,7 +111,7 @@ void Player::Fire() {
 
 bool Player::IsDead(){
 	if (health <= 0.0f) {
-		std::cout << "I'm Dead" << std::endl;
+		//std::cout << "I'm Dead" << std::endl;
 		return true;
 	}
 	return false;
@@ -113,7 +120,7 @@ bool Player::IsDead(){
 void Player::Respawn(){
 	GetTransform().SetPosition(spawnPos);
 	health = maxHealth;
-	BulletCounter = 0;
+	bulletsPerShot = BULLETS_PER_SHOT;
 }
 
 void Player::Reset() 
