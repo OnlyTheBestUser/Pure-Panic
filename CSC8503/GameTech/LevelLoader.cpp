@@ -149,7 +149,7 @@ void LevelLoader::ReadInLevelFile(std::string filename) {
 					AddThroneToWorld(Vec3FromStr(lineContents[1]), std::stoi(lineContents[2]), Vec3FromStr(lineContents[3]));
 				}
 				else if (lineContents[0] == "PILLAR") {
-					AddAABBWallToWorld(Vec3FromStr(lineContents[1]), Vec3FromStr(lineContents[2]), std::stoi(lineContents[3]), lineContents[0]);
+					AddPillarToWorld(Vec3FromStr(lineContents[1]), Vec3FromStr(lineContents[2]), std::stoi(lineContents[3]));
 				}
 			}
 		}
@@ -262,6 +262,31 @@ GameObject* LevelLoader::AddFloorToWorld(const Maths::Vector3& position) {
 	floor->GetPhysicsObject()->SetDynamic(false);
 	world->AddGameObject(floor);
 	return floor;
+}
+
+GameObject* LevelLoader::AddPillarToWorld(const Vector3& position, Vector3 dimensions, int rotation) {
+	GameObject* cube = new GameObject("Pillar");
+	AABBVolume* volume = new AABBVolume(dimensions);
+	cube->SetBoundingVolume((CollisionVolume*)volume);
+
+	cube->GetTransform()
+		.SetPosition(position)
+		.SetScale(dimensions * 2)
+		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
+
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, basicShader));
+	cube->GetRenderObject()->SetColour(Debug::BLACK);
+
+
+	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
+
+	cube->GetPhysicsObject()->SetInverseMass(0.0f);
+	cube->GetPhysicsObject()->InitCubeInertia();
+
+	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	cube->GetPhysicsObject()->SetDynamic(false);
+	world->AddGameObject(cube);
+	return cube;
 }
 
 GameObject* LevelLoader::AddAABBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name) {

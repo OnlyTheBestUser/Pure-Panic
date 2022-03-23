@@ -47,6 +47,8 @@ namespace NCL {
 			GameObject* AddRenderPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture);
 			GameObject* AddAssetToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture, const Vector3& phyLocation, const Vector3& phyDimensions, const float& paintRad = 3.f, const string& name = "PaintableAsset");
 
+			GameObject* AddPillarToWorld(const Vector3& position, Vector3 dimensions, int rotation);
+
 			void SplitStringOnDelimiter(const std::string& s, char delim, vector<std::string>& result);
 			Vector3 Vec3FromStr(std::string input);
 
