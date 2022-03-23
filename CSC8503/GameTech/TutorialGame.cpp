@@ -13,15 +13,24 @@
 #include "../../Common/Assets.h"
 
 #include "../CSC8503Common/InputList.h"
+#include "LoadingScreen.h"
 
 using namespace NCL;
 using namespace CSC8503;
 
 TutorialGame::TutorialGame()	{
 	world			= new GameWorld();
+	LoadingScreen::AddProgress(15.0f);
+	LoadingScreen::UpdateGame(0.0f);
 	renderer		= new Renderer(*world);
+	LoadingScreen::AddProgress(10.0f);
+	LoadingScreen::UpdateGame(0.0f);
 	physics			= new PhysicsSystem(*world);
+	LoadingScreen::AddProgress(25.0f);
+	LoadingScreen::UpdateGame(0.0f);
 	levelLoader		= new LevelLoader(physics, renderer);
+	LoadingScreen::AddProgress(50.0f);
+	LoadingScreen::UpdateGame(0.0f);
 	gameManager		= new GameManager(this);
 	
 #ifndef _ORBIS
@@ -82,7 +91,6 @@ TutorialGame::TutorialGame()	{
 
 	inputHandler = new InputHandler();
 
-	Command* toggleGrav = new ToggleGravityCommand(physics);
 	Command* toggleDebug = new ToggleBoolCommand(&debugDraw);
 	Command* togglePause = new ToggleBoolCommand(&pause);
 	Command* toggleMouse = new ToggleMouseCommand(&inSelectionMode);
@@ -91,7 +99,6 @@ TutorialGame::TutorialGame()	{
 	//Command* paintFireCommand = new PaintFireCommand(this);
 	Command* startTimer = new StartTimerCommand(gameManager->GetTimer());
 	
-	inputHandler->BindButton(TOGGLE_GRAV, toggleGrav);
 	inputHandler->BindButton(TOGGLE_DEBUG, toggleDebug);
 	inputHandler->BindButton(TOGGLE_PAUSE, togglePause);
 	inputHandler->BindButton(RESET_WORLD, resetWorld);
@@ -153,13 +160,6 @@ void TutorialGame::UpdateGameWorld(float dt)
 	}
 
 	//UpdateKeys();
-
-	if (physics->GetGravity()) {
-		Debug::Print("(G)ravity on", Vector2(5, 95));
-	}
-	else {
-		Debug::Print("(G)ravity off", Vector2(5, 95));
-	}
 
 	if (debugDraw) {
 		GameObjectIterator first;
