@@ -92,7 +92,6 @@ void NetworkedGame::UpdateGame(float dt) {
 	}
 	if (thisServer && Window::GetKeyboard()->KeyPressed(KeyboardKeys::F8)) {
 		SendResetGamePacket();
-		ResetLevel();
 	}
 
 	for (auto x : powerups) {
@@ -195,6 +194,7 @@ void NetworkedGame::SpawnPlayer() {
 }
 
 void NetworkedGame::StartLevel() {
+	ResetLevel();
 	gameManager->StartRound();
 	SendStartGamePacket();
 }
@@ -325,6 +325,7 @@ void NetworkedGame::HandleGameState(GameStatePacket* packet) {
 		ResetLevel();
 		return;
 	case Game_Start:
+		ResetLevel();
 		gameManager->StartRound();
 		return;
 	case Game_Update:
@@ -427,6 +428,7 @@ void NetworkedGame::SendResetGamePacket() {
 	newPacket.team2Score = 0;
 
 	thisServer->SendGlobalPacket(newPacket);
+	ResetLevel();
 }
 
 void NetworkedGame::SendStartGamePacket() {
