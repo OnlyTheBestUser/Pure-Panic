@@ -1,5 +1,6 @@
 #include "SimpleAI.h"
 #include "Debug.h"
+#include "../CSC8503Common/GameWorld.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
 
@@ -12,8 +13,12 @@ void SimpleAI::Update(float dt)
 {
 	if (target) {
 		Vector3 force;
+		
 		force += Arrive(target->GetTransform().GetPosition());
 		physicsObject->AddForce(force);
+
+		Avoid();
+
 		RotateToVelocity();
 	}
 }
@@ -56,9 +61,37 @@ Vector3 SimpleAI::Arrive(Vector3 arriveTarget)
 	return force;
 }
 
+Vector3 SimpleAI::Avoid()
+{
+#if DRAW_DEBUG
+	Vector3 test = (Matrix4::Rotation(30, Vector3(0, 1, 0)) * Matrix4::Translation(physicsObject->GetLinearVelocity())).GetPositionVector();
+	Vector3 test2 = (Matrix4::Rotation(-30, Vector3(0, 1, 0)) * Matrix4::Translation(physicsObject->GetLinearVelocity())).GetPositionVector();
+	Debug::DrawLine(transform.GetPosition(), transform.GetPosition() + (test.Normalised() * 10.0f));
+	Debug::DrawLine(transform.GetPosition(), transform.GetPosition() + (test2.Normalised() * 10.0f));
+#endif
+	// Raycast ahead, if it hits something, raycast to the sides, whichever gets the furthest, go in that direction.
+	Ray forwardRay(transform.GetPosition() + (physicsObject->GetLinearVelocity().Normalised() * 1.5f), physicsObject->GetLinearVelocity().Normalised());
+	forwardRay.SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	RayCollision forwardCollision;
+
+	Vector4 colour = Debug::BLUE;
+
+	if (GameWorld::Raycast(forwardRay, forwardCollision, true)) {
+		colour = Debug::RED;
+		//((GameObject*)forwardCollision.node)->GetRenderObject()->SetColour(Debug::RED);
+		if ((forwardCollision.collidedAt - transform.GetPosition()).Length() < avoid_distance) {
+			std::cout << (forwardCollision.collidedAt - transform.GetPosition()).Length() << std::endl;
+		}
+	}
+	Debug::DrawLine(forwardRay.GetPosition(), forwardRay.GetPosition() + (forwardRay.GetDirection().Normalised() * avoid_distance), colour);
+
+	return Vector3();
+}
+
 Vector3 SimpleAI::Pursue()
 {
 	Vector3 targetPos = target->GetTransform().GetPosition() + (target->GetPhysicsObject()->GetLinearVelocity().Normalised() * max_predict);
+
 #if DRAW_DEBUG
 	Debug::DrawSphere(targetPos, 1.0f, Debug::RED);
 #endif

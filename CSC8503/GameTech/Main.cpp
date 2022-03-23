@@ -191,7 +191,7 @@ int main() {
 	float totalTime = 0.0f;
 	int totalFrames = 0;
 
-	//TutorialGame* g = new TutorialGame();
+	//TutorialGame* h = new TutorialGame();
 	NetworkedGame* h = new NetworkedGame();
 	// MainMenu* m = new MainMenu();
 	// PushdownMachine p = new Menu(m, g, h, g);
