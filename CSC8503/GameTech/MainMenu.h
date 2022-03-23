@@ -13,12 +13,14 @@ namespace NCL {
 			LevelState(TutorialGame* level) : level(level) {};
 
 			PushdownState::PushdownResult OnUpdate(float dt, PushdownState** newState) override {
-				if (level) {
-					level->UpdateGame(dt);
-				}
-				else {
+				if (!level)
 					return PushdownResult::Pop;
-				}
+
+				level->UpdateGame(dt);
+
+				if (level->GetQuit())
+					return PushdownResult::Pop;
+				
 
 				return PushdownState::PushdownResult::NoChange;
 			}

@@ -32,7 +32,7 @@ PushdownState::PushdownResult MainMenu::OnUpdate(float dt, PushdownState** newSt
 	drawMenuOption("Start Training Game", { 30,30 }, selectedItem, 1);
 	drawMenuOption("Quit", { 30,50 }, selectedItem, 2);
 
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM1)) {
+	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::C)) {
 		switch (selectedItem)
 		{
 		default:

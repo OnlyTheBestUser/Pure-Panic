@@ -92,7 +92,7 @@ RendererBase::~RendererBase() {
 
 void RendererBase::Render() {
 	rendererAPI->BeginFrame();
-
+	rendererAPI->SetClearColour(0.2, 0.2, 0.2, 1);
 	rendererAPI->EndFrame();
 	DrawDebugData();
 	rendererAPI->SwapBuffers();

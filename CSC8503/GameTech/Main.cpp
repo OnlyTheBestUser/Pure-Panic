@@ -73,10 +73,6 @@ int main() {
 	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
 	float smallestFrameRate = 144.0f;
 	while (w->UpdateWindow()) { //&& !w->GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
-#if _WIN64
-		if (w->GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE))
-			break;
-#endif
 
 		//DisplayPathfinding();
 		float dt = w->GetTimer()->GetTimeDeltaSeconds();
