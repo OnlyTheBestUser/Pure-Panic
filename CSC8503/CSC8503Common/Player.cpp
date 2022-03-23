@@ -123,8 +123,8 @@ void Player::Respawn(){
 }
 
 void Player::SetPlayerID(int playerID){
-	SetColour(GameManager::GetColourForID(playerID));
 	this->playerID = playerID;
+	SetColour(GameManager::GetColourForID(playerID));
 }
 
 void Player::Reset() 

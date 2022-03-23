@@ -86,7 +86,7 @@ void NetworkedGame::UpdateGame(float dt) {
 		std::cout << "Server start" << std::endl;
 	}
 	if (!thisClient && Window::GetKeyboard()->KeyPressed(KeyboardKeys::F10)) {
-		StartAsClient(10, 70, 32, 241);
+		StartAsClient(10, 70, 32, 238);
 		std::cout << "Client start" << std::endl;
 	}
 
@@ -322,6 +322,7 @@ void NetworkedGame::HandleAssignID(AssignIDPacket* packet)
 	playerID = packet->clientID;
 	SpawnPlayer();
 	localPlayer->SetPlayerID(playerID);
+	renderer->playerColour = GameManager::GetColourForID(playerID);
 }
 
 void NetworkedGame::HandlePlayerConnect(NewPlayerPacket* packet)
@@ -332,6 +333,7 @@ void NetworkedGame::HandlePlayerConnect(NewPlayerPacket* packet)
 	if (packet->clientID != playerID) {
 		GameObject* newPlayer = levelLoader->AddDummyPlayerToWorld(Vector3(10, 15, 10));
 		newPlayer->SetNetworkObject(new NetworkObject(*newPlayer, packet->clientID, world));
+		newPlayer->GetRenderObject()->SetColour(GameManager::GetColourForID(newPlayer->GetNetworkObject()->GetNetID()));
 		newPlayer->GetPhysicsObject()->SetDynamic(true);
 		std::cout << "Player Spawned with Network ID: " << newPlayer->GetNetworkObject()->GetNetID() << "." << std::endl;
 		if (!(packet->clientID < networkObjects.size())) {

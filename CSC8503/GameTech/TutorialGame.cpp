@@ -129,7 +129,6 @@ void TutorialGame::UpdateGame(float dt) {
 	case PAUSE: UpdatePauseScreen(dt); break;
 	case WIN: UpdateWinScreen(dt); break;
 	case RESET: {
-		renderer->playerColour = player1->GetPlayerID() % 2 == 0 ? GameManager::team2Colour : GameManager::team1Colour;
 		InitCamera();
 		InitWorld();
 		renderer->ClearPaint();
