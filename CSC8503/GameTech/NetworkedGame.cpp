@@ -261,6 +261,7 @@ void NetworkedGame::AddNewPlayerToServer(int clientID, int lastID)
 	client->SetNetworkObject(new NetworkObject(*client, clientID, world));
 	client->GetPhysicsObject()->SetDynamic(true);
 	client->GetPhysicsObject()->SetGravity(false);
+	client->GetRenderObject()->SetColour(GameManager::GetColourForID(clientID));
 
 	serverPlayers.insert(std::pair<int, Player*>(clientID, (Player*)client));
 
@@ -302,6 +303,7 @@ bool NCL::CSC8503::NetworkedGame::CheckExists(IDPacket* packet)
 		p->GetPhysicsObject()->SetDynamic(true);
 		p->GetPhysicsObject()->SetGravity(false);
 		p->SetNetworkObject(new NetworkObject(*p, packet->clientID, world));
+		p->GetRenderObject()->SetColour(GameManager::GetColourForID(packet->clientID));
 		networkObjects[packet->clientID] = p->GetNetworkObject();
 	}
 	return true;
@@ -333,13 +335,13 @@ void NetworkedGame::HandlePlayerConnect(NewPlayerPacket* packet)
 	if (packet->clientID != playerID) {
 		GameObject* newPlayer = levelLoader->AddDummyPlayerToWorld(Vector3(10, 15, 10));
 		newPlayer->SetNetworkObject(new NetworkObject(*newPlayer, packet->clientID, world));
-		newPlayer->GetRenderObject()->SetColour(GameManager::GetColourForID(newPlayer->GetNetworkObject()->GetNetID()));
 		newPlayer->GetPhysicsObject()->SetDynamic(true);
 		std::cout << "Player Spawned with Network ID: " << newPlayer->GetNetworkObject()->GetNetID() << "." << std::endl;
 		if (!(packet->clientID < networkObjects.size())) {
 			networkObjects.resize(packet->clientID + 1);
 		}
 		networkObjects[newPlayer->GetNetworkObject()->GetNetID()] = (newPlayer->GetNetworkObject());
+		newPlayer->GetRenderObject()->SetColour(GameManager::GetColourForID(packet->clientID));
 	}
 }
 
