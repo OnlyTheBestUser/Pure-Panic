@@ -19,16 +19,16 @@ using namespace CSC8503;
 
 TutorialGame::TutorialGame()	{
 	world			= new GameWorld();
-	LoadingScreen::AddProgress(4.0f);
+	LoadingScreen::AddProgress(15.0f);
 	LoadingScreen::UpdateGame(0.0f);
 	renderer		= new Renderer(*world);
-	LoadingScreen::AddProgress(4.0f);
+	LoadingScreen::AddProgress(10.0f);
 	LoadingScreen::UpdateGame(0.0f);
 	physics			= new PhysicsSystem(*world);
-	LoadingScreen::AddProgress(8.0f);
+	LoadingScreen::AddProgress(25.0f);
 	LoadingScreen::UpdateGame(0.0f);
 	levelLoader		= new LevelLoader(physics, renderer);
-	LoadingScreen::AddProgress(17.0f);
+	LoadingScreen::AddProgress(50.0f);
 	LoadingScreen::UpdateGame(0.0f);
 	gameManager		= new GameManager(this);
 

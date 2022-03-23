@@ -120,10 +120,10 @@ public:
 	PushdownResult OnUpdate(float dt, PushdownState** newState) override {
 		m->UpdateGame(dt);
 
-		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM1)) {
+		/*if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM1)) {
 			*newState = new Game(tg);
 			return PushdownResult::Push;
-		}
+		}*/
 
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM2)) {
 			*newState = new Game(ng);
@@ -132,12 +132,6 @@ public:
 
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
 			return PushdownResult::Exit;
-		}
-
-		if (m->GetPaused()) {
-			
-			*newState = new PauseGame(m);
-			return PushdownResult::Push;
 		}
 
 		return PushdownResult::NoChange;
@@ -155,11 +149,12 @@ public:
 	Loading(LoadingScreen* l) : ls(l) {};
 	PushdownResult OnUpdate(float dt, PushdownState** newState) override 
 	{
+		LoadingScreen::SetInstancesToLoad(2);
 		LoadingScreen::UpdateGame(dt);
 
 		m = new MainMenu();
 		ng = new NetworkedGame();
-		tg = new TutorialGame();
+		tg = nullptr;
 		
 		*newState = new Menu(m, tg, ng);
 		return PushdownResult::Push;
@@ -167,7 +162,7 @@ public:
 
 protected:
 	LoadingScreen* ls;
-	TutorialGame* tg;
+	NetworkedGame* tg;
 	NetworkedGame* ng;
 	MainMenu* m;
 };
@@ -209,7 +204,8 @@ int main() {
 	w->SetTitle("Loading");
 
 	LoadingScreen* l = new LoadingScreen();
-	PushdownMachine p = new Loading(l);	
+	//PushdownMachine p = new Loading(l);	
+	NetworkedGame* h = new NetworkedGame();
 		
 	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
 	float smallestFrameRate = 144.0f;
@@ -249,11 +245,11 @@ int main() {
 			curTimeWait = avgTimeWait;
 		}
 
-		//l->UpdateGame(dt);
+		h->UpdateGame(dt);
 
-		if (!p.Update(dt)) {
+		/*if (!p.Update(dt)) {
 			return 0;
-		}
+		}*/
 	}
 	Window::DestroyGameWindow();
 }

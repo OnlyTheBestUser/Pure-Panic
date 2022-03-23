@@ -12,9 +12,11 @@ namespace NCL {
 
 			static void UpdateGame(float dt);
 			static void AddProgress(float progress) { singleton->progression += progress; }
+			static void SetInstancesToLoad(int instances) { singleton->instancesToLoad += instances; }
 
 		protected:
 			static LoadingScreen* singleton;
+			int instancesToLoad;
 			float progression = 0.0f;
 
 			GameWorld* world;
