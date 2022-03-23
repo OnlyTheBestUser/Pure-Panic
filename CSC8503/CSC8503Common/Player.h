@@ -15,7 +15,7 @@ namespace NCL {
         class Player : public GameActor
         {
         public:
-			Player(Camera* camera, LevelLoader* lvlLoader, GameWorld* world, string name = "", Vector3 ch = Vector3(0, 2, 0));
+			Player(Camera* camera, string name = "", Vector3 ch = Vector3(0, 2, 0));
             ~Player() {};
 
             void OnCollisionBegin(GameObject* other, Vector3 localA, Vector3 localB, Vector3 normal) override;

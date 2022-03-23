@@ -193,33 +193,6 @@ Vector3 LevelLoader::Vec3FromStr(std::string input) {
 	return Vector3(std::stof(values[0]), std::stof(values[1]), std::stof(values[2]));
 }
 
-Player* LevelLoader::AddPlayerToWorld(const Vector3& position) {
-	float meshSize = 3.0f;
-	float inverseMass = 5.0f;
-
-	Player* character = new Player(world->GetMainCamera(), this, world, "Player", position);
-
-	CapsuleVolume* volume = new CapsuleVolume(0.85f * meshSize, 0.3f * meshSize);
-	character->SetBoundingVolume((CollisionVolume*)volume);
-
-	character->GetTransform()
-		.SetScale(Vector3(meshSize, meshSize, meshSize))
-		.SetPosition(position);
-
-	character->SetRenderObject(new RenderObject(&character->GetTransform(), charMeshA, nullptr, basicShader));
-	character->SetColour(GameManager::GetColourForID(character->GetPlayerID()));
-	character->SetPhysicsObject(new PhysicsObject(&character->GetTransform(), character->GetBoundingVolume()));
-
-	character->GetPhysicsObject()->SetInverseMass(inverseMass);
-	character->GetPhysicsObject()->SetLinearDamping(3.0f);
-	character->GetPhysicsObject()->InitSphereInertia();
-	character->GetPhysicsObject()->SetFriction(false);
-	character->GetPhysicsObject()->SetShouldApplyAngular(false);
-
-	character->GetPhysicsObject()->SetDynamic(true);
-	character->GetPhysicsObject()->SetCanSleep(false);
-
-	character->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
 bool LevelLoader::BoolFromStr(std::string input) {
 	return input == "TRUE";
 }
@@ -232,7 +205,6 @@ Player* LevelLoader::SpawnPlayer(const Vector3& position) {
 
 GameObject* LevelLoader::SpawnDummyPlayer(const Vector3& position) {
 	GameObject* character = new GameObject("Dummy");
-
 	return singleton->AddPlayerObjectToWorld(position, character);
 }
 

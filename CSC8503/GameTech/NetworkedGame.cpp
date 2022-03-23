@@ -350,7 +350,7 @@ bool NetworkedGame::CheckExists(IDPacket* packet)
 		GameObject* p = LevelLoader::SpawnDummyPlayer(Vector3(packet->clientID * 5, 10, 0));
 		p->GetPhysicsObject()->SetDynamic(true);
 		p->GetPhysicsObject()->SetGravity(false);
-		p->SetNetworkObject(new NetworkObject(*p, packet->clientID, world));
+		p->SetNetworkObject(new NetworkObject(*p, packet->clientID));
 		p->GetRenderObject()->SetColour(GameManager::GetColourForID(packet->clientID));
 		networkObjects[packet->clientID] = p->GetNetworkObject();
 	}

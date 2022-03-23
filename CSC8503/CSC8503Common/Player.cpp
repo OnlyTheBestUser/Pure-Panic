@@ -5,7 +5,7 @@
 using namespace NCL;
 using namespace CSC8503;
 
-Player::Player(Camera* camera, LevelLoader* lvlLoader, GameWorld* world, string name, Vector3 ch) : GameActor(name), checkpoint(ch), spawnPos(ch), levelLoader(lvlLoader), world(world) {
+Player::Player(Camera* camera, string name, Vector3 ch) : GameActor(name), checkpoint(ch), spawnPos(ch) {
 	this->camera = camera;
 	camLocked = true;
 	playerID = 0;
