@@ -146,6 +146,7 @@ bool GameWorld::Raycast(Ray& r, RayCollision& closestCollision, bool closestObje
 	RayCollision collision;
 
 	for (auto& i : singleton->gameObjects) {
+
 		if (!i->GetBoundingVolume()) { //objects might not be collideable etc...
 			continue;
 		}
@@ -157,7 +158,6 @@ bool GameWorld::Raycast(Ray& r, RayCollision& closestCollision, bool closestObje
 		if (!skip) {
 			RayCollision thisCollision;
 			if (CollisionDetection::RayIntersection(r, *i, thisCollision)) {
-
 				if (!closestObject) {
 					closestCollision = collision;
 					closestCollision.node = i;

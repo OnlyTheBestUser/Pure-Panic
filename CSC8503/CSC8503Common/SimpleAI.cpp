@@ -70,8 +70,8 @@ Vector3 SimpleAI::Avoid()
 	Debug::DrawLine(transform.GetPosition(), transform.GetPosition() + (test2.Normalised() * 10.0f));
 #endif
 	// Raycast ahead, if it hits something, raycast to the sides, whichever gets the furthest, go in that direction.
-	Ray forwardRay(transform.GetPosition() + (physicsObject->GetLinearVelocity().Normalised() * 1.5f), physicsObject->GetLinearVelocity().Normalised());
-	forwardRay.SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	Ray forwardRay(transform.GetPosition() + (physicsObject->GetLinearVelocity().Normalised() * 1.5f), physicsObject->GetLinearVelocity().Normalised() + Vector3(0,0.0000000000000001f,0));
+	forwardRay.SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
 	RayCollision forwardCollision;
 
 	Vector4 colour = Debug::BLUE;
@@ -83,6 +83,7 @@ Vector3 SimpleAI::Avoid()
 			std::cout << (forwardCollision.collidedAt - transform.GetPosition()).Length() << std::endl;
 		}
 	}
+
 	Debug::DrawLine(forwardRay.GetPosition(), forwardRay.GetPosition() + (forwardRay.GetDirection().Normalised() * avoid_distance), colour);
 
 	return Vector3();
