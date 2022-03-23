@@ -53,8 +53,12 @@ namespace NCL {
 				return quit;
 			}
 
+			Player* GetPlayer() {
+				return player1;
+			}
+
 			void PaintObject();
-			
+
 		protected:
 			InputHandler* inputHandler;
 

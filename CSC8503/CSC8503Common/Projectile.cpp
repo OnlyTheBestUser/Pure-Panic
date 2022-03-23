@@ -2,7 +2,10 @@
 #include "../GameTech/Renderer.h"
 #include "../CSC8503Common/AudioManager.h"
 #include "../../Common/Assets.h"
+#include "../CSC8503Common/GameManager.h"
 
+
+using namespace NCL::CSC8503;
 
 void Projectile::Update(float dt) {
 	Vector3 velocityDir = (this->GetPhysicsObject()->GetLinearVelocity()).Normalised();
@@ -36,15 +39,7 @@ void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vecto
 				Vector3 barycentric;
 				CollisionDetection::GetBarycentricFromRay(ray, *test, texUV_a, texUV_b, texUV_c, barycentric, collisionPoint);
 
-				Vector4 colour;
-				if (GetOwnerPlayerID() % 2 == 0) {
-					// Turquoise
-					colour = Vector4(0.011, 0.988, 0.941, 1);
-				}
-				else {
-					// Pink
-					colour = Vector4(1, 0.039, 0.941, 1);
-				}
+				Vector4 colour = GameManager::GetColourForID(GetOwnerPlayerID());
 				
 				float randRad = ((GameObject*)closestCollision.node)->GetPaintRadius() + (((static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * 2.0f) - 1.0f) * ((GameObject*)closestCollision.node)->GetPaintRadius() * 0.25f;
 

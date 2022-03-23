@@ -11,8 +11,8 @@
 #include "../CSC8503Common/GameActor.h"
 #include "../CSC8503Common/Command.h"
 #include "../../Common/Assets.h"
+
 #include "../CSC8503Common/InputList.h"
-#include "LoadingScreen.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -31,7 +31,7 @@ TutorialGame::TutorialGame()	{
 	LoadingScreen::AddProgress(50.0f);
 	LoadingScreen::UpdateGame(0.0f);
 	gameManager		= new GameManager(this);
-
+	
 #ifndef _ORBIS
 	audio = NCL::AudioManager::GetInstance();
 	audio->Initialize();
@@ -124,7 +124,8 @@ TutorialGame::~TutorialGame() {
 void TutorialGame::UpdateGame(float dt) {
 	Debug::SetRenderer(renderer);
 	switch (state) {
-	case PLAY: UpdateGameWorld(dt); break;
+	case PLAY: 
+		UpdateGameWorld(dt); break;
 	case PAUSE: UpdatePauseScreen(dt); break;
 	case WIN: UpdateWinScreen(dt); break;
 	case RESET: {
@@ -142,6 +143,7 @@ void TutorialGame::UpdateGame(float dt) {
 	renderer->Update(dt);
 
 	Debug::FlushRenderables(dt);
+	renderer->scores = gameManager->CalcCurrentScoreRatio();
 	renderer->Render();
 }
 
@@ -203,7 +205,7 @@ void TutorialGame::UpdateScores(float dt) {
 			return;
 		}
 		// Need to score the texture here.
-		Vector2 scoreDif = renderer->CountPaintMask((*cur)->GetRenderObject()->GetPaintMask(), world->GetScore((*cur)), Vector4(0.3, 0, 0.5, 1), Vector4(0.250, 0.878, 0.815, 1));
+		Vector2 scoreDif = renderer->CountPaintMask((*cur)->GetRenderObject()->GetPaintMask(), world->GetScoreForObject((*cur)), GameManager::team1Colour, GameManager::team2Colour);
 		if ((*cur)->GetPaintRadius() != 0){
 			scoreDif = scoreDif / (*cur)->GetPaintRadius();
 		}
@@ -371,6 +373,7 @@ void TutorialGame::InitWorld() {
 	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);*/
 
 	player1 = player;
+	renderer->playerColour = GameManager::GetColourForID(player1->GetPlayerID());
 
 	physics->BuildStaticList();
 }

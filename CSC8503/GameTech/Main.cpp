@@ -7,6 +7,8 @@ size_t       sceLibcHeapSize = 256 * 1024 * 1024;	/* Set up heap area upper limi
 #include "../../Plugins/PlayStation4/PS4Input.h"
 #include "../../Common/Window.h"
 
+#include "TutorialGame.h"
+
 #include "../CSC8503Common/StateMachine.h"
 #include "../CSC8503Common/StateTransition.h"
 #include "../CSC8503Common/State.h"
@@ -14,11 +16,7 @@ size_t       sceLibcHeapSize = 256 * 1024 * 1024;	/* Set up heap area upper limi
 #include "../CSC8503Common/NavigationGrid.h"
 
 #include "TutorialGame.h"
-#include "NetworkedGame.h"
-#include "TutorialGame.h"
 #include "MainMenu.h"
-#include "LoadingScreen.h"
-
 #include "../CSC8503Common/BehaviourAction.h"
 #include "../CSC8503Common/BehaviourSequence.h"
 #include "../CSC8503Common/BehaviourSelector.h"
@@ -26,6 +24,8 @@ size_t       sceLibcHeapSize = 256 * 1024 * 1024;	/* Set up heap area upper limi
 #include "../CSC8503Common/PushdownState.h"
 #include "../CSC8503Common/PushdownMachine.h"
 #include <iostream>
+
+#include "NetworkedGame.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -97,6 +97,7 @@ public:
 			return PushdownResult::Push;
 		}
 		
+
 		if (g->GetPaused()) {
 			*newState = new PauseGame(g);
 			return PushdownResult::Push;
@@ -132,7 +133,7 @@ public:
 
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
 			return PushdownResult::Exit;
-		}
+		}*/
 
 		return PushdownResult::NoChange;
 	}
@@ -189,6 +190,7 @@ int main() {
 	Ps4AudioSystem* audioSystem = new Ps4AudioSystem(8);
 #endif
 
+		
 	if (!w->HasInitialised()) {
 		return -1;
 	}	
@@ -215,6 +217,7 @@ int main() {
 			break;
 #endif
 
+		//DisplayPathfinding();
 		float dt = w->GetTimer()->GetTimeDeltaSeconds();
 		if (dt > 0.1f) {
 			std::cout << "Skipping large time delta" << std::endl;
