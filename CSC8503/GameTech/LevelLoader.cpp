@@ -146,7 +146,7 @@ void LevelLoader::ReadInLevelFile(std::string filename) {
 					AddPaintWallToWorld(Vec3FromStr(lineContents[1]), Vector3(5, 4.2, 4), std::stoi(lineContents[2]), lineContents[0]);
 				}
 				else if (lineContents[0] == "THRONE") {
-					AddThroneToWorld(Vec3FromStr(lineContents[1]), std::stoi(lineContents[2]));
+					AddThroneToWorld(Vec3FromStr(lineContents[1]), std::stoi(lineContents[2]), Vec3FromStr(lineContents[3]));
 				}
 			}
 		}
