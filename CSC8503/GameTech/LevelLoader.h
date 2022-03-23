@@ -31,8 +31,7 @@ namespace NCL {
 			static GameObject* SpawnDummyPlayer(const Vector3& position);
 			
 			static Projectile* SpawnProjectile(Player* owner, const bool& NeedBulletSpread, const float& initialSpeed = PROJ_SPEED, const float& meshSize = PROJ_SIZE);
-			static Projectile* SpawnProjectile(GameObject* owner, const bool& NeedBulletSpread, const int bulletIndex, float pitch, int playerID, const float& initialSpeed = PROJ_SPEED, const float& meshSize = PROJ_SIZE);
-
+			
 			Projectile* SpawnProjectile(Player* owner, const bool& IsPlayerDead, const float& initialSpeed = PROJ_SPEED, const float& meshSize = PROJ_SIZE);
 
 		protected:
@@ -53,7 +52,7 @@ namespace NCL {
 			GameObject* AddRenderPartToWorld  (const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture);
 			GameObject* AddPlayerObjectToWorld(const Vector3& position, GameObject* character);
 			PowerUp*    AddPowerUpToWorld     (const Vector3& position, const PowerUpType& ability, const float& radius = 1.0f);
-			Projectile* AddProjectileToWorld  (GameObject* owner, const bool& NeedBulletSpread, const int bulletIndex, float pitch, int playerID, const float& initialSpeed = PROJ_SPEED, const float& meshSize = PROJ_SIZE);
+			Projectile* AddProjectileToWorld  (GameObject* owner, const bool& NeedBulletSpread, const int bulletIndex, float pitch, int playerID, const float initialSpeed = PROJ_SPEED, const float meshSize = PROJ_SIZE);
 			Vector3		AddSpawnPointToWorld  (const Vector3& position);
 
 			void SetFieldsForCube(GameObject* sphere, const Vector3& position, Vector3 dimensions, CollisionLayer layers, bool isTrigger = false, bool dynamic = false, bool OBB = false, 

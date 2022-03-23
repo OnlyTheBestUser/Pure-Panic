@@ -504,20 +504,21 @@ PowerUp*    LevelLoader::AddPowerUpToWorld(const Vector3& position, const PowerU
 }
 
 Projectile* LevelLoader::SpawnProjectile(Player* owner, const bool& NeedBulletSpread, const float& initialSpeed, const float& meshSize) {
-	return SpawnProjectile((GameObject*)owner, NeedBulletSpread, owner->BulletCounter, owner->GetCam()->GetPitch(), owner->GetPlayerID(), initialSpeed, meshSize);
+	return singleton->AddProjectileToWorld((GameObject*)owner, NeedBulletSpread, owner->BulletCounter, owner->GetCam()->GetPitch(), owner->GetPlayerID(), initialSpeed, meshSize);
 }
 
-
-Projectile* LevelLoader::SpawnProjectile(Player* owner, const bool& IsPlayerDead, const float& initialSpeed, const float& meshSize) {
+Projectile* LevelLoader::SpawnProjectile(Player* owner, const bool& NeedBulletSpread, const float& initialSpeed, const float& meshSize) {
 #ifndef _ORBIS
 	AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + "gun_fire.ogg", owner->GetTransform().GetPosition(), 0.3f);
 #endif // !_ORBIS
-	return singleton->SpawnProjectile((GameObject*)owner, IsPlayerDead, owner->GetCam()->GetPitch(), owner->GetPlayerID(), initialSpeed, meshSize);
+	return singleton->AddProjectileToWorld((GameObject*) owner, NeedBulletSpread, owner->GetCam()->GetPitch(), owner->GetPlayerID(), initialSpeed, meshSize);
 }
 
-Projectile* LevelLoader::AddProjectileToWorld(GameObject* owner, const bool& NeedBulletSpread, const int bulletIndex, float pitch, int playerID, const float& initialSpeed, const float& meshSize)
+Projectile* LevelLoader::AddProjectileToWorld(GameObject* owner, const bool& NeedBulletSpread, const int bulletIndex, float pitch, int playerID, const float initialSpeed, const float meshSize)
 {
 	float inverseMass = 1.0f;
+
+	const int SPREAD_ANGLE_CONST = 400;
 
 	Vector3 ownerRot = owner->GetTransform().GetOrientation().ToEuler();
 
