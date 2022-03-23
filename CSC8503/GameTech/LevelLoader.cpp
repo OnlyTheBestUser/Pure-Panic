@@ -208,18 +208,6 @@ GameObject* LevelLoader::SpawnDummyPlayer(const Vector3& position) {
 	return singleton->AddPlayerObjectToWorld(position, character);
 }
 
-//Projectile* LevelLoader::SpawnProjectile(Player* owner, const bool& NeedBulletSpread, const float& initialSpeed, const float& meshSize) {
-//	return SpawnProjectile((GameObject*)owner, NeedBulletSpread, owner->GetCam()->GetPitch(), owner->GetPlayerID(), initialSpeed, meshSize);
-//}
-//
-//Projectile* LevelLoader::SpawnProjectile(GameObject* owner, const bool& NeedBulletSpread, const int bulletIndex, float pitch, int playerID, const float& initialSpeed, const float& meshSize) {
-//	#ifndef _ORBIS
-//		AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + "gun_fire.ogg", owner->GetTransform().GetPosition(), 0.3f);
-//	#endif // !_ORBIS
-//
-//	return singleton->AddProjectileToWorld(owner, NeedBulletSpread, bulletIndex, pitch, playerID, initialSpeed, meshSize);
-//}
-
 GameObject* LevelLoader::AddFloorToWorld(const Vector3& position) {
 	GameObject* floor = new GameObject("Floor", 1.5f);
 	Vector3 floorSize = Vector3(250, 1, 250);
@@ -429,7 +417,7 @@ GameObject* LevelLoader::AddRenderPartToWorld(const Vector3& position, Vector3 d
 	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, OGLTexture::RGBATextureEmpty(texture->GetWidth()/16,texture->GetHeight()/16), basicShader));
 #endif
 #ifdef _ORBIS
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, basicShader));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, PS4::PS4Texture::EmptyTex(texture->GetWidth() / 16, texture->GetHeight() / 16), basicShader));
 #endif
 
 	GameWorld::AddGameObject(cube);
