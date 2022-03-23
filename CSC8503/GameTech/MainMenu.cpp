@@ -10,13 +10,7 @@ MainMenu::MainMenu(TutorialGame* start, TutorialGame* training)
 PushdownState::PushdownResult MainMenu::OnUpdate(float dt, PushdownState** newState) {
 	renderer.Render();
 
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::W)) {
-		selectedItem -= 1;
-	}
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::S)) {
-		selectedItem += 1;
-	}
-	selectedItem = std::clamp(selectedItem, 0, 2);
+	renderer.DrawString("Spitoon", { 20,30 }, { 0.6f,0.3f,0.8f,1.0f }, {100.0f});
 
 	auto drawMenuOption = [=](const std::string& string, const Maths::Vector2 pos, int selection, int menuNumber) {
 		if (selection == menuNumber) {
@@ -27,9 +21,17 @@ PushdownState::PushdownResult MainMenu::OnUpdate(float dt, PushdownState** newSt
 		}
 	};
 
-	drawMenuOption("Start Networked Game", {30,50}, selectedItem, 0);
-	drawMenuOption("Start Training Game", { 30,60 }, selectedItem, 1);
-	drawMenuOption("Quit", { 30,70 }, selectedItem, 2);
+	drawMenuOption("Start Networked Game", { 30, 50 }, selectedItem, 0);
+	drawMenuOption("Start Training Game", { 30, 60 }, selectedItem, 1);
+	drawMenuOption("Quit", { 30, 70 }, selectedItem, 2);
+
+	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::W)) {
+		selectedItem -= 1;
+	}
+	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::S)) {
+		selectedItem += 1;
+	}
+	selectedItem = std::clamp(selectedItem, 0, 2);
 
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::RETURN)) {
 		switch (selectedItem)

@@ -198,8 +198,8 @@ void TutorialGame::UpdateScores(float dt) {
 			}
 		}
 
-		if ((*cur)->GetPaintRadius() == 0) {
-			currentObj++;
+		currentObj++;
+		if ((*cur)->GetPaintRadius() == 0 || (*cur)->GetRenderObject() == nullptr) {
 			return;
 		}
 		// Need to score the texture here.
@@ -211,7 +211,6 @@ void TutorialGame::UpdateScores(float dt) {
 		//std::cout << (*cur)->GetName() << "\n" << "Team 1: " << scoreDif.x << "\n" << "Team 2: " << scoreDif.y << "\n\n";
 
 		gameManager->UpdateScores(scoreDif);
-		currentObj++;
 		timeSinceLastScoreUpdate = 0;
 	}
 }

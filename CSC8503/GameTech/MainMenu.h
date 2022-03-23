@@ -18,12 +18,12 @@ namespace NCL {
 
 				if (level->GetQuit()) {
 					level->SetQuit(false);
+					level->SetState(GameState::RESET);
 					return PushdownResult::Pop;
 				}
 
 				level->UpdateGame(dt);
 				
-
 				return PushdownState::PushdownResult::NoChange;
 			}
 		protected:
