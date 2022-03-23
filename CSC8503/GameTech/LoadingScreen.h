@@ -10,10 +10,11 @@ namespace NCL {
 			LoadingScreen();
 			~LoadingScreen();
 
-			void UpdateGame(float dt);
-			void UpdateProgress(float progress) { progression = progress; }
+			static void UpdateGame(float dt);
+			static void AddProgress(float progress) { singleton->progression += progress; }
 
 		protected:
+			static LoadingScreen* singleton;
 			float progression = 0.0f;
 
 			GameWorld* world;

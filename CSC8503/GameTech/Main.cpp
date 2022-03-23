@@ -63,9 +63,6 @@ void Loader::Run()
 {
 	bool done = false;
 	
-	AssignHDC(wglGetCurrentDC());
-	SetRendererContext();
-
 	while (!done)
 	{
 		mutex.LockMutex();
@@ -73,13 +70,10 @@ void Loader::Run()
 		{
 			done = true;
 			completed = true;
-			ClearRendererContext();
 		}
 		else
 		{
-			progression += 0.17f;
-			ls->UpdateProgress(progression);
-			ls->UpdateGame(0);
+			LoadingScreen::UpdateGame(0.0f);
 		}
 		mutex.UnlockMutex();
 	}
@@ -246,37 +240,31 @@ public:
 		if (!threadMade)
 		{
 			doneLoading = false;
-			wglMakeCurrent(NULL, NULL);
 			loadThread.AssignLoadScreen(ls);
 			loadThread.Start();
 			threadMade = true; 
 		}
 
-		//ls->UpdateGame(dt);
+		LoadingScreen::UpdateGame(0.0f);
+		LoadingScreen::UpdateGame(0.0f);
+		LoadingScreen::UpdateGame(0.0f);
+		LoadingScreen::UpdateGame(0.0f);
 
 		m = new MainMenu();
-		ls->UpdateProgress(33.3f);
-		//ls->UpdateGame(dt);
+		LoadingScreen::AddProgress(33.0f);
 
 		ng = new NetworkedGame();
-		ls->UpdateProgress(66.6f);
-		//ls->UpdateGame(dt);
+		LoadingScreen::AddProgress(33.0f);
 
 		tg = new TutorialGame();
-		ls->UpdateProgress(99.9f);
-		//ls->UpdateGame(dt);
+		LoadingScreen::AddProgress(33.0f);
 
 		mutex.LockMutex();
 		doneLoading = true;
 		mutex.UnlockMutex();
-
-		//loadThread.Join();
-
+		
 		goToMenu = true;
 				
-		//wglMakeCurrent(mainHdc, mainHglrc);
-		//wglMakeCurrent(wglGetCurrentDC(), wglGetCurrentContext());
-
 		if (goToMenu)
 		{
 			*newState = new Menu(m, tg, ng);

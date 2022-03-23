@@ -1,11 +1,12 @@
 #include "LoadingScreen.h"
-#include <Windows.h>
-
 using namespace NCL;
 using namespace CSC8503;
 
+LoadingScreen* LoadingScreen::singleton = nullptr;
+
 LoadingScreen::LoadingScreen()
 {
+	singleton = this;
 	world = new GameWorld();
 	renderer = new Renderer(*world);
 	Debug::SetRenderer(renderer);
@@ -18,13 +19,12 @@ LoadingScreen::~LoadingScreen()
 
 void LoadingScreen::UpdateGame(float dt)
 {
-	//wglMakeCurrent(wglGetCurrentDC(), wglGetCurrentContext());
-	Debug::SetRenderer(renderer);
-	progression += dt * 10;
-	renderer->DrawString("Loading: " + std::to_string(progression) + "%", Vector2(30, 50), Debug::WHITE, 30.0f);
-	std::cout << "LOADING: " << progression << "%" << std::endl;
+	Debug::SetRenderer(singleton->renderer);
+	
+	singleton->renderer->DrawString("Loading...", Vector2(30, 50), Debug::WHITE, 30.0f);
+	std::cout << "Loading: " + std::to_string(singleton->progression) + "%" << std::endl;
+	singleton->renderer->Update(dt);
 
-	renderer->Update(dt);
 	Debug::FlushRenderables(dt);
-	renderer->Render();
+	singleton->renderer->Render();
 }
