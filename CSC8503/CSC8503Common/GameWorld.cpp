@@ -99,7 +99,7 @@ void GameWorld::GetPaintableObjectIterators(
 }
 
 void GameWorld::UpdateScore(GameObject* paintableScore, Vector2 scoreChange) {
-	paintableObjectScores[paintableScore] + scoreChange;
+	paintableObjectScores[paintableScore] += scoreChange;
 }
 
 Vector2 GameWorld::GetScoreForObject(GameObject* paintableScore) {
