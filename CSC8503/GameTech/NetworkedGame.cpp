@@ -291,6 +291,7 @@ void NetworkedGame::AddNewPlayerToServer(int clientID, int lastID)
 	client->SetNetworkObject(new NetworkObject(*client, clientID));
 	client->GetPhysicsObject()->SetDynamic(true);
 	client->GetPhysicsObject()->SetGravity(false);
+	client->GetRenderObject()->SetColour(GameManager::GetColourForID(clientID));
 
 	serverPlayers.insert(std::pair<int, Player*>(clientID, (Player*)client));
 
@@ -350,6 +351,7 @@ bool NetworkedGame::CheckExists(IDPacket* packet)
 		p->GetPhysicsObject()->SetDynamic(true);
 		p->GetPhysicsObject()->SetGravity(false);
 		p->SetNetworkObject(new NetworkObject(*p, packet->clientID));
+		p->GetRenderObject()->SetColour(GameManager::GetColourForID(packet->clientID));
 		networkObjects[packet->clientID] = p->GetNetworkObject();
 	}
 	return true;
@@ -372,6 +374,7 @@ void NetworkedGame::HandleAssignID(AssignIDPacket* packet)
 
 	SpawnPlayer();
 	localPlayer->SetPlayerID(playerID);
+	renderer->playerColour = GameManager::GetColourForID(playerID);
 }
 
 void NetworkedGame::HandlePlayerConnect(NewPlayerPacket* packet)
@@ -388,6 +391,7 @@ void NetworkedGame::HandlePlayerConnect(NewPlayerPacket* packet)
 			networkObjects.resize(packet->clientID + 1);
 		}
 		networkObjects[newPlayer->GetNetworkObject()->GetNetID()] = (newPlayer->GetNetworkObject());
+		newPlayer->GetRenderObject()->SetColour(GameManager::GetColourForID(packet->clientID));
 	}
 }
 
