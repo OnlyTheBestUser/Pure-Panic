@@ -315,6 +315,7 @@ NCL::Maths::Vector2 Renderer::CountPaintMask(TextureBase* paintMask, NCL::Maths:
 		}
 		
 	}
+	delete[] data;
 	return Vector2(team1Score - prevScores.x , team2Score - prevScores.y);
 #endif
 }
