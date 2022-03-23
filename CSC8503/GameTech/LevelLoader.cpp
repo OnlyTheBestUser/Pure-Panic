@@ -290,7 +290,7 @@ GameObject* LevelLoader::AddPaintWallToWorld(const Vector3& position, Vector3 di
 	GameObject* cube = new GameObject(name, 12.0f);
 	OBBVolume* volume = new OBBVolume(dimensions + Vector3(0, 10, -2));
 	cube->SetBoundingVolume((CollisionVolume*)volume);
-
+	
 	cube->GetTransform()
 		.SetPosition(position)
 		.SetScale(dimensions * 2)
@@ -317,7 +317,7 @@ GameObject* LevelLoader::AddPaintWallToWorld(const Vector3& position, Vector3 di
 
 	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	cube->GetPhysicsObject()->SetDynamic(false);
-
+	cube->GetPhysicsObject()->SetElasticity(0.0f);
 	GameWorld::AddGameObject(cube);
 
 	return cube;
