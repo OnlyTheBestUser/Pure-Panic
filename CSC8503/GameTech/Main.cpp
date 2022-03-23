@@ -21,8 +21,6 @@ size_t       sceLibcHeapSize = 256 * 1024 * 1024;	/* Set up heap area upper limi
 #include "../CSC8503Common/BehaviourSequence.h"
 #include "../CSC8503Common/BehaviourSelector.h"
 
-#include "../CSC8503Common/PushdownState.h"
-#include "../CSC8503Common/PushdownMachine.h"
 #include <iostream>
 
 #include "NetworkedGame.h"
@@ -31,130 +29,6 @@ using namespace NCL;
 using namespace CSC8503;
 using namespace NCL;
 using namespace NCL::PS4;
-
-class WinGame : public PushdownState {
-public:
-	WinGame(TutorialGame* g) : g(g) {};
-
-	PushdownResult OnUpdate(float dt, PushdownState** newState) override {
-		g->UpdateGame(dt);
-
-		//if (g->GetQuit()) {
-		//	g->ResetGame();
-		//	g->UpdateGame(dt);
-		//	return PushdownResult::Pop;
-		//}
-
-		//if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
-		//	return PushdownResult::Reset;
-		//}
-
-		return PushdownResult::NoChange;
-	}
-
-	void OnAwake() override {
-		g->SetState(WIN);
-	}
-
-protected:
-	TutorialGame* g;
-};
-
-class PauseGame : public PushdownState {
-public:
-	PauseGame(TutorialGame* g) : g(g) {};
-
-	PushdownResult OnUpdate(float dt, PushdownState** newState) override {
-		g->UpdateGame(dt);
-
-		if (!g->GetPaused()) {
-			return PushdownResult::Pop;
-		}
-
-		if (g->GetQuit()) {
-			return PushdownResult::Reset;
-		}
-		return PushdownResult::NoChange;
-	}
-
-	void OnAwake() override {
-		g->SetState(PAUSE);
-	}
-
-protected:
-	TutorialGame* g;
-};
-
-class Game : public PushdownState {
-public:
-	Game(TutorialGame* g) : g(g) {};
-
-	PushdownResult OnUpdate(float dt, PushdownState** newState) override {
-		g->UpdateGame(dt);
-
-		if (g->Win()) {
-			*newState = new WinGame(g);
-			return PushdownResult::Push;
-		}
-		
-
-		if (g->GetPaused()) {
-			*newState = new PauseGame(g);
-			return PushdownResult::Push;
-		}
-
-		return PushdownResult::NoChange;
-	}
-
-	void OnAwake() override {
-		g->SetState(PLAY);
-	}
-
-protected:
-	TutorialGame* g;
-};
-
-class Menu : public PushdownState {
-public:
-	Menu(MainMenu* m, TutorialGame* g, TutorialGame* h, TutorialGame* i) : m(m), g(g), h(h), i(i) {};
-
-	PushdownResult OnUpdate(float dt, PushdownState** newState) override {
-		m->UpdateGame(dt);
-
-		/*if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM1)) {
-			*newState = new Game(f);
-			return PushdownResult::Push;
-		}
-
-		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM2)) {
-			*newState = new Game(h);
-			return PushdownResult::Push;
-		}
-
-		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM3)) {
-			*newState = new Game(i);
-			return PushdownResult::Push;
-		}
-
-		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
-			return PushdownResult::Exit;
-		}*/
-
-		if (m->GetPaused()) {
-			
-			*newState = new PauseGame(m);
-			return PushdownResult::Push;
-		}
-
-		return PushdownResult::NoChange;
-	}
-
-protected:
-	TutorialGame* g;
-	TutorialGame* h;
-	TutorialGame* i;
-	MainMenu* m;
-};
 
 /*
 
@@ -192,11 +66,10 @@ int main() {
 	int totalFrames = 0;
 
 	//TutorialGame* g = new TutorialGame();
-	NetworkedGame* h = new NetworkedGame();
+	NetworkedGame* level = new NetworkedGame();
 	// MainMenu* m = new MainMenu();
 	// PushdownMachine p = new Menu(m, g, h, g);
-	//MainMenu* m = new MainMenu();
-	//PushdownMachine p = new Menu(m, g, g, g);
+	MainMenu menu(level, nullptr);
 	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
 	float smallestFrameRate = 144.0f;
 	while (w->UpdateWindow()) { //&& !w->GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
@@ -236,11 +109,10 @@ int main() {
 			curTimeWait = avgTimeWait;
 		}
 
-		h->UpdateGame(dt);
+		if (!menu.UpdateGame(dt)) {
+			return 0;
+		}
 
-		//if (!p.Update(dt)) {
-		//	return 0;
-		//}
 	}
 	Window::DestroyGameWindow();
 }

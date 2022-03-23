@@ -133,8 +133,6 @@ void TutorialGame::UpdateGame(float dt) {
 
 	inputHandler->HandleInput();
 
-	renderer->Update(dt);
-
 	Debug::FlushRenderables(dt);
 	renderer->Render();
 }

@@ -21,7 +21,8 @@ RendererAPI* RendererBase::rendererAPI = nullptr;
 
 RendererBase::RendererBase() {
 #ifdef _WIN64
-	rendererAPI = new OGLRendererAPI(*Window::GetWindow());
+	if (rendererAPI == nullptr)
+		rendererAPI = new OGLRendererAPI(*Window::GetWindow());
 
 	TextureLoader::RegisterAPILoadFunction(OGLTexture::RGBATextureFromFilename);
 
@@ -45,7 +46,8 @@ RendererBase::RendererBase() {
 	debugTextMesh = new OGLMesh();
 #endif
 #ifdef _ORBIS
-	rendererAPI = new PS4::PS4RendererAPI(*Window::GetWindow());
+	if (rendererAPI == nullptr)
+		rendererAPI = new PS4::PS4RendererAPI(*Window::GetWindow());
 
 	TextureLoader::RegisterAPILoadFunction(PS4::PS4Texture::LoadTextureFromFile);
 
@@ -86,6 +88,14 @@ RendererBase::~RendererBase() {
 	delete debugTextMesh;
 
 	delete debugShader;
+}
+
+void RendererBase::Render() {
+	rendererAPI->BeginFrame();
+
+	rendererAPI->EndFrame();
+	DrawDebugData();
+	rendererAPI->SwapBuffers();
 }
 
 void RendererBase::DrawString(const std::string& text, const Maths::Vector2& pos, const Maths::Vector4& colour, float size) {
@@ -202,6 +212,6 @@ Maths::Matrix4 RendererBase::SetupDebugLineMatrix()	const {
 }
 
 Maths::Matrix4 RendererBase::SetupDebugStringMatrix()	const {
-	return Matrix4();
+	return Matrix4::Orthographic(-1, 1.0f, 100, 0, 0, 100);
 }
 

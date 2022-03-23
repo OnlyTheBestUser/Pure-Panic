@@ -2,27 +2,60 @@
 using namespace NCL;
 using namespace CSC8503;
 
-
-void MainMenu::InitWorld()
-{
-	world->ClearAndErase();
-	physics->Clear();
-	world->GetMainCamera()->LockCamera();
-	//InitDefaultFloor();
+MainMenu::MainMenu(TutorialGame* start, TutorialGame* training) : renderer(RendererBase()) {
+	levelState = new LevelState(start);
+	trainingState = new LevelState(training);
+	pushMachine = new PushdownMachine((PushdownState*)this);
 }
 
-void MainMenu::UpdateGame(float dt)
-{
-	Debug::SetRenderer(renderer);
+PushdownState::PushdownResult MainMenu::OnUpdate(float dt, PushdownState** newState) {
+	renderer.Render();
 
-	renderer->DrawString("Spitoon", Vector2(22, 30), Debug::MAGENTA, 30.0f);
-	renderer->DrawString("Press 1 - Test Level", Vector2(30, 50), Debug::WHITE, 20.0f);
-	renderer->DrawString("Press 2 - Networking Test", Vector2(30, 55), Debug::WHITE, 20.0f);
-	renderer->DrawString("Press 3 - Physics Test", Vector2(30, 60), Debug::WHITE, 20.0f);
-	renderer->DrawString("Press Escape to Exit", Vector2(29, 65), Debug::WHITE, 20.0f);
+	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::W)) {
+		selectedItem -= 1;
+	}
+	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::S)) {
+		selectedItem += 1;
+	}
+	selectedItem = std::clamp(selectedItem, 0, 2);
 
-	renderer->Update(dt);
+	auto drawMenuOption = [=](const std::string& string, const Maths::Vector2 pos, int selection, int menuNumber) {
+		if (selection == menuNumber) {
+			renderer.DrawString(string, pos, { 1.0f,0.2f,0.2f,1.0f });
+		}
+		else {
+			renderer.DrawString(string, pos, { 0.8f,0.8f,0.8f,1.0f });
+		}
+	};
 
-	Debug::FlushRenderables(dt);
-	renderer->Render();
+	drawMenuOption("Start Networked Game", {30,10}, selectedItem, 0);
+	drawMenuOption("Start Training Game", { 30,30 }, selectedItem, 1);
+	drawMenuOption("Quit", { 30,50 }, selectedItem, 2);
+
+	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM1)) {
+		switch (selectedItem)
+		{
+		default:
+			return PushdownState::PushdownResult::NoChange;
+			break;
+		case 0:
+			*newState = (LevelState*)levelState;
+			return PushdownState::PushdownResult::Push;
+			break;
+		case 1:
+			*newState = (LevelState*)trainingState;
+			return PushdownState::PushdownResult::Push;
+			break;
+		case 2:
+			return PushdownState::PushdownResult::NoChange;
+			break;
+		}
+	}
+	return PushdownState::PushdownResult::NoChange;
+}
+
+bool MainMenu::UpdateGame(float dt) {
+	if (!pushMachine->Update(dt)) {
+		return false;
+	}
 }

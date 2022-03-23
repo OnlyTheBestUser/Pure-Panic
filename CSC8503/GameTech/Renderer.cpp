@@ -100,10 +100,6 @@ Renderer::~Renderer() {
 	delete maskShader;
 }
 
-void Renderer::Update(float dt) {
-
-}
-
 void Renderer::Render() {
 	rendererAPI->BeginFrame();
 
