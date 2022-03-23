@@ -26,6 +26,7 @@ size_t       sceLibcHeapSize = 256 * 1024 * 1024;	/* Set up heap area upper limi
 #include <iostream>
 
 #include "NetworkedGame.h"
+#include "LoadingScreen.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -133,7 +134,7 @@ public:
 
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
 			return PushdownResult::Exit;
-		}*/
+		}
 
 		return PushdownResult::NoChange;
 	}

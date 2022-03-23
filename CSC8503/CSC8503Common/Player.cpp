@@ -49,7 +49,7 @@ void Player::Update(float dt)
 	float distanceToGround = CheckDistToGround();
 
 	// For smooth jump mechanism
-	if (distanceToGround < 0.1f) {
+	if (distanceToGround < 0.3f) {
 		canJump = true;
 	}
 	else {
@@ -57,7 +57,7 @@ void Player::Update(float dt)
 	}
 
 	// Check if grounded, if so don't apply more gravity
-	if (distanceToGround < 0.1f && force.y <= 0.0f)
+	if (distanceToGround < 0.3f && force.y <= 0.0f)
 	{
 		Vector3 currentVel = GetPhysicsObject()->GetLinearVelocity();
 		GetPhysicsObject()->SetLinearVelocity(Vector3(currentVel.x, 0.0f, currentVel.z));

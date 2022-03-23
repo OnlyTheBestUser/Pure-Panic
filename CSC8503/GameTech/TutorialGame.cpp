@@ -13,6 +13,7 @@
 #include "../../Common/Assets.h"
 
 #include "../CSC8503Common/InputList.h"
+#include "LoadingScreen.h"
 
 using namespace NCL;
 using namespace CSC8503;
