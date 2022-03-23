@@ -116,7 +116,10 @@ namespace NCL {
 
 			void DealDamage(float damageAmount) {
 				health -= damageAmount;
-				if (health < 0) health = 0;
+				if (health < 0) { 
+					health = 0;
+					SprayBullets();
+				}
 			}
 
 			void ChangeCamLock() { camLocked = !camLocked; }
@@ -134,6 +137,8 @@ namespace NCL {
 			void SetPlayerID(int x) { playerID = x; }
 
         protected:
+
+			void SprayBullets();
 			float CheckDistToGround();
 
 			int playerID;

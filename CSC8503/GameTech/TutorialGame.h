@@ -89,6 +89,7 @@ namespace NCL {
 			GameManager* gameManager;
 
 			void UpdateGameWorld(float dt);
+			void UpdateDebugText(float dt);
 			void UpdatePauseScreen(float dt);
 			void UpdateWinScreen(float dt);
 

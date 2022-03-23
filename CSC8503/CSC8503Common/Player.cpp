@@ -117,3 +117,7 @@ void Player::Reset()
 {
 
 }
+
+void Player::SprayBullets() {
+	//LevelLoader::SpawnProjectile(this, 90, )
+}
