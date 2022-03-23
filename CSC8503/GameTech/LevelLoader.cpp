@@ -148,6 +148,9 @@ void LevelLoader::ReadInLevelFile(std::string filename) {
 				else if (lineContents[0] == "THRONE") {
 					AddThroneToWorld(Vec3FromStr(lineContents[1]), std::stoi(lineContents[2]), Vec3FromStr(lineContents[3]));
 				}
+				else if (lineContents[0] == "PILLAR") {
+					AddAABBWallToWorld(Vec3FromStr(lineContents[1]), Vec3FromStr(lineContents[2]), std::stoi(lineContents[3]), lineContents[0]);
+				}
 			}
 		}
 
