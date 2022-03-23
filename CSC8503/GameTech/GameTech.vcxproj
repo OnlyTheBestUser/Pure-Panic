@@ -208,6 +208,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="LevelLoader.cpp" />
+    <ClCompile Include="LoadingScreen.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="NetworkedGame.cpp" />
@@ -218,6 +219,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LevelLoader.h" />
+    <ClInclude Include="LoadingScreen.h" />
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="NetworkedGame.h" />
     <ClInclude Include="NetworkedPlayer.h" />

@@ -7,8 +7,6 @@ size_t       sceLibcHeapSize = 256 * 1024 * 1024;	/* Set up heap area upper limi
 #include "../../Plugins/PlayStation4/PS4Input.h"
 #include "../../Common/Window.h"
 
-#include "TutorialGame.h"
-
 #include "../CSC8503Common/StateMachine.h"
 #include "../CSC8503Common/StateTransition.h"
 #include "../CSC8503Common/State.h"
@@ -16,7 +14,11 @@ size_t       sceLibcHeapSize = 256 * 1024 * 1024;	/* Set up heap area upper limi
 #include "../CSC8503Common/NavigationGrid.h"
 
 #include "TutorialGame.h"
+#include "NetworkedGame.h"
+#include "TutorialGame.h"
 #include "MainMenu.h"
+#include "LoadingScreen.h"
+
 #include "../CSC8503Common/BehaviourAction.h"
 #include "../CSC8503Common/BehaviourSequence.h"
 #include "../CSC8503Common/BehaviourSelector.h"
@@ -24,8 +26,6 @@ size_t       sceLibcHeapSize = 256 * 1024 * 1024;	/* Set up heap area upper limi
 #include "../CSC8503Common/PushdownState.h"
 #include "../CSC8503Common/PushdownMachine.h"
 #include <iostream>
-
-#include "NetworkedGame.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -97,7 +97,6 @@ public:
 			return PushdownResult::Push;
 		}
 		
-
 		if (g->GetPaused()) {
 			*newState = new PauseGame(g);
 			return PushdownResult::Push;
@@ -116,29 +115,24 @@ protected:
 
 class Menu : public PushdownState {
 public:
-	Menu(MainMenu* m, TutorialGame* g, TutorialGame* h, TutorialGame* i) : m(m), g(g), h(h), i(i) {};
+	Menu(MainMenu* m, TutorialGame* g, NetworkedGame* h) : m(m), tg(g), ng(h) {};
 
 	PushdownResult OnUpdate(float dt, PushdownState** newState) override {
 		m->UpdateGame(dt);
 
-		/*if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM1)) {
-			*newState = new Game(f);
+		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM1)) {
+			*newState = new Game(tg);
 			return PushdownResult::Push;
 		}
 
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM2)) {
-			*newState = new Game(h);
-			return PushdownResult::Push;
-		}
-
-		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM3)) {
-			*newState = new Game(i);
+			*newState = new Game(ng);
 			return PushdownResult::Push;
 		}
 
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
 			return PushdownResult::Exit;
-		}*/
+		}
 
 		if (m->GetPaused()) {
 			
@@ -150,9 +144,31 @@ public:
 	}
 
 protected:
-	TutorialGame* g;
-	TutorialGame* h;
-	TutorialGame* i;
+	TutorialGame* tg;
+	NetworkedGame* ng;
+	MainMenu* m;
+};
+
+class Loading : public PushdownState
+{
+public:
+	Loading(LoadingScreen* l) : ls(l) {};
+	PushdownResult OnUpdate(float dt, PushdownState** newState) override 
+	{
+		LoadingScreen::UpdateGame(dt);
+
+		m = new MainMenu();
+		ng = new NetworkedGame();
+		tg = new TutorialGame();
+		
+		*newState = new Menu(m, tg, ng);
+		return PushdownResult::Push;
+	}
+
+protected:
+	LoadingScreen* ls;
+	TutorialGame* tg;
+	NetworkedGame* ng;
 	MainMenu* m;
 };
 
@@ -178,7 +194,6 @@ int main() {
 	Ps4AudioSystem* audioSystem = new Ps4AudioSystem(8);
 #endif
 
-		
 	if (!w->HasInitialised()) {
 		return -1;
 	}	
@@ -191,12 +206,11 @@ int main() {
 	float totalTime = 0.0f;
 	int totalFrames = 0;
 
-	//TutorialGame* g = new TutorialGame();
-	NetworkedGame* h = new NetworkedGame();
-	// MainMenu* m = new MainMenu();
-	// PushdownMachine p = new Menu(m, g, h, g);
-	//MainMenu* m = new MainMenu();
-	//PushdownMachine p = new Menu(m, g, g, g);
+	w->SetTitle("Loading");
+
+	LoadingScreen* l = new LoadingScreen();
+	PushdownMachine p = new Loading(l);	
+		
 	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
 	float smallestFrameRate = 144.0f;
 	while (w->UpdateWindow()) { //&& !w->GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
@@ -205,7 +219,6 @@ int main() {
 			break;
 #endif
 
-		//DisplayPathfinding();
 		float dt = w->GetTimer()->GetTimeDeltaSeconds();
 		if (dt > 0.1f) {
 			std::cout << "Skipping large time delta" << std::endl;
@@ -236,11 +249,11 @@ int main() {
 			curTimeWait = avgTimeWait;
 		}
 
-		h->UpdateGame(dt);
+		//l->UpdateGame(dt);
 
-		//if (!p.Update(dt)) {
-		//	return 0;
-		//}
+		if (!p.Update(dt)) {
+			return 0;
+		}
 	}
 	Window::DestroyGameWindow();
 }
