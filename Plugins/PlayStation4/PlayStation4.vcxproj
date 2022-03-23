@@ -182,6 +182,7 @@
     <ClCompile Include="PS4AudioSource.cpp" />
     <ClCompile Include="PS4ComputeShader.cpp" />
     <ClCompile Include="PS4Frame.cpp" />
+    <ClCompile Include="PS4FrameBuffer.cpp" />
     <ClCompile Include="PS4Input.cpp" />
     <ClCompile Include="PS4MemoryAware.cpp" />
     <ClCompile Include="PS4Mesh.cpp" />
@@ -198,6 +199,7 @@
     <ClInclude Include="PS4AudioSource.h" />
     <ClInclude Include="PS4ComputeShader.h" />
     <ClInclude Include="PS4Frame.h" />
+    <ClInclude Include="PS4FrameBuffer.h" />
     <ClInclude Include="PS4Input.h" />
     <ClInclude Include="PS4MemoryAware.h" />
     <ClInclude Include="PS4Mesh.h" />
@@ -221,6 +223,18 @@
       <Profile Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">VSVS</Profile>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">-cache</AdditionalOptions>
       <OutputFileName Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">$(SolutionDir)Assets\Shaders\PS4\%(FileName).sb</OutputFileName>
+    </WavePsslc>
+    <WavePsslc Include="..\..\Assets\Shaders\PS4\maskPixel.pssl">
+      <Profile Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">PS</Profile>
+      <Profile Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">PS</Profile>
+      <OutputFileName Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">$(SolutionDir)Assets\Shaders\PS4\%(FileName).sb</OutputFileName>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">-cache</AdditionalOptions>
+    </WavePsslc>
+    <WavePsslc Include="..\..\Assets\Shaders\PS4\maskVertex.pssl">
+      <Profile Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">VSVS</Profile>
+      <Profile Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">VSVS</Profile>
+      <OutputFileName Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">$(SolutionDir)Assets\Shaders\PS4\%(FileName).sb</OutputFileName>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">-cache</AdditionalOptions>
     </WavePsslc>
     <WavePsslc Include="..\..\Assets\Shaders\PS4\PixelShader.pssl">
       <Profile Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">PS</Profile>

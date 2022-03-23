@@ -8,11 +8,7 @@ namespace NCL {
 		class GameClient;
 		class NetworkPlayer;
 
-#ifndef _ORBIS
 		class NetworkedGame : public TutorialGame, public PacketReceiver {
-#else
-		class NetworkedGame : public TutorialGame {
-#endif
 		public:
 			NetworkedGame();
 			~NetworkedGame();
@@ -26,15 +22,16 @@ namespace NCL {
 
 			void StartLevel();
 
-#ifndef _ORBIS
 			void ReceivePacket(int type, GamePacket* payload, int source) override;
-#endif
 
 			void OnPlayerCollision(NetworkPlayer* a, NetworkPlayer* b);
 
 			void RemovePlayerFromServer(int clientID);
 
-			static NetworkedGame* GetInstance() { return instance; }
+			static NetworkedGame* GetInstance() { return singleton; }
+
+			static void AddPowerUp(PowerUp* powerup) { singleton->powerups.emplace_back(powerup); }
+			static void AddSpawnPoint(Vector3 pos) { singleton->spawnPoints.emplace_back(pos); }
 
 		protected:
 			void UpdateAsServer(float dt);
@@ -42,7 +39,7 @@ namespace NCL {
 
 			void BroadcastSnapshot();
 
-			static NetworkedGame* instance;
+			static NetworkedGame* singleton;
 			std::map<int, int> stateIDs;
 
 			GameServer* thisServer;
@@ -53,6 +50,8 @@ namespace NCL {
 			int playerID;
 
 			std::vector<NetworkObject*> networkObjects;
+			std::vector<PowerUp*>		powerups;
+			std::vector<Vector3>		spawnPoints;
 
 			// client ID, last ID
 			std::map<int, int> clientHistory;
@@ -62,13 +61,12 @@ namespace NCL {
 			Player* localPlayer;
 
 			// Packet Handling Functions
-#ifndef _ORBIS
-			void HandleClientPacket(ClientPacket* packet);
-#endif
-			void AddNewPlayerToServer(int clientID, int lastID);
-			void Fire(GameObject* owner, float pitch, int clientID);
 
-#ifndef _ORBIS
+			void HandleClientPacket(ClientPacket* packet);
+			void AddNewPlayerToServer(int clientID, int lastID);
+			void ServerFire(GameObject* owner, float pitch, int bulletCounter, bool spread, int clientID);
+			void Fire(GameObject* owner, bool spread, int bulletCounter, float pitch, int clientID);
+
 			bool CheckExists(IDPacket* packet);
 
 			void HandleFullState(FullPacket* packet);
@@ -76,7 +74,7 @@ namespace NCL {
 			void HandleAssignID(AssignIDPacket* packet);
 			void HandlePlayerConnect(NewPlayerPacket* packet);
 			void HandlePlayerDisconnect(PlayerDisconnectPacket* packet);
-#endif
+			void HandlePowerUp(PowerUpPacket* packet);
 		};
 	}
 }

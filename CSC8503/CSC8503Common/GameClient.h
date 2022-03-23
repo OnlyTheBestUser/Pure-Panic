@@ -1,5 +1,4 @@
 #pragma once
-#ifndef _ORBIS
 #include "NetworkBase.h"
 #include <stdint.h>
 #include <thread>
@@ -18,14 +17,12 @@ namespace NCL {
 			void SendPacket(GamePacket& payload);
 
 			void UpdateClient();
-		protected:
-			//void ThreadedUpdate();
 
+		protected:
+#ifndef ORBISNET
 			ENetPeer* netPeer;
-			//std::atomic<bool>	threadAlive;
-			//std::thread			updateThread;
+#endif
 		};
 	}
 }
-#endif
 

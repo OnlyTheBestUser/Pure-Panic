@@ -1,24 +1,33 @@
-#ifndef _ORBIS
 #include "NetworkBase.h"
+#ifndef ORBISNET
 #include <enet/enet.h>
+#endif
 #include <iostream>
 
 NetworkBase::NetworkBase() {
+#ifndef ORBISNET
 	netHandle = nullptr;
+#endif
 }
 
 NetworkBase::~NetworkBase() {
+#ifndef ORBISNET
 	if (netHandle) {
 		enet_host_destroy(netHandle);
 	}
+#endif
 }
 
 void NetworkBase::Initialise() {
+#ifndef ORBISNET
 	enet_initialize();
+#endif
 }
 
 void NetworkBase::Destroy() {
+#ifndef ORBISNET
 	enet_deinitialize();
+#endif
 }
 
 bool NetworkBase::ProcessPacket(GamePacket* packet, int peerID) {
@@ -36,4 +45,3 @@ bool NetworkBase::ProcessPacket(GamePacket* packet, int peerID) {
 	std::cout << __FUNCTION__ << " no handler for packet type " << packet->type << std::endl;
 	return false;
 }
-#endif

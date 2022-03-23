@@ -17,7 +17,6 @@ extern "C"
 #else
 #include "enet/unix.h"
 #endif
-
 #include "enet/types.h"
 #include "enet/protocol.h"
 #include "enet/list.h"

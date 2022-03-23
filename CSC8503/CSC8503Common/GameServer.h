@@ -1,4 +1,3 @@
-#ifndef _ORBIS
 #pragma once
 #include <thread>
 #include <atomic>
@@ -20,12 +19,14 @@ namespace NCL {
 
 			//void ThreadedUpdate();
 
+#ifndef ORBISNET
 			bool SendGlobalPacket(int msgID);
 			bool SendGlobalPacket(GamePacket& packet);
 
 			bool SendPacketToPeer(int peerID, int msgID);
 			bool SendPacketToPeer(int peerID, GamePacket& packet);
 			bool SendPacketToPeer(ENetPeer* peer, GamePacket& packet);
+#endif
 
 			virtual void UpdateServer();
 
@@ -38,7 +39,9 @@ namespace NCL {
 			//std::atomic<bool> threadAlive;
 
 			// peerId, peer*
+#ifndef ORBISNET
 			std::map<int, ENetPeer*> connectedClients;
+#endif
 
 			//std::thread updateThread;
 
@@ -47,4 +50,3 @@ namespace NCL {
 		};
 	}
 }
-#endif

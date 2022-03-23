@@ -2,7 +2,8 @@
 #include "Debug.h"
 #include <algorithm>
 
-using namespace NCL::CSC8503;
+using namespace NCL;
+using namespace CSC8503;
 
 void Timer::Update(const float& dt) {
 	if (state == TimerStates::Running) {
@@ -15,4 +16,10 @@ void Timer::Update(const float& dt) {
 		Debug::Print("Game Ended", Vector2(30.0f, 50.0f), 50.0f, Debug::RED);
 	}
 	Debug::Print(std::to_string(int(timeLeft)), Vector2(92.0f, 10.0f), 30.0f, Debug::BLACK);
+}
+
+void Timer::StartTimer() {
+	if (state == Ended)
+		timeLeft = maxTime;
+	state = TimerStates::Running;
 }

@@ -43,15 +43,6 @@ RendererBase::RendererBase() {
 
 	debugLinesMesh = new OGLMesh();
 	debugTextMesh = new OGLMesh();
-
-	debugLinesMesh->SetVertexPositions(std::vector<Vector3>(5000, Vector3()));
-	debugLinesMesh->SetVertexColours(std::vector<Vector4>(5000, Vector3()));
-
-	debugTextMesh->SetVertexPositions(std::vector<Vector3>(5000, Vector3()));
-	debugTextMesh->SetVertexColours(std::vector<Vector4>(5000, Vector3()));
-	debugTextMesh->SetVertexTextureCoords(std::vector<Vector2>(5000, Vector3()));
-
-
 #endif
 #ifdef _ORBIS
 	rendererAPI = new PS4::PS4RendererAPI(*Window::GetWindow());
@@ -67,25 +58,24 @@ RendererBase::RendererBase() {
 
 	debugLinesMesh = new PS4::PS4Mesh();
 	debugTextMesh = new PS4::PS4Mesh();
-
-	int test = 5000;
-	debugLinesMesh->SetVertexPositions(std::vector<Vector3>(test, Vector3()));
-	debugLinesMesh->SetVertexColours(std::vector<Vector4>(test, Vector4()));
-	debugLinesMesh->SetVertexTextureCoords(std::vector<Vector2>(test, Vector2()));
-	debugLinesMesh->SetVertexNormals(std::vector<Vector3>(test, Vector3()));
-	debugLinesMesh->SetVertexTangents(std::vector<Vector4>(test, Vector4()));
-
-	debugTextMesh->SetVertexPositions(std::vector<Vector3>(test, Vector3()));
-	debugTextMesh->SetVertexColours(std::vector<Vector4>(test, Vector4()));
-	debugTextMesh->SetVertexTextureCoords(std::vector<Vector2>(test, Vector2()));
-	debugTextMesh->SetVertexNormals(std::vector<Vector3>(test, Vector3()));
-	debugTextMesh->SetVertexTangents(std::vector<Vector4>(test, Vector4()));
-
 #endif
-	debugTextMesh->UploadToGPU(rendererAPI);
+	debugLinesMesh->SetVertexPositions(std::vector<Vector3>(5000, Vector3()));
+	debugLinesMesh->SetVertexColours(std::vector<Vector4>(5000, Vector4()));
+	debugLinesMesh->SetVertexTextureCoords(std::vector<Vector2>(5000, Vector2()));
+	debugLinesMesh->SetVertexNormals(std::vector<Vector3>(5000, Vector3()));
+	debugLinesMesh->SetVertexTangents(std::vector<Vector4>(5000, Vector2()));
+
+	debugTextMesh->SetVertexPositions(std::vector<Vector3>(5000, Vector3()));
+	debugTextMesh->SetVertexColours(std::vector<Vector4>(5000, Vector4()));
+	debugTextMesh->SetVertexTextureCoords(std::vector<Vector2>(5000, Vector2()));
+	debugTextMesh->SetVertexNormals(std::vector<Vector3>(5000, Vector2()));
+	debugTextMesh->SetVertexTangents(std::vector<Vector4>(5000, Vector2()));
+
 	debugLinesMesh->UploadToGPU(rendererAPI);
+	debugTextMesh->UploadToGPU(rendererAPI);
 
 	debugLinesMesh->SetPrimitiveType(GeometryPrimitive::Lines);
+	debugTextMesh->SetPrimitiveType(GeometryPrimitive::Triangles);
 }
 
 RendererBase::~RendererBase() {
@@ -165,8 +155,11 @@ void RendererBase::DrawDebugStrings() {
 	}
 
 	debugTextMesh->SetVertexPositions(vertPos);
-	debugTextMesh->SetVertexTextureCoords(vertTex);
 	debugTextMesh->SetVertexColours(vertColours);
+	debugTextMesh->SetVertexTextureCoords(vertTex);
+	debugTextMesh->SetVertexNormals(std::vector<Vector3>(vertPos.size(), Vector3()));
+	debugTextMesh->SetVertexTangents(std::vector<Vector4>(vertPos.size(), Vector4()));
+
 	debugTextMesh->UpdateGPUBuffers(0, vertPos.size());
 
 	rendererAPI->DrawMesh(debugTextMesh);
@@ -188,9 +181,13 @@ void RendererBase::DrawDebugLines() {
 		vertCol.emplace_back(s.colour);
 	}
 
+
 	debugLinesMesh->SetVertexPositions(vertPos);
 	debugLinesMesh->SetVertexColours(vertCol);
-	
+	debugLinesMesh->SetVertexTextureCoords(std::vector<Vector2>(vertPos.size(), Vector2()));
+	debugLinesMesh->SetVertexNormals(std::vector<Vector3>(vertPos.size(), Vector3()));
+	debugLinesMesh->SetVertexTangents(std::vector<Vector4>(vertPos.size(), Vector4()));
+
 	debugLinesMesh->UpdateGPUBuffers(0, vertPos.size());
 
 	rendererAPI->DrawMesh(debugLinesMesh);

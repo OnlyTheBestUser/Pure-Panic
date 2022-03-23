@@ -113,7 +113,7 @@
     <LibraryPath>$(SCE_ORBIS_SAMPLE_DIR)\sample_code\graphics\api_gnm\toolkit;$(SolutionDir)$(Platform)_$(Configuration)\;$(LibraryPath)</LibraryPath>
     <IncludePath>$(IncludePath)</IncludePath>
     <LibraryPath>$(SCE_ORBIS_SAMPLE_DIR)\sample_code\graphics\api_gnm\toolkit;$(SolutionDir)$(Platform)_$(Configuration)\;$(LibraryPath);$(SolutionDir)\Plugins\FMod\PS4\api\studio\lib\;$(SolutionDir)\Plugins\FMod\PS4\api\core\lib\</LibraryPath>
-    <IncludePath>$(IncludePath);$(SolutionDir)\Plugins\FMod\PS4\api\core\inc\;</IncludePath>
+    <IncludePath>$(IncludePath);$(SolutionDir)\Plugins\FMod\PS4\api\core\inc\;$(SolutionDir)\Plugins\Networking-ENet\include</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LibraryPath>$(SolutionDir)\Plugins\FMod\Windows\api\core\lib\x64;$(SolutionDir)\Plugins\FMod\PS4\api\core\lib;$(SolutionDir)\Plugins\OpenGLRendering;$(SolutionDir)\Plugins\Networking-ENet\include;;$(SolutionDir)\Plugins\OpenGLRendering;$(SolutionDir)\Plugins\FMod\api\core\lib;$(SolutionDir)$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>

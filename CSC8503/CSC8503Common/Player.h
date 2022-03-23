@@ -15,7 +15,7 @@ namespace NCL {
         class Player : public GameActor
         {
         public:
-			Player(Camera* camera, LevelLoader* lvlLoader, GameWorld* world, string name = "", Vector3 ch = Vector3(0, 2, 0)) : GameActor(name), checkpoint(ch), spawnPos(ch), levelLoader(lvlLoader), world(world){
+			Player(Camera* camera, string name = "", Vector3 ch = Vector3(0, 2, 0)) : GameActor(name), checkpoint(ch), spawnPos(ch) {
 				this->camera = camera;
 				camLocked = true;
 				playerID = 0;
@@ -51,6 +51,13 @@ namespace NCL {
 				currentPowerUp = PowerUpType::FireRate;
 			}
 
+			void ActivateMultiBullet(const int& NoOfBullets, const float& duration) {
+				if (NoOfBullets <= 0) return;
+				bulletsPerShot = NoOfBullets;
+				powerupTime = duration;
+				currentPowerUp = PowerUpType::MultiBullet;
+			}
+
 			void IncreaseHealth(const float& increaseHealthBy) {
 				if (increaseHealthBy <= 0) return;
 				health += increaseHealthBy;
@@ -63,6 +70,7 @@ namespace NCL {
 			{
 				fireRate = defaultFireRate;
 				curSpeed = defaultCurSpeed;
+				bulletsPerShot = defaultBulletsPerShot;
 				currentPowerUp = PowerUpType::None;
 			}
 
@@ -125,6 +133,8 @@ namespace NCL {
 			int GetPlayerID() const { return playerID; }
 			void SetPlayerID(int x) { playerID = x; }
 
+			int BulletCounter = 0;
+
         protected:
 			float CheckDistToGround();
 
@@ -140,6 +150,8 @@ namespace NCL {
 			float defaultFireRate = 0.2f;
 			float defaultCurSpeed = 80.0f;
 			float fireRate = 0.2f;
+			int defaultBulletsPerShot = 1;
+			int bulletsPerShot = defaultBulletsPerShot;
 			float timeSincePrevShot = 0.0f;
 			float powerupTime = 0.0f;
 			float curSpeed = 80.0f;
@@ -155,12 +167,9 @@ namespace NCL {
 
 			float cameraVertMult = 0.5f;
 			Camera* camera;
-			GameWorld* world;
 			bool camLocked;
 			
 			bool fired = false;
-
-			LevelLoader* levelLoader;
         };
     }
 }

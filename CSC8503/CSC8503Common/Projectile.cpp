@@ -11,7 +11,7 @@ void Projectile::Update(float dt) {
 	lifeSpan -= dt;
 	if (lifeSpan < 0.0f)
 	{
-		gameWorld.RemoveGameObject(this, true);
+		GameWorld::RemoveGameObject(this, true);
 	}
 }
 
@@ -19,17 +19,15 @@ void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vecto
 #ifndef _ORBIS
 	int soundToPlay = rand() % 2;
 	NCL::AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + (soundToPlay == 0 ? "splat_neutral_01.ogg" : "splat_neutral_02.ogg"), this->GetTransform().GetPosition());
-#endif // !_ORBIS
+#endif
 
-	Ray ray(this->GetTransform().GetPosition(), -this->GetPhysicsObject()->GetLinearVelocity());
+	Ray ray(this->GetTransform().GetPosition() - this->GetPhysicsObject()->GetLinearVelocity().Normalised(), this->GetPhysicsObject()->GetLinearVelocity());
 	ray.SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
-	//Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
+
 	RayCollision closestCollision;
-	if (gameWorld.Raycast(ray, closestCollision, true)) {
+	if (GameWorld::Raycast(ray, closestCollision, true)) {
 		RenderObject* test = ((GameObject*)closestCollision.node)->GetRenderObject();
 		
-		//Debug::DrawLine(ray.GetPosition(), ray.GetPosition() * ray.GetDirection());
-		//Debug::DrawSphere(closestCollision.collidedAt, 0.5, Vector4(1, 0, 0, 1), 0.f);
 		if (test) {
 			if (test->GetPaintMask() != nullptr) {
 
@@ -40,17 +38,24 @@ void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vecto
 
 				Vector4 colour;
 				if (GetOwnerPlayerID() % 2 == 0) {
-					colour = Vector4(0.3, 0, 0.5, 1);
+					// Turquoise
+					colour = Vector4(0.011, 0.988, 0.941, 1);
 				}
 				else {
-					colour = Vector4(0.250, 0.878, 0.815, 1);
+					// Pink
+					colour = Vector4(1, 0.039, 0.941, 1);
 				}
 				
+				float randRad = ((GameObject*)closestCollision.node)->GetPaintRadius() + (((static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * 2.0f) - 1.0f) * ((GameObject*)closestCollision.node)->GetPaintRadius() * 0.25f;
+
 				// Get the uv from the ray
-				renderInst->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, 1, 0.3, 0.5, colour);
+				renderInst->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, randRad, 0.7, 1, colour);
+
+				// Debug Rainbow Gun
+				//renderInst->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, randRad, 0.7, 1, Vector4(static_cast <float> (rand()) / static_cast <float> (RAND_MAX) , static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX), 1));
 			}
 		}
 	}
-
-	gameWorld.RemoveGameObject(this, true);
+	
+	GameWorld::RemoveGameObject(this, true);
 }

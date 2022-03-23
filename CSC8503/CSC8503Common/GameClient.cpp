@@ -1,4 +1,3 @@
-#ifndef _ORBIS
 #include "GameClient.h"
 #include <iostream>
 #include <string>
@@ -7,16 +6,21 @@ using namespace NCL;
 using namespace CSC8503;
 
 GameClient::GameClient() {
+#ifndef ORBISNET
 	netHandle = enet_host_create(nullptr, 1, 1, 0, 0);
+#endif
 }
 
 GameClient::~GameClient() {
 	//threadAlive = false;
 	//updateThread.join();
+#ifndef ORBISNET
 	enet_host_destroy(netHandle);
+#endif
 }
 
 bool GameClient::Connect(uint8_t a, uint8_t b, uint8_t c, uint8_t d, int portNum) {
+#ifndef ORBISNET
 	ENetAddress address;
 	address.port = portNum;
 
@@ -30,14 +34,22 @@ bool GameClient::Connect(uint8_t a, uint8_t b, uint8_t c, uint8_t d, int portNum
 	}
 
 	return netPeer != nullptr;
+#else
+	return false;
+#endif
 }
 
 void GameClient::UpdateClient() {
+#ifndef ORBISNET
 	if (netHandle == nullptr)
 	{
 		return;
 	}
+#else
+	return;
+#endif
 	//Handle all incoming packets & send any packets awaiting dispatch
+#ifndef ORBISNET
 	ENetEvent event;
 	while (enet_host_service(netHandle, &event, 0) > 0)
 	{
@@ -51,12 +63,15 @@ void GameClient::UpdateClient() {
 		}
 		enet_packet_destroy(event.packet);
 	}
+#endif
 }
 
 void GameClient::SendPacket(GamePacket& payload) {
+#ifndef ORBISNET
 	ENetPacket* dataPacket = enet_packet_create(&payload, payload.GetTotalSize(), 0);
 
 	int test = enet_peer_send(netPeer, 0, dataPacket);
+#endif
 }
 
 //void GameClient::ThreadedUpdate() {
@@ -64,4 +79,3 @@ void GameClient::SendPacket(GamePacket& payload) {
 //		UpdateClient();
 //	}
 //}
-#endif

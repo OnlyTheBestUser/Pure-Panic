@@ -27,22 +27,22 @@ TutorialGame::TutorialGame()	{
 	physics			= new PhysicsSystem(*world);
 	LoadingScreen::AddProgress(8.0f);
 	LoadingScreen::UpdateGame(0.0f);
-	levelLoader		= new LevelLoader(world, physics, renderer);
+	levelLoader		= new LevelLoader(physics, renderer);
 	LoadingScreen::AddProgress(17.0f);
 	LoadingScreen::UpdateGame(0.0f);
+	gameManager		= new GameManager(this);
 
 #ifndef _ORBIS
 	audio = NCL::AudioManager::GetInstance();
 	audio->Initialize();
 	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_01.ogg", true, false, false);
 	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_02.ogg", true, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "gun_fire.ogg", true, false, false);
 	audio->LoadSound(Assets::AUDIODIR + "menu_music.ogg", false, true, true);
 
 	bgm = new BGMManager(audio);
 	bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 3.0f);
 #endif
-
-	//levelLoader = new LevelLoader(world, physics, renderer);
 
 	forceMagnitude = 30.0f;
 	useGravity = true;
@@ -50,11 +50,7 @@ TutorialGame::TutorialGame()	{
 
 	inSelectionMode = false;
 
-	testStateObject = nullptr;
-
 	state = PLAY;
-
-	timer = new Timer(abs(60.0f));
 
 	Debug::SetRenderer(renderer);
 
@@ -98,28 +94,23 @@ TutorialGame::TutorialGame()	{
 	Command* toggleDebug = new ToggleBoolCommand(&debugDraw);
 	Command* togglePause = new ToggleBoolCommand(&pause);
 	Command* toggleMouse = new ToggleMouseCommand(&inSelectionMode);
+	Command* resetWorld = new ResetWorldCommand(&state);
 	Command* quitCommand = new QuitCommand(&quit, &pause);
 	//Command* paintFireCommand = new PaintFireCommand(this);
-	Command* startTimer = new StartTimerCommand(timer);
+	Command* startTimer = new StartTimerCommand(gameManager->GetTimer());
+	
 	inputHandler->BindButton(TOGGLE_GRAV, toggleGrav);
 	inputHandler->BindButton(TOGGLE_DEBUG, toggleDebug);
 	inputHandler->BindButton(TOGGLE_PAUSE, togglePause);
+	inputHandler->BindButton(RESET_WORLD, resetWorld);
 	inputHandler->BindButton(QUIT, quitCommand);
 	//inputHandler->BindButton(FIRE, paintFireCommand);
 	inputHandler->BindButton(TOGGLE_MOUSE, toggleMouse);
 	inputHandler->BindButton(START_TIMER, startTimer);
 
 #pragma endregion
-
-	InitialiseAssets();
 }
-/*
 
-Each of the little demo scenarios used in the game uses the same 2 meshes,
-and the same texture and shader. There's no need to ever load in anything else
-for this module, even in the coursework, but you can add it if you like!
-
-*/
 void TutorialGame::InitialiseAssets() {
 	InitCamera();
 	InitWorld();
@@ -141,7 +132,9 @@ void TutorialGame::UpdateGame(float dt) {
 	case RESET: {
 		InitCamera();
 		InitWorld();
+		renderer->ClearPaint();
 		selectionObject = nullptr;
+		state = PLAY;
 		break;
 	}
 	}
@@ -192,11 +185,49 @@ void TutorialGame::UpdateGameWorld(float dt)
 
 	world->UpdateWorld(dt);
 
-	timer->Update(dt);
+	gameManager->Update(dt);
+
+	UpdateScores(dt);
+}
+
+void TutorialGame::UpdateScores(float dt) {
+	timeSinceLastScoreUpdate += dt;
+	//Can change time for better performance
+	if (timeSinceLastScoreUpdate > 1.0f/60.0f) {
+		GameObjectIterator start;
+		GameObjectIterator cur;
+		GameObjectIterator end;
+		world->GetPaintableObjectIterators(start, end);
+		cur = start;
+		for (int i = 0; i < currentObj; i++) {
+			cur++;
+			if (cur == end) {
+				currentObj = 0;
+				cur = start;
+			}
+		}
+
+		if ((*cur)->GetPaintRadius() == 0) {
+			currentObj++;
+			return;
+		}
+		// Need to score the texture here.
+		Vector2 scoreDif = renderer->CountPaintMask((*cur)->GetRenderObject()->GetPaintMask(), world->GetScore((*cur)), Vector4(0.3, 0, 0.5, 1), Vector4(0.250, 0.878, 0.815, 1));
+		if ((*cur)->GetPaintRadius() != 0){
+			scoreDif = scoreDif / (*cur)->GetPaintRadius();
+		}
+		world->UpdateScore((*cur), scoreDif);
+		//std::cout << (*cur)->GetName() << "\n" << "Team 1: " << scoreDif.x << "\n" << "Team 2: " << scoreDif.y << "\n\n";
+
+		gameManager->UpdateScores(scoreDif);
+		currentObj++;
+		timeSinceLastScoreUpdate = 0;
+	}
 }
 
 void TutorialGame::DebugDrawCollider(const CollisionVolume* c, Transform* worldTransform) {
 	Vector4 col = Vector4(1, 0, 0, 1);
+
 	if (c == nullptr)
 		return;
 	switch (c->type) {
@@ -323,20 +354,9 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	levelLoader->ReadInLevelFile(NCL::Assets::DATADIR + "../../Assets/Maps/map1.txt");
-	Player* player = levelLoader->AddPlayerToWorld(Vector3(0, 5, 0));
-	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 20), PowerUpType::SpeedBoost);
-	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 30), PowerUpType::FireRate);
-	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 40), PowerUpType::Heal);
-
-	//Command* f = new MoveForwardCommand(player);
-	//Command* b = new MoveBackwardCommand(player);
-	//Command* l = new MoveLeftCommand(player);
-	//Command* r = new MoveRightCommand(player);
-	//inputHandler->BindButton(FORWARD, f);
-	//inputHandler->BindButton(BACK, b);
-	//inputHandler->BindButton(LEFT, l);
-	//inputHandler->BindButton(RIGHT, r);
+	levelLoader->ReadInLevelFile(NCL::Assets::MAPDIR + "map1.txt");
+	Player* player = levelLoader->SpawnPlayer(Vector3(0, 5, 0));
+	
 	AxisCommand* m = new MoveCommand(player);
 	inputHandler->BindAxis(0, m);
 
@@ -355,13 +375,11 @@ void TutorialGame::InitWorld() {
 	Command* f = new FireCommand(player);
 	inputHandler->BindButton(FIRE, f);
 
-	/*GameObject* cap1 = levelLoader->AddCapsuleToWorld(Vector3(15, 15, 0), 3.0f, 1.5f);
+	/*GameObject* cap1 = LevelLoader->AddCapsuleToWorld(Vector3(15, 15, 0), 3.0f, 1.5f);
 	cap1->GetPhysicsObject()->SetDynamic(true);
 	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);*/
 
 	player1 = player;
-
-	//Projectile* spit = AddProjectileToWorld(Vector3(5, 5, 0), 0.3f, 1.0f);
 
 	physics->BuildStaticList();
 }
@@ -544,7 +562,7 @@ void TutorialGame::PaintObject() {
 			
 			
 			// Get the uv from the ray
-			renderer->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, 1, 0.2, 0.2, Vector4(0.3, 0, 0.5, 1));
+			renderer->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, ((GameObject*)closestCollision.node)->GetPaintRadius(), 0.2, 0.2, Vector4(0.3, 0, 0.5, 1));
 		}
 	}
 }

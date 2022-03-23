@@ -37,15 +37,14 @@ float mask(vec2 _position, vec2 _center, float _radius, float _hardness){
 void main(void)	{
 // This world possition is the position of verticies not fragments.
 
-    float avgScale = (textureScale.x + textureScale.y + textureScale.z) / 3;
-
-    float f = mask(gl_FragCoord.xy / viewport,uvHitPoint, radius/avgScale, hardness);
+    float f = mask(gl_FragCoord.xy / viewport,uvHitPoint, radius/100, hardness);
 
     float edge = f * strength;
 
-    fragColour.rgb = mix(fragColour.rgb, colour.rgb, edge);
+    fragColour.rgba = mix(fragColour.rgba, vec4(colour.rgb, 1), edge);
+    //fragColour.r = fragColour.a;
+    //fragColour.g = fragColour.a;
+    //fragColour.b = fragColour.a;
 
-    fragColour.a = 1;
-
-	//fragColour = vec4(0.01,0,0,1);
+    //fragColour.a = 1;
 }

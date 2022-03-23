@@ -1,4 +1,3 @@
-#ifndef _ORBIS
 #pragma once
 #include "GameObject.h"
 #include "NetworkBase.h"
@@ -18,10 +17,22 @@ namespace NCL {
 
 		struct FirePacket : public IDPacket {
 			float	pitch;
+			bool	spread;
+			int		bulletCounter;
 
 			FirePacket() {
 				type = Fire_State;
 				size = sizeof(FirePacket) - sizeof(GamePacket);
+			}
+		};
+
+
+		struct PowerUpPacket : public IDPacket {
+			int worldID;
+
+			PowerUpPacket() {
+				type = PowerUp_State;
+				size = sizeof(PowerUpPacket) - sizeof(GamePacket);
 			}
 		};
 
@@ -31,6 +42,8 @@ namespace NCL {
 			float	pos[3];
 			float	pitch, yaw;
 			bool	firing;
+			bool	spread;
+			int		bulletCounter;
 
 			ClientPacket() {
 				type = Received_State;
@@ -40,10 +53,10 @@ namespace NCL {
 
 		class NetworkObject {
 		public:
-			NetworkObject(GameObject& o, int id, GameWorld* world);
+			NetworkObject(GameObject& o, int id);
 			virtual ~NetworkObject() {
 				object.SetNetworkObject(nullptr);
-				world->RemoveGameObject(&object);
+				GameWorld::RemoveGameObject(&object);
 			}
 
 			//Called by clients
@@ -74,10 +87,7 @@ namespace NCL {
 			int fullErrors;
 
 			int networkID;
-
-			GameWorld* world;
 		};
 	}
 }
-#endif
 

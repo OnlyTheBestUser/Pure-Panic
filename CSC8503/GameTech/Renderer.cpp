@@ -3,6 +3,7 @@
 #include "../../Plugins/PlayStation4/PS4Shader.h"
 #include "../../Plugins/PlayStation4/PS4Texture.h"
 #include "../../Plugins/PlayStation4/PS4UniformBuffer.h"
+#include "../../Plugins/PlayStation4/PS4FrameBuffer.h"
 #endif
 #include "Renderer.h"
 
@@ -12,13 +13,15 @@
 #include "../../Common/MeshGeometry.h"
 
 
-
+#ifdef _WIN64
 #include "../../Plugins/OpenGLRendering/OGLFrameBuffer.h"
 #include "../../Plugins/OpenGLRendering/OGLShader.h"
 #include "../../Plugins/OpenGLRendering/OGLMesh.h"
 #include "../../Plugins/OpenGLRendering/OGLTexture.h"
 #include "../../Plugins/OpenGLRendering/OGLUniformBuffer.h"
+#endif
 using namespace NCL;
+using namespace Maths;
 using namespace Rendering;
 using namespace CSC8503;
 
@@ -70,6 +73,11 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 
 	skyboxTex = PS4::PS4Texture::LoadSkyboxFromFile(NCL::Assets::TEXTUREDIR + "Cubemap/cubemap.gnf");
 
+	maskShader = PS4::PS4Shader::GenerateShader(
+		Assets::SHADERDIR + "PS4/maskVertex.sb",
+		Assets::SHADERDIR + "PS4/maskPixel.sb"
+	);
+
 	camBuffer = new PS4::PS4UniformBuffer(sizeof(CameraMatrix));
 #endif
 
@@ -104,9 +112,7 @@ void Renderer::Render() {
 	BuildObjectList();
 	SortObjectList();
 
-#ifdef _WIN64
 	ApplyPaintToMasks();
-#endif
 	RenderScene();
 	rendererAPI->SetCullFace(false);
 
@@ -129,6 +135,8 @@ void Renderer::BuildObjectList() {
 		}
 	);
 }
+
+
 
 void Renderer::SortObjectList() {
 	//Who cares!
@@ -224,10 +232,12 @@ void Renderer::RenderObjects() {
 		shader->UpdateUniformInt("hasTexture", (*i).GetDefaultTexture() ? 1 : 0);
 #ifdef _WIN64
 		if (shadowFBO->GetTexture()) shadowFBO->GetTexture()->Bind(1);
-
-		if ((*i).GetPaintMask()) (*i).GetPaintMask()->Bind(2);
-		shader->UpdateUniformInt("hasPaintMask", (*i).GetPaintMask() ? 1 : 0);
 #endif
+		if ((*i).GetPaintMask()) {
+			(*i).GetPaintMask()->Bind(2);
+		}
+		shader->UpdateUniformInt("hasPaintMask", (*i).GetPaintMask() ? 1 : 0);
+
 
 		Matrix4 modelMatrix = (*i).GetTransform()->GetMatrix();
 #ifdef _WIN64
@@ -237,16 +247,79 @@ void Renderer::RenderObjects() {
 		shader->UpdateUniformMatrix4("invModelMatrix", modelMatrix.Inverse());
 #ifdef _WIN64
 		shader->UpdateUniformMatrix4("shadowMatrix", fullShadowMat);
-
+#endif
 		shader->UpdateUniformVector4("objectColour", i->GetColour());
 		shader->UpdateUniformInt("hasVertexColours", !(*i).GetMesh()->GetColourData().empty());
-#endif
+
+
+
 
 		rendererAPI->DrawMeshAndSubMesh((*i).GetMesh());
 	}
 }
 
-void Renderer::Paint(const RenderObject* paintable, Vector3& barycentric, Vector3& colpos, Vector2& texUV_a, Vector2& texUV_b, Vector2& texUV_c, float radius, float hardness, float strength, NCL::Maths::Vector4 colour)
+void NCL::Rendering::Renderer::ClearPaint()
+{
+	GameObjectIterator start;
+	GameObjectIterator cur;
+	GameObjectIterator end;
+	gameWorld.GetPaintableObjectIterators(start, end);
+	cur = start;
+
+	while (cur != end) {
+		(*cur)->GetRenderObject()->GetPaintMask()->ResetTexture();
+		cur++;
+	}
+}
+
+NCL::Maths::Vector2 Renderer::CountPaintMask(TextureBase* paintMask, NCL::Maths::Vector2 prevScores, NCL::Maths::Vector4 team1Colour, NCL::Maths::Vector4 team2Colour) {
+
+#ifdef _ORBIS
+	return prevScores;
+#elif _WIN64
+
+	paintMask->Bind();
+
+	int pixelDataSize = paintMask->GetHeight() * paintMask->GetWidth() * 4;
+	GLubyte* data = new GLubyte[pixelDataSize];
+	glGetTextureImage(((OGLTexture*)paintMask)->GetObjectID(), 0, GL_RGBA, GL_UNSIGNED_BYTE, pixelDataSize * 4, data);
+
+	int team1Score = 0;
+	int team2Score = 0;
+
+	//Read data from paint mask for scoring
+	for (size_t x= 0;x < paintMask->GetWidth(); x++){
+		for (size_t y = 0; y < paintMask->GetHeight(); y++) {
+			float r, g, b, a;
+
+			size_t elmes_per_line = paintMask->GetWidth() * 4;
+
+			size_t row = y * elmes_per_line;
+			size_t col = x * 4;
+
+			r = static_cast<float>(data[row + col] / 255.0f);
+			g = static_cast<float>(data[row + col+1] / 255.0f);
+			b = static_cast<float>(data[row + col+2] / 255.0f);
+			a = static_cast<float>(data[row + col+3] / 255.0f);
+			
+			if (a != 1.0f) {
+				continue;
+			}
+
+			//Check if the colour is closer to team a or team b
+			Vector3 curCol = Vector3(r, g, b);
+			Vector3 team1Pixel = curCol - Vector3(team1Colour.x, team1Colour.y, team1Colour.z);
+			Vector3 team2Pixel = curCol - Vector3(team2Colour.x, team2Colour.y, team2Colour.z);
+
+			(team1Pixel.LengthSquared() < team2Pixel.LengthSquared()) ? (team1Score++) : (team2Score++);
+		}
+		
+	}
+	return Vector2(team1Score - prevScores.x , team2Score - prevScores.y);
+#endif
+}
+
+void Renderer::Paint(const RenderObject* paintable, NCL::Maths::Vector3& barycentric, NCL::Maths::Vector3& colpos, NCL::Maths::Vector2& texUV_a, NCL::Maths::Vector2& texUV_b, NCL::Maths::Vector2& texUV_c, float radius, float hardness, float strength, NCL::Maths::Vector4 colour)
 {
 	PaintInstance pi;
 	pi.object = paintable;
@@ -264,24 +337,25 @@ void Renderer::Paint(const RenderObject* paintable, Vector3& barycentric, Vector
 }
 
 void Renderer::ApplyPaintToMasks() {
-#ifdef _WIN64
 	rendererAPI->SetDepth(false);
-	rendererAPI->SetBlend(true, RendererAPI::BlendType::ONE, RendererAPI::BlendType::ALPHA);
+	rendererAPI->SetBlend(true, RendererAPI::BlendType::ONE, RendererAPI::BlendType::ONE_MINUS_ALPHA);
 
 	maskShader->BindShader();
 
 	Vector2 currentSize;
 	for (const auto& i : paintInstances) {
 		if (i.object->GetPaintMask() == nullptr) continue;
+#ifdef _WIN64
 		OGLFrameBuffer maskFBO;
-		maskFBO.AddTexture((OGLTexture*)(i.object->GetPaintMask()));
-
+#elif _ORBIS
+		PS4::PS4FrameBuffer maskFBO;
+#endif
+		maskFBO.AddTexture((i.object->GetPaintMask()));
 		if (Vector2(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight()) != currentSize) {
 			currentSize = Vector2(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight());
 			rendererAPI->SetViewportSize(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight());
 		}
 
-		// Update uniforms here
 		maskShader->UpdateUniformMatrix4("modelMatrix", i.object->GetTransform()->GetMatrix());
 		maskShader->UpdateUniformVector3("barycentricCoord", i.barycentric);
 		maskShader->UpdateUniformVector3("collisionPoint", i.colPoint);
@@ -297,46 +371,42 @@ void Renderer::ApplyPaintToMasks() {
 		maskShader->UpdateUniformVector2("viewport", Vector2(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight()));
 
 		maskShader->UpdateUniformVector2("textureSize", Vector2(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight()));
-		float scale = 400.0f / (400.0f / 1.0f);
 		maskShader->UpdateUniformVector3("textureScale", i.object->GetTransform()->GetScale());
-		maskShader->UpdateUniformFloat("radius", 5.0f);
+		maskShader->UpdateUniformFloat("radius", i.radius);
 		maskShader->UpdateUniformFloat("hardness", i.hardness);
 		maskShader->UpdateUniformFloat("strength", i.strength);
 		maskShader->UpdateUniformVector4("colour", i.colour);
 
 		rendererAPI->BindFrameBuffer(&maskFBO);
 
+		rendererAPI->SetCullFace(false);
 		rendererAPI->DrawMesh(skyboxMesh);
+
+#ifdef _ORBIS
+		PS4::PS4Texture* ps4Tex = static_cast<PS4::PS4Texture*>(i.object->GetPaintMask());
+		uint64_t textureSizeInBytes;
+		Gnm::AlignmentType textureAlignment;
+		GpuAddress::computeTotalTiledTextureSize(&textureSizeInBytes, &textureAlignment, &ps4Tex->GetAPITexture());
+		
+		((PS4::PS4RendererAPI*)NCL::Rendering::RendererBase::rendererAPI)->currentGFXContext->waitForGraphicsWrites(
+			ps4Tex->GetAPITexture().getBaseAddress256ByteBlocks(),
+			(textureSizeInBytes + 255) / 256,
+			Gnm::kWaitTargetSlotCb1,
+			Gnm::kCacheActionWriteBackAndInvalidateL1andL2,
+			Gnm::kExtendedCacheActionFlushAndInvalidateCbCache,
+			Gnm::kStallCommandBufferParserDisable
+		);
+#endif
+
 	}
 	rendererAPI->SetBlend(false, RendererAPI::BlendType::ONE, RendererAPI::BlendType::NONE);
 	rendererAPI->SetDepth(true);
 	rendererAPI->SetViewportSize(rendererAPI->GetCurrentWidth(), rendererAPI->GetCurrentHeight());
-	rendererAPI->ClearBuffer(true, true, true);
 	rendererAPI->BindFrameBuffer();
-#endif
+	rendererAPI->SetCullFace(true);
+	rendererAPI->ClearBuffer(true, true, true);
+	
 	paintInstances.clear();
-}
-
-Maths::Vector2 Renderer::GetUVCoord(const RenderObject* paintable, NCL::Maths::Vector3 pos) {
-	const vector<Vector3> vertices = paintable->GetMesh()->GetPositionData();
-
-	Vector3 localPos = paintable->GetTransform()->GetMatrix().Inverse() * pos;
-	Vector3 closestDistance = Vector3(10000,10000,10000);
-	int closestVertex = -1;
-	for (auto i = 0; i < paintable->GetMesh()->GetVertexCount(); ++i) {
-		Vector3 distance = vertices[i] - localPos;
-		float t1 = distance.Length();
-		float t2 = closestDistance.Length();
-		if (distance.Length() < closestDistance.Length()) {
-			closestDistance = distance;
-			closestVertex = i;
-		}
-	}
-
-	if (closestVertex != -1) {
-		return paintable->GetMesh()->GetTextureCoordData()[closestVertex];
-	}
-	return Vector2();
 }
 
 Maths::Matrix4 Renderer::SetupDebugLineMatrix()	const {
