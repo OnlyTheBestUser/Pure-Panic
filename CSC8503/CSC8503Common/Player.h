@@ -131,6 +131,8 @@ namespace NCL {
 			int GetPlayerID() const { return playerID; }
 			void SetPlayerID(int playerID);
 
+			int BulletCounter = 0;
+
         protected:
 			float CheckDistToGround();
 
@@ -163,12 +165,9 @@ namespace NCL {
 
 			float cameraVertMult = 0.5f;
 			Camera* camera;
-			GameWorld* world;
 			bool camLocked;
 			
 			bool fired = false;
-
-			LevelLoader* levelLoader;
         };
     }
 }

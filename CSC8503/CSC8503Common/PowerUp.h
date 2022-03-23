@@ -40,6 +40,12 @@ namespace NCL {
 				return IsPicked;
 			}
 
+			void PickUp() {
+				IsPicked = true;
+				reappearAfter = REAPPEAR_AFTER_DURATION;
+				GetRenderObject()->SetVisibility(false);
+			}
+
 		protected:
 			PowerUp(PowerUpType powerType, bool networked = false) : GameObject("PowerUp"), powerUpType(powerType) {
 				powerupDuration = POWERUP_DURATION;
@@ -49,10 +55,9 @@ namespace NCL {
 
 			PowerUpType powerUpType;
 			float powerupDuration;
-
+			
 			bool IsPicked;
 			float reappearAfter;
-
 		};
 	}
 }

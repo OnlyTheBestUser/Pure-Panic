@@ -5,8 +5,7 @@
 
 namespace NCL {
 	namespace CSC8503 {
-		class SpeedBoost : public PowerUp
-		{
+		class SpeedBoost : public PowerUp {
 		public:
 			SpeedBoost(float speedIncreasedBy = 1.5f) : PowerUp(PowerUpType::SpeedBoost), increaseInSpeed(speedIncreasedBy) {}
 
@@ -17,10 +16,7 @@ namespace NCL {
 					if (player->GetCurrentPowerup() != PowerUpType::None) return;
 					((Player*)otherObject)->IncreaseSpeed(increaseInSpeed, powerupDuration);
 
-					IsPicked = true;
-					reappearAfter = REAPPEAR_AFTER_DURATION;
-
-					GetRenderObject()->SetVisibility(false);
+					PickUp();
 				}
 			}
 		private:

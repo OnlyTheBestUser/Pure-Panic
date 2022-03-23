@@ -25,16 +25,17 @@ namespace NCL {
 			void Clear();
 			void ClearAndErase();
 
-			void AddGameObject(GameObject* o);
-			void RemoveGameObject(GameObject* o, bool andDelete = false);
+			static void AddGameObject(GameObject* o);
+			static void RemoveGameObject(GameObject* o, bool andDelete = false);
+			
 			void RemoveGameObjectsFromWorld();
 			void DeleteGameObjectsFromWorld();
 
 			void AddConstraint(Constraint* c);
 			void RemoveConstraint(Constraint* c, bool andDelete = false);
 
-			Camera* GetMainCamera() const {
-				return mainCamera;
+			static Camera* GetMainCamera() {
+				return singleton->mainCamera;
 			}
 
 			void ShuffleConstraints(bool state) {
@@ -45,8 +46,8 @@ namespace NCL {
 				shuffleObjects = state;
 			}
 
-			bool Raycast(Ray& r, RayCollision& closestCollision, bool closestObject = false) const;
-			bool RaycastIgnoreObject(GameObject* obj, Ray& r, RayCollision& closestCollision, bool closestObject = false) const;
+			static bool Raycast(Ray& r, RayCollision& closestCollision, bool closestObject = false);
+			static bool RaycastIgnoreObject(GameObject* obj, Ray& r, RayCollision& closestCollision, bool closestObject = false);
 
 			virtual void UpdateWorld(float dt);
 
@@ -71,10 +72,9 @@ namespace NCL {
 				std::vector<Constraint*>::const_iterator& first,
 				std::vector<Constraint*>::const_iterator& last) const;
 
-
-			NavigationGrid* GetNavGrid() const { return navGrid; }
-
 		protected:
+			static GameWorld* singleton;
+
 			std::vector<GameObject*> gameObjects;
 			std::vector<GameObject*> paintableObjects;
 			std::map<GameObject*, Vector2> paintableObjectScores;
@@ -83,8 +83,6 @@ namespace NCL {
 			std::vector<Constraint*> constraints;
 
 			Camera* mainCamera;
-
-			NavigationGrid* navGrid;
 
 			bool	shuffleConstraints;
 			bool	shuffleObjects;

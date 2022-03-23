@@ -10,11 +10,16 @@ namespace NCL::PS4 {
 	{
 	public:
 		friend class PS4RendererAPI;
+		friend class PS4FrameBuffer;
+		friend class Renderer;
 
 		~PS4Texture();
 
 		virtual void Bind(int slot = 0) const override;
+		virtual void ResetTexture() override;
 
+		static PS4Texture* EmptyTex(int width, int height);
+		static PS4Texture* GenTexFromBuffer(const sce::Gnm::RenderTarget& fbo);
 		static PS4Texture* LoadTextureFromFile(const std::string& filename);
 		static PS4Texture* LoadSkyboxFromFile(const std::string& filename);
 
@@ -22,9 +27,12 @@ namespace NCL::PS4 {
 			return apiTexture;
 		}
 
+		sce::Gnm::RenderTarget target;
+
 	protected:
 		PS4Texture();
 		sce::Gnm::Texture apiTexture;
+
 	};
 }
 #endif
