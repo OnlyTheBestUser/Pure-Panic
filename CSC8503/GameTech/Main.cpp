@@ -24,6 +24,7 @@ size_t       sceLibcHeapSize = 256 * 1024 * 1024;	/* Set up heap area upper limi
 #include <iostream>
 
 #include "NetworkedGame.h"
+#include "TrainingGame.h"
 #include "LoadingScreen.h"
 
 using namespace NCL;
@@ -54,17 +55,17 @@ int main() {
 	int totalFrames = 0;
 
 	LoadingScreen* l = new LoadingScreen();
-	LoadingScreen::SetInstancesToLoad(2);
-
 	MainMenu menu;
+
 	w->GetTimer()->GetTimeDeltaSeconds(); 
+
 	float smallestFrameRate = 144.0f;
 	while (w->UpdateWindow()) {
 
 		float dt = w->GetTimer()->GetTimeDeltaSeconds();
-		if (dt > 0.1f) {
-			std::cout << "Skipping large time delta" << std::endl;
-			continue;
+
+		if (dt > 0.1f) {	//Skipping large time delta
+			continue;	//must have hit a breakpoint or something to have a 1 second frame time!
 		}
 
 		float frameRate = (1.0f / dt);
@@ -76,15 +77,10 @@ int main() {
 		curTimeWait -= dt;
 		totalTime += dt;
 		totalFrames++;
-		if (curTimeWait < 0.0f) {
-			std::cout << "Average Frame Time: " << 1000.0f * (totalTime / totalFrames) << "\n";
-			curTimeWait = avgTimeWait;
-		}
 
 		if (!menu.UpdateGame(dt)) {
 			return 0;
 		}
-
 	}
 	Window::DestroyGameWindow();
 }

@@ -8,14 +8,30 @@ Vector4 GameManager::team2Colour = Vector4(0.011, 0.988, 0.941, 1);
 void GameManager::Update(const float& dt) {
 	timer->Update(dt);
 
-	if (timer->GetState() == TimerStates::Ended) {
-		if (Teams[A].score > Teams[B].score)
-			Debug::Print("Team A Wins", { 30.f, 70.f });
-		else if (Teams[A].score < Teams[B].score)
-			Debug::Print("Team B Wins", { 30.f, 70.f });
-		else
-			Debug::Print("Tie", { 30.f, 70.f });
+	if (printResults) {
+		PrintResult(Teams[A].score, Teams[B].score);
 	}
+
+	PrintScores(Teams[A].score, Teams[B].score);
+}
+
+void GameManager::PrintScores(float scoreA, float scoreB) {
+	Debug::Print(std::to_string((int)scoreA), { 30.f, 80.f }, 15, Vector4(0.3, 0, 0.5, 1));
+	Debug::Print(std::to_string((int)scoreB), { 50.f, 80.f }, 15, Vector4(0.25, 0.878, 0.815, 1));
+
+	Vector2 ratio = CalcCurrentScoreRatio();
+
+	Debug::Print(std::to_string(ratio.x), { 30.f, 85.f }, 15, Vector4(1, 1, 1, 1));
+	Debug::Print(std::to_string(ratio.y), { 50.f, 85.f }, 15, Vector4(1, 1, 1, 1));
+}
+
+void GameManager::PrintResult(float scoreA, float scoreB) {
+	if (scoreA > scoreB)
+		Debug::Print("Team A Wins", { 30.f, 70.f });
+	else if (scoreA < scoreB)
+		Debug::Print("Team B Wins", { 30.f, 70.f });
+	else
+		Debug::Print("Tie", { 30.f, 70.f });
 }
 
 void GameManager::PlacePlayersToSpawnPositions() {
@@ -34,7 +50,11 @@ Vector4 GameManager::GetColourForID(int playerID) {
 void GameManager::UpdateScores(Vector2 scores) {
 	Teams[0].score += scores.x;
 	Teams[1].score += scores.y;
-	//std::cout << CalcCurrentScoreRatio() << "\n";
+}
+
+void GameManager::SetScores(Vector2 scores) {
+	Teams[0].score = scores.x;
+	Teams[1].score = scores.y;
 }
 
 Vector2 GameManager::CalcCurrentScoreRatio() {
@@ -48,7 +68,6 @@ void GameManager::HandleScoresAfterRound() {
 }
 
 void GameManager::StartRound() {
-	game->SetState(GameState::RESET);
 	PlacePlayersToSpawnPositions();
 	HandleScoresAfterRound();
 	timer->StartTimer();

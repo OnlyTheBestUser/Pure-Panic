@@ -4,7 +4,6 @@
 #include "../../Common/Assets.h"
 #include "../CSC8503Common/GameManager.h"
 
-
 using namespace NCL::CSC8503;
 
 void Projectile::Update(float dt) {
@@ -25,6 +24,7 @@ void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vecto
 	NCL::AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + (soundToPlay == 0 ? "splat_neutral_01.ogg" : "splat_neutral_02.ogg"), this->GetTransform().GetPosition(), 1.0f, 0.0f, pitch);
 #endif
 	string name = otherObject->GetName();
+	
 	if (!(otherObject->GetName() == "Dummy" || otherObject->GetName() == "Player")) {
 		Ray ray(this->GetTransform().GetPosition() - this->GetPhysicsObject()->GetLinearVelocity().Normalised(), this->GetPhysicsObject()->GetLinearVelocity());
 		ray.SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
@@ -32,7 +32,7 @@ void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vecto
 		RayCollision closestCollision;
 		if (GameWorld::Raycast(ray, closestCollision, true)) {
 			RenderObject* test = ((GameObject*)closestCollision.node)->GetRenderObject();
-
+		
 			if (test) {
 				if (test->GetPaintMask() != nullptr) {
 
@@ -41,15 +41,19 @@ void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vecto
 					Vector3 barycentric;
 					CollisionDetection::GetBarycentricFromRay(ray, *test, texUV_a, texUV_b, texUV_c, barycentric, collisionPoint);
 
-					Vector4 colour = GameManager::GetColourForID(GetOwnerPlayerID());
+					Vector4 colour;
+
+					if (!IsDeathProjectile) {
+						colour = GameManager::GetColourForID(ownerPlayerID);
+					}
+					else {
+						colour = GameManager::GetColourForID(ownerPlayerID + 1);
+					}
 
 					float randRad = ((GameObject*)closestCollision.node)->GetPaintRadius() + (((static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * 2.0f) - 1.0f) * ((GameObject*)closestCollision.node)->GetPaintRadius() * 0.25f;
 
 					// Get the uv from the ray
 					renderInst->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, randRad, 0.7, 1, colour);
-
-					// Debug Rainbow Gun
-					//renderInst->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, randRad, 0.7, 1, Vector4(static_cast <float> (rand()) / static_cast <float> (RAND_MAX) , static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX), 1));
 				}
 			}
 		}

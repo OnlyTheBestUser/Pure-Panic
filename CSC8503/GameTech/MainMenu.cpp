@@ -1,6 +1,8 @@
 #include "MainMenu.h"
 #include "../CSC8503Common/InputHandler.h"
 #include "NetworkedGame.h"
+#include "TrainingGame.h"
+
 #include "../../Common/Assets.h"
 using namespace NCL;
 using namespace CSC8503;
@@ -46,7 +48,7 @@ PushdownState::PushdownResult MainMenu::OnUpdate(float dt, PushdownState** newSt
 		break;
 	case 1:
 		if (trainingLevel) delete trainingLevel;
-		trainingLevel = new NetworkedGame();
+		trainingLevel = new TrainingGame();
 		*newState = new LevelState(trainingLevel);
 		bgm->PlaySong(Assets::AUDIODIR + "game_music.ogg");
 		pressed = false;

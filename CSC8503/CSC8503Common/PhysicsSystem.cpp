@@ -107,6 +107,8 @@ void PhysicsSystem::Update(float dt) {
 
 	UpdateObjectAABBs();
 
+	Clear();
+
 	while(dTOffset >= realDT) {
 		std::vector<GameObject*>::const_iterator first;
 		std::vector<GameObject*>::const_iterator last;
@@ -122,10 +124,13 @@ void PhysicsSystem::Update(float dt) {
 		BroadPhase();
 		NarrowPhase();
 
+		Debug::DebugPrint("Broadphase Collisions:  " + std::to_string(broadphaseCollisions.size()), Vector2(5, 25), 20, Vector4(1, .5, .5, 1));
+		Debug::DebugPrint("Narrowphase Collisions: " + std::to_string(allCollisions.size()), Vector2(5, 30), 20, Vector4(1, .5, .5, 1));
+
 		// TODO
 		//This is our simple iterative solver - 
 		//we just run things multiple times, slowly moving things forward
-		//and then rechecking that the constraints have been met		
+		//and then rechecking that the constraints have been met
 		float constraintDt = realDT /  (float)constraintIterationCount;
 		for (int i = 0; i < constraintIterationCount; ++i) {
 			UpdateConstraints(constraintDt);	
@@ -153,7 +158,7 @@ void PhysicsSystem::Update(float dt) {
 	if (updateTime > realDT) {
 		realHZ /= 2;
 		realDT *= 2;
-		std::cout << "Dropping iteration count due to long physics time...(now " << realHZ << ")\n";
+		//std::cout << "Dropping iteration count due to long physics time...(now " << realHZ << ")\n";
 	}
 	else if(dt*2 < realDT) { //we have plenty of room to increase iteration count!
 		int temp = realHZ;
@@ -164,45 +169,11 @@ void PhysicsSystem::Update(float dt) {
 			realHZ = idealHZ;
 			realDT = idealDT;
 		}
-		if (temp != realHZ) {
+		/*if (temp != realHZ) {
 			std::cout << "Raising iteration count due to short physics time...(now " << realHZ << ")\n";
-		}
+		}*/
 	}
 }
-
-/*
-Later on we're going to need to keep track of collisions
-across multiple frames, so we store them in a set.
-
-The first time they are added, we tell the objects they are colliding.
-The frame they are to be removed, we tell them they're no longer colliding.
-
-From this simple mechanism, we we build up gameplay interactions inside the
-OnCollisionBegin / OnCollisionEnd functions (removing health when hit by a 
-rocket launcher, gaining a point when the player hits the gold coin, and so on).
-*/
-//void PhysicsSystem::UpdateCollisionList() {
-//	for (std::set<CollisionDetection::CollisionInfo>::iterator i = allCollisions.begin(); i != allCollisions.end(); ) {
-//		/*if (i->a == nullptr || i->b == nullptr)
-//		{
-//			i = allCollisions.erase(i);
-//			continue;
-//		}*/
-//		if ((*i).framesLeft == numCollisionFrames) {
-//			i->a->OnCollisionBegin(i->b, i->point.localA, i->point.localB, i->point.normal);
-//			i->b->OnCollisionBegin(i->a, i->point.localB, i->point.localA, -i->point.normal);
-//		}
-//		(*i).framesLeft = (*i).framesLeft - 1;
-//		if ((*i).framesLeft < 0) {
-//			i->a->OnCollisionEnd(i->b);
-//			i->b->OnCollisionEnd(i->a);
-//			i = allCollisions.erase(i);
-//		}
-//		else {
-//			++i;
-//		}
-//	}
-//}
 
 void PhysicsSystem::UpdateObjectAABBs() {
 	gameWorld.OperateOnContents(
@@ -296,16 +267,9 @@ void PhysicsSystem::ResolveSpringCollision(GameObject& a, GameObject& b, Collisi
 
 	Vector3 force = p.normal * -(s.GetK() * (p.penetration - s.GetLength()));
 	force *= s.GetD();
-	//force -= p.normal * s.GetD() * (Vector3::Dot(relativeVel, p.normal));
 
 	physA->ApplyLinearImpulse(force);
 	physB->ApplyLinearImpulse(-force);
-
-	//physA->AddForce(force);
-	//physB->AddForce(-force);
-	//Debug::DrawLine(b.GetTransform().GetPosition(), b.GetTransform().GetPosition() + (force.Normalised() * 10), Debug::RED);
-	//Debug::DrawLine(b.GetTransform().GetPosition(), b.GetTransform().GetPosition() + Vector3(10,0,0), Debug::BLUE);
-	//Debug::DrawLine(a.GetTransform().GetPosition(), a.GetTransform().GetPosition() + Vector3(20,0,0), Debug::GREEN);
 }
 
 /*
@@ -337,7 +301,6 @@ void PhysicsSystem::BroadPhase() {
 		CollisionDetection::CollisionInfo info;
 		for (auto i = data.begin(); i != data.end(); ++i) {
 			list.clear();
-			//if(i->object->GetName() == "player")
 			staticTree->GetContentsAtNode(i->object, i->pos, i->size, list);
 			for (auto j = list.begin(); j != list.end(); j++) {
 				info.a = std::min((*i).object, (*j).object);
@@ -356,13 +319,10 @@ void PhysicsSystem::BroadPhase() {
 			for (auto j = std::next(i); j != data.end(); ++j) {
 				//is this pair of items already in the collision set - 
 				// if the same pair is in another Octree node together etc
-#ifdef _WIN64
+
 				info.a = std::min((*i).object, (*j).object);
 				info.b = std::max((*i).object, (*j).object);
-#else // _WIN64
-				info.a = std::min((*i).object, (*j).object);
-				info.b = std::max((*i).object, (*j).object);
-#endif
+
 				if (ValidCollisionLayers(info.a->GetCollisionLayers(), info.b->GetCollisionLayers()) && !(!info.a->GetPhysicsObject()->IsDynamic() && !info.b->GetPhysicsObject()->IsDynamic())) {
 					broadphaseCollisions.insert(info);
 				}

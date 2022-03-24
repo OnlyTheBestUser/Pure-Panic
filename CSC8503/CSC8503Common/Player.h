@@ -8,6 +8,8 @@
 #include <chrono>
 #include <algorithm>
 
+const int BULLETS_PER_SHOT = 1;
+
 namespace NCL {
     using namespace Maths;
     namespace CSC8503 {
@@ -15,7 +17,8 @@ namespace NCL {
         class Player : public GameActor
         {
         public:
-			Player(Camera* camera, string name = "", Vector3 ch = Vector3(0, 2, 0));
+
+			Player(Camera* camera, string name = "", Vector3 ch = Vector3(0, 3, 0));
             ~Player() {};
 
             void OnCollisionBegin(GameObject* other, Vector3 localA, Vector3 localB, Vector3 normal) override;
@@ -114,7 +117,9 @@ namespace NCL {
 
 			void DealDamage(float damageAmount) {
 				health -= damageAmount;
-				if (health < 0) health = 0;
+				if (health < 0) { 
+					health = 0;
+				}
 			}
 
 			void ChangeCamLock() { camLocked = !camLocked; }
@@ -132,6 +137,7 @@ namespace NCL {
 			void SetPlayerID(int playerID);
 
 			int BulletCounter = 0;
+			void FireDeathProjectiles();
 
         protected:
 			float CheckDistToGround();
@@ -150,6 +156,7 @@ namespace NCL {
 			float fireRate = 0.2f;
 			int defaultBulletsPerShot = 1;
 			int bulletsPerShot = defaultBulletsPerShot;
+
 			float timeSincePrevShot = 0.0f;
 			float powerupTime = 0.0f;
 			float curSpeed = 80.0f;

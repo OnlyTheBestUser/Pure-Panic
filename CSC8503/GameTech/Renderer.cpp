@@ -290,7 +290,7 @@ void NCL::Rendering::Renderer::ClearPaint()
 	for (auto it = start; it != end; ++it){
 		if (!(*it)->GetRenderObject()) return;
 
-		if ((*it)->GetRenderObject()->GetPaintMask()) return;
+		if (!(*it)->GetRenderObject()->GetPaintMask()) return;
 
 		(*it)->GetRenderObject()->GetPaintMask()->ResetTexture();
 	}
@@ -435,6 +435,7 @@ void Renderer::ApplyPaintToMasks() {
 }
 
 void Renderer::DrawGUI() {
+#ifdef _WIN64
 	uiBarShader->BindShader();
 
 	rendererAPI->SetCullFace(false);
@@ -462,6 +463,7 @@ void Renderer::DrawGUI() {
 	rendererAPI->SetBlend(false, RendererAPI::BlendType::ONE, RendererAPI::BlendType::NONE);
 	rendererAPI->SetCullFace(true);
 	rendererAPI->SetDepth(true);
+#endif
 }
 
 Maths::Vector2 Renderer::GetUVCoord(const RenderObject* paintable, NCL::Maths::Vector3 pos) {
