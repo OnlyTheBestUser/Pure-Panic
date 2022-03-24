@@ -5,6 +5,7 @@
 #include "../GameTech/TutorialGame.h"
 #include "Timer.h"
 #include "../GameTech/MainMenu.h"
+#include "../../Common/Assets.h"
 
 namespace NCL {
 	namespace CSC8503 {
@@ -144,6 +145,7 @@ namespace NCL {
 				void execute() {
 					if (*paused == true) {
 						*quit = true;
+						NCL::BGMManager::GetInstance()->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 0.1f);
 					}
 				}
 			protected:

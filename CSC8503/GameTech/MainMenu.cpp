@@ -1,6 +1,7 @@
 #include "MainMenu.h"
 #include "../CSC8503Common/InputHandler.h"
 #include "NetworkedGame.h"
+#include "../../Common/Assets.h"
 using namespace NCL;
 using namespace CSC8503;
 
@@ -13,6 +14,13 @@ MainMenu::MainMenu()
 	inputHandler->BindAxis(0, m);
 	Command* enter = new MenuEnterCommand(this);
 	inputHandler->BindButton(Input::JUMP, enter);
+	AudioManager* a = NCL::AudioManager::GetInstance();
+	a->Initialize();
+	a->LoadSound(Assets::AUDIODIR + "menu_music.ogg", false, true, true);
+	a->LoadSound(Assets::AUDIODIR + "menu_move.ogg", false, false, false);
+	a->LoadSound(Assets::AUDIODIR + "menu_select.ogg", false, false, false);
+	bgm = NCL::BGMManager::GetInstance();
+	bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 0.5f);
 }
 
 MainMenu::~MainMenu() {
@@ -33,12 +41,14 @@ PushdownState::PushdownResult MainMenu::OnUpdate(float dt, PushdownState** newSt
 		networkedLevel = new NetworkedGame();
 		*newState = new LevelState(networkedLevel);
 		pressed = false;
+		bgm->PlaySong(Assets::AUDIODIR + "game_music.ogg");
 		return PushdownState::PushdownResult::Push;
 		break;
 	case 1:
 		if (trainingLevel) delete trainingLevel;
 		trainingLevel = new NetworkedGame();
 		*newState = new LevelState(trainingLevel);
+		bgm->PlaySong(Assets::AUDIODIR + "game_music.ogg");
 		pressed = false;
 		return PushdownState::PushdownResult::Push;
 		break;
@@ -49,6 +59,7 @@ PushdownState::PushdownResult MainMenu::OnUpdate(float dt, PushdownState** newSt
 }
 
 void MainMenu::UpdateMenu(float dt) {
+	NCL::AudioManager::GetInstance()->Update();
 	renderer.Render();
 
 	float framed = (renderer.GetFrameNumber() / 240.f);
@@ -77,18 +88,26 @@ void MainMenu::UpdateMenu(float dt) {
 void MainMenu::HandleMenuMove(const Vector2 axis) {
 	if (axis.y > 0.1f) {
 		selectedItem += 1;
+		if (selectedItem < 3) {
+			AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + "menu_move.ogg");
+		}
 	}
 	if (axis.y < -0.1f) {
 		selectedItem -= 1;
+		if (selectedItem > -1) {
+			AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + "menu_move.ogg");
+		}
 	}
 	selectedItem = std::clamp(selectedItem, 0, 2);
 }
 
 void MainMenu::HandleMenuPress() {
 	pressed = true;
+	AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + "menu_select.ogg");
 }
 
 bool MainMenu::UpdateGame(float dt) {
+	NCL::AudioManager::GetInstance()->Update();
 	bool val = false;
 	!pushMachine->Update(dt) ? val = false : val =  true;
 	return val;

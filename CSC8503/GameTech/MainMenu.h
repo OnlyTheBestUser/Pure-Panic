@@ -3,6 +3,7 @@
 
 #include "../CSC8503Common/PushdownState.h"
 #include "../CSC8503Common/PushdownMachine.h"
+#include "../CSC8503Common/BGMManager.h"
 #include <algorithm>
 
 namespace NCL {
@@ -53,6 +54,7 @@ namespace NCL {
 			TutorialGame* networkedLevel;
 			TutorialGame* trainingLevel;
 			PushdownMachine* pushMachine;
+			BGMManager* bgm;
 
 			int selectedItem = 0;
 			bool pressed = false;
