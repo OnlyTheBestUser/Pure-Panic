@@ -17,7 +17,7 @@ namespace NCL {
 					if (player->GetCurrentPowerup() != PowerUpType::None) return;
 					((Player*)otherObject)->IncreaseFireRate(FireRateIncrease, powerupDuration);
 					
-					IsPicked = true;// gameWorld.RemoveGameObject(this, true);
+					IsPicked = true;
 					reappearAfter = REAPPEAR_AFTER_DURATION;
 					
 					GetRenderObject()->SetVisibility(false);

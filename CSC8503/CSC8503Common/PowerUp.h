@@ -16,8 +16,8 @@ enum PowerUpType
 namespace NCL {
 	namespace CSC8503 {
 
-		const float REAPPEAR_AFTER_DURATION = 5.f;
-		const float POWERUP_DURATION = 5.f;
+		const float REAPPEAR_AFTER_DURATION = 5.0f;
+		const float POWERUP_DURATION = 5.0f;
 
 		class PowerUp : public GameObject
 		{
@@ -29,7 +29,7 @@ namespace NCL {
 			virtual void Update(float dt) override {
 				if (IsPicked || reappearAfter >= 0.0f) {
 					reappearAfter -= dt;
-					if (reappearAfter <= 0.f) {
+					if (reappearAfter <= 0.0f) {
 						GetRenderObject()->SetVisibility(true);
 						IsPicked = false;	
 					}

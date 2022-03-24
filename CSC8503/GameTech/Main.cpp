@@ -63,9 +63,9 @@ int main() {
 	while (w->UpdateWindow()) {
 
 		float dt = w->GetTimer()->GetTimeDeltaSeconds();
-		if (dt > 0.1f) {
-			std::cout << "Skipping large time delta" << std::endl;
-			continue;
+
+		if (dt > 0.1f) {	//Skipping large time delta
+			continue;	//must have hit a breakpoint or something to have a 1 second frame time!
 		}
 
 		float frameRate = (1.0f / dt);
@@ -77,10 +77,6 @@ int main() {
 		curTimeWait -= dt;
 		totalTime += dt;
 		totalFrames++;
-		if (curTimeWait < 0.0f) {
-			std::cout << "Average Frame Time: " << 1000.0f * (totalTime / totalFrames) << "\n";
-			curTimeWait = avgTimeWait;
-		}
 
 		if (!menu.UpdateGame(dt)) {
 			return 0;

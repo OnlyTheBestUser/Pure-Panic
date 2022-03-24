@@ -115,7 +115,6 @@ void Player::Fire() {
 
 bool Player::IsDead(){
 	if (health <= 0.0f) {
-		std::cout << "I'm Dead" << std::endl;
 		return true;
 	}
 	return false;
