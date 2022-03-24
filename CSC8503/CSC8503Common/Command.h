@@ -145,7 +145,9 @@ namespace NCL {
 				void execute() {
 					if (*paused == true) {
 						*quit = true;
+#ifndef _ORBIS
 						NCL::BGMManager::GetInstance()->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 0.1f);
+#endif
 					}
 				}
 			protected:

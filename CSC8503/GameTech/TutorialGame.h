@@ -2,8 +2,10 @@
 #include "LevelLoader.h"
 #include "../CSC8503Common/PhysicsSystem.h"
 #include "../CSC8503Common/Player.h"
+#ifndef _ORBIS
 #include "../CSC8503Common/AudioManager.h"
 #include "../CSC8503Common/BGMManager.h"
+#endif
 #include "../CSC8503Common/GameManager.h"
 //#include "../CSC8503Common/Projectile.h"
 
@@ -82,8 +84,10 @@ namespace NCL {
 			Renderer*			renderer;
 			PhysicsSystem*		physics;
 			GameWorld*			world;
+#ifndef _ORBIS
 			NCL::AudioManager*	audio;
 			BGMManager*			bgm;
+#endif
 			LevelLoader*		levelLoader;
 
 			GameState state;
