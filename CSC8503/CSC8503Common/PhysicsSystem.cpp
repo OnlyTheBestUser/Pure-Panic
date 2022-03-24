@@ -124,8 +124,10 @@ void PhysicsSystem::Update(float dt) {
 		BroadPhase();
 		NarrowPhase();
 
-		Debug::DebugPrint("Broadphase Collisions:  " + std::to_string(broadphaseCollisions.size()), Vector2(5, 25), 20, Vector4(1, .5, .5, 1));
-		Debug::DebugPrint("Narrowphase Collisions: " + std::to_string(allCollisions.size()), Vector2(5, 30), 20, Vector4(1, .5, .5, 1));
+		if (debug) {
+			Debug::DebugPrint("Broadphase Collisions:  " + std::to_string(broadphaseCollisions.size()), Vector2(5, 25), 20, Vector4(1, .5, .5, 1));
+			Debug::DebugPrint("Narrowphase Collisions: " + std::to_string(allCollisions.size()), Vector2(5, 30), 20, Vector4(1, .5, .5, 1));
+		}
 
 		// TODO
 		//This is our simple iterative solver - 

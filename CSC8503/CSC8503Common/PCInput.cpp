@@ -40,5 +40,10 @@ void PCInput::Poll()
 	buttons[RESET_WORLD] 	= Window::GetKeyboard()->KeyPressed(NCL::KeyboardKeys::F1) ? 1.0f : 0.0f;
 	buttons[QUIT]			= Window::GetKeyboard()->KeyPressed(NCL::KeyboardKeys::ESCAPE) ? 1.0f : 0.0f;
 	buttons[START_TIMER]	= Window::GetKeyboard()->KeyPressed(NCL::KeyboardKeys::T) ? 1.0f : 0.0f;
+	
+	buttons[START_SERVER]	= Window::GetKeyboard()->KeyPressed(NCL::KeyboardKeys::NUM1) ? 1.0f : 0.0f;
+	buttons[START_CLIENT]	= Window::GetKeyboard()->KeyPressed(NCL::KeyboardKeys::NUM2) ? 1.0f : 0.0f;
+	buttons[START_GAME]		= Window::GetKeyboard()->KeyPressed(NCL::KeyboardKeys::NUM3) ? 1.0f : 0.0f;
+	buttons[RESET_GAME]		= Window::GetKeyboard()->KeyPressed(NCL::KeyboardKeys::NUM4) ? 1.0f : 0.0f;
 }
 #endif

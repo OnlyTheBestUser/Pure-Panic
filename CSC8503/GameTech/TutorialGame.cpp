@@ -37,9 +37,7 @@ TutorialGame::TutorialGame()	{
 	levelLoader		= new LevelLoader(physics, renderer, this);
 	LoadingScreen::AddProgress(50.0f);
 	LoadingScreen::UpdateGame(0.0f);
-
 	gameManager		= new GameManager(this);
-
 	LoadingScreen::ResetProgress();
 	LoadingScreen::SetCompletionState(true);
 	
@@ -230,6 +228,11 @@ void TutorialGame::UpdateGameWorld(float dt)
 }
 
 void TutorialGame::UpdateDebugText(float dt) {
+	if (!debugDraw) {
+		physics->debug = false;
+		return;
+	}
+
 	Debug::DebugPrint("FPS:" + std::to_string((int) (1.0f / dt)), Vector2(5, 10), 20, Vector4(1, 1, .5, 1));
 
 #ifndef _ORBIS
@@ -251,6 +254,8 @@ void TutorialGame::UpdateDebugText(float dt) {
 
 	Debug::DebugPrint("Virt Mem: " + std::to_string(virtualMemUsedByMe / 1000000) + "MB/" + std::to_string(totalVirtualMem / 1000000) + "MB", Vector2(5, 15), 20, Vector4(1, .5, 1, 1));
 	Debug::DebugPrint("Phys Mem: " + std::to_string(physMemUsedByMe / 1000000)    + "MB/" + std::to_string(totalPhysMem / 1000000)    + "MB", Vector2(5, 20), 20, Vector4(1, .5, 1, 1));
+
+	physics->debug = true;
 #endif
 }
 

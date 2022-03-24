@@ -37,7 +37,13 @@ NetworkedGame::NetworkedGame() {
 	
 	emptyPlayer = new GameObject();
 	emptyPlayer->SetPhysicsObject(new PhysicsObject(&emptyPlayer->GetTransform(), new CollisionVolume()));
-	
+
+	Command* startServer = new StartServerCommand(this);
+	Command* startClient = new StartClientCommand(this);
+
+	inputHandler->BindButton(START_SERVER, startServer);
+	inputHandler->BindButton(START_CLIENT, startClient);
+
 	//InitialiseAssets();
 }
 
@@ -48,6 +54,9 @@ NetworkedGame::~NetworkedGame() {
 }
 
 void NetworkedGame::StartAsServer() {
+	if (thisServer || thisClient) {
+		return;
+	}
 
 	thisServer = new GameServer(NetworkBase::GetDefaultPort(), 4);
 
@@ -55,11 +64,20 @@ void NetworkedGame::StartAsServer() {
 	thisServer->RegisterPacketHandler(PowerUp_State, this);
 	thisServer->RegisterPacketHandler(Death_State, this);
 
+	Command* startGame = new StartGameCommand(this);
+	Command* resetGame = new ResetGameCommand(this);
+
+	inputHandler->BindButton(START_GAME, startGame);
+	inputHandler->BindButton(RESET_GAME, resetGame);
+
 	SpawnPlayer();
 
 }
 
 void NetworkedGame::StartAsClient(char a, char b, char c, char d) {
+	if (thisServer || thisClient) {
+		return;
+	}
 
 	thisClient = new GameClient();
 	thisClient->Connect(a, b, c, d, NetworkBase::GetDefaultPort());
@@ -86,23 +104,6 @@ void NetworkedGame::UpdateGame(float dt) {
 		}
 		timeToNextPacket += 1.0f / 60.0f; //60hz server/client update
 	}
-
-#ifndef ORBISNET
-	if (!thisServer && Window::GetKeyboard()->KeyPressed(KeyboardKeys::F9)) {
-		StartAsServer();
-		std::cout << "Server start" << std::endl;
-	}
-	if (!thisClient && Window::GetKeyboard()->KeyPressed(KeyboardKeys::F10)) {
-		StartAsClient(127, 0, 0, 1);
-		std::cout << "Client start" << std::endl;
-	}
-	if (!thisClient && thisServer && Window::GetKeyboard()->KeyPressed(KeyboardKeys::F11)) {
-		StartLevel();
-	}
-	if (thisServer && Window::GetKeyboard()->KeyPressed(KeyboardKeys::F8)) {
-		SendResetGamePacket();
-	}
-#endif
 
 	for (auto x : powerups) {
 		if (x->IsPickedUp()) {
