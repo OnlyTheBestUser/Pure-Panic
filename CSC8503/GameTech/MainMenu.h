@@ -3,7 +3,9 @@
 
 #include "../CSC8503Common/PushdownState.h"
 #include "../CSC8503Common/PushdownMachine.h"
+#ifndef _ORBIS
 #include "../CSC8503Common/BGMManager.h"
+#endif
 #include <algorithm>
 
 namespace NCL {
@@ -54,7 +56,9 @@ namespace NCL {
 			TutorialGame* networkedLevel;
 			TutorialGame* trainingLevel;
 			PushdownMachine* pushMachine;
+#ifndef _ORBIS
 			BGMManager* bgm;
+#endif
 
 			int selectedItem = 0;
 			bool pressed = false;
