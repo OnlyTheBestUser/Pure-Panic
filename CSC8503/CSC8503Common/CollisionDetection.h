@@ -142,7 +142,7 @@ namespace NCL {
 		static Vector3		UnprojectScreenPosition(Vector3 position, float aspect, float fov, const Camera &c);
 		static Matrix4		GenerateInverseProjection(float aspect, float fov, float nearPlane, float farPlane);
 		static Matrix4		GenerateInverseView(const Camera &c);
-		static bool			GetBarycentricFromRay(const Ray ray, const RenderObject obj, Vector2& va, Vector2& vb, Vector2& vc, Vector3& barycentric, Vector3& collisionPoint);
+		static bool			GetBarycentricFromRay(const Ray ray, const RenderObject obj, Vector2& va, Vector2& vb, Vector2& vc, Vector3& barycentric, Vector3& collisionPoint, Vector3& collisionNorm);
 
 	protected:
 	
