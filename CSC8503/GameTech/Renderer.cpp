@@ -42,15 +42,10 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 	skyboxMesh->UploadToGPU();
 
 	uiBarMesh = new OGLMesh();
-	uiBarMesh->SetVertexPositions({ Vector3(-0.5f, 0.2f,-0.5f), Vector3(-0.5f,0.1f,-0.5f) , Vector3(0.5f,0.1f,-0.5f) , Vector3(0.5f,0.2f,-0.5f) });
-	uiBarMesh->SetVertexIndices({ 0,1,2,2,3,0 });
-	uiBarMesh->UploadToGPU();
+
 
 	uiCrosshairMesh = new OGLMesh();
-	uiCrosshairMesh->SetVertexPositions({ Vector3(-0.025f, 0.2f,-0.025f), Vector3(-0.025f,0.1f,-0.025f) , Vector3(0.025f,0.1f,-0.025f) , Vector3(0.025f,0.2f,-0.025f) });
-	uiCrosshairMesh->SetVertexTextureCoords({ Vector2(0,1), Vector2(0,0), Vector2(1,0) , Vector2(1,1) });
-	uiCrosshairMesh->SetVertexIndices({ 0,1,2,2,3,0 });
-	uiCrosshairMesh->UploadToGPU();
+
 	//ui = new RenderObject(nullptr, uiMesh, nullptr, uiShader);
 
 	ForceValidDebugState(true);
@@ -67,8 +62,6 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 	shadowFBO = new OGLFrameBuffer();
 	shadowFBO->AddTexture();
 
-	//maskFBO = new OGLFrameBuffer();
-	//maskFBO->AddTexture(2048 / 4, 2048 / 4);
 	maskShader = new OGLShader("MaskVertex.glsl", "MaskFragment.glsl");
 
 	uiBarShader = new OGLShader("UIBarVert.glsl", "UIBarFrag.glsl");
@@ -76,7 +69,8 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 
 	crosshairTex = OGLTexture::RGBATextureFromFilename("crosshair.png");
 	uiCrosshairShader = new OGLShader("UICrosshairVert.glsl", "UICrosshairFrag.glsl");
-	// Uniform block bindings
+
+
 	camBuffer = new OGLUniformBuffer(sizeof(CameraMatrix), 0);
 
 #endif
@@ -96,8 +90,33 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 		Assets::SHADERDIR + "PS4/maskPixel.sb"
 	);
 
+	uiBarShader = PS4::PS4Shader::GenerateShader(
+		Assets::SHADERDIR + "PS4/UIBarVert.sb",
+		Assets::SHADERDIR + "PS4/UIBarPixel.sb"
+	);
+
+	//crosshairTex = OGLTexture::RGBATextureFromFilename("crosshair.png");
+	//uiCrosshairShader = new OGLShader("UICrosshairVert.glsl", "UICrosshairFrag.glsl");
+
+	uiBarMesh = new PS4::PS4Mesh();
+	uiCrosshairMesh = new PS4::PS4Mesh();
+
 	camBuffer = new PS4::PS4UniformBuffer(sizeof(CameraMatrix));
 #endif
+
+	uiBarMesh->SetVertexPositions({ Vector3(-0.5f, 0.2f,-0.5f), Vector3(-0.5f,0.1f,-0.5f) , Vector3(0.5f,0.1f,-0.5f) , Vector3(0.5f,0.2f,-0.5f) });
+	uiBarMesh->SetVertexTextureCoords(std::vector(4,Vector2()));
+	uiBarMesh->SetVertexIndices({ 0,1,2,2,3,0 });
+	uiBarMesh->SetVertexTangents(std::vector<Vector4>(4, Vector4()));
+	uiBarMesh->SetVertexNormals(std::vector<Vector3>(4, Vector3()));
+	uiBarMesh->UploadToGPU();
+
+	uiCrosshairMesh->SetVertexPositions({ Vector3(-0.025f, 0.2f,-0.025f), Vector3(-0.025f,0.1f,-0.025f) , Vector3(0.025f,0.1f,-0.025f) , Vector3(0.025f,0.2f,-0.025f) });
+	uiCrosshairMesh->SetVertexTextureCoords({ Vector2(0,1), Vector2(0,0), Vector2(1,0) , Vector2(1,1) });
+	uiCrosshairMesh->SetVertexIndices({ 0,1,2,2,3,0 });
+	uiCrosshairMesh->SetVertexTangents(std::vector<Vector4>(4, Vector4()));
+	uiCrosshairMesh->SetVertexNormals(std::vector<Vector3>(4, Vector3()));
+	uiCrosshairMesh->UploadToGPU();
 
 	//Set up the light properties
 	lightColour = Vector4(0.8f, 0.8f, 0.5f, 1.0f);
@@ -435,7 +454,7 @@ void Renderer::ApplyPaintToMasks() {
 }
 
 void Renderer::DrawGUI() {
-#ifdef _WIN64
+
 	uiBarShader->BindShader();
 
 	rendererAPI->SetCullFace(false);
@@ -450,6 +469,7 @@ void Renderer::DrawGUI() {
 	uiBarShader->UpdateUniformVector2("screenSize", Vector2(rendererAPI->GetCurrentWidth(), rendererAPI->GetCurrentHeight()));
 	rendererAPI->DrawMesh(uiBarMesh);
 
+#ifdef _WIN64
 	rendererAPI->SetBlend(true, RendererAPI::BlendType::ALPHA, RendererAPI::BlendType::ONE_MINUS_ALPHA);
 
 	crosshairTex->Bind(0);

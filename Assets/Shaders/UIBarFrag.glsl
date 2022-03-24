@@ -1,7 +1,5 @@
 #version 420 core
 
-layout (binding = 0) uniform sampler2D 	mainTex;
-uniform int useTexture;
 uniform vec2 ratio;
 uniform vec4 team1Colour;
 uniform vec4 team2Colour;
