@@ -7,7 +7,6 @@
 #include <math.h>
 
 
-
 using namespace NCL::CSC8503;
 
 void Projectile::Update(float dt) {
@@ -24,28 +23,44 @@ void Projectile::Update(float dt) {
 void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vector3 localB, Vector3 normal) {
 #ifndef _ORBIS
 	int soundToPlay = rand() % 2;
-	NCL::AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + (soundToPlay == 0 ? "splat_neutral_01.ogg" : "splat_neutral_02.ogg"), this->GetTransform().GetPosition());
+	float pitch = 1.0f + (((static_cast <float> (rand()) / static_cast <float> (RAND_MAX))-0.5) * 2.0f / 5.0f);
+	NCL::AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + (soundToPlay == 0 ? "splat_neutral_01.ogg" : "splat_neutral_02.ogg"), this->GetTransform().GetPosition(), 1.0f, 0.0f, pitch);
 #endif
+	string name = otherObject->GetName();
+	
+	if (!(otherObject->GetName() == "Dummy" || otherObject->GetName() == "Player")) {
+		Ray ray(this->GetTransform().GetPosition() - this->GetPhysicsObject()->GetLinearVelocity().Normalised(), this->GetPhysicsObject()->GetLinearVelocity());
+		ray.SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
 
-	Ray ray(this->GetTransform().GetPosition() - this->GetPhysicsObject()->GetLinearVelocity().Normalised() * 2, this->GetPhysicsObject()->GetLinearVelocity());
-	ray.SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
-
-	RayCollision closestCollision;
-	if (GameWorld::Raycast(ray, closestCollision, true)) {
-
-		RenderObject* test = ((GameObject*)closestCollision.node)->GetRenderObject();
+		RayCollision closestCollision;
+		if (GameWorld::Raycast(ray, closestCollision, true)) {
+			RenderObject* test = ((GameObject*)closestCollision.node)->GetRenderObject();
 		
-		if (test) {
-			if (test->GetPaintMask() != nullptr) {
+			if (test) {
+				if (test->GetPaintMask() != nullptr) {
 
-				Vector3 center = this->GetTransform().GetPosition() - this->GetPhysicsObject()->GetLinearVelocity().Normalised() * 10;
-				Vector4 colour = GameManager::GetColourForID(GetOwnerPlayerID());
-				Quaternion rotation = this->GetTransform().GetOrientation();
+					Vector3 center = this->GetTransform().GetPosition() - this->GetPhysicsObject()->GetLinearVelocity().Normalised() * 10;
+					Quaternion rotation = this->GetTransform().GetOrientation();
+					Vector4 colour;
 
-				PaintCircle(center, rotation, colour, 7, 1.2f, 0.5f);
-				PaintCircle(center, rotation, colour, 11, 3.0f, 0.4f);
+					if (!IsDeathProjectile) {
+						colour = GameManager::GetColourForID(ownerPlayerID);
+					}
+					else {
+						colour = GameManager::GetColourForID(ownerPlayerID + 1);
+					}
+
+					PaintCircle(center, rotation, colour, 7, 1.2f, 0.5f);
+					PaintCircle(center, rotation, colour, 11, 3.0f, 0.4f);
+				}
 			}
 		}
+	}
+	else {
+#ifndef _ORBIS
+		int sound = (rand() % 3) + 1;
+		NCL::AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + "boy_whoa_0" + std::to_string(sound) + ".ogg");
+#endif // !_ORBIS
 	}
 	
 	GameWorld::RemoveGameObject(this, true);
@@ -98,9 +113,4 @@ void Projectile::PaintCircle(const Vector3& centre, const Quaternion& rotation, 
 
 		prevPoint = curPoint;
 	}
-}
-
-void Projectile::Paint()
-{
-
 }

@@ -60,7 +60,7 @@ namespace NCL {
 			void					LoadSoundBank(const std::string& bankName);
 			void					LoadSound(const std::string& soundName, bool threeDimensional = false, bool looping = false, bool stream = false);
 			void					UnLoadSound(const std::string& soundName);
-			int						StartPlayingSound(const std::string& soundName, const Vector3& position = Vector3(0, 0, 0), const float& volumePercent = 1.0f, const float& positionInSong = 0.0f);
+			int						StartPlayingSound(const std::string& soundName, const Vector3& position = Vector3(0, 0, 0), const float& volumePercent = 1.0f, const float& positionInSong = 0.0f, const float& pitch = 1.0f);
 			int						FadeInSound(const std::string& soundName, float fadeInTime, const Vector3& position = Vector3(0, 0, 0), const float& volumePercent = 1.0f, const float& positionInSong = 0.0f);
 			AudioManager&			SetChannelVolume(int channelID, const float& volPercent);
 			AudioManager&			SetChannelPitch(int channelID, const float& pitch);

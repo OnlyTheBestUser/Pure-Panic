@@ -14,7 +14,6 @@ GameServer::GameServer(int onPort, int maxClients) {
 #ifndef ORBISNET
 	netHandle = nullptr;
 #endif
-	//threadAlive = false;
 
 	Initialise();
 }
@@ -26,10 +25,7 @@ GameServer::~GameServer() {
 void GameServer::Shutdown() {
 #ifndef ORBISNET
 	SendGlobalPacket(BasicNetworkMessages::Shutdown);
-
-	//threadAlive = false;
-	//updateThread.join();
-
+	
 	enet_host_destroy(netHandle);
 	netHandle = nullptr;
 #endif
@@ -44,11 +40,9 @@ bool GameServer::Initialise() {
 	netHandle = enet_host_create(&address, clientMax, 1, 0, 0);
 
 	if (!netHandle) {
-		std::cout << __FUNCTION__ << " failed to create network handle!" << std::endl;
+		//std::cout << __FUNCTION__ << " failed to create network handle!" << std::endl;
 		return false;
 	}
-	//threadAlive		= true;
-	//updateThread	= std::thread(&GameServer::ThreadedUpdate, this);
 
 	return true;
 #endif
@@ -103,9 +97,6 @@ void GameServer::UpdateServer() {
 		int peer = p->incomingPeerID;
 		int playerID = peer + 1;
 		if (type == ENetEventType::ENET_EVENT_TYPE_CONNECT) {
-			std::cout << "Server: New client connected" << std::endl;
-			std::cout << "Server: Client connected with peerid: " << peer << ".\n";
-			std::cout << "Server: Client connected with PlayerID: " << playerID << ".\n";
 			AssignIDPacket newID(playerID); // Assign
 			SendPacketToPeer(p, newID);
 			NewPlayerPacket player(playerID);
@@ -113,7 +104,6 @@ void GameServer::UpdateServer() {
 			connectedClients.insert(std::pair<int, ENetPeer*>(peer, p));
 		}
 		else if (type == ENetEventType::ENET_EVENT_TYPE_DISCONNECT) {
-			std::cout << "Server: A client has disconnected" << std::endl;
 			PlayerDisconnectPacket player(playerID);
 			SendGlobalPacket(player);
 			connectedClients.erase(peer);
@@ -128,12 +118,6 @@ void GameServer::UpdateServer() {
 	}
 #endif
 }
-
-//void GameServer::ThreadedUpdate() {
-//	while (threadAlive) {
-//		UpdateServer();
-//	}
-//}
 
 //Second networking tutorial stuff
 

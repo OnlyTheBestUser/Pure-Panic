@@ -12,7 +12,7 @@ namespace NCL {
 
 			InputHandler() {
 #ifdef _ORBIS
-				inputBase = new PS4::PS4Input();
+				inputBase = PS4::PS4Input::GetInstance();
 #endif
 #ifndef _ORBIS
 				inputBase = new PCInput();

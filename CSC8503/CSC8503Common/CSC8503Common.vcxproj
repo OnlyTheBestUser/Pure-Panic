@@ -186,6 +186,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -242,6 +243,7 @@
     <ClInclude Include="PCInput.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PowerUp.h" />
+    <ClInclude Include="SimpleAI.h" />
     <ClInclude Include="SpeedBoost.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="SphereVolume.h" />
@@ -293,6 +295,7 @@
     <ClCompile Include="PushdownState.cpp" />
     <ClCompile Include="Octree.cpp" />
     <ClCompile Include="RenderObject.cpp" />
+    <ClCompile Include="SimpleAI.cpp" />
     <ClCompile Include="StateMachine.cpp" />
     <ClCompile Include="StateTransition.cpp" />
     <ClCompile Include="Timer.cpp" />

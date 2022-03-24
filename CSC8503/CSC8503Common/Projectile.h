@@ -26,11 +26,16 @@ namespace NCL {
 
 			void Update(float dt) override;
 
+			void SetAsDeathProjectile() {
+				IsDeathProjectile = true;
+			}
+
 		private:
 			float lifeSpan = 5.0f;
 			Renderer* renderInst;
 			int ownerPlayerID;
 			float damagePerShot;
+			bool IsDeathProjectile = false;
 		};
 	}
 }

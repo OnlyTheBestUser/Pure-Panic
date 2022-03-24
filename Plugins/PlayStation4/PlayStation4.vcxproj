@@ -241,6 +241,38 @@
       <OutputFileName Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">$(SolutionDir)Assets\Shaders\PS4\%(FileName).sb</OutputFileName>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">-cache %(AdditionalOptions)</AdditionalOptions>
     </WavePsslc>
+    <WavePsslc Include="..\..\Assets\Shaders\PS4\UIBarPixel.pssl">
+      <Profile Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">PS</Profile>
+      <Profile Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">PS</Profile>
+      <OutputFileName Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">$(SolutionDir)Assets\Shaders\PS4\%(FileName).sb</OutputFileName>
+      <OutputFileName Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">$(SolutionDir)Assets\Shaders\PS4\%(FileName).sb</OutputFileName>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">-cache</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">-cache</AdditionalOptions>
+    </WavePsslc>
+    <WavePsslc Include="..\..\Assets\Shaders\PS4\UIBarVert.pssl">
+      <Profile Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">VSVS</Profile>
+      <Profile Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">VSVS</Profile>
+      <OutputFileName Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">$(SolutionDir)Assets\Shaders\PS4\%(FileName).sb</OutputFileName>
+      <OutputFileName Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">$(SolutionDir)Assets\Shaders\PS4\%(FileName).sb</OutputFileName>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">-cache</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">-cache</AdditionalOptions>
+    </WavePsslc>
+    <WavePsslc Include="..\..\Assets\Shaders\PS4\UICrosshairPixel.pssl">
+      <Profile Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">PS</Profile>
+      <Profile Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">PS</Profile>
+      <OutputFileName Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">$(SolutionDir)Assets\Shaders\PS4\%(FileName).sb</OutputFileName>
+      <OutputFileName Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">$(SolutionDir)Assets\Shaders\PS4\%(FileName).sb</OutputFileName>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">-cache</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">-cache</AdditionalOptions>
+    </WavePsslc>
+    <WavePsslc Include="..\..\Assets\Shaders\PS4\UICrosshairVert.pssl">
+      <Profile Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">VSVS</Profile>
+      <Profile Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">VSVS</Profile>
+      <OutputFileName Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">$(SolutionDir)Assets\Shaders\PS4\%(FileName).sb</OutputFileName>
+      <OutputFileName Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">$(SolutionDir)Assets\Shaders\PS4\%(FileName).sb</OutputFileName>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">-cache</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">-cache</AdditionalOptions>
+    </WavePsslc>
     <WavePsslc Include="..\..\Assets\Shaders\PS4\VertexShader.pssl">
       <Profile Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">VSVS</Profile>
       <OutputFileName Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">$(SolutionDir)Assets\Shaders\PS4\%(FileName).sb</OutputFileName>
@@ -263,6 +295,8 @@
     <CustomBuild Include="..\..\Assets\Textures\checkerboard.png">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -275,40 +309,66 @@
     <CustomBuild Include="..\..\Assets\Textures\Animated_Screens_A_Colour.png">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
     </CustomBuild>
     <CustomBuild Include="..\..\Assets\Textures\Corridor_Light_Colour.png">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
     </CustomBuild>
     <CustomBuild Include="..\..\Assets\Textures\Corridor_Light_Normal.png">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
     </CustomBuild>
     <CustomBuild Include="..\..\Assets\Textures\Corridor_Walls_Redux_Colour.png">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
     </CustomBuild>
     <CustomBuild Include="..\..\Assets\Textures\Corridor_Walls_Redux_Metal.png">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
     </CustomBuild>
     <CustomBuild Include="..\..\Assets\Textures\Corridor_Walls_Redux_Normal.png">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
     </CustomBuild>
     <CustomBuild Include="..\..\Assets\Textures\corridor_wall_c.png">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
     </CustomBuild>
     <CustomBuild Include="..\..\Assets\Textures\corridor_wall_n.png">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\Assets\Textures\PressStart2P.png">
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\Assets\Textures\crosshair.png">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
     </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

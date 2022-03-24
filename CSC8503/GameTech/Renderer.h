@@ -17,7 +17,6 @@ namespace NCL {
 			Renderer(CSC8503::GameWorld& world);
 			~Renderer();
 
-			void Update(float dt) override;
 			void Render() override;
 
 			void BuildObjectList();
@@ -42,6 +41,7 @@ namespace NCL {
 
 			Vector2 scores;
 			Vector4 playerColour;
+			bool drawGUI;
 		protected:
 
 			struct PaintInstance {

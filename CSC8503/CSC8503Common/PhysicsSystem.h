@@ -41,7 +41,6 @@ namespace NCL {
 
 			void UpdateConstraints(float dt);
 
-			//void UpdateCollisionList();
 			void UpdateObjectAABBs();
 
 			void ImpulseResolveCollision(GameObject& a , GameObject&b, CollisionDetection::ContactPoint& p) const;
@@ -59,7 +58,7 @@ namespace NCL {
 			std::set<CollisionDetection::CollisionInfo> allCollisions;
 			std::set<CollisionDetection::CollisionInfo> broadphaseCollisions;
 
-			vector<Vector2> validLayers;
+			vector<std::pair<int, int>> validLayers;
 
 			bool useBroadPhase		= true;
 			int numCollisionFrames	= 5;

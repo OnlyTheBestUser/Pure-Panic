@@ -4,6 +4,8 @@
 #include "InputBase.h"
 #include "../GameTech/TutorialGame.h"
 #include "Timer.h"
+#include "../GameTech/MainMenu.h"
+#include "../../Common/Assets.h"
 
 namespace NCL {
 	namespace CSC8503 {
@@ -141,8 +143,10 @@ namespace NCL {
 				QuitCommand(bool* quit, bool* paused) : paused(paused), quit(quit) {};
 				virtual ~QuitCommand() {};
 				void execute() {
-					if (paused)
+					if (*paused == true) {
 						*quit = true;
+						NCL::BGMManager::GetInstance()->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 0.1f);
+					}
 				}
 			protected:
 				bool* paused;
@@ -154,7 +158,7 @@ namespace NCL {
 			ResetWorldCommand(GameState* s) : state(s) {};
 			virtual ~ResetWorldCommand() {};
 			void execute() {
-				*state = RESET;
+				*state = GameState::RESET;
 			}
 		protected:
 			GameState* state;
@@ -178,6 +182,33 @@ namespace NCL {
 			}
 		protected:
 			bool* mouse;
+		};
+#pragma endregion
+
+#pragma region Menu Commands
+
+		class MenuEnterCommand : public Command {
+		public:
+			MenuEnterCommand(MainMenu* menu) : menu(menu) {};
+			virtual ~MenuEnterCommand() {};
+			void execute() {
+				menu->HandleMenuPress();
+			}
+		protected:
+			MainMenu* menu;
+		};
+
+		class MenuMoveCommand : public AxisCommand{
+		public:
+			MenuMoveCommand(MainMenu* menu) : menu(menu) {};
+			virtual ~MenuMoveCommand() {};
+
+			void execute(AXIS* axis) {
+				menu->HandleMenuMove({axis->x,axis->y});
+			}
+
+		protected:
+			MainMenu* menu;
 		};
 #pragma endregion
 	}
