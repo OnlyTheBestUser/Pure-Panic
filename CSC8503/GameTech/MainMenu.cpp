@@ -10,7 +10,9 @@ MainMenu::MainMenu(TutorialGame* start, TutorialGame* training)
 PushdownState::PushdownResult MainMenu::OnUpdate(float dt, PushdownState** newState) {
 	renderer.Render();
 
-	renderer.DrawString("Spitoon", { 20,30 }, { 0.6f,0.3f,0.8f,1.0f }, {100.0f});
+	float framed = (renderer.GetFrameNumber() / 180.f);
+	float size = (50.0f * abs(sin(framed))) + 40.0f;
+	renderer.DrawString("Spitoon", {20,30 }, { 0.6f,0.3f,0.8f,1.0f }, { size });
 
 	auto drawMenuOption = [=](const std::string& string, const Maths::Vector2 pos, int selection, int menuNumber) {
 		if (selection == menuNumber) {

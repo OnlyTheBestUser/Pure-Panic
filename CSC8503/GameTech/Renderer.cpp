@@ -115,6 +115,7 @@ void Renderer::Render() {
 	rendererAPI->EndFrame();
 	DrawDebugData();
 	rendererAPI->SwapBuffers();
+	frameNumber++;
 }
 
 void Renderer::BuildObjectList() {

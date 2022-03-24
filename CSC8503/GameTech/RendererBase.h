@@ -26,10 +26,14 @@ namespace NCL {
 
 			virtual void Render();
 
-			RendererAPI* GetRendererAPI() { return rendererAPI; }
+			RendererAPI* GetRendererAPI() const { return rendererAPI; }
 
 			void ForceValidDebugState(bool newState) {
 				forceValidDebugState = newState;
+			}
+
+			int GetFrameNumber() const {
+				return frameNumber;
 			}
 
 			// Render commands
@@ -50,6 +54,7 @@ namespace NCL {
 			MeshGeometry* debugTextMesh;
 			MeshGeometry* debugLinesMesh;
 			ShaderBase* debugShader;
+			int frameNumber;
 
 
 		private:

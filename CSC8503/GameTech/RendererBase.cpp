@@ -96,6 +96,7 @@ void RendererBase::Render() {
 	rendererAPI->EndFrame();
 	DrawDebugData();
 	rendererAPI->SwapBuffers();
+	frameNumber++;
 }
 
 void RendererBase::DrawString(const std::string& text, const Maths::Vector2& pos, const Maths::Vector4& colour, float size) {
