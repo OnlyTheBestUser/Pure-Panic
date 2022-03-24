@@ -95,6 +95,11 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 		Assets::SHADERDIR + "PS4/UIBarPixel.sb"
 	);
 
+	crosshairTex = PS4::PS4Texture::LoadTextureFromFile(NCL::Assets::TEXTUREDIR + "crosshair.gnf");
+	uiCrosshairShader = PS4::PS4Shader::GenerateShader(
+		Assets::SHADERDIR + "PS4/UICrosshairVert.sb",
+		Assets::SHADERDIR + "PS4/UICrosshairPixel.sb"
+	);
 	//crosshairTex = OGLTexture::RGBATextureFromFilename("crosshair.png");
 	//uiCrosshairShader = new OGLShader("UICrosshairVert.glsl", "UICrosshairFrag.glsl");
 
@@ -461,7 +466,6 @@ void Renderer::DrawGUI() {
 	rendererAPI->SetBlend(false);
 	rendererAPI->SetDepth(false);
 
-	
 	uiBarShader->UpdateUniformMatrix4("viewProjMatrix", Matrix4::Translation(Vector3(0, 1, 0)) * Matrix4::Orthographic(-1, 1.0f, 1, -1, -1, 1));
 	uiBarShader->UpdateUniformVector2("ratio", scores);
 	uiBarShader->UpdateUniformVector4("team1Colour", GameManager::team1Colour);
@@ -469,7 +473,6 @@ void Renderer::DrawGUI() {
 	uiBarShader->UpdateUniformVector2("screenSize", Vector2(rendererAPI->GetCurrentWidth(), rendererAPI->GetCurrentHeight()));
 	rendererAPI->DrawMesh(uiBarMesh);
 
-#ifdef _WIN64
 	rendererAPI->SetBlend(true, RendererAPI::BlendType::ALPHA, RendererAPI::BlendType::ONE_MINUS_ALPHA);
 
 	crosshairTex->Bind(0);
@@ -478,12 +481,9 @@ void Renderer::DrawGUI() {
 	uiCrosshairShader->UpdateUniformVector4("colour", playerColour);
 	rendererAPI->DrawMesh(uiCrosshairMesh);
 
-
-
 	rendererAPI->SetBlend(false, RendererAPI::BlendType::ONE, RendererAPI::BlendType::NONE);
 	rendererAPI->SetCullFace(true);
 	rendererAPI->SetDepth(true);
-#endif
 }
 
 Maths::Vector2 Renderer::GetUVCoord(const RenderObject* paintable, NCL::Maths::Vector3 pos) {

@@ -1,29 +1,36 @@
-ConstantBuffer ShaderConstants
+ConstantBuffer viewProjMatrix
 {
-	column_major matrix m_WorldViewProj;
+	column_major matrix m_viewProjMatrix;
+};
+
+ConstantBuffer colour
+{
+	float4 m_colour;
 };
 
 struct VS_INPUT
 {
 	float3 Position		: POSITION0;
-	float3 Color		: COLOR0;
 	float2 UV			: TEXCOORD0;
+	float3 Normal		: TEXCOORD1;
+	float3 Tangent		: TEXCOORD2;
+	float4 Color		: COLOR0;
 };
 
 struct VS_OUTPUT
 {
 	float4 Position		: S_POSITION;
-	float3 Color		: TEXCOORD0;
-	float2 UV			: TEXCOORD1;
+	float2 UV			: TEXCOORD0;
+	float4 Color		: COLOR0;
 };
 
 VS_OUTPUT main(VS_INPUT Input)
 {
 	VS_OUTPUT Output;
 
-	Output.Position = mul(m_WorldViewProj, float4(Input.Position.xyz, 1));
-	Output.Color = Input.Color;
+	Output.Position = mul(m_viewProjMatrix, float4(Input.Position.xyz, 1));
 	Output.UV = Input.UV;
+	Output.Color = m_colour;
 
 	return Output;
 }
