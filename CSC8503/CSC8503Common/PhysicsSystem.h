@@ -27,6 +27,8 @@ namespace NCL {
 						
 			void BuildStaticList();
 
+			bool debug = false;
+
 		protected:
 			void BroadPhase();
 			void NarrowPhase();
@@ -50,6 +52,7 @@ namespace NCL {
 
 			GameWorld& gameWorld;
 			Octree<GameObject*>* staticTree;
+
 
 			bool	applyGravity;
 			Vector3 gravity;
