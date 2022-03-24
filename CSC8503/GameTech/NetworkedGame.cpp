@@ -354,7 +354,9 @@ void NetworkedGame::SendDeathPacket(int clientID, Vector3 pos)
 
 	if (singleton) {
 		if (singleton->thisServer) {
+#ifndef ORBISNET
 			singleton->thisServer->SendGlobalPacket(packet);
+#endif
 		}
 		else {
 			singleton->thisClient->SendPacket(packet);
@@ -434,7 +436,9 @@ void NetworkedGame::HandleFireState(FirePacket* packet)
 void NetworkedGame::HandleDeathState(DeathPacket* packet)
 {
 	if (thisServer) {
+#ifndef ORBISNET
 		thisServer->SendGlobalPacket(*packet);
+#endif
 	}
 
 	emptyPlayer->GetTransform().SetPosition(Vector3(packet->x, packet->y, packet->z));
@@ -515,7 +519,9 @@ void NetworkedGame::SendResetGamePacket() {
 	newPacket.team1Score = 0;
 	newPacket.team2Score = 0;
 
+#ifndef ORBISNET
 	thisServer->SendGlobalPacket(newPacket);
+#endif
 	ResetLevel();
 }
 
@@ -526,7 +532,9 @@ void NetworkedGame::SendStartGamePacket() {
 	newPacket.team1Score = 0;
 	newPacket.team2Score = 0;
 
+#ifndef ORBISNET
 	thisServer->SendGlobalPacket(newPacket);
+#endif
 }
 
 void NetworkedGame::SendUpdateGamePacket() {
@@ -538,7 +546,9 @@ void NetworkedGame::SendUpdateGamePacket() {
 	newPacket.team1Score = scores.x;
 	newPacket.team2Score = scores.y;
 
+#ifndef ORBISNET
 	thisServer->SendGlobalPacket(newPacket);
+#endif
 }
 
 void NetworkedGame::SendEndGamePacket() {
@@ -549,8 +559,9 @@ void NetworkedGame::SendEndGamePacket() {
 	Vector2 scores = gameManager->GetScores();
 	newPacket.team1Score = scores.x;
 	newPacket.team2Score = scores.y;
-
+#ifndef ORBISNET
 	thisServer->SendGlobalPacket(newPacket);
+#endif
 	gameManager->printResults = true;
 }
 void NetworkedGame::UpdatePauseState(float dt)
