@@ -110,7 +110,7 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 #endif
 
 	uiBarMesh->SetVertexPositions({ Vector3(-0.5f, 0.2f,-0.5f), Vector3(-0.5f,0.1f,-0.5f) , Vector3(0.5f,0.1f,-0.5f) , Vector3(0.5f,0.2f,-0.5f) });
-	uiBarMesh->SetVertexTextureCoords(std::vector(4,Vector2()));
+	uiBarMesh->SetVertexTextureCoords({ Vector2(0,1), Vector2(0,0), Vector2(1,0) , Vector2(1,1) });
 	uiBarMesh->SetVertexIndices({ 0,1,2,2,3,0 });
 	uiBarMesh->SetVertexTangents(std::vector<Vector4>(4, Vector4()));
 	uiBarMesh->SetVertexNormals(std::vector<Vector3>(4, Vector3()));

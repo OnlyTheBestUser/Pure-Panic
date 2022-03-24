@@ -18,21 +18,16 @@ ConstantBuffer team2Colour
 	float4 m_team2Colour;
 };
 
-ConstantBuffer screenSize
-{
-	float2 m_screenSize;
-};
-
 struct VS_OUTPUT
 {
 	float4 Position		: S_POSITION;
-	float3 Color		: TEXCOORD0;
+	float2 UV			: TEXCOORD0;
+	float4 Color		: COLOR0;
 };
 
 float4 main(VS_OUTPUT In) : S_TARGET_OUTPUT
 {
-	float2 curScreenCoord = In.Position.xy / (m_screenSize/2 + m_screenSize/2); 
-	if(curScreenCoord.x < m_ratio.x){
+	if(In.UV.x < m_ratio.x){
 		return m_team1Colour;
 	} else {
 		return m_team2Colour;
