@@ -34,15 +34,7 @@ TutorialGame::TutorialGame()	{
 	gameManager		= new GameManager(this);
 	
 #ifndef _ORBIS
-	audio = NCL::AudioManager::GetInstance();
-	audio->Initialize();
-	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_01.ogg", true, false, false);
-	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_02.ogg", true, false, false);
-	audio->LoadSound(Assets::AUDIODIR + "gun_fire.ogg", true, false, false);
-	audio->LoadSound(Assets::AUDIODIR + "menu_music.ogg", false, true, true);
-
-	bgm = new BGMManager(audio);
-	bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 3.0f);
+	InitSounds();
 #endif
 
 	forceMagnitude = 30.0f;
@@ -113,6 +105,31 @@ TutorialGame::TutorialGame()	{
 void TutorialGame::InitialiseAssets() {
 	InitCamera();
 	InitWorld();
+}
+
+
+void TutorialGame::InitSounds() {
+#ifndef _ORBIS
+	audio = NCL::AudioManager::GetInstance();
+	audio->Initialize();
+	//Menu Sounds
+	audio->LoadSound(Assets::AUDIODIR + "menu_music.ogg", false, true, true);
+	audio->LoadSound(Assets::AUDIODIR + "menu_move.ogg", false, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "menu_select.ogg", false, false, false);
+
+	//Shooting Sounds
+	audio->LoadSound(Assets::AUDIODIR + "gun_fire.ogg", true, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_01.ogg", true, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_02.ogg", true, false, false);
+
+	//Player Sounds
+	audio->LoadSound(Assets::AUDIODIR + "boy_whoa_01.ogg", true, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "boy_whoa_02.ogg", true, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "boy_whoa_03.ogg", true, false, false);
+
+	bgm = new BGMManager(audio);
+	bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 3.0f);
+#endif // !_ORBIS
 }
 
 TutorialGame::~TutorialGame() {

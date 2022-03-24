@@ -21,7 +21,8 @@ void Projectile::Update(float dt) {
 void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vector3 localB, Vector3 normal) {
 #ifndef _ORBIS
 	int soundToPlay = rand() % 2;
-	NCL::AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + (soundToPlay == 0 ? "splat_neutral_01.ogg" : "splat_neutral_02.ogg"), this->GetTransform().GetPosition());
+	float pitch = 1.0f + (((static_cast <float> (rand()) / static_cast <float> (RAND_MAX))-0.5) * 2.0f / 5.0f);
+	NCL::AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + (soundToPlay == 0 ? "splat_neutral_01.ogg" : "splat_neutral_02.ogg"), this->GetTransform().GetPosition(), 1.0f, 0.0f, pitch);
 #endif
 	string name = otherObject->GetName();
 	if (!(otherObject->GetName() == "Dummy" || otherObject->GetName() == "Player")) {
@@ -52,6 +53,12 @@ void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vecto
 				}
 			}
 		}
+	}
+	else {
+#ifndef _ORBIS
+		int sound = (rand() % 3) + 1;
+		NCL::AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + "boy_whoa_0" + std::to_string(sound) + ".ogg");
+#endif // !_ORBIS
 	}
 	
 	GameWorld::RemoveGameObject(this, true);
