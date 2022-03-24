@@ -6,7 +6,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-#define DRAW_DEBUG true
+#define DRAW_DEBUG false
 
 using namespace NCL;
 using namespace CSC8503;

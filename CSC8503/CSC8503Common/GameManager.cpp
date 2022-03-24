@@ -10,9 +10,9 @@ void GameManager::Update(const float& dt) {
 
 	if (timer->GetState() == TimerStates::Ended) {
 		if (Teams[A].score > Teams[B].score)
-			Debug::Print("Team A Wins", { 30.f, 70.f });
+			Debug::Print("Purple Wins", { 30.f, 70.f });
 		else if (Teams[A].score < Teams[B].score)
-			Debug::Print("Team B Wins", { 30.f, 70.f });
+			Debug::Print("Blue Wins", { 30.f, 70.f });
 		else
 			Debug::Print("Tie", { 30.f, 70.f });
 	}

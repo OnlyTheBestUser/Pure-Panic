@@ -124,7 +124,7 @@ void NetworkedGame::UpdateAsServer(float dt) {
 #ifndef ORBISNET
 		thisServer->SendGlobalPacket(*newPacket);
 #endif
-    
+
 		delete newPacket;
 	}
 
