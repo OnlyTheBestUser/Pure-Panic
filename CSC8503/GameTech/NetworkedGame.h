@@ -28,6 +28,9 @@ namespace NCL {
 
 			void RemovePlayerFromServer(int clientID);
 
+			void UpdatePauseState(float dt) override;
+			void UpdatePauseScreen(float dt) override;
+
 			static NetworkedGame* GetInstance() { return singleton; }
 
 			/*static void AddPowerUp(PowerUp* powerup) { singleton->powerups.emplace_back(powerup); }

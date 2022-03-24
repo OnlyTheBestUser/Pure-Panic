@@ -20,9 +20,9 @@ void main(void)
 	vec2 curScreenCoord = gl_FragCoord.xy / (screenSize/2 + screenSize/2); 
 
 	fragColor = IN.colour;
+	fragColor *= texture(mainTex, IN.texCoord);
 	if(fragColor.a == 0){
 		discard;
 	}
-	fragColor *= texture(mainTex, IN.texCoord);
 
 }
