@@ -68,7 +68,6 @@ void GameManager::HandleScoresAfterRound() {
 }
 
 void GameManager::StartRound() {
-	game->SetState(GameState::RESET);
 	PlacePlayersToSpawnPositions();
 	HandleScoresAfterRound();
 	timer->StartTimer();

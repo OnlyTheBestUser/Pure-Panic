@@ -246,6 +246,9 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
 		case(Player_Disconnected):
 			HandlePlayerDisconnect((PlayerDisconnectPacket*)payload);
 			return;
+		case(Game_State):
+			HandleGameState((GameStatePacket*)payload);
+			return;
 	}
 
 	if (!CheckExists((IDPacket*)payload))
@@ -254,9 +257,6 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
 	switch (type) {
 		case(Full_State):
 			HandleFullState((FullPacket*)payload);
-			return;
-		case(Game_State):
-			HandleGameState((GameStatePacket*)payload);
 			return;
 		case(Fire_State):
 			HandleFireState((FirePacket*)payload);
@@ -553,7 +553,7 @@ void NetworkedGame::SendEndGamePacket() {
 	thisServer->SendGlobalPacket(newPacket);
 	gameManager->printResults = true;
 }
-void NCL::CSC8503::NetworkedGame::UpdatePauseState(float dt)
+void NetworkedGame::UpdatePauseState(float dt)
 {
 	UpdatePauseScreen(dt);
 	physics->Update(dt);
@@ -562,7 +562,7 @@ void NCL::CSC8503::NetworkedGame::UpdatePauseState(float dt)
 	UpdateScores(dt);
 }
 
-void NCL::CSC8503::NetworkedGame::UpdatePauseScreen(float dt)
+void NetworkedGame::UpdatePauseScreen(float dt)
 {
 	renderer->DrawString("PAUSED", Vector2(5, 80), Debug::MAGENTA, 30.0f);
 	renderer->DrawString("Press P to Unpause.", Vector2(5, 90), Debug::WHITE, 20.0f);

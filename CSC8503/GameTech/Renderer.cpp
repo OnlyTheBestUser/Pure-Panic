@@ -290,7 +290,7 @@ void NCL::Rendering::Renderer::ClearPaint()
 	for (auto it = start; it != end; ++it){
 		if (!(*it)->GetRenderObject()) return;
 
-		if ((*it)->GetRenderObject()->GetPaintMask()) return;
+		if (!(*it)->GetRenderObject()->GetPaintMask()) return;
 
 		(*it)->GetRenderObject()->GetPaintMask()->ResetTexture();
 	}
