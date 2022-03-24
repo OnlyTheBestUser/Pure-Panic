@@ -48,6 +48,7 @@ LevelLoader::LevelLoader(PhysicsSystem* physics, Renderer* renderer, TutorialGam
 	loadFunc("security.msh", &enemyMesh);
 	loadFunc("coin.msh", &bonusMesh);
 	loadFunc("capsule.msh", &capsuleMesh);
+	loadFunc("SanctumThrone.msh", &sanctumThrone);
 	loadFunc("Corridor_Floor_Basic.msh", &corridorFloor);
 	loadFunc("Corridor_Wall_Alert.msh", &corridorWallAlert);
 	loadFunc("Corridor_Wall_Corner_In_Both.msh", &corridorWallCorner);
@@ -74,6 +75,7 @@ LevelLoader::LevelLoader(PhysicsSystem* physics, Renderer* renderer, TutorialGam
 	loadTexFunc("Corridor_Walls_Redux_Colour", &corridorWallStraightTex);
 	loadTexFunc("checkerboard", &corridorWallHammerTex);
 	loadTexFunc("checkerboard", &basicTex);
+	loadTexFunc("InSanct_Max_Throne_B_Colour", &sanctumThroneTex);
 
 	#ifdef _ORBIS
 		basicTex = PS4::PS4Texture::LoadTextureFromFile(NCL::Assets::TEXTUREDIR + "checkerboard.gnf");
@@ -159,7 +161,13 @@ void LevelLoader::ReadInLevelFile(std::string filename) {
 					singleton->AddCapsuleToWorld(Vec3FromStr(lineContents[1]), std::stof(lineContents[2]), std::stof(lineContents[3]), std::stof(lineContents[4]));
 				}
 				else if (lineContents[0] == "PAINT_WALL") {
-					singleton->AddPaintWallToWorld(Vec3FromStr(lineContents[1]), Vector3(5, 5, 4), std::stoi(lineContents[2]), lineContents[0]);
+					singleton->AddPaintWallToWorld(Vec3FromStr(lineContents[1]), Vector3(5, 4.2, 4), std::stoi(lineContents[2]), lineContents[0]);
+				}
+				else if (lineContents[0] == "THRONE") {
+					singleton->AddThroneToWorld(Vec3FromStr(lineContents[1]), std::stoi(lineContents[2]), Vec3FromStr(lineContents[3]));
+				}
+				else if (lineContents[0] == "PILLAR") {
+					singleton->AddPillarToWorld(Vec3FromStr(lineContents[1]), Vec3FromStr(lineContents[2]), std::stoi(lineContents[3]));
 				}
 				else if (lineContents[0] == "POWERUP") {
 					singleton->AddPowerUpToWorld(Vec3FromStr(lineContents[1]), (const PowerUpType) std::stoi(lineContents[2]));
@@ -231,6 +239,33 @@ GameObject* LevelLoader::AddFloorToWorld(const Vector3& position) {
 	return floor;
 }
 
+GameObject* LevelLoader::AddPillarToWorld(const Vector3& position, Vector3 dimensions, int rotation) {
+	GameObject* cube = new GameObject("Pillar");
+	AABBVolume* volume = new AABBVolume(dimensions);
+	cube->SetBoundingVolume((CollisionVolume*)volume);
+
+	cube->GetTransform()
+		.SetPosition(position)
+		.SetScale(dimensions * 2)
+		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
+
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, nullptr, basicShader));
+	cube->GetRenderObject()->SetColour(Vector4(0.357f, 0.357f, 0.357f,1.0f));
+
+
+	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
+
+	cube->GetPhysicsObject()->SetInverseMass(0.0f);
+	cube->GetPhysicsObject()->InitCubeInertia();
+
+	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	cube->GetPhysicsObject()->SetDynamic(false);
+	
+	GameWorld::AddGameObject(cube);
+
+	return cube;
+}
+
 GameObject* LevelLoader::AddAABBWallToWorld(const Vector3& position, Vector3 dimensions, int rotation, string name) {
 	GameObject* cube = new GameObject(name);
 	CollisionVolume* volume = (CollisionVolume*) new AABBVolume(dimensions);
@@ -282,7 +317,7 @@ GameObject* LevelLoader::AddLongWallToWorld(const Vector3& position, Vector3 dim
 	{
 		for (int i = -dimensions.z; i < dimensions.z; i += 10)
 		{
-			AddRenderPartToWorld(Vector3(position.x, position.y, position.z + i), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallAlertTex);
+			AddRenderPartToWorld(Vector3(position.x, position.y, position.z + i), Vector3(5, 4, 4), rotation, corridorWallStraight, corridorWallAlertTex);
 		}
 		return physicalObject;
 	}
@@ -290,7 +325,7 @@ GameObject* LevelLoader::AddLongWallToWorld(const Vector3& position, Vector3 dim
 	{
 		for (int i = -dimensions.x; i < dimensions.x; i += 10)
 		{
-			AddRenderPartToWorld(Vector3(position.x + i, position.y, position.z), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallAlertTex);
+			AddRenderPartToWorld(Vector3(position.x + i, position.y, position.z), Vector3(5, 4, 4), rotation, corridorWallStraight, corridorWallAlertTex);
 		}
 		return physicalObject;
 	}
@@ -330,6 +365,36 @@ GameObject* LevelLoader::AddPaintWallToWorld(const Vector3& position, Vector3 di
 	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
 	cube->GetPhysicsObject()->SetDynamic(false);
 	cube->GetPhysicsObject()->SetElasticity(0.0f);
+	GameWorld::AddGameObject(cube);
+
+	return cube;
+}
+
+GameObject* LevelLoader::AddAssetToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture, const Vector3& phyLocation, const Vector3& phyDimensions, const float& paintRad, const string& name) {
+	GameObject* cube = new GameObject(name, paintRad);
+	AABBVolume* volume = new AABBVolume(phyDimensions);
+	cube->SetBoundingVolume((CollisionVolume*)volume);
+
+	cube->GetTransform()
+		.SetPosition(position)
+		.SetScale(dimensions * 2)
+		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0))
+		.SetOffset(phyLocation - position);
+
+#ifdef _WIN64
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, OGLTexture::RGBATextureEmpty(texture->GetWidth() / 16, texture->GetHeight() / 16), basicShader));
+#endif
+#ifdef _ORBIS
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, basicShader));
+#endif
+
+	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
+	cube->GetPhysicsObject()->SetInverseMass(0.0f);
+	cube->GetPhysicsObject()->InitCubeInertia();
+
+	cube->SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	cube->GetPhysicsObject()->SetDynamic(false);
+	
 	GameWorld::AddGameObject(cube);
 
 	return cube;
@@ -378,9 +443,8 @@ void		LevelLoader::AddSecurityCameraToWorld(const Vector3& position, int rotatio
 		location += Vector3(4, 0, 0);
 	}
 
-	GameObject* physicalObject = AddAABBWallToWorld(location, dimensions, rotation, "Security Camera");
-	physicalObject->GetPhysicsObject()->Sleep();
-	AddRenderPartToWorld(position, Vector3(5, 5, 5), rotation, securityCamera, securityCameraTex);
+	AddAssetToWorld(position, Vector3(5, 5, 5), rotation, securityCamera, securityCameraTex, location, dimensions, 10.f, "Security Camera")
+		->GetPhysicsObject()->Sleep();
 	return;
 }
 
@@ -409,9 +473,19 @@ void		LevelLoader::AddWallHammerToWorld(const Vector3& position, int rotation)
 		location += Vector3(5.5, 0, -0.25);
 	}
 
-	GameObject* physicalObject = AddAABBWallToWorld(location, dimensions, rotation, "Wall Hammer");
-	physicalObject->GetPhysicsObject()->Sleep();
-	AddRenderPartToWorld(position, Vector3(10, 10, 6), rotation, corridorWallHammer, corridorWallHammerTex);
+	AddAssetToWorld(position, Vector3(10, 10, 6), rotation, corridorWallHammer, corridorWallHammerTex, location, dimensions, 10.f, "Wall Hammer")
+		->GetPhysicsObject()->Sleep();
+	return;
+}
+
+void LevelLoader::AddThroneToWorld(const Vector3& position, int rotation, const Vector3& scale)
+{
+	Vector3 location = position + Vector3(0, 4, 0) * scale;
+	Vector3 phyDimensions = Vector3(2, 4, 2) * scale;
+	Vector3 meshDimensions = Vector3(1.5f, 1.5f, 1.5f) * scale;
+
+	AddAssetToWorld(position, meshDimensions, rotation, sanctumThrone, sanctumThroneTex, location, phyDimensions, 10.f, "Sanctum Throne")
+		->GetPhysicsObject()->Sleep();
 	return;
 }
 
@@ -516,20 +590,24 @@ PowerUp*    LevelLoader::AddPowerUpToWorld(const Vector3& position, const PowerU
 	return powerup;
 }
 
-Projectile* LevelLoader::SpawnProjectile(Player* owner, const bool& NeedBulletSpread, const float& initialSpeed, const float& meshSize) {
-	return SpawnProjectile((GameObject*)owner, NeedBulletSpread, owner->BulletCounter, owner->GetCam()->GetPitch(), owner->GetPlayerID(), initialSpeed, meshSize);
+Projectile* LevelLoader::SpawnProjectile(Player* owner, bool NeedBulletSpread, float initialSpeed, float meshSize) {
+	return singleton->AddProjectileToWorld((GameObject*)owner, NeedBulletSpread, owner->BulletCounter, owner->GetCam()->GetPitch(), owner->GetPlayerID(), initialSpeed, meshSize);
 }
 
-Projectile* LevelLoader::SpawnProjectile(GameObject* owner, const bool& NeedBulletSpread, const int bulletIndex, float pitch, int playerID, const float& initialSpeed, const float& meshSize)
-{
-  #ifndef _ORBIS
+Projectile* LevelLoader::SpawnProjectile(GameObject* owner, bool needBulletSpread, int bulletIndex, bool deadSpray, float pitch, int playerID, float initialSpeed, float meshSize) {
+#ifndef _ORBIS
 	AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + "gun_fire.ogg", owner->GetTransform().GetPosition(), 0.3f);
 #endif // !_ORBIS
-  return singleton->AddProjectileToWorld(owner, NeedBulletSpread, bulletIndex, pitch, playerID, initialSpeed, meshSize);
+	Projectile* proj = singleton->AddProjectileToWorld((GameObject*) owner, needBulletSpread, bulletIndex, pitch, playerID, initialSpeed, meshSize);
+
+	if (deadSpray) proj->SetAsDeathProjectile();
+
+	return proj;
 }
 
-Projectile* LevelLoader::AddProjectileToWorld(GameObject* owner, const bool& NeedBulletSpread, const int bulletIndex, float pitch, int playerID, const float& initialSpeed, const float& meshSize) {
-  float inverseMass = 1.0f;
+Projectile* LevelLoader::AddProjectileToWorld(GameObject* owner, const bool& NeedBulletSpread, const int bulletIndex, float pitch, int playerID, const float initialSpeed, const float meshSize)
+{
+	float inverseMass = 1.0f;
 
 	const int SPREAD_ANGLE_CONST = 400;
 

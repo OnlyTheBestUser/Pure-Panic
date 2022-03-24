@@ -3,7 +3,20 @@
 
 #ifndef _ORBIS
 using namespace NCL;
-using namespace CSC8503;
+
+BGMManager* BGMManager::inst = nullptr;
+int BGMManager::curSongChannel = -1;
+
+BGMManager::BGMManager() {
+	audioManager = NCL::AudioManager::GetInstance();
+}
+
+BGMManager* BGMManager::GetInstance()
+{
+	if (BGMManager::inst == nullptr)
+		BGMManager::inst = new BGMManager();
+	return BGMManager::inst;
+}
 
 int BGMManager::PlaySong(std::string songName, float posInSong) {
 	StopMusic();

@@ -17,7 +17,6 @@ namespace NCL {
 			Renderer(CSC8503::GameWorld& world);
 			~Renderer();
 
-			void Update(float dt) override;
 			void Render() override;
 
 			void BuildObjectList();

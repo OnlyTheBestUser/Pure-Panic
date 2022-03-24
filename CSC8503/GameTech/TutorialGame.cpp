@@ -16,6 +16,11 @@
 #include "../CSC8503Common/SimpleAI.h"
 #include "LoadingScreen.h"
 
+#ifndef _ORBIS
+	#include "windows.h"
+	#include "psapi.h"
+#endif
+
 using namespace NCL;
 using namespace CSC8503;
 
@@ -33,6 +38,7 @@ TutorialGame::TutorialGame()	{
 	LoadingScreen::AddProgress(50.0f);
 	LoadingScreen::UpdateGame(0.0f);
 	gameManager		= new GameManager(this);
+	LoadingScreen::ResetProgress();
 	LoadingScreen::SetCompletionState(true);
 	
 #ifndef _ORBIS
@@ -45,13 +51,10 @@ TutorialGame::TutorialGame()	{
 
 	inSelectionMode = false;
 
-	state = PLAY;
+	state = GameState::PLAY;
 
 	Debug::SetRenderer(renderer);
-
-	//physics->SetGravity(Vector3(0, 9.8f, 0));
-	//physics->SetLinearDamping(10.0f);
-
+	
 #pragma region Commands
 
 	/*
@@ -86,18 +89,16 @@ TutorialGame::TutorialGame()	{
 	inputHandler = new InputHandler();
 
 	Command* toggleDebug = new ToggleBoolCommand(&debugDraw);
-	Command* togglePause = new ToggleBoolCommand(&pause);
+	Command* togglePause = new ToggleBoolCommand(&pausePressed);
 	Command* toggleMouse = new ToggleMouseCommand(&inSelectionMode);
 	Command* resetWorld = new ResetWorldCommand(&state);
 	Command* quitCommand = new QuitCommand(&quit, &pause);
-	//Command* paintFireCommand = new PaintFireCommand(this);
 	Command* startTimer = new StartTimerCommand(gameManager->GetTimer());
 	
 	inputHandler->BindButton(TOGGLE_DEBUG, toggleDebug);
 	inputHandler->BindButton(TOGGLE_PAUSE, togglePause);
 	inputHandler->BindButton(RESET_WORLD, resetWorld);
 	inputHandler->BindButton(QUIT, quitCommand);
-	//inputHandler->BindButton(FIRE, paintFireCommand);
 	inputHandler->BindButton(TOGGLE_MOUSE, toggleMouse);
 	inputHandler->BindButton(START_TIMER, startTimer);
 
@@ -116,24 +117,18 @@ void TutorialGame::InitialiseAssets() {
 void TutorialGame::InitSounds() {
 #ifndef _ORBIS
 	audio = NCL::AudioManager::GetInstance();
-	audio->Initialize();
-	//Menu Sounds
-	audio->LoadSound(Assets::AUDIODIR + "menu_music.ogg", false, true, true);
-	audio->LoadSound(Assets::AUDIODIR + "menu_move.ogg", false, false, false);
-	audio->LoadSound(Assets::AUDIODIR + "menu_select.ogg", false, false, false);
-
 	//Shooting Sounds
 	audio->LoadSound(Assets::AUDIODIR + "gun_fire.ogg", true, false, false);
 	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_01.ogg", true, false, false);
 	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_02.ogg", true, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "game_music.ogg", false, true, true);
 
 	//Player Sounds
 	audio->LoadSound(Assets::AUDIODIR + "boy_whoa_01.ogg", true, false, false);
 	audio->LoadSound(Assets::AUDIODIR + "boy_whoa_02.ogg", true, false, false);
 	audio->LoadSound(Assets::AUDIODIR + "boy_whoa_03.ogg", true, false, false);
 
-	bgm = new BGMManager(audio);
-	bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 3.0f);
+	bgm = NCL::BGMManager::GetInstance();
 #endif // !_ORBIS
 }
 
@@ -146,31 +141,58 @@ TutorialGame::~TutorialGame() {
 
 void TutorialGame::UpdateGame(float dt) {
 	Debug::SetRenderer(renderer);
-	switch (state) {
-	case PLAY: 
-		UpdateGameWorld(dt); break;
-	case PAUSE: UpdatePauseScreen(dt); break;
-	case WIN: UpdateWinScreen(dt); break;
-	case RESET: {
-		InitCamera();
-		InitWorld();
-		renderer->ClearPaint();
-		selectionObject = nullptr;
-		state = PLAY;
-		break;
+	if (pausePressed) {
+		if (pause == false) {
+			pause = true;
+			SetState(GameState::PAUSE);
+		}
+		else {
+			pause = false;
+			SetState(GameState::PLAY);
+			
+		}
+		pausePressed = false;
 	}
+
+	switch (state) {
+		case GameState::PLAY: {
+			UpdateGameWorld(dt);
+			break;
+		}
+		case GameState::PAUSE: {
+			UpdatePauseState(dt);
+			break;
+		}
+		case GameState::WIN: {
+			UpdateWinScreen(dt);
+			break;
+		}
+		case GameState::RESET: {
+			InitCamera();
+			InitWorld();
+			renderer->ClearPaint();
+			selectionObject = nullptr;
+			quit = false;
+			pause = false;
+			SetState(GameState::PLAY);
+			break;
+		}
 	}
 
 	inputHandler->HandleInput();
 
-	renderer->Update(dt);
-
 	Debug::FlushRenderables(dt);
 
 	renderer->scores = gameManager->CalcCurrentScoreRatio();
-	renderer->drawGUI = (LoadingScreen::GetCompletionState() && state == PLAY);
+
+	renderer->drawGUI = (LoadingScreen::GetCompletionState() && state == GameState::PLAY);
+
 
 	renderer->Render();
+}
+
+void TutorialGame::UpdatePauseState(float dt) {
+	UpdatePauseScreen(dt);
 }
 
 void TutorialGame::UpdateGameWorld(float dt)
@@ -183,9 +205,9 @@ void TutorialGame::UpdateGameWorld(float dt)
 	if (!inSelectionMode) {
 		world->GetMainCamera()->UpdateCamera(dt);
 	}
-
-	//UpdateKeys();
-
+	
+	UpdateDebugText(dt);
+	
 	if (debugDraw) {
 		GameObjectIterator first;
 		GameObjectIterator last;
@@ -198,15 +220,43 @@ void TutorialGame::UpdateGameWorld(float dt)
 		}
 	}
 
-	//SelectObject();
-	//MoveSelectedObject(dt);
 	physics->Update(dt);
-
 	world->UpdateWorld(dt);
-
 	gameManager->Update(dt);
 
 	UpdateScores(dt);
+}
+
+void TutorialGame::UpdateDebugText(float dt) {
+	if (!debugDraw) {
+		physics->debug = false;
+		return;
+	}
+
+	Debug::DebugPrint("FPS:" + std::to_string((int) (1.0f / dt)), Vector2(5, 10), 20, Vector4(1, 1, .5, 1));
+
+#ifndef _ORBIS
+	MEMORYSTATUSEX memInfo;
+	memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+	GlobalMemoryStatusEx(&memInfo);
+
+	PROCESS_MEMORY_COUNTERS_EX pmc;
+	GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
+
+	DWORDLONG totalVirtualMem = memInfo.ullTotalPageFile;
+	DWORDLONG virtualMemUsed = memInfo.ullTotalPageFile - memInfo.ullAvailPageFile;
+
+	DWORDLONG totalPhysMem = memInfo.ullTotalPhys;
+	DWORDLONG physMemUsed = memInfo.ullTotalPhys - memInfo.ullAvailPhys;
+
+	SIZE_T virtualMemUsedByMe = pmc.PrivateUsage;
+	SIZE_T physMemUsedByMe = pmc.WorkingSetSize;
+
+	Debug::DebugPrint("Virt Mem: " + std::to_string(virtualMemUsedByMe / 1000000) + "MB/" + std::to_string(totalVirtualMem / 1000000) + "MB", Vector2(5, 15), 20, Vector4(1, .5, 1, 1));
+	Debug::DebugPrint("Phys Mem: " + std::to_string(physMemUsedByMe / 1000000)    + "MB/" + std::to_string(totalPhysMem / 1000000)    + "MB", Vector2(5, 20), 20, Vector4(1, .5, 1, 1));
+
+	physics->debug = true;
+#endif
 }
 
 void TutorialGame::UpdateScores(float dt) {
@@ -226,8 +276,8 @@ void TutorialGame::UpdateScores(float dt) {
 			}
 		}
 
-		if ((*cur)->GetPaintRadius() == 0) {
-			currentObj++;
+		currentObj++;
+		if ((*cur)->GetPaintRadius() == 0 || (*cur)->GetRenderObject() == nullptr) {
 			return;
 		}
 		// Need to score the texture here.
@@ -236,10 +286,8 @@ void TutorialGame::UpdateScores(float dt) {
 			scoreDif = scoreDif / (*cur)->GetPaintRadius();
 		}
 		world->UpdateScore((*cur), scoreDif);
-		//std::cout << (*cur)->GetName() << "\n" << "Team 1: " << scoreDif.x << "\n" << "Team 2: " << scoreDif.y << "\n\n";
 
 		gameManager->UpdateScores(scoreDif);
-		currentObj++;
 		timeSinceLastScoreUpdate = 0;
 	}
 }
@@ -289,58 +337,6 @@ void TutorialGame::UpdateWinScreen(float dt)
 	renderer->DrawString("Press Esc to return to Main Menu.", Vector2(5, 95), Debug::WHITE, 20.0f);
 }
 
-void TutorialGame::UpdateKeys() {
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F1)) {
-		InitWorld(); //We can reset the simulation at any time with F1
-		selectionObject = nullptr;
-	}
-
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F2)) {
-		InitCamera(); //F2 will reset the camera to a specific default place
-	}
-
-	//Running certain physics updates in a consistent order might cause some
-	//bias in the calculations - the same objects might keep 'winning' the constraint
-	//allowing the other one to stretch too much etc. Shuffling the order so that it
-	//is random every frame can help reduce such bias.
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F9)) {
-		world->ShuffleConstraints(true);
-	}
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F10)) {
-		world->ShuffleConstraints(false);
-	}
-
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F7)) {
-		world->ShuffleObjects(true);
-	}
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F8)) {
-		world->ShuffleObjects(false);
-	}
-	if (Window::GetKeyboard()->KeyPressed(NCL::KeyboardKeys::L)) {
-		player1->ChangeCamLock();
-	}
-
-	DebugObjectMovement();
-}
-
-void TutorialGame::DebugObjectMovement() {
-	//If we've selected an object, we can manipulate it with some key presses
-	if (inSelectionMode && selectionObject) {
-
-		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::NUM7)) {
-			selectionObject->GetPhysicsObject()->AddTorque(Vector3(0, 10, 0));
-		}
-
-		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::NUM8)) {
-			selectionObject->GetPhysicsObject()->AddTorque(Vector3(0, -10, 0));
-		}
-
-		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::NUM5)) {
-			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, -10, 0));
-		}
-	}
-}
-
 void TutorialGame::InitCamera() {
 	world->GetMainCamera()->SetNearPlane(0.1f);
 	world->GetMainCamera()->SetFarPlane(500.0f);
@@ -354,7 +350,9 @@ void TutorialGame::InitWorld() {
 	physics->Clear();
 
 	levelLoader->ReadInLevelFile(NCL::Assets::MAPDIR + "training_map.txt");
-	Player* player = levelLoader->SpawnPlayer(Vector3(0, 5, 0));
+	
+	Player* player = levelLoader->SpawnPlayer(Vector3(-50, 5, -50));
+	player->SetRenderObject(nullptr);
 	
 	AxisCommand* m = new MoveCommand(player);
 	inputHandler->BindAxis(0, m);
@@ -373,19 +371,12 @@ void TutorialGame::InitWorld() {
 
 	Command* f = new FireCommand(player);
 	inputHandler->BindButton(FIRE, f);
-
-	/*GameObject* cap1 = LevelLoader->AddCapsuleToWorld(Vector3(15, 15, 0), 3.0f, 1.5f);
-	cap1->GetPhysicsObject()->SetDynamic(true);
-	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);*/
-
+	
 	player1 = player;
 	renderer->playerColour = GameManager::GetColourForID(player1->GetPlayerID());
 
 	physics->BuildStaticList();
 }
-//PowerUp* TutorialGame::AddPowerUpToWorld(const Vector3& position) {
-//
-//}
 
 /*
 
@@ -414,7 +405,6 @@ bool TutorialGame::SelectObject() {
 			if (selectionObject) {	//set colour to deselected;
 				if (selectionObject->GetRenderObject())
 					selectionObject->GetRenderObject()->SetColour(Vector4(1, 1, 1, 1));
-				//selectionObject->SetLayer(0);
 				selectionObject = nullptr;
 			}
 
@@ -425,17 +415,7 @@ bool TutorialGame::SelectObject() {
 				selectionObject = (GameObject*)closestCollision.node;
 				if (selectionObject->GetRenderObject())
 					selectionObject->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
-				//selectionObject->SetLayer(1);
-				//Ray r(selectionObject->GetTransform().GetPosition(), Vector3(0,0,-1));
-				//RayCollision col;
-
-				// Doesn't work for cubes for some reason idk
-
-				//if (world->Raycast(r, col, true)) {
-				//	((GameObject*)col.node)->GetRenderObject()->SetColour(Vector4(0, 0, 1, 1));
-				//	Debug::DrawLine(r.GetPosition(), col.collidedAt, Vector4(1, 0, 0, 1), 5.0f);
-				//}
-
+				
 				Debug::DrawLine(ray.GetPosition(), closestCollision.collidedAt, Vector4(1, 0, 0, 1), 5.0f);
 				return true;
 			}
@@ -481,63 +461,26 @@ void TutorialGame::MoveSelectedObject(float dt) {
 
 	if (Window::GetKeyboard()->KeyHeld(NCL::KeyboardKeys::F))
 		selectionObject->Interact(dt);
-
-	/*if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::UP)) {
-		if (selectionObject->GetName() == "player")
-			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 0, -1) * ((Player*)selectionObject)->GetSpeed() * 0.1);
-		else
-			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 0, -1) * forceMagnitude * 0.1);
-	}
-	if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::DOWN)) {
-		if (selectionObject->GetName() == "player")
-			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 0, 1) * ((Player*)selectionObject)->GetSpeed() * 0.1);
-		else
-			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 0, 1) * forceMagnitude * 0.1);
-	}
-	if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::LEFT)) {
-		if (selectionObject->GetName() == "player")
-			selectionObject->GetPhysicsObject()->AddForce(Vector3(-1, 0, 0) * ((Player*)selectionObject)->GetSpeed() * 0.1);
-		else
-			selectionObject->GetPhysicsObject()->AddForce(Vector3(-1, 0, 0) * forceMagnitude * 0.1);
-	}
-	if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::RIGHT)) {
-		if (selectionObject->GetName() == "player")
-			selectionObject->GetPhysicsObject()->AddForce(Vector3(1, 0, 0) * ((Player*)selectionObject)->GetSpeed() * 0.1);
-		else
-			selectionObject->GetPhysicsObject()->AddForce(Vector3(1, 0, 0) * forceMagnitude * 0.1);
-	}
-	if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::SHIFT)) {
-		if (selectionObject->GetName() == "player")
-			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, -1, 0) * ((Player*)selectionObject)->GetSpeed() * 0.1);
-		else
-			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, -1, 0) * forceMagnitude * 0.1);
-	}
-	if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::SPACE)) {
-		if (selectionObject->GetName() == "player")
-			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 1, 0) * ((Player*)selectionObject)->GetSpeed() * 0.1);
-		else
-			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 1, 0) * forceMagnitude * 0.1);
-	}*/
 }
 
 void TutorialGame::UpdateBGM() {
 #ifndef _ORBIS
 
 	switch (state) {
-	case PLAY:
+	case GameState::PLAY:
 		std::cout << "play";
 		bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 3.0f);
 		break;
-	case PAUSE:
+		std::cout << "pause";
 		std::cout << "pause";
 		bgm->StopMusic();
-		break;
-	case RESET:
+		std::cout << "reset";
+	case GameState::RESET:
 		std::cout << "reset";
 		bgm->StopMusic();
 		break;
 	default:
-		bgm->StopMusic();
+		bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 0.1f);
 		break;
 	}
 
@@ -551,15 +494,14 @@ void TutorialGame::PaintObject() {
 	if (world->Raycast(ray, closestCollision, true)) {
 		auto test = ((GameObject*)closestCollision.node)->GetRenderObject();
 
-		//Debug::DrawLine(ray.GetPosition(), ray.GetPosition() * ray.GetDirection());
 		Debug::DrawSphere(closestCollision.collidedAt, 0.5, Vector4(1,0,0,1), 0.f);
 		if (test) {
 			
 			Vector2 texUV_a, texUV_b, texUV_c;
 			Vector3 collisionPoint;
 			Vector3 barycentric;
-			CollisionDetection::GetBarycentricFromRay(ray, *test, texUV_a, texUV_b, texUV_c, barycentric, collisionPoint);
-			
+			Vector3 norm;
+			CollisionDetection::GetBarycentricFromRay(ray, *test, texUV_a, texUV_b, texUV_c, barycentric, collisionPoint, norm);
 			
 			// Get the uv from the ray
 			renderer->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, ((GameObject*)closestCollision.node)->GetPaintRadius(), 0.2, 0.2, Vector4(0.3, 0, 0.5, 1));

@@ -27,6 +27,8 @@ namespace NCL {
 						
 			void BuildStaticList();
 
+			bool debug = false;
+
 		protected:
 			void BroadPhase();
 			void NarrowPhase();
@@ -41,7 +43,6 @@ namespace NCL {
 
 			void UpdateConstraints(float dt);
 
-			//void UpdateCollisionList();
 			void UpdateObjectAABBs();
 
 			void ImpulseResolveCollision(GameObject& a , GameObject&b, CollisionDetection::ContactPoint& p) const;
@@ -51,6 +52,7 @@ namespace NCL {
 
 			GameWorld& gameWorld;
 			Octree<GameObject*>* staticTree;
+
 
 			bool	applyGravity;
 			Vector3 gravity;

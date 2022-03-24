@@ -26,20 +26,29 @@ namespace NCL {
 		public:
 
 			GameManager(TutorialGame* tg) : game(tg) {
-				timer = new Timer(abs(10.0f));
+				timer = new Timer(abs(90.0f));
 			}
 
 			void Update(const float& dt);
+
+			void PrintScores(float scoreA, float scoreB);
+			void PrintResult(float scoreA, float scoreB);
 
 			Timer* GetTimer() const {
 				return timer;
 			}
 
+			bool IsTimerFinished() {
+				return timer->GetState() == TimerStates::Ended;
+			}
+
 			void UpdateScores(Vector2 scores);
+			void SetScores(Vector2 scores);
+			Vector2 GetScores() { return Vector2(Teams[A].score, Teams[B].score); }
 
 			Vector2 CalcCurrentScoreRatio();
 
-			void AddPlayerToTeam(Player* player,const TeamTypes& t) {
+			void AddPlayerToTeam(Player* player, const TeamTypes& t) {
 				Teams[t].TeamPlayers.push_back(player);
 			}
 
@@ -48,6 +57,7 @@ namespace NCL {
 
 			void StartRound();
 
+			bool printResults = false;
 			static Vector4 team1Colour;
 			static Vector4 team2Colour;
 

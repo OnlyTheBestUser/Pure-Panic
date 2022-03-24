@@ -151,6 +151,18 @@
     <WavePsslc Include="..\..\Assets\Shaders\PS4\maskVertex.pssl">
       <Filter>Assets\Shaders</Filter>
     </WavePsslc>
+    <WavePsslc Include="..\..\Assets\Shaders\PS4\UIBarPixel.pssl">
+      <Filter>Assets\Shaders</Filter>
+    </WavePsslc>
+    <WavePsslc Include="..\..\Assets\Shaders\PS4\UIBarVert.pssl">
+      <Filter>Assets\Shaders</Filter>
+    </WavePsslc>
+    <WavePsslc Include="..\..\Assets\Shaders\PS4\UICrosshairVert.pssl">
+      <Filter>Assets\Shaders</Filter>
+    </WavePsslc>
+    <WavePsslc Include="..\..\Assets\Shaders\PS4\UICrosshairPixel.pssl">
+      <Filter>Assets\Shaders</Filter>
+    </WavePsslc>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\Assets\Textures\checkerboard.png">
@@ -184,6 +196,9 @@
       <Filter>Assets\Textures</Filter>
     </CustomBuild>
     <CustomBuild Include="..\..\Assets\Textures\PressStart2P.png">
+      <Filter>Assets\Textures</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\crosshair.png">
       <Filter>Assets\Textures</Filter>
     </CustomBuild>
   </ItemGroup>

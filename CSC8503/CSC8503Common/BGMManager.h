@@ -2,16 +2,16 @@
 #include <string>
 namespace NCL {
 	class AudioManager;
-	namespace CSC8503 {
-		class BGMManager {
-		public:
-			BGMManager(NCL::AudioManager* am) : audioManager(am) {};
-			int PlaySong(std::string songName, float posInSong = 0.0f);
-			int PlaySongFade(std::string songName, float fadeInTime, float posInSong = 0.0f);
-			void StopMusic();
-		private:
-			NCL::AudioManager* audioManager;
-			int curSongChannel = -1;
-		};
-	}
+	class BGMManager {
+	public:
+		int PlaySong(std::string songName, float posInSong = 0.0f);
+		int PlaySongFade(std::string songName, float fadeInTime, float posInSong = 0.0f);
+		void StopMusic();
+		static BGMManager* GetInstance();
+	private:
+		static BGMManager* inst;
+		BGMManager();
+		NCL::AudioManager* audioManager;
+		static int curSongChannel;
+	};
 }

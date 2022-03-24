@@ -15,7 +15,8 @@ namespace NCL {
 		public:
 			Timer(float totalDuration) : maxTime(totalDuration), timeLeft(totalDuration) {}
 			void StartTimer();
-			void PauseTimer() { state = TimerStates::Paused; };
+			void PauseTimer() { state = TimerStates::Paused; }
+			void ResetTimer() { state = TimerStates::NotStarted; timeLeft = maxTime; }
 			void Update(const float& dt);
 			float GetTime() const {
 				return timeLeft;

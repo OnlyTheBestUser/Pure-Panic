@@ -15,6 +15,24 @@ namespace NCL {
 			}
 		};
 
+		enum SetGameState {
+			Game_Start,
+			Game_Update,
+			Game_Over,
+			Game_Reset
+		};
+
+		struct GameStatePacket : public GamePacket {
+			int		state;
+			float	team1Score;
+			float 	team2Score;
+
+			GameStatePacket() {
+				type = Game_State;
+				size = sizeof(GameStatePacket) - sizeof(GamePacket);
+			}
+		};
+
 		struct FirePacket : public IDPacket {
 			float	pitch;
 			bool	spread;
@@ -26,6 +44,14 @@ namespace NCL {
 			}
 		};
 
+		struct DeathPacket : public IDPacket {
+			float x, y, z;
+
+			DeathPacket() {
+				type = Death_State;
+				size = sizeof(DeathPacket) - sizeof(GamePacket);
+			}
+		};
 
 		struct PowerUpPacket : public IDPacket {
 			int worldID;
@@ -44,6 +70,7 @@ namespace NCL {
 			bool	firing;
 			bool	spread;
 			int		bulletCounter;
+			bool	hasDied;
 
 			ClientPacket() {
 				type = Received_State;
