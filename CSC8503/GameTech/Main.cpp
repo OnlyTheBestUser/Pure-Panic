@@ -24,6 +24,7 @@ size_t       sceLibcHeapSize = 256 * 1024 * 1024;	/* Set up heap area upper limi
 #include <iostream>
 
 #include "NetworkedGame.h"
+#include "TrainingGame.h"
 #include "LoadingScreen.h"
 
 using namespace NCL;
@@ -54,10 +55,10 @@ int main() {
 	int totalFrames = 0;
 
 	LoadingScreen* l = new LoadingScreen();
-	LoadingScreen::SetInstancesToLoad(2);
-
 	MainMenu menu;
+
 	w->GetTimer()->GetTimeDeltaSeconds(); 
+
 	float smallestFrameRate = 144.0f;
 	while (w->UpdateWindow()) {
 
@@ -84,7 +85,6 @@ int main() {
 		if (!menu.UpdateGame(dt)) {
 			return 0;
 		}
-
 	}
 	Window::DestroyGameWindow();
 }

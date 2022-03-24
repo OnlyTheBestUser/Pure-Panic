@@ -13,6 +13,7 @@
 #include "../../Common/Assets.h"
 
 #include "../CSC8503Common/InputList.h"
+#include "../CSC8503Common/SimpleAI.h"
 #include "LoadingScreen.h"
 
 using namespace NCL;
@@ -28,10 +29,11 @@ TutorialGame::TutorialGame()	{
 	physics			= new PhysicsSystem(*world);
 	LoadingScreen::AddProgress(25.0f);
 	LoadingScreen::UpdateGame(0.0f);
-	levelLoader		= new LevelLoader(physics, renderer);
+	levelLoader		= new LevelLoader(physics, renderer, this);
 	LoadingScreen::AddProgress(50.0f);
 	LoadingScreen::UpdateGame(0.0f);
 	gameManager		= new GameManager(this);
+	LoadingScreen::SetCompletionState(true);
 	
 #ifndef _ORBIS
 	InitSounds();
@@ -100,6 +102,9 @@ TutorialGame::TutorialGame()	{
 	inputHandler->BindButton(START_TIMER, startTimer);
 
 #pragma endregion
+
+	InitCamera();
+	InitWorld();
 }
 
 void TutorialGame::InitialiseAssets() {
@@ -186,7 +191,9 @@ void TutorialGame::UpdateGame(float dt) {
 	Debug::FlushRenderables(dt);
 
 	renderer->scores = gameManager->CalcCurrentScoreRatio();
-	renderer->drawGUI = (!LoadingScreen::GetCompletionState() && state == GameState::PLAY);
+
+	renderer->drawGUI = (LoadingScreen::GetCompletionState() && state == GameState::PLAY);
+
 
 	renderer->Render();
 }
@@ -318,8 +325,8 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	levelLoader->ReadInLevelFile(NCL::Assets::MAPDIR + "map1.txt");
-	Player* player = levelLoader->SpawnPlayer(Vector3(50, 5, 50));
+	levelLoader->ReadInLevelFile(NCL::Assets::MAPDIR + "training_map.txt");
+	Player* player = levelLoader->SpawnPlayer(Vector3(-50, 5, -50));
 	
 	AxisCommand* m = new MoveCommand(player);
 	inputHandler->BindAxis(0, m);

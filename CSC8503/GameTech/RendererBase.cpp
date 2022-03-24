@@ -17,13 +17,9 @@
 using namespace NCL;
 using namespace Rendering;
 
-RendererAPI* RendererBase::rendererAPI = nullptr;
-
 RendererBase::RendererBase() {
+	rendererAPI = RendererAPI::GetInstance();
 #ifdef _WIN64
-	if (rendererAPI == nullptr) {
-		rendererAPI = new OGLRendererAPI(*Window::GetWindow());
-	}
 
 	TextureLoader::RegisterAPILoadFunction(OGLTexture::RGBATextureFromFilename);
 
@@ -47,8 +43,6 @@ RendererBase::RendererBase() {
 	debugTextMesh = new OGLMesh();
 #endif
 #ifdef _ORBIS
-	if (rendererAPI == nullptr)
-		rendererAPI = new PS4::PS4RendererAPI(*Window::GetWindow());
 
 	TextureLoader::RegisterAPILoadFunction(PS4::PS4Texture::LoadTextureFromFile);
 

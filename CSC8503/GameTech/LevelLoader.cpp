@@ -19,13 +19,14 @@
 	#include "../../Plugins/OpenGLRendering/OGLShader.h"
 	#include "../../Plugins/OpenGLRendering/OGLTexture.h"
 #endif
+#include "../CSC8503Common/SimpleAI.h"
 
 using namespace NCL;
 using namespace CSC8503;
 
 LevelLoader* LevelLoader::singleton = nullptr;
 
-LevelLoader::LevelLoader(PhysicsSystem* physics, Renderer* renderer) : physics(physics), renderer(renderer) {
+LevelLoader::LevelLoader(PhysicsSystem* physics, Renderer* renderer, TutorialGame* game) : physics(physics), renderer(renderer), game(game) {
 	singleton = this;
 
 	auto loadFunc = [](const string& name, MeshGeometry** into) {
@@ -173,6 +174,9 @@ void LevelLoader::ReadInLevelFile(std::string filename) {
 				}
 				else if (lineContents[0] == "SPAWNPOINT") {
 					singleton->AddSpawnPointToWorld(Vec3FromStr(lineContents[1]));
+				} 
+				else if (lineContents[0] == "AI_ENEMY") {
+					singleton->SpawnAIEnemy(Vec3FromStr(lineContents[1]));
 				}
 			}
 		}
@@ -213,6 +217,14 @@ Player* LevelLoader::SpawnPlayer(const Vector3& position) {
 
 GameObject* LevelLoader::SpawnDummyPlayer(const Vector3& position) {
 	GameObject* character = new GameObject("Dummy");
+	return singleton->AddPlayerObjectToWorld(position, character);
+}
+
+GameObject* LevelLoader::SpawnAIEnemy(const Vector3& position, GameObject* target)
+{
+	SimpleAI* character = new SimpleAI();
+	character->SetTarget(target);
+
 	return singleton->AddPlayerObjectToWorld(position, character);
 }
 
@@ -574,7 +586,7 @@ PowerUp*    LevelLoader::AddPowerUpToWorld(const Vector3& position, const PowerU
 	if (powerup) powerup->GetRenderObject()->SetColour(colour);
 	
 	GameWorld::AddGameObject(powerup);
-	NetworkedGame::AddPowerUp(powerup);
+	game->AddPowerUp(powerup);
 	return powerup;
 }
 
@@ -651,8 +663,7 @@ Projectile* LevelLoader::AddProjectileToWorld(GameObject* owner, const bool& Nee
 }
 
 Vector3     LevelLoader::AddSpawnPointToWorld(const Vector3& position) {
-	NetworkedGame::AddSpawnPoint(position);
-
+	game->AddSpawnPoint(position);
 	return position;
 }
 
