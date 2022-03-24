@@ -107,6 +107,8 @@ void PhysicsSystem::Update(float dt) {
 
 	UpdateObjectAABBs();
 
+	Clear();
+
 	while(dTOffset >= realDT) {
 		std::vector<GameObject*>::const_iterator first;
 		std::vector<GameObject*>::const_iterator last;
@@ -122,10 +124,13 @@ void PhysicsSystem::Update(float dt) {
 		BroadPhase();
 		NarrowPhase();
 
+		Debug::DebugPrint("Broadphase Collisions:  " + std::to_string(broadphaseCollisions.size()), Vector2(5, 25), 20, Vector4(1, .5, .5, 1));
+		Debug::DebugPrint("Narrowphase Collisions: " + std::to_string(allCollisions.size()), Vector2(5, 30), 20, Vector4(1, .5, .5, 1));
+
 		// TODO
 		//This is our simple iterative solver - 
 		//we just run things multiple times, slowly moving things forward
-		//and then rechecking that the constraints have been met		
+		//and then rechecking that the constraints have been met
 		float constraintDt = realDT /  (float)constraintIterationCount;
 		for (int i = 0; i < constraintIterationCount; ++i) {
 			UpdateConstraints(constraintDt);	

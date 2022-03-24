@@ -590,20 +590,24 @@ PowerUp*    LevelLoader::AddPowerUpToWorld(const Vector3& position, const PowerU
 	return powerup;
 }
 
-Projectile* LevelLoader::SpawnProjectile(Player* owner, const bool& NeedBulletSpread, const float& initialSpeed, const float& meshSize) {
-	return SpawnProjectile((GameObject*)owner, NeedBulletSpread, owner->BulletCounter, owner->GetCam()->GetPitch(), owner->GetPlayerID(), initialSpeed, meshSize);
+Projectile* LevelLoader::SpawnProjectile(Player* owner, bool NeedBulletSpread, float initialSpeed, float meshSize) {
+	return singleton->AddProjectileToWorld((GameObject*)owner, NeedBulletSpread, owner->BulletCounter, owner->GetCam()->GetPitch(), owner->GetPlayerID(), initialSpeed, meshSize);
 }
 
-Projectile* LevelLoader::SpawnProjectile(GameObject* owner, const bool& NeedBulletSpread, const int bulletIndex, float pitch, int playerID, const float& initialSpeed, const float& meshSize)
-{
-  #ifndef _ORBIS
+Projectile* LevelLoader::SpawnProjectile(GameObject* owner, bool needBulletSpread, int bulletIndex, bool deadSpray, float pitch, int playerID, float initialSpeed, float meshSize) {
+#ifndef _ORBIS
 	AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + "gun_fire.ogg", owner->GetTransform().GetPosition(), 0.3f);
 #endif // !_ORBIS
-  return singleton->AddProjectileToWorld(owner, NeedBulletSpread, bulletIndex, pitch, playerID, initialSpeed, meshSize);
+	Projectile* proj = singleton->AddProjectileToWorld((GameObject*) owner, needBulletSpread, bulletIndex, pitch, playerID, initialSpeed, meshSize);
+
+	if (deadSpray) proj->SetAsDeathProjectile();
+
+	return proj;
 }
 
-Projectile* LevelLoader::AddProjectileToWorld(GameObject* owner, const bool& NeedBulletSpread, const int bulletIndex, float pitch, int playerID, const float& initialSpeed, const float& meshSize) {
-  float inverseMass = 1.0f;
+Projectile* LevelLoader::AddProjectileToWorld(GameObject* owner, const bool& NeedBulletSpread, const int bulletIndex, float pitch, int playerID, const float initialSpeed, const float meshSize)
+{
+	float inverseMass = 1.0f;
 
 	const int SPREAD_ANGLE_CONST = 400;
 

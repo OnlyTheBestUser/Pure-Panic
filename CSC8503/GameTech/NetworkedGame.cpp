@@ -34,13 +34,17 @@ NetworkedGame::NetworkedGame() {
 	packetsToSnapshot = 0;
 
 	singleton = this;
-
+	
+	emptyPlayer = new GameObject();
+	emptyPlayer->SetPhysicsObject(new PhysicsObject(&emptyPlayer->GetTransform(), new CollisionVolume()));
+	
 	//InitialiseAssets();
 }
 
 NetworkedGame::~NetworkedGame() {
 	delete thisServer;
 	delete thisClient;
+	delete emptyPlayer;
 }
 
 void NetworkedGame::StartAsServer() {
@@ -49,9 +53,9 @@ void NetworkedGame::StartAsServer() {
 
 	thisServer->RegisterPacketHandler(Received_State, this);
 	thisServer->RegisterPacketHandler(PowerUp_State, this);
+	thisServer->RegisterPacketHandler(Death_State, this);
 
 	SpawnPlayer();
-	StartLevel();
 
 }
 
@@ -67,7 +71,8 @@ void NetworkedGame::StartAsClient(char a, char b, char c, char d) {
 	thisClient->RegisterPacketHandler(Player_Disconnected, this);
 	thisClient->RegisterPacketHandler(Assign_ID, this);
 	thisClient->RegisterPacketHandler(PowerUp_State, this);
-
+	thisClient->RegisterPacketHandler(Death_State, this);
+	thisClient->RegisterPacketHandler(Game_State, this);
 }
 
 void NetworkedGame::UpdateGame(float dt) {
@@ -91,6 +96,12 @@ void NetworkedGame::UpdateGame(float dt) {
 		StartAsClient(127, 0, 0, 1);
 		std::cout << "Client start" << std::endl;
 	}
+	if (!thisClient && thisServer && Window::GetKeyboard()->KeyPressed(KeyboardKeys::F11)) {
+		StartLevel();
+	}
+	if (thisServer && Window::GetKeyboard()->KeyPressed(KeyboardKeys::F8)) {
+		SendResetGamePacket();
+	}
 #endif
 
 	for (auto x : powerups) {
@@ -98,7 +109,7 @@ void NetworkedGame::UpdateGame(float dt) {
 			PowerUpPacket powerUpPacket;
 			powerUpPacket.worldID = x->GetWorldID();
 			powerUpPacket.clientID = playerID;
-			if(thisClient)
+			if (thisClient)
 				thisClient->SendPacket(powerUpPacket);
 #ifndef ORBISNET
 			if (thisServer)
@@ -111,7 +122,6 @@ void NetworkedGame::UpdateGame(float dt) {
 }
 
 void NetworkedGame::UpdateAsServer(float dt) {
-
 	thisServer->UpdateServer();
 
 	if (localPlayer->IsFiring()) {
@@ -126,6 +136,13 @@ void NetworkedGame::UpdateAsServer(float dt) {
 #endif
 
 		delete newPacket;
+	}
+
+	if (gameManager->IsTimerFinished()) {
+		SendEndGamePacket();
+	}
+	else {
+		SendUpdateGamePacket();
 	}
 
 	BroadcastSnapshot();
@@ -153,15 +170,9 @@ void NetworkedGame::UpdateAsClient(float dt) {
 
 	newPacket.firing = localPlayer->IsFiring();
 	newPacket.spread = (localPlayer->GetCurrentPowerup() == PowerUpType::MultiBullet);
-
 	newPacket.bulletCounter = localPlayer->BulletCounter;
 
-	if (newPacket.firing) {
-		std::cout << "Client: " << newPacket.bulletCounter << std::endl;
-	}
-
 	thisClient->SendPacket(newPacket);
-
 }
 
 void NetworkedGame::BroadcastSnapshot() {
@@ -203,15 +214,19 @@ void NetworkedGame::SpawnPlayer() {
 }
 
 void NetworkedGame::StartLevel() {
-	// Reset the level
-	// Start timer
+	ResetLevel();
+	gameManager->StartRound();
+	SendStartGamePacket();
+}
 
-	// TODO Start Game with Command for Game Manager
-	// When Game Manager is over, send win states.
+void NetworkedGame::ResetLevel() {
+	renderer->ClearPaint();
+	gameManager->GetTimer()->ResetTimer();
+	gameManager->SetScores(Vector2(0, 0));
+	gameManager->printResults = false;
 }
 
 void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
-
 	//SERVER version of the game will receive these from the clients
 	if (type == Received_State) {
 		ClientPacket* realPacket = (ClientPacket*)payload;
@@ -231,6 +246,9 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
 		case(Player_Disconnected):
 			HandlePlayerDisconnect((PlayerDisconnectPacket*)payload);
 			return;
+		case(Game_State):
+			HandleGameState((GameStatePacket*)payload);
+			return;
 	}
 
 	if (!CheckExists((IDPacket*)payload))
@@ -242,6 +260,9 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
 			return;
 		case(Fire_State):
 			HandleFireState((FirePacket*)payload);
+			return;
+		case(Death_State):
+			HandleDeathState((DeathPacket*)payload);
 			return;
 		case(PowerUp_State):
 			HandlePowerUp((PowerUpPacket*)payload);
@@ -271,9 +292,11 @@ void NetworkedGame::HandleClientPacket(ClientPacket* packet)
 		if (index->second < packet->lastID) {
 			index->second = packet->lastID;
 			auto obj = serverPlayers.find(packet->clientID);
+
 			Vector3 pos(packet->pos[0], packet->pos[1], packet->pos[2]);
 			obj->second->GetTransform().SetPosition(pos);
 			obj->second->GetTransform().SetOrientation(Quaternion::EulerAnglesToQuaternion(0, packet->yaw, 0));
+
 			if (packet->firing) {
 				std::cout << "Handle Client Packet: " << packet->bulletCounter << std::endl;
 				ServerFire(obj->second, packet->pitch, packet->bulletCounter, packet->spread, packet->clientID);
@@ -306,16 +329,38 @@ void NetworkedGame::AddNewPlayerToServer(int clientID, int lastID)
 void NetworkedGame::ServerFire(GameObject* owner, float pitch, int bulletCounter, bool spread, int clientID)
 {
 	Fire(owner, spread, bulletCounter, pitch, clientID);
+
 	std::cout << "ServerFire: " << bulletCounter << std::endl;
+
 	FirePacket newPacket;
 	newPacket.clientID = clientID;
 	newPacket.pitch = pitch;
 	newPacket.bulletCounter = bulletCounter;
 	newPacket.spread = spread;
+	
 #ifndef ORBISNET
 	thisServer->SendGlobalPacket(newPacket); 
 #endif
-  
+}
+
+void NetworkedGame::SendDeathPacket(int clientID, Vector3 pos)
+{
+	DeathPacket packet;
+
+	packet.clientID = clientID;
+	packet.x = pos.x;
+	packet.y = pos.y;
+	packet.z = pos.z;
+
+	if (singleton) {
+		if (singleton->thisServer) {
+			singleton->thisServer->SendGlobalPacket(packet);
+		}
+		else {
+			singleton->thisClient->SendPacket(packet);
+		}
+	}
+
 }
 
 void NetworkedGame::Fire(GameObject* owner, bool spread, int bulletCounter, float pitch, int clientID)
@@ -326,7 +371,7 @@ void NetworkedGame::Fire(GameObject* owner, bool spread, int bulletCounter, floa
 	}
 
 	for (int i = 0; i < num; i++) {
-		LevelLoader::SpawnProjectile(owner, spread, bulletCounter, pitch, clientID);
+		LevelLoader::SpawnProjectile(owner, spread, bulletCounter, false, pitch, clientID);
 	}
 }
 
@@ -335,9 +380,27 @@ void NetworkedGame::HandleFullState(FullPacket* packet)
 	if (packet->clientID == playerID)
 		return;
 
-	if (packet->clientID < (int)networkObjects.size()) {
+	if (packet->clientID < (int) networkObjects.size()) {
 		if (networkObjects[packet->clientID])
 			networkObjects[packet->clientID]->ReadPacket(*packet);
+	}
+}
+
+void NetworkedGame::HandleGameState(GameStatePacket* packet) {
+	switch (packet->state) {
+	case Game_Reset:
+		ResetLevel();
+		return;
+	case Game_Start:
+		ResetLevel();
+		gameManager->StartRound();
+		return;
+	case Game_Update:
+		gameManager->SetScores(Vector2(packet->team1Score, packet->team2Score));
+		return;
+	case Game_Over:
+		gameManager->printResults = true;
+		return;
 	}
 }
 
@@ -350,7 +413,6 @@ bool NetworkedGame::CheckExists(IDPacket* packet)
 	}
 	if (!networkObjects[packet->clientID]) {
 		GameObject* p = LevelLoader::SpawnDummyPlayer(Vector3(packet->clientID * 5, 10, 0));
-		p->GetPhysicsObject()->SetDynamic(true);
 		p->GetPhysicsObject()->SetGravity(false);
 		p->SetNetworkObject(new NetworkObject(*p, packet->clientID));
 		p->GetRenderObject()->SetColour(GameManager::GetColourForID(packet->clientID));
@@ -366,6 +428,20 @@ void NetworkedGame::HandleFireState(FirePacket* packet)
 	auto obj = networkObjects[packet->clientID];
 	if (obj) {
 		Fire(&obj->object, packet->spread, packet->bulletCounter, packet->pitch, packet->clientID);
+	}
+}
+
+void NetworkedGame::HandleDeathState(DeathPacket* packet)
+{
+	if (thisServer) {
+		thisServer->SendGlobalPacket(*packet);
+	}
+
+	emptyPlayer->GetTransform().SetPosition(Vector3(packet->x, packet->y, packet->z));
+
+	for (int i = 0; i < 10; ++i)
+	{
+		LevelLoader::SpawnProjectile(emptyPlayer, true, i, false, 90, packet->clientID + 1, 10);
 	}
 }
 
@@ -432,7 +508,52 @@ void NetworkedGame::RemovePlayerFromServer(int clientID) {
 	}
 }
 
-void NCL::CSC8503::NetworkedGame::UpdatePauseState(float dt)
+void NetworkedGame::SendResetGamePacket() {
+	GameStatePacket newPacket;
+
+	newPacket.state = Game_Reset;
+	newPacket.team1Score = 0;
+	newPacket.team2Score = 0;
+
+	thisServer->SendGlobalPacket(newPacket);
+	ResetLevel();
+}
+
+void NetworkedGame::SendStartGamePacket() {
+	GameStatePacket newPacket;
+
+	newPacket.state = Game_Start;
+	newPacket.team1Score = 0;
+	newPacket.team2Score = 0;
+
+	thisServer->SendGlobalPacket(newPacket);
+}
+
+void NetworkedGame::SendUpdateGamePacket() {
+	GameStatePacket newPacket;
+
+	newPacket.state = Game_Update;
+
+	Vector2 scores = gameManager->GetScores();
+	newPacket.team1Score = scores.x;
+	newPacket.team2Score = scores.y;
+
+	thisServer->SendGlobalPacket(newPacket);
+}
+
+void NetworkedGame::SendEndGamePacket() {
+	GameStatePacket newPacket;
+
+	newPacket.state = Game_Over;
+
+	Vector2 scores = gameManager->GetScores();
+	newPacket.team1Score = scores.x;
+	newPacket.team2Score = scores.y;
+
+	thisServer->SendGlobalPacket(newPacket);
+	gameManager->printResults = true;
+}
+void NetworkedGame::UpdatePauseState(float dt)
 {
 	UpdatePauseScreen(dt);
 	physics->Update(dt);
@@ -441,7 +562,7 @@ void NCL::CSC8503::NetworkedGame::UpdatePauseState(float dt)
 	UpdateScores(dt);
 }
 
-void NCL::CSC8503::NetworkedGame::UpdatePauseScreen(float dt)
+void NetworkedGame::UpdatePauseScreen(float dt)
 {
 	renderer->DrawString("PAUSED", Vector2(5, 80), Debug::MAGENTA, 30.0f);
 	renderer->DrawString("Press P to Unpause.", Vector2(5, 90), Debug::WHITE, 20.0f);

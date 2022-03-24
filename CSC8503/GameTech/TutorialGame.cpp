@@ -16,6 +16,11 @@
 #include "../CSC8503Common/SimpleAI.h"
 #include "LoadingScreen.h"
 
+#ifndef _ORBIS
+	#include "windows.h"
+	#include "psapi.h"
+#endif
+
 using namespace NCL;
 using namespace CSC8503;
 
@@ -144,7 +149,6 @@ TutorialGame::~TutorialGame() {
 
 void TutorialGame::UpdateGame(float dt) {
 	Debug::SetRenderer(renderer);
-
 	if (pausePressed) {
 		if (pause == false) {
 			pause = true;
@@ -210,7 +214,9 @@ void TutorialGame::UpdateGameWorld(float dt)
 	if (!inSelectionMode) {
 		world->GetMainCamera()->UpdateCamera(dt);
 	}
-
+	
+	UpdateDebugText(dt);
+	
 	if (debugDraw) {
 		GameObjectIterator first;
 		GameObjectIterator last;
@@ -228,6 +234,31 @@ void TutorialGame::UpdateGameWorld(float dt)
 	gameManager->Update(dt);
 
 	UpdateScores(dt);
+}
+
+void TutorialGame::UpdateDebugText(float dt) {
+	Debug::DebugPrint("FPS:" + std::to_string((int) (1.0f / dt)), Vector2(5, 10), 20, Vector4(1, 1, .5, 1));
+
+#ifndef _ORBIS
+	MEMORYSTATUSEX memInfo;
+	memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+	GlobalMemoryStatusEx(&memInfo);
+
+	PROCESS_MEMORY_COUNTERS_EX pmc;
+	GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
+
+	DWORDLONG totalVirtualMem = memInfo.ullTotalPageFile;
+	DWORDLONG virtualMemUsed = memInfo.ullTotalPageFile - memInfo.ullAvailPageFile;
+
+	DWORDLONG totalPhysMem = memInfo.ullTotalPhys;
+	DWORDLONG physMemUsed = memInfo.ullTotalPhys - memInfo.ullAvailPhys;
+
+	SIZE_T virtualMemUsedByMe = pmc.PrivateUsage;
+	SIZE_T physMemUsedByMe = pmc.WorkingSetSize;
+
+	Debug::DebugPrint("Virt Mem: " + std::to_string(virtualMemUsedByMe / 1000000) + "MB/" + std::to_string(totalVirtualMem / 1000000) + "MB", Vector2(5, 15), 20, Vector4(1, .5, 1, 1));
+	Debug::DebugPrint("Phys Mem: " + std::to_string(physMemUsedByMe / 1000000)    + "MB/" + std::to_string(totalPhysMem / 1000000)    + "MB", Vector2(5, 20), 20, Vector4(1, .5, 1, 1));
+#endif
 }
 
 void TutorialGame::UpdateScores(float dt) {
@@ -321,7 +352,9 @@ void TutorialGame::InitWorld() {
 	physics->Clear();
 
 	levelLoader->ReadInLevelFile(NCL::Assets::MAPDIR + "training_map.txt");
+	
 	Player* player = levelLoader->SpawnPlayer(Vector3(-50, 5, -50));
+	player->SetRenderObject(nullptr);
 	
 	AxisCommand* m = new MoveCommand(player);
 	inputHandler->BindAxis(0, m);

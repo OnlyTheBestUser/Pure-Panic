@@ -123,7 +123,7 @@ void SimpleAI::Shoot(float dt)
 	}
 
 	if ((target->GetTransform().GetPosition() - transform.GetPosition()).Length() < shoot_radius) {
-		LevelLoader::SpawnProjectile((GameObject*)this, false, 3, -5.0f, 1);
+		LevelLoader::SpawnProjectile((GameObject*)this, false, 3, false, -5.0f, 1);
 	}
 
 	shoot_time = max_shoot_time;
