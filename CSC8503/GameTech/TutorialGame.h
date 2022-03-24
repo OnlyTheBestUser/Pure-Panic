@@ -64,6 +64,7 @@ namespace NCL {
 
 			void InitialiseAssets();
 
+			void InitSounds();
 			void InitCamera();
 			void UpdateKeys();
 

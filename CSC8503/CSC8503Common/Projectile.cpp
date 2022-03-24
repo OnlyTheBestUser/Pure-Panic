@@ -53,6 +53,12 @@ void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vecto
 			}
 		}
 	}
+	else {
+#ifndef _ORBIS
+		int sound = (rand() % 3) + 1;
+		NCL::AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + "boy_whoa_0" + std::to_string(sound) + ".ogg");
+#endif // !_ORBIS
+	}
 	
 	GameWorld::RemoveGameObject(this, true);
 }
