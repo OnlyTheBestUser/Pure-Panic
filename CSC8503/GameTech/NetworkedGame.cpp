@@ -169,8 +169,6 @@ void NetworkedGame::UpdateAsClient(float dt) {
 	newPacket.spread = (localPlayer->GetCurrentPowerup() == PowerUpType::MultiBullet);
 	newPacket.bulletCounter = localPlayer->BulletCounter;
 
-	newPacket.hasDied = localPlayer->HasDied();
-
 	thisClient->SendPacket(newPacket);
 }
 

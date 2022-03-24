@@ -4,9 +4,6 @@
 #include "../../Common/Assets.h"
 #include "../CSC8503Common/GameManager.h"
 
-const Vector4 COLOUR_A = Vector4(0.011, 0.988, 0.941, 1); // Turquoise
-const Vector4 COLOUR_B = Vector4(1, 0.039, 0.941, 1); // Pink
-
 using namespace NCL::CSC8503;
 
 void Projectile::Update(float dt) {
@@ -27,35 +24,32 @@ void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vecto
 	NCL::AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + (soundToPlay == 0 ? "splat_neutral_01.ogg" : "splat_neutral_02.ogg"), this->GetTransform().GetPosition(), 1.0f, 0.0f, pitch);
 #endif
 	string name = otherObject->GetName();
+	
 	if (!(otherObject->GetName() == "Dummy" || otherObject->GetName() == "Player")) {
 		Ray ray(this->GetTransform().GetPosition() - this->GetPhysicsObject()->GetLinearVelocity().Normalised(), this->GetPhysicsObject()->GetLinearVelocity());
 		ray.SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
 
-	Ray ray(this->GetTransform().GetPosition() - this->GetPhysicsObject()->GetLinearVelocity().Normalised(), this->GetPhysicsObject()->GetLinearVelocity());
-	ray.SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
-
-	RayCollision closestCollision;
-	if (GameWorld::Raycast(ray, closestCollision, true)) {
-		RenderObject* test = ((GameObject*)closestCollision.node)->GetRenderObject();
+		RayCollision closestCollision;
+		if (GameWorld::Raycast(ray, closestCollision, true)) {
+			RenderObject* test = ((GameObject*)closestCollision.node)->GetRenderObject();
 		
-		if (test) {
-			if (test->GetPaintMask() != nullptr) {
+			if (test) {
+				if (test->GetPaintMask() != nullptr) {
 
-				Vector2 texUV_a, texUV_b, texUV_c;
-				Vector3 collisionPoint;
-				Vector3 barycentric;
-				CollisionDetection::GetBarycentricFromRay(ray, *test, texUV_a, texUV_b, texUV_c, barycentric, collisionPoint);
+					Vector2 texUV_a, texUV_b, texUV_c;
+					Vector3 collisionPoint;
+					Vector3 barycentric;
+					CollisionDetection::GetBarycentricFromRay(ray, *test, texUV_a, texUV_b, texUV_c, barycentric, collisionPoint);
 
-				if (IsDeathProjectile)
-					std::cout << "\n OwnerPlayerID: " << GetOwnerPlayerID() << std::endl;
+					Vector4 colour;
 
-				Vector4 colour;
-				if (GetOwnerPlayerID() % 2 == 0) {
-					colour = IsDeathProjectile ? COLOUR_B : COLOUR_A;
-				}
-				else {
-					colour = IsDeathProjectile ? COLOUR_A : COLOUR_B;
-				}
+					if (IsDeathProjectile) {
+						colour = GameManager::GetColourForID(ownerPlayerID);
+					}
+					else {
+						colour = GameManager::GetColourForID(ownerPlayerID + 1);
+					}
+
 					float randRad = ((GameObject*)closestCollision.node)->GetPaintRadius() + (((static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * 2.0f) - 1.0f) * ((GameObject*)closestCollision.node)->GetPaintRadius() * 0.25f;
 
 					// Get the uv from the ray
