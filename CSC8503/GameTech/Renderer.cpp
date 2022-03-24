@@ -48,7 +48,7 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 
 	uiCrosshairMesh = new OGLMesh();
 	uiCrosshairMesh->SetVertexPositions({ Vector3(-0.025f, 0.2f,-0.025f), Vector3(-0.025f,0.1f,-0.025f) , Vector3(0.025f,0.1f,-0.025f) , Vector3(0.025f,0.2f,-0.025f) });
-	uiCrosshairMesh->SetVertexTextureCoords({ Vector2(0,0), Vector2(0,1), Vector2(1,1) , Vector2(1,0) });
+	uiCrosshairMesh->SetVertexTextureCoords({ Vector2(0,1), Vector2(0,0), Vector2(1,0) , Vector2(1,1) });
 	uiCrosshairMesh->SetVertexIndices({ 0,1,2,2,3,0 });
 	uiCrosshairMesh->UploadToGPU();
 	//ui = new RenderObject(nullptr, uiMesh, nullptr, uiShader);
@@ -451,7 +451,7 @@ void Renderer::DrawGUI() {
 	uiBarShader->UpdateUniformVector2("screenSize", Vector2(rendererAPI->GetCurrentWidth(), rendererAPI->GetCurrentHeight()));
 	rendererAPI->DrawMesh(uiBarMesh);
 
-	rendererAPI->SetBlend(true, RendererAPI::BlendType::ONE, RendererAPI::BlendType::ONE_MINUS_ALPHA);
+	rendererAPI->SetBlend(true, RendererAPI::BlendType::ALPHA, RendererAPI::BlendType::ONE_MINUS_ALPHA);
 
 	crosshairTex->Bind(0);
 	uiCrosshairShader->BindShader();
