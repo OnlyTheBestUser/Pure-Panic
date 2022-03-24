@@ -20,30 +20,23 @@ PhysicsSystem::PhysicsSystem(GameWorld& g) : gameWorld(g)	{
 	SetGravity(Vector3(0.0f, -19.6f, 0.0f));
 
 	// Sets the valid different collision layers here
-	/* Col Layer 1 = 1
-	Col Layer 2 = 2
-	Col Layer 3 = 4
-	Col Layer 4 = 8
-	Col Layer 5 = 16
-	Col Layer 6 = 32 
-	...so Col1 | Col3  = 5 */
-	validLayers.emplace_back(Vector2(1, 1));
-	validLayers.emplace_back(Vector2(1, 3));
-	validLayers.emplace_back(Vector2(3, 1));
-	validLayers.emplace_back(Vector2(1, 5));
-	validLayers.emplace_back(Vector2(5, 1));
-	validLayers.emplace_back(Vector2(3, 5));
-	validLayers.emplace_back(Vector2(5, 3));
+	validLayers.emplace_back(std::make_pair(CollisionLayer::LAYER_ONE, CollisionLayer::LAYER_ONE));
+	validLayers.emplace_back(std::make_pair(CollisionLayer::LAYER_ONE, CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO));
+	validLayers.emplace_back(std::make_pair(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO, CollisionLayer::LAYER_ONE));
+	validLayers.emplace_back(std::make_pair(CollisionLayer::LAYER_ONE, CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE));
+	validLayers.emplace_back(std::make_pair(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE, CollisionLayer::LAYER_ONE));
+	validLayers.emplace_back(std::make_pair(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO, CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE));
+	validLayers.emplace_back(std::make_pair(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE, CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO));
 
 	//Powerups
-	validLayers.emplace_back(Vector2(5, 8));
-	validLayers.emplace_back(Vector2(8, 5));
+	validLayers.emplace_back(std::make_pair(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE, CollisionLayer::LAYER_FOUR));
+	validLayers.emplace_back(std::make_pair(CollisionLayer::LAYER_FOUR, CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE));
 
 	//Projectiles
-	validLayers.emplace_back(Vector2(16, 1));
-	validLayers.emplace_back(Vector2(1, 16));
-	validLayers.emplace_back(Vector2(16, 5));
-	validLayers.emplace_back(Vector2(5, 16));
+	validLayers.emplace_back(std::make_pair(CollisionLayer::LAYER_FIVE, CollisionLayer::LAYER_ONE));
+	validLayers.emplace_back(std::make_pair(CollisionLayer::LAYER_ONE, CollisionLayer::LAYER_FIVE));
+	validLayers.emplace_back(std::make_pair(CollisionLayer::LAYER_FIVE, CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE));
+	validLayers.emplace_back(std::make_pair(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE, CollisionLayer::LAYER_FIVE));
 
 }
 
@@ -601,7 +594,7 @@ bool PhysicsSystem::ValidCollisionLayers(int aLayers, int bLayers)
 {
 	for (auto v : validLayers)
 	{
-		if (aLayers == v.x && bLayers == v.y)
+		if (aLayers == v.first && bLayers == v.second)
 			return true;
 	}
 	return false;
