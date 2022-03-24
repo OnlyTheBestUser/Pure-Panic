@@ -43,7 +43,7 @@ void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vecto
 
 					Vector4 colour;
 
-					if (IsDeathProjectile) {
+					if (!IsDeathProjectile) {
 						colour = GameManager::GetColourForID(ownerPlayerID);
 					}
 					else {
