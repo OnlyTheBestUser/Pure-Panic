@@ -306,7 +306,7 @@ Matrix4::Rotation(pitch, Vector3(1, 0, 0));
 return iview;
 }
 
-bool CollisionDetection::GetBarycentricFromRay(const Ray ray, const RenderObject obj, Vector2& va, Vector2& vb, Vector2& vc, Vector3& barycentric, Vector3& collisionPoint)
+bool CollisionDetection::GetBarycentricFromRay(const Ray ray, const RenderObject obj, Vector2& va, Vector2& vb, Vector2& vc, Vector3& barycentric, Vector3& collisionPoint, Vector3& collisionNorm)
 {
 
 	Triangle	closest;
@@ -351,6 +351,7 @@ bool CollisionDetection::GetBarycentricFromRay(const Ray ray, const RenderObject
 	va = closest.texUV_a;
 	vb = closest.texUV_b;
 	vc = closest.texUV_c;
+	collisionNorm = closestnorm;
 	collisionPoint = closestcollision;
 	barycentric = CalcTriBaryCoord(closest, closestcollision);
 

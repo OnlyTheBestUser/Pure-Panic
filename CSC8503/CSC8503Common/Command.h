@@ -78,7 +78,7 @@ namespace NCL {
 			virtual ~PaintFireCommand() {};
 
 			void execute() {
-				game->PaintObject();
+			//	game->PaintObject();
 			}
 
 		protected:
