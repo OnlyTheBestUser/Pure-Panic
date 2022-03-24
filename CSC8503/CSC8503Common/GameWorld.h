@@ -63,9 +63,10 @@ namespace NCL {
 
 			void UpdateScore(GameObject* paintableScore, Vector2 scoreChange);
 
-			Vector2 GetScore(GameObject* paintableScore);
+			Vector2 GetScoreForObject(GameObject* paintableScore);
 
-			bool GetScoreForObject(GameObject* object, Vector2& outScore);
+			Vector2 GetScoreRatio();
+
 
 			void GetConstraintIterators(
 				std::vector<Constraint*>::const_iterator& first,

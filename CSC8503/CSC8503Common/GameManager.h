@@ -16,7 +16,7 @@ namespace NCL {
 		};
 
 		struct TeamInfo {
-			float score = 0.0f;
+			float score = 0.1f;
 			std::vector<Player*> TeamPlayers;
 		};
 
@@ -43,7 +43,13 @@ namespace NCL {
 				Teams[t].TeamPlayers.push_back(player);
 			}
 
+			static Vector4 GetColourForID(int playerID);
+
+
 			void StartRound();
+
+			static Vector4 team1Colour;
+			static Vector4 team2Colour;
 
 		protected:
 

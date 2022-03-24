@@ -53,6 +53,10 @@ namespace NCL {
 				return quit;
 			}
 
+			Player* GetPlayer() {
+				return player1;
+			}
+
 			void PaintObject();
 
 			void AddPowerUp(PowerUp* powerup) { powerups.emplace_back(powerup); }
@@ -63,6 +67,7 @@ namespace NCL {
 
 			void InitialiseAssets();
 
+			void InitSounds();
 			void InitCamera();
 			void UpdateKeys();
 
