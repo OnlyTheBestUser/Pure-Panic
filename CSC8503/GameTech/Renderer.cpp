@@ -322,50 +322,57 @@ void NCL::Rendering::Renderer::ClearPaint()
 
 NCL::Maths::Vector2 Renderer::CountPaintMask(TextureBase* paintMask, NCL::Maths::Vector2 prevScores, NCL::Maths::Vector4 team1Colour, NCL::Maths::Vector4 team2Colour) {
 
-#ifdef _ORBIS
-	return prevScores;
-#elif _WIN64
-
 	paintMask->Bind();
 
 	int pixelDataSize = paintMask->GetHeight() * paintMask->GetWidth() * 4;
+#ifndef _ORBIS
 	GLubyte* data = new GLubyte[pixelDataSize];
 	glGetTextureImage(((OGLTexture*)paintMask)->GetObjectID(), 0, GL_RGBA, GL_UNSIGNED_BYTE, pixelDataSize * 4, data);
+#else
+	Gnm::Texture tex = ((PS4::PS4Texture*)paintMask)->GetAPITexture();
+	Gnm::DataFormat texFormat = tex.getDataFormat();
+
+#endif
 
 	int team1Score = 0;
 	int team2Score = 0;
+#ifndef _ORBIS
 
 	//Read data from paint mask for scoring
-	for (size_t x= 0;x < paintMask->GetWidth(); x++){
+	for (size_t x = 0; x < paintMask->GetWidth(); x++) {
 		for (size_t y = 0; y < paintMask->GetHeight(); y++) {
-			float r, g, b, a;
 
 			size_t elmes_per_line = paintMask->GetWidth() * 4;
-
+	
 			size_t row = y * elmes_per_line;
 			size_t col = x * 4;
 
-			r = static_cast<float>(data[row + col] / 255.0f);
-			g = static_cast<float>(data[row + col+1] / 255.0f);
-			b = static_cast<float>(data[row + col+2] / 255.0f);
-			a = static_cast<float>(data[row + col+3] / 255.0f);
-			
+			float a = static_cast<float>(data[row + col + 3] / 255.0f);
 			if (a != 1.0f) {
 				continue;
 			}
+			else {
+				bool a = true;
+			}
+	
+			float r = static_cast<float>(data[row + col] / 255.0f);
+			float g = static_cast<float>(data[row + col+1] / 255.0f);
+			float b = static_cast<float>(data[row + col+2] / 255.0f);
 
 			//Check if the colour is closer to team a or team b
 			Vector3 curCol = Vector3(r, g, b);
 			Vector3 team1Pixel = curCol - Vector3(team1Colour.x, team1Colour.y, team1Colour.z);
 			Vector3 team2Pixel = curCol - Vector3(team2Colour.x, team2Colour.y, team2Colour.z);
-
+	
 			(team1Pixel.LengthSquared() < team2Pixel.LengthSquared()) ? (team1Score++) : (team2Score++);
 		}
 		
 	}
-	delete[] data;
-	return Vector2(team1Score - prevScores.x , team2Score - prevScores.y);
 #endif
+#ifdef _WIN64
+	delete[] data;
+#endif
+	return Vector2(team1Score - prevScores.x , team2Score - prevScores.y);
 }
 
 void Renderer::Paint(const RenderObject* paintable, NCL::Maths::Vector3& barycentric, NCL::Maths::Vector3& colpos, NCL::Maths::Vector2& texUV_a, NCL::Maths::Vector2& texUV_b, NCL::Maths::Vector2& texUV_c, float radius, float hardness, float strength, NCL::Maths::Vector4 colour)
