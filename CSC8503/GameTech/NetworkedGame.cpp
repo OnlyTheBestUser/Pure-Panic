@@ -23,6 +23,8 @@ struct MessagePacket : public GamePacket {
 };
 
 NetworkedGame::NetworkedGame() {
+	levelLoader = new LevelLoader(physics, renderer, this);
+
 	thisServer = nullptr;
 	thisClient = nullptr;
 
@@ -33,7 +35,7 @@ NetworkedGame::NetworkedGame() {
 
 	singleton = this;
 
-	InitialiseAssets();
+	//InitialiseAssets();
 }
 
 NetworkedGame::~NetworkedGame() {
@@ -122,7 +124,7 @@ void NetworkedGame::UpdateAsServer(float dt) {
 #ifndef ORBISNET
 		thisServer->SendGlobalPacket(*newPacket);
 #endif
-    
+
 		delete newPacket;
 	}
 

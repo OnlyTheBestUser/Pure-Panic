@@ -33,8 +33,8 @@ namespace NCL {
 
 			static NetworkedGame* GetInstance() { return singleton; }
 
-			static void AddPowerUp(PowerUp* powerup) { singleton->powerups.emplace_back(powerup); }
-			static void AddSpawnPoint(Vector3 pos) { singleton->spawnPoints.emplace_back(pos); }
+			/*static void AddPowerUp(PowerUp* powerup) { singleton->powerups.emplace_back(powerup); }
+			static void AddSpawnPoint(Vector3 pos) { singleton->spawnPoints.emplace_back(pos); }*/
 
 		protected:
 			void UpdateAsServer(float dt);
@@ -53,8 +53,6 @@ namespace NCL {
 			int playerID;
 
 			std::vector<NetworkObject*> networkObjects;
-			std::vector<PowerUp*>		powerups;
-			std::vector<Vector3>		spawnPoints;
 
 			// client ID, last ID
 			std::map<int, int> clientHistory;

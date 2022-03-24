@@ -52,6 +52,9 @@ namespace NCL {
 
 			void PaintObject();
 
+			void AddPowerUp(PowerUp* powerup) { powerups.emplace_back(powerup); }
+			void AddSpawnPoint(Vector3 pos) { spawnPoints.emplace_back(pos); }
+
 		protected:
 			InputHandler* inputHandler;
 
@@ -96,6 +99,9 @@ namespace NCL {
 			bool pause = false;
 			bool pausePressed = false;
 			bool quit = false;
+
+			std::vector<PowerUp*>		powerups;
+			std::vector<Vector3>		spawnPoints;
 
 			float		forceMagnitude;
 
