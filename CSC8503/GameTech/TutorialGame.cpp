@@ -137,8 +137,7 @@ void TutorialGame::UpdateGame(float dt) {
 			break;
 		}
 		case GameState::PAUSE: {
-			UpdatePauseScreen(dt); 
-			UpdateGameWorld(dt);
+			UpdatePauseState(dt);
 			break;
 		}
 		case GameState::WIN: {
@@ -162,6 +161,10 @@ void TutorialGame::UpdateGame(float dt) {
 
 	Debug::FlushRenderables(dt);
 	renderer->Render();
+}
+
+void TutorialGame::UpdatePauseState(float dt) {
+	UpdatePauseScreen(dt);
 }
 
 void TutorialGame::UpdateGameWorld(float dt)
@@ -323,9 +326,6 @@ void TutorialGame::InitWorld() {
 
 	physics->BuildStaticList();
 }
-//PowerUp* TutorialGame::AddPowerUpToWorld(const Vector3& position) {
-//
-//}
 
 /*
 

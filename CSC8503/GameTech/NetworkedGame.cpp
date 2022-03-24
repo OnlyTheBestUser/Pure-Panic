@@ -424,3 +424,19 @@ void NetworkedGame::RemovePlayerFromServer(int clientID) {
 		serverPlayers.erase(sInd);
 	}
 }
+
+void NCL::CSC8503::NetworkedGame::UpdatePauseState(float dt)
+{
+	UpdatePauseScreen(dt);
+	physics->Update(dt);
+	world->UpdateWorld(dt);
+	gameManager->Update(dt);
+	UpdateScores(dt);
+}
+
+void NCL::CSC8503::NetworkedGame::UpdatePauseScreen(float dt)
+{
+	renderer->DrawString("PAUSED", Vector2(5, 80), Debug::MAGENTA, 30.0f);
+	renderer->DrawString("Press P to Unpause.", Vector2(5, 90), Debug::WHITE, 20.0f);
+	renderer->DrawString("Press Esc to disconnect.", Vector2(5, 95), Debug::WHITE, 20.0f);
+}

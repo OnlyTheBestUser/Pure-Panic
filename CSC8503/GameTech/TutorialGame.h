@@ -46,10 +46,6 @@ namespace NCL {
 				return quit;
 			}
 
-			void SetQuit(bool quit) {
-				this->quit = quit;
-			}
-
 			void PaintObject();
 
 		protected:
@@ -58,18 +54,18 @@ namespace NCL {
 			void InitialiseAssets();
 
 			void InitCamera();
-			void UpdateKeys();
+
 
 			virtual void InitWorld();
 
 			bool SelectObject();
 			void MoveSelectedObject(float dt);
-			void DebugObjectMovement();
 			void DebugDrawCollider(const CollisionVolume* c, Transform* worldTransform);
 			void DebugDrawVelocity(const Vector3& vel, Transform* worldTransform);
 			void DebugDrawObjectInfo(const GameObject* obj);
 			void UpdateBGM();
 			void UpdateScores(float dt);
+			virtual void UpdatePauseState(float dt);
 
 			int currentObj;
 
@@ -86,7 +82,7 @@ namespace NCL {
 			GameManager* gameManager;
 
 			void UpdateGameWorld(float dt);
-			void UpdatePauseScreen(float dt);
+			virtual void UpdatePauseScreen(float dt);
 			void UpdateWinScreen(float dt);
 
 			bool useGravity;
