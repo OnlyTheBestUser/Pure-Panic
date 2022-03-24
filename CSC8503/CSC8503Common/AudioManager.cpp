@@ -49,7 +49,7 @@ void AudioManager::Update() {
 }
 
 void AudioManager::UpdateAudioListener(int listenerID, const Vector3& position, const Quaternion& orientration) {
-	Vector3 forwardRot = orientration * Vector3(0, 0, -1);
+	Vector3 forwardRot = orientration * Vector3(0, 0, 1);
 	Vector3 upRot = orientration * Vector3(0, 1, 0);
 	FMOD_VECTOR* pos = VectorToFMODVector(position);
 	FMOD_VECTOR* fr = VectorToFMODVector(forwardRot);

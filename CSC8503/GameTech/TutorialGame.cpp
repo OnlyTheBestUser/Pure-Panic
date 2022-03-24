@@ -480,7 +480,7 @@ void TutorialGame::UpdateBGM() {
 		bgm->StopMusic();
 		break;
 	default:
-		bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 0.1f);
+		//bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 0.1f);
 		break;
 	}
 
