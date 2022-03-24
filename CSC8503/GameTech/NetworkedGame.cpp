@@ -105,23 +105,6 @@ void NetworkedGame::UpdateGame(float dt) {
 		timeToNextPacket += 1.0f / 60.0f; //60hz server/client update
 	}
 
-#ifndef ORBISNET
-	if (!thisServer && Window::GetKeyboard()->KeyPressed(KeyboardKeys::F9)) {
-		StartAsServer();
-		std::cout << "Server start" << std::endl;
-	}
-	if (!thisClient && Window::GetKeyboard()->KeyPressed(KeyboardKeys::F10)) {
-		StartAsClient(127, 0, 0, 1);
-		std::cout << "Client start" << std::endl;
-	}
-	if (!thisClient && thisServer && Window::GetKeyboard()->KeyPressed(KeyboardKeys::F11)) {
-		StartLevel();
-	}
-	if (thisServer && Window::GetKeyboard()->KeyPressed(KeyboardKeys::F8)) {
-		SendResetGamePacket();
-	}
-#endif
-
 	for (auto x : powerups) {
 		if (x->IsPickedUp()) {
 			PowerUpPacket powerUpPacket;
