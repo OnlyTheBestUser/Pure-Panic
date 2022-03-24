@@ -27,7 +27,7 @@ void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vecto
 	NCL::AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + (soundToPlay == 0 ? "splat_neutral_01.ogg" : "splat_neutral_02.ogg"), this->GetTransform().GetPosition());
 #endif
 
-	Ray ray(this->GetTransform().GetPosition(), this->GetPhysicsObject()->GetLinearVelocity());
+	Ray ray(this->GetTransform().GetPosition() - this->GetPhysicsObject()->GetLinearVelocity().Normalised() * 2, this->GetPhysicsObject()->GetLinearVelocity());
 	ray.SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
 
 	RayCollision closestCollision;
@@ -38,66 +38,69 @@ void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vecto
 		if (test) {
 			if (test->GetPaintMask() != nullptr) {
 
-				Vector2 texUV_a, texUV_b, texUV_c;
-				Vector3 collisionPoint;
-				Vector3 barycentric;
-				Vector3 norm;
-				CollisionDetection::GetBarycentricFromRay(ray, *test, texUV_a, texUV_b, texUV_c, barycentric, collisionPoint, norm);
-
-				Vector4 colour = GameManager::GetColourForID(GetOwnerPlayerID());
-				
-				float randRad = ((GameObject*)closestCollision.node)->GetPaintRadius() + (((static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * 2.0f) - 1.0f) * ((GameObject*)closestCollision.node)->GetPaintRadius() * 0.25f;
-
-				//renderInst->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, randRad, 0.7, 1, colour);
-
 				Vector3 center = this->GetTransform().GetPosition() - this->GetPhysicsObject()->GetLinearVelocity().Normalised() * 10;
+				Vector4 colour = GameManager::GetColourForID(GetOwnerPlayerID());
+				Quaternion rotation = this->GetTransform().GetOrientation();
 
-				//Vector3 center = collisionPoint + (norm * 10);
-				Vector3 firstpoint = center + this->GetTransform().GetOrientation() * Vector3(3, 0, 0);
-				Vector3 prevPoint = firstpoint;
-				Vector3 curPoint;
-				int pointNum = 10;
-				float rot = 0.0f;
-				for (int i = 0; i < pointNum; i++) {
-					rot += ((M_PI * 2) / pointNum);
-					curPoint = center + this->GetTransform().GetOrientation() * Vector3((cos(rot) * 3), 0, (sin(rot) * 3));
-					
-					Debug::DrawLine(prevPoint, curPoint, colour, 1);
-
-					Ray subRay(curPoint, this->GetPhysicsObject()->GetLinearVelocity());
-					subRay.SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
-
-					RayCollision subClosestCollision;
-					if (GameWorld::Raycast(subRay, subClosestCollision, true)) {
-
-						RenderObject* subTest = ((GameObject*)subClosestCollision.node)->GetRenderObject();
-
-						if (subTest) {
-							if (subTest->GetPaintMask() != nullptr) {
-
-								Vector2 subTexUV_a, subTexUV_b, subTexUV_c;
-								Vector3 subCollisionPoint;
-								Vector3 subBarycentric;
-								Vector3 subNorm;
-								CollisionDetection::GetBarycentricFromRay(subRay, *subTest, subTexUV_a, subTexUV_b, subTexUV_c, subBarycentric, subCollisionPoint, subNorm);
-								float subRandRad = (((GameObject*)subClosestCollision.node)->GetPaintRadius() + (((static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * 2.0f) - 1.0f) * ((GameObject*)subClosestCollision.node)->GetPaintRadius() * 0.25f) * 0.25f;
-
-								// Get the uv from the ray
-								renderInst->Paint(subTest, subBarycentric, subCollisionPoint, subTexUV_a, subTexUV_b, subTexUV_c, subRandRad, 0.7, 1, colour);
-							}
-						}
-					}
-
-
-
-					prevPoint = curPoint;
-				}
-
-				// Debug Rainbow Gun
-				//renderInst->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, randRad, 0.7, 1, Vector4(static_cast <float> (rand()) / static_cast <float> (RAND_MAX) , static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX), 1));
+				PaintCircle(center, rotation, colour, 7, 1.2f, 0.5f);
+				PaintCircle(center, rotation, colour, 11, 3.0f, 0.4f);
 			}
 		}
 	}
 	
 	GameWorld::RemoveGameObject(this, true);
+}
+
+void Projectile::PaintCircle(const Vector3& centre, const Quaternion& rotation, const Vector4& colour, int numberOfPoints, float circleRadius, float paintRadiusModifier)
+{
+	Vector3 firstpoint = centre + rotation * Vector3(3, 0, 0);
+	Vector3 prevPoint = firstpoint;
+	Vector3 curPoint;
+	int pointNum = numberOfPoints;
+	float rot = 0.0f;
+
+	for (int i = 0; i < pointNum; i++) {
+		rot += ((M_PI * 2) / pointNum);
+		curPoint = centre + rotation * Vector3((cos(rot) * circleRadius), 0, (sin(rot) * circleRadius));
+
+		//Debug::DrawLine(prevPoint, curPoint, colour, 1);
+
+		Ray ray(curPoint, this->GetPhysicsObject()->GetLinearVelocity());
+		ray.SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
+
+		RayCollision closestCollision;
+		if (GameWorld::Raycast(ray, closestCollision, true)) {
+
+			//Debug::DrawArrow(curPoint, subClosestCollision.collidedAt, Vector4(1,1,1,1), 0.1);
+
+			if ((curPoint - closestCollision.collidedAt).Length() > 15.0f) {
+				prevPoint = curPoint;
+				continue;
+			}
+			
+			RenderObject* rendObj = ((GameObject*)closestCollision.node)->GetRenderObject();
+
+			if (rendObj) {
+				if (rendObj->GetPaintMask() != nullptr) {
+
+					Vector2 texUV_a, texUV_b, texUV_c;
+					Vector3 collisionPoint;
+					Vector3 barycentric;
+					Vector3 norm;
+					CollisionDetection::GetBarycentricFromRay(ray, *rendObj, texUV_a, texUV_b, texUV_c, barycentric, collisionPoint, norm);
+					float randRad = (((GameObject*)closestCollision.node)->GetPaintRadius() + (((static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * 2.0f) - 1.0f) * ((GameObject*)closestCollision.node)->GetPaintRadius() * 0.25f) * paintRadiusModifier;
+					renderInst->Paint(rendObj, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, randRad, 0.7, 1, colour);
+				}
+			}
+		}
+
+
+
+		prevPoint = curPoint;
+	}
+}
+
+void Projectile::Paint()
+{
+
 }
