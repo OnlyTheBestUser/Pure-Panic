@@ -54,10 +54,9 @@ int main() {
 	int totalFrames = 0;
 
 	LoadingScreen* l = new LoadingScreen();
-	NetworkedGame* level = new NetworkedGame();
-	NetworkedGame* level2 = new NetworkedGame();
+	LoadingScreen::SetInstancesToLoad(2);
 
-	MainMenu menu(level, level2);
+	MainMenu menu;
 	w->GetTimer()->GetTimeDeltaSeconds(); 
 	float smallestFrameRate = 144.0f;
 	while (w->UpdateWindow()) {

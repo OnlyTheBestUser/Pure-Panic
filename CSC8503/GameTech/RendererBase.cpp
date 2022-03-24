@@ -21,8 +21,9 @@ RendererAPI* RendererBase::rendererAPI = nullptr;
 
 RendererBase::RendererBase() {
 #ifdef _WIN64
-	if (rendererAPI == nullptr)
+	if (rendererAPI == nullptr) {
 		rendererAPI = new OGLRendererAPI(*Window::GetWindow());
+	}
 
 	TextureLoader::RegisterAPILoadFunction(OGLTexture::RGBATextureFromFilename);
 
@@ -82,7 +83,6 @@ RendererBase::RendererBase() {
 
 RendererBase::~RendererBase() {
 	delete font;
-	delete rendererAPI;
 
 	delete debugLinesMesh;
 	delete debugTextMesh;

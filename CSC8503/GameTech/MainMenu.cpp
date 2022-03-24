@@ -1,10 +1,11 @@
 #include "MainMenu.h"
 #include "../CSC8503Common/InputHandler.h"
+#include "NetworkedGame.h"
 using namespace NCL;
 using namespace CSC8503;
 
-MainMenu::MainMenu(TutorialGame* start, TutorialGame* training) 
-	: renderer(RendererBase()), networkedLevel(start), trainingLevel(training) {
+MainMenu::MainMenu() 
+	: renderer(RendererBase()), networkedLevel(nullptr), trainingLevel(nullptr) {
 	pushMachine = new PushdownMachine((PushdownState*)this);
 	inputHandler = new InputHandler();
 
@@ -19,15 +20,24 @@ MainMenu::~MainMenu() {
 	delete inputHandler;
 }
 
+PushdownState::PushdownResult MainMenu::OnUpdate(float dt, PushdownState** newState) {
 	UpdateMenu(dt);
-
+	if (!pressed) return PushdownState::PushdownResult::NoChange;
+	switch (selectedItem)
+	{
+	default:
+		return PushdownState::PushdownResult::NoChange;
 		break;
 	case 0:
+		if (networkedLevel) delete networkedLevel;
+		networkedLevel = new NetworkedGame();
 		*newState = new LevelState(networkedLevel);
 		pressed = false;
 		return PushdownState::PushdownResult::Push;
 		break;
 	case 1:
+		if (trainingLevel) delete trainingLevel;
+		trainingLevel = new NetworkedGame();
 		*newState = new LevelState(trainingLevel);
 		pressed = false;
 		return PushdownState::PushdownResult::Push;

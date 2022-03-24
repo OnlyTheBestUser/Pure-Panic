@@ -34,7 +34,7 @@ namespace NCL {
 		class MainMenu : public PushdownState
 		{
 		public:
-			MainMenu(TutorialGame* start, TutorialGame* training);
+			MainMenu();
 			~MainMenu();
 
 			bool UpdateGame(float dt);

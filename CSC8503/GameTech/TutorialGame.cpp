@@ -186,7 +186,7 @@ void TutorialGame::UpdateGame(float dt) {
 	Debug::FlushRenderables(dt);
 
 	renderer->scores = gameManager->CalcCurrentScoreRatio();
-	renderer->drawGUI = (!LoadingScreen::GetCompletionState() && state == PLAY);
+	renderer->drawGUI = (!LoadingScreen::GetCompletionState() && state == GameState::PLAY);
 
 	renderer->Render();
 }
