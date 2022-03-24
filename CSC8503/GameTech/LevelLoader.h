@@ -71,7 +71,6 @@ namespace NCL {
 			static void SplitStringOnDelimiter(const std::string& s, char delim, vector<std::string>& result);
 			static Vector3 Vec3FromStr(std::string input);
 			static bool BoolFromStr(std::string input);
-			
 			GameObject* AddAssetToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture, const Vector3& phyLocation, const Vector3& phyDimensions, const float& paintRad = 3.f, const string& name = "PaintableAsset");
 
 			static LevelLoader* singleton;

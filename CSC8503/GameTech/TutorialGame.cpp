@@ -347,7 +347,7 @@ void TutorialGame::InitWorld() {
 	physics->Clear();
 
 	levelLoader->ReadInLevelFile(NCL::Assets::MAPDIR + "map1.txt");
-	Player* player = levelLoader->SpawnPlayer(Vector3(0, 5, 0));
+	Player* player = levelLoader->SpawnPlayer(Vector3(80, 5, 70));
 	
 	AxisCommand* m = new MoveCommand(player);
 	inputHandler->BindAxis(0, m);
