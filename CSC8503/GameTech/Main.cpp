@@ -26,6 +26,7 @@ size_t       sceLibcHeapSize = 256 * 1024 * 1024;	/* Set up heap area upper limi
 #include <iostream>
 
 #include "NetworkedGame.h"
+#include "TrainingGame.h"
 #include "LoadingScreen.h"
 
 using namespace NCL;
@@ -122,13 +123,13 @@ public:
 	PushdownResult OnUpdate(float dt, PushdownState** newState) override {
 		m->UpdateGame(dt);
 
-		/*if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM1)) {
-			*newState = new Game(tg);
+		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM1)) {
+			*newState = new Game(new TrainingGame());
 			return PushdownResult::Push;
-		}*/
+		}
 
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM2)) {
-			*newState = new Game(ng);
+			*newState = new Game(new NetworkedGame());
 			return PushdownResult::Push;
 		}
 
@@ -151,13 +152,13 @@ public:
 	Loading(LoadingScreen* l) : ls(l) {};
 	PushdownResult OnUpdate(float dt, PushdownState** newState) override 
 	{
-		LoadingScreen::SetInstancesToLoad(2);
+		LoadingScreen::SetInstancesToLoad(1);
 		LoadingScreen::SetCompletionState(false);
 		LoadingScreen::UpdateGame(dt);
 
 		m = new MainMenu();
-		ng = new NetworkedGame();
-		tg = nullptr;
+		/*tg = new TutorialGame();*/ tg = nullptr;
+		/*ng = new NetworkedGame();*/ ng = nullptr;
 
 		LoadingScreen::SetCompletionState(true);
 		
@@ -167,7 +168,7 @@ public:
 
 protected:
 	LoadingScreen* ls;
-	NetworkedGame* tg;
+	TutorialGame* tg;
 	NetworkedGame* ng;
 	MainMenu* m;
 };
@@ -210,8 +211,9 @@ int main() {
 	w->SetTitle("Loading");
 
 	LoadingScreen* l = new LoadingScreen();
-	//PushdownMachine p = new Loading(l);	
-	NetworkedGame* h = new NetworkedGame();
+	PushdownMachine p = new Loading(l);	
+	//TutorialGame* h = new TutorialGame();
+	//NetworkedGame* h = new NetworkedGame();
 		
 	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
 	float smallestFrameRate = 144.0f;
@@ -252,11 +254,11 @@ int main() {
 			curTimeWait = avgTimeWait;
 		}
 
-		h->UpdateGame(dt);
+		//h->UpdateGame(dt);
 
-		/*if (!p.Update(dt)) {
+		if (!p.Update(dt)) {
 			return 0;
-		}*/
+		}
 	}
 	Window::DestroyGameWindow();
 }

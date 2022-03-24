@@ -216,6 +216,7 @@
     <ClCompile Include="NetworkedPlayer.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RendererBase.cpp" />
+    <ClCompile Include="TrainingGame.cpp" />
     <ClCompile Include="TutorialGame.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -226,6 +227,7 @@
     <ClInclude Include="NetworkedPlayer.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RendererBase.h" />
+    <ClInclude Include="TrainingGame.h" />
     <ClInclude Include="TutorialGame.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

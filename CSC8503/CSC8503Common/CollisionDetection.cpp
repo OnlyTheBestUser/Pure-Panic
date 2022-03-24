@@ -47,6 +47,7 @@ bool CollisionDetection::RayTriangleIntersection(const Ray& r, const Triangle& t
 }
 
 bool CollisionDetection::RayIntersection(const Ray& r,GameObject& object, RayCollision& collision) {
+
 	bool hasCollided = false;
 
 	const Transform& worldTransform = object.GetTransform();
@@ -55,10 +56,9 @@ bool CollisionDetection::RayIntersection(const Ray& r,GameObject& object, RayCol
 	if (!volume) {
 		return false;
 	}
-
 	switch (volume->type) {
 		case VolumeType::AABB:		hasCollided = RayAABBIntersection(r, worldTransform, (const AABBVolume&)*volume	, collision); break;
-		case VolumeType::OBB:		hasCollided = RayOBBIntersection(r, worldTransform, (const OBBVolume&)*volume	, collision); break;
+		case VolumeType::OBB:		hasCollided = RayOBBIntersection(r, worldTransform, (const OBBVolume&)*volume	, collision, object.GetName()); break;
 		case VolumeType::Sphere:	hasCollided = RaySphereIntersection(r, worldTransform, (const SphereVolume&)*volume	, collision); break;
 		case VolumeType::Capsule:	hasCollided = RayCapsuleIntersection(r, worldTransform, (const CapsuleVolume&)*volume, collision); break;
 	}
@@ -107,7 +107,9 @@ bool CollisionDetection::RayAABBIntersection(const Ray&r, const Transform& world
 	return RayBoxIntersection(r, boxPos, boxSize, collision);
 }
 
-bool CollisionDetection::RayOBBIntersection(const Ray&r, const Transform& worldTransform, const OBBVolume& volume, RayCollision& collision) {
+bool CollisionDetection::RayOBBIntersection(const Ray&r, const Transform& worldTransform, const OBBVolume& volume, RayCollision& collision, string name) {
+	//if (name == "PAINT_WALL")
+	//	std::cout << ".";
 	Quaternion orientation = worldTransform.GetOrientation();
 	Vector3 position = worldTransform.GetPosition();
 

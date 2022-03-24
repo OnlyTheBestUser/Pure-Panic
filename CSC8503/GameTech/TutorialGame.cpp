@@ -13,6 +13,7 @@
 #include "../../Common/Assets.h"
 
 #include "../CSC8503Common/InputList.h"
+#include "../CSC8503Common/SimpleAI.h"
 #include "LoadingScreen.h"
 
 #ifndef _ORBIS
@@ -33,10 +34,11 @@ TutorialGame::TutorialGame()	{
 	physics			= new PhysicsSystem(*world);
 	LoadingScreen::AddProgress(25.0f);
 	LoadingScreen::UpdateGame(0.0f);
-	levelLoader		= new LevelLoader(physics, renderer);
+	levelLoader		= new LevelLoader(physics, renderer, this);
 	LoadingScreen::AddProgress(50.0f);
 	LoadingScreen::UpdateGame(0.0f);
 	gameManager		= new GameManager(this);
+	LoadingScreen::SetCompletionState(true);
 	
 #ifndef _ORBIS
 	InitSounds();
@@ -105,6 +107,9 @@ TutorialGame::TutorialGame()	{
 	inputHandler->BindButton(START_TIMER, startTimer);
 
 #pragma endregion
+
+	InitCamera();
+	InitWorld();
 }
 
 void TutorialGame::InitialiseAssets() {
@@ -168,7 +173,7 @@ void TutorialGame::UpdateGame(float dt) {
 	Debug::FlushRenderables(dt);
 
 	renderer->scores = gameManager->CalcCurrentScoreRatio();
-	renderer->drawGUI = (!LoadingScreen::GetCompletionState() && state == PLAY);
+	renderer->drawGUI = (LoadingScreen::GetCompletionState() && state == PLAY);
 
 	renderer->Render();
 }
@@ -354,14 +359,6 @@ void TutorialGame::UpdateKeys() {
 void TutorialGame::DebugObjectMovement() {
 	//If we've selected an object, we can manipulate it with some key presses
 	if (inSelectionMode && selectionObject) {
-		//Twist the selected object!
-		//if (Window::GetKeyboard()->KeyDown(KeyboardKeys::LEFT)) {
-		//	selectionObject->GetPhysicsObject()->AddTorque(Vector3(-10, 0, 0));
-		//}
-
-		//if (Window::GetKeyboard()->KeyDown(KeyboardKeys::RIGHT)) {
-		//	selectionObject->GetPhysicsObject()->AddTorque(Vector3(10, 0, 0));
-		//}
 
 		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::NUM7)) {
 			selectionObject->GetPhysicsObject()->AddTorque(Vector3(0, 10, 0));
@@ -370,18 +367,6 @@ void TutorialGame::DebugObjectMovement() {
 		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::NUM8)) {
 			selectionObject->GetPhysicsObject()->AddTorque(Vector3(0, -10, 0));
 		}
-
-		//if (Window::GetKeyboard()->KeyDown(KeyboardKeys::RIGHT)) {
-		//	selectionObject->GetPhysicsObject()->AddTorque(Vector3(10, 0, 0));
-		//}
-
-		//if (Window::GetKeyboard()->KeyDown(KeyboardKeys::UP)) {
-		//	selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 0, -10));
-		//}
-
-		//if (Window::GetKeyboard()->KeyDown(KeyboardKeys::DOWN)) {
-		//	selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 0, 10));
-		//}
 
 		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::NUM5)) {
 			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, -10, 0));
@@ -401,7 +386,7 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	levelLoader->ReadInLevelFile(NCL::Assets::MAPDIR + "map1.txt");
+	levelLoader->ReadInLevelFile(NCL::Assets::MAPDIR + "training_map.txt");
 	Player* player = levelLoader->SpawnPlayer(Vector3(0, 5, 0));
 	
 	AxisCommand* m = new MoveCommand(player);

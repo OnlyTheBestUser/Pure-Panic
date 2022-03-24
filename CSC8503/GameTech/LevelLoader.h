@@ -11,6 +11,7 @@
 
 namespace NCL {
 	namespace CSC8503 {
+		class TutorialGame;
 		class LevelLoader {
 
 		#define DEF_MASS 10.0f
@@ -22,15 +23,18 @@ namespace NCL {
 		#define PROJ_SIZE  0.5f
 
 		public:
-			LevelLoader(PhysicsSystem* physics, Renderer* renderer);
+			LevelLoader(PhysicsSystem* physics, Renderer* renderer, TutorialGame* game);
 			~LevelLoader();
 
 			static void ReadInLevelFile(std::string filename);
 
 			static Player*     SpawnPlayer(const Vector3& position);
 			static GameObject* SpawnDummyPlayer(const Vector3& position);
+			
 			static Projectile* SpawnProjectile(Player* owner, bool needBulletSpread, float initialSpeed = PROJ_SPEED, float meshSize = PROJ_SIZE);
 			static Projectile* SpawnProjectile(GameObject* owner, bool needBulletSpread, int bulletIndex, bool deadSpray, float pitch, int playerID, float initialSpeed = PROJ_SPEED, float meshSize = PROJ_SIZE);
+
+			static GameObject* SpawnAIEnemy(const Vector3& position, GameObject* target = nullptr);
 
 		protected:
 			GameObject* AddFloorToWorld    (const Vector3& position);
@@ -72,8 +76,9 @@ namespace NCL {
 
 			static LevelLoader* singleton;
 
-			PhysicsSystem* physics;
-			Renderer*	   renderer;
+			PhysicsSystem*	physics;
+			Renderer*		renderer;
+			TutorialGame*	game;
 
 			ShaderBase*	  basicShader				= nullptr;
 			TextureBase*  basicTex					= nullptr;

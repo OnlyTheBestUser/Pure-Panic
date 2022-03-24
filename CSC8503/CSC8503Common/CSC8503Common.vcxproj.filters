@@ -27,6 +27,9 @@
     <ClCompile Include="GameManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SimpleAI.cpp">
+      <Filter>AI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AABBVolume.h" />
@@ -86,6 +89,9 @@
     </ClInclude>
     <ClInclude Include="MultiBullet.h">
       <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleAI.h">
+      <Filter>AI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

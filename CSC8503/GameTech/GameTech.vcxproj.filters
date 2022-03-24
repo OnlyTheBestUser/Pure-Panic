@@ -34,6 +34,7 @@
     <ClCompile Include="LoadingScreen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TrainingGame.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Renderer.h">
@@ -60,6 +61,7 @@
     <ClInclude Include="LoadingScreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TrainingGame.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LevelLoader.h" />
