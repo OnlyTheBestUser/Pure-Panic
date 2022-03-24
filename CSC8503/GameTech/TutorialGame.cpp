@@ -33,6 +33,7 @@ TutorialGame::TutorialGame()	{
 	LoadingScreen::AddProgress(50.0f);
 	LoadingScreen::UpdateGame(0.0f);
 	gameManager		= new GameManager(this);
+	LoadingScreen::SetCompletionState(true);
 	
 #ifndef _ORBIS
 	InitSounds();
@@ -167,7 +168,7 @@ void TutorialGame::UpdateGame(float dt) {
 	Debug::FlushRenderables(dt);
 
 	renderer->scores = gameManager->CalcCurrentScoreRatio();
-	renderer->drawGUI = (!LoadingScreen::GetCompletionState() && state == PLAY);
+	renderer->drawGUI = (LoadingScreen::GetCompletionState() && state == PLAY);
 
 	renderer->Render();
 }
@@ -379,11 +380,6 @@ void TutorialGame::InitWorld() {
 
 	player1 = player;
 	renderer->playerColour = GameManager::GetColourForID(player1->GetPlayerID());
-
-	GameObject* x = LevelLoader::SpawnAIEnemy(Vector3(20, 5, 20), player1);
-	x->GetPhysicsObject()->SetGravity(false);
-	x->GetPhysicsObject()->SetLinearDamping(0.6f);
-	x->GetPhysicsObject()->SetFriction(false);
 
 	physics->BuildStaticList();
 }
