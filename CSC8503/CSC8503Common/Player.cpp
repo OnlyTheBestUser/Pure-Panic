@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "../GameTech/LevelLoader.h"
+#include "../GameTech/NetworkedGame.h"
 #include "GameManager.h"
 
 using namespace NCL;
@@ -22,7 +23,9 @@ void Player::OnCollisionBegin(GameObject* other, Vector3 localA, Vector3 localB,
 }
 
 void Player::SetColour(Vector4 col) {
-	this->renderObject->SetColour(GameManager::GetColourForID(playerID));
+	if (renderObject) {
+		renderObject->SetColour(GameManager::GetColourForID(playerID));
+	}
 }
 
 void Player::Update(float dt)
@@ -68,14 +71,22 @@ void Player::Update(float dt)
 		physicsObject->SetGravity(true);
 	}
 
-	
 	force = Vector3(0, 0, 0);
 	
 	if (IsDead()) {
+		NetworkedGame::SendDeathPacket(playerID, GetTransform().GetPosition());
+		FireDeathProjectiles();
 		Respawn();
 	}
 
 	Debug::Print("Health: " + std::to_string(health), { 50.0f,90.0f });
+}
+
+void Player::FireDeathProjectiles() {
+	for (int i = 0; i < 10; ++i)
+	{
+		LevelLoader::SpawnProjectile(this, true, i, true, 90, playerID, 10);
+	}
 }
 
 float Player::CheckDistToGround()
@@ -123,7 +134,7 @@ bool Player::IsDead(){
 void Player::Respawn(){
 	GetTransform().SetPosition(spawnPos);
 	health = maxHealth;
-	BulletCounter = 0;
+	bulletsPerShot = BULLETS_PER_SHOT;
 }
 
 void Player::SetPlayerID(int playerID){

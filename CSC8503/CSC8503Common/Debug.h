@@ -11,6 +11,7 @@ namespace NCL {
 	{
 	public:
 		static void Print(const std::string& text, const Vector2&pos, const float& size = 20.0f, const Vector4& colour = Vector4(1, 1, 1, 1));
+		static void DebugPrint(const std::string& text, const Vector2& pos, const float& size = 20.0f, const Vector4& colour = Vector4(1, 1, 1, 1));
 		static void DrawLine(const Vector3& startpoint, const Vector3& endpoint, const Vector4& colour = Vector4(1, 1, 1, 1), float time = 0.0f);
 		static void DrawArrow(const Vector3& startpoint, const Vector3& endpoint, const Vector4& colour = Vector4(1, 1, 1, 1), float time = 0.0f);
 		static void DrawCube(const Vector3& centre, const Vector3& halfSizes, const Vector4& colour = Vector4(1, 1, 1, 1), float time = 0.0f, const Quaternion & rotation = Quaternion(0, 0, 0, 0));
