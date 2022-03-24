@@ -42,6 +42,7 @@ namespace NCL {
 
 			Vector2 scores;
 			Vector4 playerColour;
+			bool drawGUI;
 		protected:
 
 			struct PaintInstance {

@@ -115,6 +115,12 @@ Renderer::~Renderer() {
 	delete skyboxMesh;
 	delete skyboxTex;
 
+	delete uiBarMesh;
+	delete uiBarShader;
+
+	delete uiCrosshairMesh;
+	delete uiCrosshairShader;
+
 	delete maskShader;
 }
 
@@ -172,7 +178,8 @@ void Renderer::RenderScene() {
 
 	RenderSkybox();
 	RenderObjects();
-	DrawGUI();
+	if (drawGUI) { DrawGUI(); }
+
 }
 
 void Renderer::RenderShadows() {
