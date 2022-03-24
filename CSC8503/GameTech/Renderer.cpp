@@ -124,10 +124,6 @@ Renderer::~Renderer() {
 	delete maskShader;
 }
 
-void Renderer::Update(float dt) {
-
-}
-
 void Renderer::Render() {
 	rendererAPI->BeginFrame();
 
@@ -143,6 +139,7 @@ void Renderer::Render() {
 	rendererAPI->EndFrame();
 	DrawDebugData();
 	rendererAPI->SwapBuffers();
+	frameNumber = frameNumber + 1 % 6000;
 }
 
 void Renderer::BuildObjectList() {
@@ -287,14 +284,15 @@ void Renderer::RenderObjects() {
 void NCL::Rendering::Renderer::ClearPaint()
 {
 	GameObjectIterator start;
-	GameObjectIterator cur;
 	GameObjectIterator end;
 	gameWorld.GetPaintableObjectIterators(start, end);
-	cur = start;
 
-	while (cur != end) {
-		(*cur)->GetRenderObject()->GetPaintMask()->ResetTexture();
-		cur++;
+	for (auto it = start; it != end; ++it){
+		if (!(*it)->GetRenderObject()) return;
+
+		if ((*it)->GetRenderObject()->GetPaintMask()) return;
+
+		(*it)->GetRenderObject()->GetPaintMask()->ResetTexture();
 	}
 }
 
