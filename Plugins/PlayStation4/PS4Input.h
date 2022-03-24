@@ -8,12 +8,13 @@ namespace NCL {
 		class PS4Input : public CSC8503::InputBase
 		{
 		public:
-			PS4Input();
+			static PS4Input* GetInstance();
 			~PS4Input(); 
 
 			void Poll() override; 
 
 		protected:
+			PS4Input();
 			void InitController();
 
 			int32_t padHandle;
