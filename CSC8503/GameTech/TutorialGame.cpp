@@ -34,6 +34,8 @@ TutorialGame::TutorialGame()	{
 	LoadingScreen::UpdateGame(0.0f);
 
 	gameManager		= new GameManager(this);
+
+	LoadingScreen::ResetProgress();
 	LoadingScreen::SetCompletionState(true);
 	
 #ifndef _ORBIS
