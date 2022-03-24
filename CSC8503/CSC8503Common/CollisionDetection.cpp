@@ -256,9 +256,7 @@ Ray CollisionDetection::BuildRayFromMouse(const Camera& cam) {
 	Vector3 c = b - a;
 
 	c.Normalise();
-
-	//std::cout << "Ray Direction:" << c << std::endl;
-
+	
 	return Ray(cam.GetPosition(), c);
 }
 
@@ -342,7 +340,6 @@ bool CollisionDetection::GetBarycentricFromRay(const Ray ray, const RenderObject
 			}
 		}
 	}
-	//Debug::DrawArrow(closestcollision, closestcollision + closestnorm, Vector4(0,1,0,1), 1.0f);
 
 	if (distance == FLT_MAX) {
 		return false;
@@ -353,9 +350,6 @@ bool CollisionDetection::GetBarycentricFromRay(const Ray ray, const RenderObject
 	vc = closest.texUV_c;
 	collisionPoint = closestcollision;
 	barycentric = CalcTriBaryCoord(closest, closestcollision);
-
-	// Draws collided mesh triangle 
-	// Debug::DrawTriangle(closest.pos_a, closest.pos_b, closest.pos_c, Vector4(1,1,1,1), 1.0f);
 
 	return true;
 }
@@ -665,12 +659,7 @@ bool CollisionDetection::OBBIntersection(
 		Vector3 maxExtentA = directions[i] * (Vector3::Dot(maxA, directions[i]) / denom);
 		Vector3 minExtentB = directions[i] * (Vector3::Dot(minB, directions[i]) / denom);
 		Vector3 maxExtentB = directions[i] * (Vector3::Dot(maxB, directions[i]) / denom);
-
-		//Debug::DrawLine(minExtentA, minExtentA + Vector3(0,1,0), Debug::GREEN);
-		//Debug::DrawLine(maxExtentA, maxExtentA + Vector3(0,1,0), Debug::CYAN);
-		//Debug::DrawLine(minExtentB, minExtentB + Vector3(0,1,0), Debug::BLUE);
-		//Debug::DrawLine(maxExtentB, maxExtentB + Vector3(0,1,0), Debug::MAGENTA);
-
+		
 		float distance = FLT_MAX;
 		float length = FLT_MAX;
 		float penDist = FLT_MAX;
@@ -713,22 +702,14 @@ bool CollisionDetection::OBBIntersection(
 		}
 
 		if (left < 0.0f && right < 0.0f) {
-			// Fully eveloped, should never be minimum intersection so don't update
+			// Fully enveloped, should never be minimum intersection so don't update
 			
-			//Debug::DrawLine(-directions[i] * 500.0f, directions[i] * 500.0f, Debug::CYAN);
-			//penDist = (maxExtentA - minExtentA).Length();
 			penIndex = i;
 			continue;
 		}
 		
 		return false;
 	}
-	//std::cout << "Colliding" << std::endl;
-	//Debug::DrawLine(collisionInfo.point.localA, collisionInfo.point.localA + Vector3(0, 5, 0), Debug::RED);
-	//Debug::DrawLine(worldTransformA.GetPosition(), worldTransformA.GetPosition() + Vector3(0, 5, 0), Debug::CYAN);
-	//Debug::DrawLine(collisionInfo.point.localB, collisionInfo.point.localB + Vector3(0, 5, 0), Debug::GREEN);
-	//Debug::DrawLine(worldTransformB.GetPosition(), worldTransformB.GetPosition() + Vector3(0, 5, 0), Debug::MAGENTA);
-	//Debug::DrawLine(collisionInfo.point.normal + Vector3(5,5,0), collisionInfo.point.normal + (collisionInfo.point.normal.Normalised() * 5.0f) + Vector3(5, 5, 0), Debug::BLUE);
 	collisionInfo.point.penetration = leastPenetration;
 	collisionInfo.point.localA -= worldTransformA.GetPosition();
 	collisionInfo.point.localB -= worldTransformB.GetPosition();
@@ -757,7 +738,6 @@ bool CollisionDetection::SphereCapsuleIntersection(
 	t.SetScale(Vector3(volumeA.GetRadius(), volumeA.GetRadius(), volumeA.GetRadius()));
 	bool sphereCheck = SphereIntersection(s,t,volumeB,worldTransformB,collisionInfo);
 	collisionInfo.point.localA += spherePos - worldTransformA.GetPosition();
-	//Debug::DrawLine(collisionInfo.point.localA, collisionInfo.point.localA + (collisionInfo.point.normal * 5.0f), Vector4(1,0,0,1), 0.01f);
 	return sphereCheck;
 }
 
@@ -774,10 +754,6 @@ bool NCL::CollisionDetection::AABBCapsuleIntersection(const AABBVolume& volumeB,
 	Vector3 capsuleDir = pointA - pointB;
 	float capsuleLength = capsuleDir.Length();
 	capsuleDir.Normalise();
-	/*
-		Debug::DrawLine(cubePos, cubePos + Vector3(0, 5, 0), Debug::GREEN);
-		Debug::DrawLine(cubePos1, cubePos1 + Vector3(0, 5, 0), Debug::YELLOW);
-		Debug::DrawLine(cubePos2, cubePos2 + Vector3(0, 5, 0), Debug::YELLOW);*/
 	float dot = Maths::Clamp(Vector3::Dot(cubePos - pointB, capsuleDir), 0.0f, capsuleLength);
 	float dot1 = Maths::Clamp(Vector3::Dot(cubePos1 - pointB, capsuleDir), 0.0f, capsuleLength);
 	float dot2 = Maths::Clamp(Vector3::Dot(cubePos2 - pointB, capsuleDir), 0.0f, capsuleLength);
@@ -790,9 +766,7 @@ bool NCL::CollisionDetection::AABBCapsuleIntersection(const AABBVolume& volumeB,
 		spherePos = spherePos1;
 	else if ((spherePos2 - cubePos2).Length() < (spherePos - cubePos).Length())
 		spherePos = spherePos2;
-
-//	Debug::DrawLine(spherePos, cubePos, Debug::CYAN);
-
+	
 	SphereVolume s(volumeA.GetRadius());
 	Transform t;
 	t.SetPosition(spherePos);
@@ -800,7 +774,6 @@ bool NCL::CollisionDetection::AABBCapsuleIntersection(const AABBVolume& volumeB,
 
 	bool collided = AABBSphereIntersection(volumeB, worldTransformB, s, t, collisionInfo);
 	collisionInfo.point.localB += t.GetPosition() - worldTransformA.GetPosition();
-	//Debug::DrawLine(worldTransformA.GetPosition() + collisionInfo.point.localB, worldTransformA.GetPosition() + collisionInfo.point.localB + Vector3(0, 10, 0), Debug::MAGENTA);
 	return collided;
 }
 
@@ -890,13 +863,11 @@ bool NCL::CollisionDetection::CapsuleIntersection(const CapsuleVolume& volumeA, 
 	Transform aT = worldTransformA;
 	aT.SetPosition(bestA);
 	aT.SetScale(Vector3(volumeA.GetRadius(), volumeA.GetRadius(), volumeA.GetRadius()));
-	//aT.SetScale(worldTransformA.GetScale());
 
 	SphereVolume bS(volumeB.GetRadius());
 	Transform bT = worldTransformB;
 	bT.SetPosition(bestB);
 	bT.SetScale(Vector3(volumeB.GetRadius(), volumeB.GetRadius(), volumeB.GetRadius()));
-	//bT.SetScale(worldTransformB.GetScale());
 
 	return SphereIntersection(aS, aT, bS, bT, collisionInfo);
 }

@@ -117,15 +117,15 @@ protected:
 
 class Menu : public PushdownState {
 public:
-	Menu(MainMenu* m, TutorialGame* g, NetworkedGame* h) : m(m), tg(g), ng(h) {};
+	Menu(MainMenu* m, NetworkedGame* g, NetworkedGame* h) : m(m), tg(g), ng(h) {};
 
 	PushdownResult OnUpdate(float dt, PushdownState** newState) override {
 		m->UpdateGame(dt);
 
-		/*if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM1)) {
+		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM1)) {
 			*newState = new Game(tg);
 			return PushdownResult::Push;
-		}*/
+		}
 
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM2)) {
 			*newState = new Game(ng);
@@ -140,7 +140,7 @@ public:
 	}
 
 protected:
-	TutorialGame* tg;
+	NetworkedGame* tg;
 	NetworkedGame* ng;
 	MainMenu* m;
 };
@@ -151,12 +151,15 @@ public:
 	Loading(LoadingScreen* l) : ls(l) {};
 	PushdownResult OnUpdate(float dt, PushdownState** newState) override 
 	{
-		LoadingScreen::SetInstancesToLoad(2);
+		LoadingScreen::SetInstancesToLoad(3);
+		LoadingScreen::SetCompletionState(false);
 		LoadingScreen::UpdateGame(dt);
 
 		m = new MainMenu();
 		ng = new NetworkedGame();
-		tg = nullptr;
+		tg = new NetworkedGame();
+
+		LoadingScreen::SetCompletionState(true);
 		
 		*newState = new Menu(m, tg, ng);
 		return PushdownResult::Push;
@@ -207,33 +210,17 @@ int main() {
 	w->SetTitle("Loading");
 
 	LoadingScreen* l = new LoadingScreen();
-	//PushdownMachine p = new Loading(l);	
-	NetworkedGame* h = new NetworkedGame();
+	PushdownMachine p = new Loading(l);	
+	//NetworkedGame* h = new NetworkedGame();
 		
-	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
+	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a large first dt!
 	float smallestFrameRate = 144.0f;
-	while (w->UpdateWindow()) { //&& !w->GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
-#if _WIN64
-		if (w->GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE))
-			break;
-#endif
+	while (w->UpdateWindow()) {
 
-		//DisplayPathfinding();
 		float dt = w->GetTimer()->GetTimeDeltaSeconds();
-		if (dt > 0.1f) {
-			std::cout << "Skipping large time delta" << std::endl;
-			continue; //must have hit a breakpoint or something to have a 1 second frame time!
+		if (dt > 0.1f) {	//Skipping large time delta
+			continue;	//must have hit a breakpoint or something to have a 1 second frame time!
 		}
-		/*if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::PRIOR)) {
-			w->ShowConsole(true);
-		}
-		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NEXT)) {
-			w->ShowConsole(false);
-		}
-
-		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::T)) {
-			w->SetWindowPosition(0, 0);
-		}*/
 
 		float frameRate = (1.0f / dt);
 		if (frameRate < smallestFrameRate)
@@ -244,16 +231,12 @@ int main() {
 		curTimeWait -= dt;
 		totalTime += dt;
 		totalFrames++;
-		if (curTimeWait < 0.0f) {
-			std::cout << "Average Frame Time: " << 1000.0f * (totalTime / totalFrames) << "\n";
-			curTimeWait = avgTimeWait;
-		}
 
-		h->UpdateGame(dt);
+		//h->UpdateGame(dt);
 
-		/*if (!p.Update(dt)) {
+		if (!p.Update(dt)) {
 			return 0;
-		}*/
+		}
 	}
 	Window::DestroyGameWindow();
 }

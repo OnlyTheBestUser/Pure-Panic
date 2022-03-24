@@ -97,7 +97,7 @@ int AudioManager::StartPlayingSound(const std::string& soundName, const Vector3&
 		nextChannelID++;
 		return newChannel;
 	}
-	std::cout << "FMOD Sound hasn't been loaded - " << soundName << std::endl;
+	//std::cout << "FMOD Sound hasn't been loaded - " << soundName << std::endl;
 	return -1;
 }
 
@@ -132,7 +132,7 @@ int AudioManager::FadeInSound(const std::string& soundName, float fadeInTime, co
 		nextChannelID++;
 		return newChannel;
 	}
-	std::cout << "FMOD Sound hasn't been loaded - " << soundName << std::endl;
+	//std::cout << "FMOD Sound hasn't been loaded - " << soundName << std::endl;
 	return -1;
 }
 
@@ -194,7 +194,7 @@ FMOD_VECTOR* AudioManager::VectorToFMODVector(const Vector3& v) {
 
 bool AudioManager::IsErroneous(FMOD_RESULT result) {
 	if (result != FMOD_OK) {
-		std::cout << "FMOD Error No: " << result << std::endl;
+		//std::cout << "FMOD Error No: " << result << std::endl;
 		return true;
 	}
 	return true;
