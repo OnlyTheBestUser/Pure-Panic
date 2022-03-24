@@ -24,6 +24,7 @@ size_t       sceLibcHeapSize = 256 * 1024 * 1024;	/* Set up heap area upper limi
 #include <iostream>
 
 #include "NetworkedGame.h"
+#include "LoadingScreen.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -52,8 +53,10 @@ int main() {
 	float totalTime = 0.0f;
 	int totalFrames = 0;
 
+	LoadingScreen* l = new LoadingScreen();
 	NetworkedGame* level = new NetworkedGame();
 	NetworkedGame* level2 = new NetworkedGame();
+
 	MainMenu menu(level, level2);
 	w->GetTimer()->GetTimeDeltaSeconds(); 
 	float smallestFrameRate = 144.0f;

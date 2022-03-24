@@ -46,6 +46,10 @@ namespace NCL {
 				return quit;
 			}
 
+			Player* GetPlayer() {
+				return player1;
+			}
+
 			void PaintObject();
 
 		protected:
@@ -53,6 +57,7 @@ namespace NCL {
 
 			void InitialiseAssets();
 
+			void InitSounds();
 			void InitCamera();
 
 

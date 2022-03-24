@@ -19,15 +19,8 @@ MainMenu::~MainMenu() {
 	delete inputHandler;
 }
 
-PushdownState::PushdownResult MainMenu::OnUpdate(float dt, PushdownState** newState) {
 	UpdateMenu(dt);
 
-	if (!pressed) return PushdownState::PushdownResult::NoChange;
-
-	switch (selectedItem)
-	{
-	default:
-		return PushdownState::PushdownResult::NoChange;
 		break;
 	case 0:
 		*newState = new LevelState(networkedLevel);
