@@ -1,5 +1,11 @@
 #pragma once
+#ifdef _ORBIS
+#define ORBISNET
+#endif
+
+#ifndef ORBISNET
 #include <enet/enet.h>
+#endif
 #ifndef _ORBIS
 #include <winsock2.h>
 #endif
@@ -125,7 +131,9 @@ protected:
 		return true;
 	}
 
+#ifndef ORBISNET
 	ENetHost* netHandle;
+#endif
 
 	std::multimap<int, PacketReceiver*> packetHandlers;
 };

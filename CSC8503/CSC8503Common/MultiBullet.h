@@ -15,7 +15,7 @@ namespace NCL {
 					Player* player = ((Player*)otherObject);
 					if (player->GetCurrentPowerup() != PowerUpType::None) return;
 					((Player*)otherObject)->ActivateMultiBullet(BulletsPerShot, powerupDuration);
-
+					IsPicked = true;
 					PickUp();
 				}
 			}

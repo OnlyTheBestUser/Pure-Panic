@@ -15,11 +15,7 @@ namespace NCL {
         class Player : public GameActor
         {
         public:
-			Player(Camera* camera, LevelLoader* lvlLoader, GameWorld* world, string name = "", Vector3 ch = Vector3(0, 2, 0)) : GameActor(name), checkpoint(ch), spawnPos(ch), levelLoader(lvlLoader), world(world){
-				this->camera = camera;
-				camLocked = true;
-				playerID = 0;
-			};
+			Player(Camera* camera, string name = "", Vector3 ch = Vector3(0, 2, 0));
             ~Player() {};
 
             void OnCollisionBegin(GameObject* other, Vector3 localA, Vector3 localB, Vector3 normal) override;
@@ -31,6 +27,8 @@ namespace NCL {
 			
 			bool IsDead();
 			void Respawn();
+
+			void SetColour(Vector4 col);
 			
             bool Win() const { return finish; }
             void Reset();
@@ -131,7 +129,9 @@ namespace NCL {
 			Camera* GetCam() { return camera; }
 
 			int GetPlayerID() const { return playerID; }
-			void SetPlayerID(int x) { playerID = x; }
+			void SetPlayerID(int playerID);
+
+			int BulletCounter = 0;
 
         protected:
 			float CheckDistToGround();
@@ -165,12 +165,9 @@ namespace NCL {
 
 			float cameraVertMult = 0.5f;
 			Camera* camera;
-			GameWorld* world;
 			bool camLocked;
 			
 			bool fired = false;
-
-			LevelLoader* levelLoader;
         };
     }
 }

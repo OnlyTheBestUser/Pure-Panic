@@ -26,6 +26,7 @@ namespace NCL {
 			void Paint(const RenderObject* paintable, Vector3& pos, Vector3& colpos, Vector2& texUV_a, Vector2& texUV_b, Vector2& texUV_c, float radius = 1.0f, float hardness = .5f, float strength = 0.5f, Vector4 color = Vector4(0,0,0,0));
 			Maths::Vector2 GetUVCoord(const RenderObject* paintable, NCL::Maths::Vector3 pos); // Gets where the uv point on a texture is given the object and collision position
 			void ApplyPaintToMasks();
+			void DrawGUI();
 			NCL::Maths::Vector2 CountPaintMask(TextureBase* paintMask, NCL::Maths::Vector2 prevScores, NCL::Maths::Vector4 team1Colour, NCL::Maths::Vector4 team2Colour);
 
 			void RenderShadows();
@@ -38,6 +39,10 @@ namespace NCL {
 			// Debug
 			Maths::Matrix4 SetupDebugLineMatrix() const override;
 			Maths::Matrix4 SetupDebugStringMatrix() const override;
+
+			Vector2 scores;
+			Vector4 playerColour;
+			bool drawGUI;
 		protected:
 
 			struct PaintInstance {
@@ -64,6 +69,13 @@ namespace NCL {
 			ShaderBase* shadowShader;
 
 			ShaderBase* maskShader;
+
+			ShaderBase* uiBarShader;
+			MeshGeometry* uiBarMesh;
+
+			ShaderBase* uiCrosshairShader;
+			MeshGeometry* uiCrosshairMesh;
+			TextureBase* crosshairTex;
 
 			ShaderBase* skyboxShader;
 			MeshGeometry* skyboxMesh;

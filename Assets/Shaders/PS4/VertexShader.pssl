@@ -20,12 +20,23 @@ ConstantBuffer invModelMatrix{
 	float4x4 invModelMatrix;
 }
 
+ConstantBuffer hasVertexColours
+{
+	int m_hasVertexColours;
+};
+
+ConstantBuffer objectColour
+{
+	float4 m_objectColour;
+};
+
 struct VS_INPUT
 {
 	float3 Position		: POSITION0;
 	float2 UV			: TEXCOORD0;
 	float3 Normal		: TEXCOORD1;
 	float3 Tangent		: TEXCOORD2;
+	float4 Color		: COLOR0;
 };
 
 struct VS_OUTPUT
@@ -34,6 +45,7 @@ struct VS_OUTPUT
 	float2 UV			: TEXCOORD0; 
 	float3 Normal		: NORMAL;
 	float3 WorldPos		: TANGENT;
+	float4 Color		: COLOR0;
 };
 
 VS_OUTPUT main(VS_INPUT Input)
@@ -46,6 +58,11 @@ VS_OUTPUT main(VS_INPUT Input)
 	Output.Normal = normalize(mul(normalMatrix, normalize(Input.Normal)));
 	Output.WorldPos = mul(modelMatrix, float4(Input.Position,1)).xyz;
 	Output.UV = Input.UV;
+	Output.Color = m_objectColour;
+
+	if (m_hasVertexColours == 1){
+		Output.Color = m_objectColour * Input.Color;
+	}
 
 	return Output;
 }

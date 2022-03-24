@@ -53,6 +53,10 @@ namespace NCL {
 				return quit;
 			}
 
+			Player* GetPlayer() {
+				return player1;
+			}
+
 			void PaintObject();
 
 		protected:
@@ -60,16 +64,12 @@ namespace NCL {
 
 			void InitialiseAssets();
 
+			void InitSounds();
 			void InitCamera();
 			void UpdateKeys();
 
 			virtual void InitWorld();
 
-			/*void InitSphereGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, float radius);
-			void InitCapsuleGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing);
-			void InitMixedGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing);
-			void InitCubeGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, const Maths::Vector3& cubeDims);*/
-	
 			bool SelectObject();
 			void MoveSelectedObject(float dt);
 			void DebugObjectMovement();
@@ -79,20 +79,16 @@ namespace NCL {
 			void UpdateBGM();
 			void UpdateScores(float dt);
 
-			StateGameObject* testStateObject;
 			int currentObj;
-
-
 
 			float timeSinceLastScoreUpdate;
 
 			Renderer*			renderer;
 			PhysicsSystem*		physics;
 			GameWorld*			world;
-			NCL::AudioManager*		audio;
-			BGMManager*	bgm;
+			NCL::AudioManager*	audio;
+			BGMManager*			bgm;
 			LevelLoader*		levelLoader;
-			vector<PowerUp*>	powerups;
 
 			GameState state;
 			GameManager* gameManager;
@@ -113,8 +109,6 @@ namespace NCL {
 
 			bool won = false;
 			Player* player1 = nullptr;
-
-			vector<Vector3> playerSpawnPositions;
 		};
 	}
 }

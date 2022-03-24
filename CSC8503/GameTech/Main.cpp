@@ -26,6 +26,7 @@ size_t       sceLibcHeapSize = 256 * 1024 * 1024;	/* Set up heap area upper limi
 #include <iostream>
 
 #include "NetworkedGame.h"
+#include "LoadingScreen.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -116,43 +117,58 @@ protected:
 
 class Menu : public PushdownState {
 public:
-	Menu(MainMenu* m, TutorialGame* g, TutorialGame* h, TutorialGame* i) : m(m), g(g), h(h), i(i) {};
+	Menu(MainMenu* m, TutorialGame* g, NetworkedGame* h) : m(m), tg(g), ng(h) {};
 
 	PushdownResult OnUpdate(float dt, PushdownState** newState) override {
 		m->UpdateGame(dt);
 
 		/*if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM1)) {
-			*newState = new Game(f);
+			*newState = new Game(tg);
 			return PushdownResult::Push;
-		}
+		}*/
 
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM2)) {
-			*newState = new Game(h);
-			return PushdownResult::Push;
-		}
-
-		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM3)) {
-			*newState = new Game(i);
+			*newState = new Game(ng);
 			return PushdownResult::Push;
 		}
 
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
 			return PushdownResult::Exit;
-		}*/
-
-		if (m->GetPaused()) {
-			
-			*newState = new PauseGame(m);
-			return PushdownResult::Push;
 		}
 
 		return PushdownResult::NoChange;
 	}
 
 protected:
-	TutorialGame* g;
-	TutorialGame* h;
-	TutorialGame* i;
+	TutorialGame* tg;
+	NetworkedGame* ng;
+	MainMenu* m;
+};
+
+class Loading : public PushdownState
+{
+public:
+	Loading(LoadingScreen* l) : ls(l) {};
+	PushdownResult OnUpdate(float dt, PushdownState** newState) override 
+	{
+		LoadingScreen::SetInstancesToLoad(2);
+		LoadingScreen::SetCompletionState(false);
+		LoadingScreen::UpdateGame(dt);
+
+		m = new MainMenu();
+		ng = new NetworkedGame();
+		tg = nullptr;
+
+		LoadingScreen::SetCompletionState(true);
+		
+		*newState = new Menu(m, tg, ng);
+		return PushdownResult::Push;
+	}
+
+protected:
+	LoadingScreen* ls;
+	NetworkedGame* tg;
+	NetworkedGame* ng;
 	MainMenu* m;
 };
 
@@ -191,12 +207,12 @@ int main() {
 	float totalTime = 0.0f;
 	int totalFrames = 0;
 
-	//TutorialGame* g = new TutorialGame();
+	w->SetTitle("Loading");
+
+	LoadingScreen* l = new LoadingScreen();
+	//PushdownMachine p = new Loading(l);	
 	NetworkedGame* h = new NetworkedGame();
-	// MainMenu* m = new MainMenu();
-	// PushdownMachine p = new Menu(m, g, h, g);
-	//MainMenu* m = new MainMenu();
-	//PushdownMachine p = new Menu(m, g, g, g);
+		
 	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
 	float smallestFrameRate = 144.0f;
 	while (w->UpdateWindow()) { //&& !w->GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
@@ -238,9 +254,9 @@ int main() {
 
 		h->UpdateGame(dt);
 
-		//if (!p.Update(dt)) {
-		//	return 0;
-		//}
+		/*if (!p.Update(dt)) {
+			return 0;
+		}*/
 	}
 	Window::DestroyGameWindow();
 }

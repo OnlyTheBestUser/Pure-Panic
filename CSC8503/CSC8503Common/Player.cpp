@@ -1,8 +1,15 @@
 #include "Player.h"
 #include "../GameTech/LevelLoader.h"
+#include "GameManager.h"
 
 using namespace NCL;
 using namespace CSC8503;
+
+Player::Player(Camera* camera, string name, Vector3 ch) : GameActor(name), checkpoint(ch), spawnPos(ch) {
+	this->camera = camera;
+	camLocked = true;
+	playerID = 0;
+};
 
 void Player::OnCollisionBegin(GameObject* other, Vector3 localA, Vector3 localB, Vector3 normal)
 {
@@ -12,6 +19,10 @@ void Player::OnCollisionBegin(GameObject* other, Vector3 localA, Vector3 localB,
 			DealDamage(projectile->GetDamage());
 		}
 	}
+}
+
+void Player::SetColour(Vector4 col) {
+	this->renderObject->SetColour(GameManager::GetColourForID(playerID));
 }
 
 void Player::Update(float dt)
@@ -35,8 +46,10 @@ void Player::Update(float dt)
 	if (force.y == 0) GetPhysicsObject()->AddAcceleration(force.Normalised() * curSpeed * dt);
 	else GetPhysicsObject()->AddAcceleration(force.Normalised() * inAirSpeed * dt);
 
+	float distanceToGround = CheckDistToGround();
+
 	// For smooth jump mechanism
-	if (CheckDistToGround() < 0.5f) {
+	if (distanceToGround < 0.3f) {
 		canJump = true;
 	}
 	else {
@@ -44,7 +57,7 @@ void Player::Update(float dt)
 	}
 
 	// Check if grounded, if so don't apply more gravity
-	if (CheckDistToGround() < 0.01f && force.y <= 0.0f)
+	if (distanceToGround < 0.3f && force.y <= 0.0f)
 	{
 		Vector3 currentVel = GetPhysicsObject()->GetLinearVelocity();
 		GetPhysicsObject()->SetLinearVelocity(Vector3(currentVel.x, 0.0f, currentVel.z));
@@ -69,16 +82,16 @@ float Player::CheckDistToGround()
 {
 	Ray ray(GetTransform().GetPosition(), Vector3(0, -1, 0));
 	RayCollision closestCollision;
-	world->Raycast(ray, closestCollision, true);
+	GameWorld::RaycastIgnoreObject(this, ray, closestCollision, true);
 	float distToGround = GetTransform().GetPosition().y - closestCollision.collidedAt.y;
 
 	const CollisionVolume* volume = GetBoundingVolume();
 	switch (GetBoundingVolume()->type)
 	{
-	case VolumeType::AABB: distToGround -= ((const AABBVolume&)* volume).GetHalfDimensions().y; break;
-	case VolumeType::OBB: distToGround -= ((const OBBVolume&)* volume).GetHalfDimensions().y; break;
-	case VolumeType::Sphere: distToGround -= ((const SphereVolume&)* volume).GetRadius(); break;
-	case VolumeType::Capsule: distToGround -= ((const CapsuleVolume&)* volume).GetHalfHeight(); break;
+	case VolumeType::AABB:    distToGround -= ((const AABBVolume&)*    volume).GetHalfDimensions().y; break;
+	case VolumeType::OBB:     distToGround -= ((const OBBVolume&)*     volume).GetHalfDimensions().y; break;
+	case VolumeType::Sphere:  distToGround -= ((const SphereVolume&)*  volume).GetRadius(); break;
+	case VolumeType::Capsule: distToGround -= ((const CapsuleVolume&)* volume).GetHalfHeight() + ((const CapsuleVolume&)* volume).GetRadius(); break;
 	}
 
 	return distToGround;
@@ -87,15 +100,17 @@ float Player::CheckDistToGround()
 void Player::Fire() {
 	if (timeSincePrevShot > fireRate)
 	{
-		for(int i = 0; i < bulletsPerShot; ++i)
-			levelLoader->SpawnProjectile(this);
+		for (int i = 0; i < bulletsPerShot; ++i)
+		{
+			LevelLoader::SpawnProjectile(this, ((currentPowerUp == PowerUpType::MultiBullet) || IsDead()));
+			++BulletCounter;
+		}
 		timeSincePrevShot = 0.0f;
 		fired = true;
 	}
 	else {
 		fired = false;
 	}
-
 }
 
 bool Player::IsDead(){
@@ -109,6 +124,12 @@ bool Player::IsDead(){
 void Player::Respawn(){
 	GetTransform().SetPosition(spawnPos);
 	health = maxHealth;
+	BulletCounter = 0;
+}
+
+void Player::SetPlayerID(int playerID){
+	this->playerID = playerID;
+	SetColour(GameManager::GetColourForID(playerID));
 }
 
 void Player::Reset() 

@@ -27,7 +27,7 @@ namespace NCL {
 			bool networked = false;
 
 			virtual void Update(float dt) override {
-				if (IsPicked) {
+				if (IsPicked || reappearAfter >= 0.0f) {
 					reappearAfter -= dt;
 					if (reappearAfter <= 0.f) {
 						GetRenderObject()->SetVisibility(true);
@@ -36,12 +36,13 @@ namespace NCL {
 				}
 			}
 
-			bool IsPickedUp() const {
-				return IsPicked;
+			bool IsPickedUp() {
+				bool x = IsPicked;
+				IsPicked = false;
+				return x;
 			}
 
 			void PickUp() {
-				IsPicked = true;
 				reappearAfter = REAPPEAR_AFTER_DURATION;
 				GetRenderObject()->SetVisibility(false);
 			}
@@ -55,10 +56,9 @@ namespace NCL {
 
 			PowerUpType powerUpType;
 			float powerupDuration;
-
+			
 			bool IsPicked;
 			float reappearAfter;
-
 		};
 	}
 }

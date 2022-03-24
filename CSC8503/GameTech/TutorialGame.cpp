@@ -13,26 +13,28 @@
 #include "../../Common/Assets.h"
 
 #include "../CSC8503Common/InputList.h"
+#include "LoadingScreen.h"
 
 using namespace NCL;
 using namespace CSC8503;
 
 TutorialGame::TutorialGame()	{
 	world			= new GameWorld();
+	LoadingScreen::AddProgress(15.0f);
+	LoadingScreen::UpdateGame(0.0f);
 	renderer		= new Renderer(*world);
+	LoadingScreen::AddProgress(10.0f);
+	LoadingScreen::UpdateGame(0.0f);
 	physics			= new PhysicsSystem(*world);
-	levelLoader		= new LevelLoader(world, physics, renderer);
+	LoadingScreen::AddProgress(25.0f);
+	LoadingScreen::UpdateGame(0.0f);
+	levelLoader		= new LevelLoader(physics, renderer);
+	LoadingScreen::AddProgress(50.0f);
+	LoadingScreen::UpdateGame(0.0f);
 	gameManager		= new GameManager(this);
+	
 #ifndef _ORBIS
-	audio = NCL::AudioManager::GetInstance();
-	audio->Initialize();
-	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_01.ogg", true, false, false);
-	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_02.ogg", true, false, false);
-	audio->LoadSound(Assets::AUDIODIR + "gun_fire.ogg", true, false, false);
-	audio->LoadSound(Assets::AUDIODIR + "menu_music.ogg", false, true, true);
-
-	bgm = new BGMManager(audio);
-	bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 3.0f);
+	InitSounds();
 #endif
 
 	forceMagnitude = 30.0f;
@@ -40,8 +42,6 @@ TutorialGame::TutorialGame()	{
 	physics->UseGravity(useGravity);
 
 	inSelectionMode = false;
-
-	testStateObject = nullptr;
 
 	state = PLAY;
 
@@ -83,35 +83,53 @@ TutorialGame::TutorialGame()	{
 
 	inputHandler = new InputHandler();
 
-	Command* toggleGrav = new ToggleGravityCommand(physics);
 	Command* toggleDebug = new ToggleBoolCommand(&debugDraw);
 	Command* togglePause = new ToggleBoolCommand(&pause);
 	Command* toggleMouse = new ToggleMouseCommand(&inSelectionMode);
+	Command* resetWorld = new ResetWorldCommand(&state);
 	Command* quitCommand = new QuitCommand(&quit, &pause);
 	//Command* paintFireCommand = new PaintFireCommand(this);
 	Command* startTimer = new StartTimerCommand(gameManager->GetTimer());
-	inputHandler->BindButton(TOGGLE_GRAV, toggleGrav);
+	
 	inputHandler->BindButton(TOGGLE_DEBUG, toggleDebug);
 	inputHandler->BindButton(TOGGLE_PAUSE, togglePause);
+	inputHandler->BindButton(RESET_WORLD, resetWorld);
 	inputHandler->BindButton(QUIT, quitCommand);
 	//inputHandler->BindButton(FIRE, paintFireCommand);
 	inputHandler->BindButton(TOGGLE_MOUSE, toggleMouse);
 	inputHandler->BindButton(START_TIMER, startTimer);
 
 #pragma endregion
-
-	InitialiseAssets();
 }
-/*
 
-Each of the little demo scenarios used in the game uses the same 2 meshes,
-and the same texture and shader. There's no need to ever load in anything else
-for this module, even in the coursework, but you can add it if you like!
-
-*/
 void TutorialGame::InitialiseAssets() {
 	InitCamera();
 	InitWorld();
+}
+
+
+void TutorialGame::InitSounds() {
+#ifndef _ORBIS
+	audio = NCL::AudioManager::GetInstance();
+	audio->Initialize();
+	//Menu Sounds
+	audio->LoadSound(Assets::AUDIODIR + "menu_music.ogg", false, true, true);
+	audio->LoadSound(Assets::AUDIODIR + "menu_move.ogg", false, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "menu_select.ogg", false, false, false);
+
+	//Shooting Sounds
+	audio->LoadSound(Assets::AUDIODIR + "gun_fire.ogg", true, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_01.ogg", true, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_02.ogg", true, false, false);
+
+	//Player Sounds
+	audio->LoadSound(Assets::AUDIODIR + "boy_whoa_01.ogg", true, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "boy_whoa_02.ogg", true, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "boy_whoa_03.ogg", true, false, false);
+
+	bgm = new BGMManager(audio);
+	bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 3.0f);
+#endif // !_ORBIS
 }
 
 TutorialGame::~TutorialGame() {
@@ -124,7 +142,8 @@ TutorialGame::~TutorialGame() {
 void TutorialGame::UpdateGame(float dt) {
 	Debug::SetRenderer(renderer);
 	switch (state) {
-	case PLAY: UpdateGameWorld(dt); break;
+	case PLAY: 
+		UpdateGameWorld(dt); break;
 	case PAUSE: UpdatePauseScreen(dt); break;
 	case WIN: UpdateWinScreen(dt); break;
 	case RESET: {
@@ -132,6 +151,7 @@ void TutorialGame::UpdateGame(float dt) {
 		InitWorld();
 		renderer->ClearPaint();
 		selectionObject = nullptr;
+		state = PLAY;
 		break;
 	}
 	}
@@ -141,6 +161,10 @@ void TutorialGame::UpdateGame(float dt) {
 	renderer->Update(dt);
 
 	Debug::FlushRenderables(dt);
+
+	renderer->scores = gameManager->CalcCurrentScoreRatio();
+	renderer->drawGUI = (!LoadingScreen::GetCompletionState() && state == PLAY);
+
 	renderer->Render();
 }
 
@@ -156,13 +180,6 @@ void TutorialGame::UpdateGameWorld(float dt)
 	}
 
 	//UpdateKeys();
-
-	if (physics->GetGravity()) {
-		Debug::Print("(G)ravity on", Vector2(5, 95));
-	}
-	else {
-		Debug::Print("(G)ravity off", Vector2(5, 95));
-	}
 
 	if (debugDraw) {
 		GameObjectIterator first;
@@ -209,7 +226,7 @@ void TutorialGame::UpdateScores(float dt) {
 			return;
 		}
 		// Need to score the texture here.
-		Vector2 scoreDif = renderer->CountPaintMask((*cur)->GetRenderObject()->GetPaintMask(), world->GetScore((*cur)), Vector4(0.3, 0, 0.5, 1), Vector4(0.250, 0.878, 0.815, 1));
+		Vector2 scoreDif = renderer->CountPaintMask((*cur)->GetRenderObject()->GetPaintMask(), world->GetScoreForObject((*cur)), GameManager::team1Colour, GameManager::team2Colour);
 		if ((*cur)->GetPaintRadius() != 0){
 			scoreDif = scoreDif / (*cur)->GetPaintRadius();
 		}
@@ -351,14 +368,9 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	levelLoader->ReadInLevelFile(NCL::Assets::DATADIR + "../../Assets/Maps/map1.txt");
-  
-	Player* player = levelLoader->AddPlayerToWorld(Vector3(0, 5, 0)); // #TODO Use playerSpawnPositions 
-	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 20), PowerUpType::SpeedBoost);
-	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 30), PowerUpType::FireRate);
-	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 40), PowerUpType::Heal);
-	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 50), PowerUpType::MultiBullet);
-
+	levelLoader->ReadInLevelFile(NCL::Assets::MAPDIR + "map1.txt");
+	Player* player = levelLoader->SpawnPlayer(Vector3(0, 5, 0));
+	
 	AxisCommand* m = new MoveCommand(player);
 	inputHandler->BindAxis(0, m);
 
@@ -377,13 +389,12 @@ void TutorialGame::InitWorld() {
 	Command* f = new FireCommand(player);
 	inputHandler->BindButton(FIRE, f);
 
-	/*GameObject* cap1 = levelLoader->AddCapsuleToWorld(Vector3(15, 15, 0), 3.0f, 1.5f);
+	/*GameObject* cap1 = LevelLoader->AddCapsuleToWorld(Vector3(15, 15, 0), 3.0f, 1.5f);
 	cap1->GetPhysicsObject()->SetDynamic(true);
 	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);*/
 
 	player1 = player;
-
-	//Projectile* spit = AddProjectileToWorld(Vector3(5, 5, 0), 0.3f, 1.0f);
+	renderer->playerColour = GameManager::GetColourForID(player1->GetPlayerID());
 
 	physics->BuildStaticList();
 }

@@ -37,7 +37,6 @@ float mask(vec2 _position, vec2 _center, float _radius, float _hardness){
 void main(void)	{
 // This world possition is the position of verticies not fragments.
 
-    float scale = length(textureScale);
     float f = mask(gl_FragCoord.xy / viewport,uvHitPoint, radius/100, hardness);
 
     float edge = f * strength;

@@ -11,7 +11,9 @@ GameServer::GameServer(int onPort, int maxClients) {
 	port = onPort;
 	clientMax = maxClients;
 	clientCount = 0;
+#ifndef ORBISNET
 	netHandle = nullptr;
+#endif
 	//threadAlive = false;
 
 	Initialise();
@@ -22,6 +24,7 @@ GameServer::~GameServer() {
 }
 
 void GameServer::Shutdown() {
+#ifndef ORBISNET
 	SendGlobalPacket(BasicNetworkMessages::Shutdown);
 
 	//threadAlive = false;
@@ -29,9 +32,11 @@ void GameServer::Shutdown() {
 
 	enet_host_destroy(netHandle);
 	netHandle = nullptr;
+#endif
 }
 
 bool GameServer::Initialise() {
+#ifndef ORBISNET
 	ENetAddress address;
 	address.host = ENET_HOST_ANY;
 	address.port = port;
@@ -46,8 +51,9 @@ bool GameServer::Initialise() {
 	//updateThread	= std::thread(&GameServer::ThreadedUpdate, this);
 
 	return true;
+#endif
 }
-
+#ifndef ORBISNET
 bool GameServer::SendGlobalPacket(int msgID) {
 	GamePacket packet;
 	packet.type = msgID;
@@ -82,8 +88,9 @@ bool GameServer::SendPacketToPeer(ENetPeer* peer, GamePacket& packet)
 	enet_peer_send(peer, 0, dataPacket);
 	return true;
 }
-
+#endif
 void GameServer::UpdateServer() {
+#ifndef ORBISNET
 	if (!netHandle) {
 		return;
 	}
@@ -119,6 +126,7 @@ void GameServer::UpdateServer() {
 		}
 		enet_packet_destroy(event.packet);
 	}
+#endif
 }
 
 //void GameServer::ThreadedUpdate() {
