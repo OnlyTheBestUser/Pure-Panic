@@ -25,6 +25,7 @@ GameWorld::~GameWorld()	{
 
 void GameWorld::Clear() {
 	gameObjects.clear();
+	paintableObjects.clear();
 	constraints.clear();
 }
 

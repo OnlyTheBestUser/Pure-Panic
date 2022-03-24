@@ -6,6 +6,15 @@
 #include <user_service\user_service_api.h>
 using namespace NCL::PS4;
 
+PS4Input* ps4input = nullptr;
+
+PS4Input* PS4Input::GetInstance() {
+	if (!ps4input) {
+		ps4input = new PS4Input();
+	}
+	return ps4input;
+}
+
 PS4Input::PS4Input()	{
 	SceUserServiceInitializeParams params;
 	memset((void*)&params, 0, sizeof(params));
@@ -97,6 +106,8 @@ void PS4Input::Poll() {
 			buttons[TOGGLE_PAUSE]	= ((data.buttons & SCE_PAD_BUTTON_START) ? 1.0f : 0.0f);
 			buttons[TOGGLE_DEBUG]	= ((data.buttons & SCE_PAD_BUTTON_SQUARE) ? 1.0f : 0.0f);
 			buttons[FIRE]			= ((data.buttons & SCE_PAD_BUTTON_R1) ? 1.0f : 0.0f);
+			buttons[QUIT] = ((data.buttons & SCE_PAD_BUTTON_OPTIONS) ? 1.0f : 0.0f);
+
 			//buttons[FORWARD]	= ((data.leftStick.y / 255.0f) * 2) - 1.0f;
 			//buttons[BACK]		= ((data.leftStick.y / 255.0f) * 2) - 1.0f;
 			//buttons[LEFT]		= ((((data.leftStick.x / 255.0f) * 2) - 1.0f) > 0.1f) ? 0.0f : 1.0f;
