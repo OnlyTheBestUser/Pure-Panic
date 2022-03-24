@@ -37,7 +37,10 @@ TutorialGame::TutorialGame()	{
 	levelLoader		= new LevelLoader(physics, renderer, this);
 	LoadingScreen::AddProgress(50.0f);
 	LoadingScreen::UpdateGame(0.0f);
+
 	gameManager		= new GameManager(this);
+
+	LoadingScreen::ResetProgress();
 	LoadingScreen::SetCompletionState(true);
 	
 #ifndef _ORBIS
@@ -53,10 +56,7 @@ TutorialGame::TutorialGame()	{
 	state = GameState::PLAY;
 
 	Debug::SetRenderer(renderer);
-
-	//physics->SetGravity(Vector3(0, 9.8f, 0));
-	//physics->SetLinearDamping(10.0f);
-
+	
 #pragma region Commands
 
 	/*
@@ -95,14 +95,12 @@ TutorialGame::TutorialGame()	{
 	Command* toggleMouse = new ToggleMouseCommand(&inSelectionMode);
 	Command* resetWorld = new ResetWorldCommand(&state);
 	Command* quitCommand = new QuitCommand(&quit, &pause);
-	//Command* paintFireCommand = new PaintFireCommand(this);
 	Command* startTimer = new StartTimerCommand(gameManager->GetTimer());
 	
 	inputHandler->BindButton(TOGGLE_DEBUG, toggleDebug);
 	inputHandler->BindButton(TOGGLE_PAUSE, togglePause);
 	inputHandler->BindButton(RESET_WORLD, resetWorld);
 	inputHandler->BindButton(QUIT, quitCommand);
-	//inputHandler->BindButton(FIRE, paintFireCommand);
 	inputHandler->BindButton(TOGGLE_MOUSE, toggleMouse);
 	inputHandler->BindButton(START_TIMER, startTimer);
 
@@ -216,10 +214,9 @@ void TutorialGame::UpdateGameWorld(float dt)
 	if (!inSelectionMode) {
 		world->GetMainCamera()->UpdateCamera(dt);
 	}
-
-
+	
 	UpdateDebugText(dt);
-
+	
 	if (debugDraw) {
 		GameObjectIterator first;
 		GameObjectIterator last;
@@ -231,7 +228,6 @@ void TutorialGame::UpdateGameWorld(float dt)
 			DebugDrawVelocity((*i)->GetPhysicsObject()->GetLinearVelocity(), &(*i)->GetTransform());
 		}
 	}
-
 
 	physics->Update(dt);
 	world->UpdateWorld(dt);
@@ -293,7 +289,6 @@ void TutorialGame::UpdateScores(float dt) {
 			scoreDif = scoreDif / (*cur)->GetPaintRadius();
 		}
 		world->UpdateScore((*cur), scoreDif);
-		//std::cout << (*cur)->GetName() << "\n" << "Team 1: " << scoreDif.x << "\n" << "Team 2: " << scoreDif.y << "\n\n";
 
 		gameManager->UpdateScores(scoreDif);
 		timeSinceLastScoreUpdate = 0;
@@ -358,8 +353,8 @@ void TutorialGame::InitWorld() {
 	physics->Clear();
 
 	levelLoader->ReadInLevelFile(NCL::Assets::MAPDIR + "training_map.txt");
-	Player* player = levelLoader->SpawnPlayer(Vector3(0, 5, 0));
-
+	
+	Player* player = levelLoader->SpawnPlayer(Vector3(-50, 5, -50));
 	player->SetRenderObject(nullptr);
 	
 	AxisCommand* m = new MoveCommand(player);
@@ -379,11 +374,7 @@ void TutorialGame::InitWorld() {
 
 	Command* f = new FireCommand(player);
 	inputHandler->BindButton(FIRE, f);
-
-	/*GameObject* cap1 = LevelLoader->AddCapsuleToWorld(Vector3(15, 15, 0), 3.0f, 1.5f);
-	cap1->GetPhysicsObject()->SetDynamic(true);
-	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);*/
-
+	
 	player1 = player;
 	renderer->playerColour = GameManager::GetColourForID(player1->GetPlayerID());
 
@@ -417,7 +408,6 @@ bool TutorialGame::SelectObject() {
 			if (selectionObject) {	//set colour to deselected;
 				if (selectionObject->GetRenderObject())
 					selectionObject->GetRenderObject()->SetColour(Vector4(1, 1, 1, 1));
-				//selectionObject->SetLayer(0);
 				selectionObject = nullptr;
 			}
 
@@ -428,17 +418,7 @@ bool TutorialGame::SelectObject() {
 				selectionObject = (GameObject*)closestCollision.node;
 				if (selectionObject->GetRenderObject())
 					selectionObject->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
-				//selectionObject->SetLayer(1);
-				//Ray r(selectionObject->GetTransform().GetPosition(), Vector3(0,0,-1));
-				//RayCollision col;
-
-				// Doesn't work for cubes for some reason idk
-
-				//if (world->Raycast(r, col, true)) {
-				//	((GameObject*)col.node)->GetRenderObject()->SetColour(Vector4(0, 0, 1, 1));
-				//	Debug::DrawLine(r.GetPosition(), col.collidedAt, Vector4(1, 0, 0, 1), 5.0f);
-				//}
-
+				
 				Debug::DrawLine(ray.GetPosition(), closestCollision.collidedAt, Vector4(1, 0, 0, 1), 5.0f);
 				return true;
 			}
@@ -484,7 +464,6 @@ void TutorialGame::MoveSelectedObject(float dt) {
 
 	if (Window::GetKeyboard()->KeyHeld(NCL::KeyboardKeys::F))
 		selectionObject->Interact(dt);
-
 }
 
 void TutorialGame::UpdateBGM() {
@@ -492,15 +471,12 @@ void TutorialGame::UpdateBGM() {
 
 	switch (state) {
 	case GameState::PLAY:
-		std::cout << "play";
 		bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 3.0f);
 		break;
 	case GameState::PAUSE:
-		std::cout << "pause";
 		bgm->StopMusic();
 		break;
 	case GameState::RESET:
-		std::cout << "reset";
 		bgm->StopMusic();
 		break;
 	default:
@@ -518,7 +494,6 @@ void TutorialGame::PaintObject() {
 	if (world->Raycast(ray, closestCollision, true)) {
 		auto test = ((GameObject*)closestCollision.node)->GetRenderObject();
 
-		//Debug::DrawLine(ray.GetPosition(), ray.GetPosition() * ray.GetDirection());
 		Debug::DrawSphere(closestCollision.collidedAt, 0.5, Vector4(1,0,0,1), 0.f);
 		if (test) {
 			
@@ -526,7 +501,6 @@ void TutorialGame::PaintObject() {
 			Vector3 collisionPoint;
 			Vector3 barycentric;
 			CollisionDetection::GetBarycentricFromRay(ray, *test, texUV_a, texUV_b, texUV_c, barycentric, collisionPoint);
-			
 			
 			// Get the uv from the ray
 			renderer->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, ((GameObject*)closestCollision.node)->GetPaintRadius(), 0.2, 0.2, Vector4(0.3, 0, 0.5, 1));
