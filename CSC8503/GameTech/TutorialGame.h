@@ -12,7 +12,7 @@ namespace NCL {
 		class InputBase;
 	}
 	namespace CSC8503 {
-		enum GameState {
+		enum class GameState {
 			PLAY,
 			PAUSE,
 			WIN,
@@ -32,13 +32,6 @@ namespace NCL {
 			void SetState(GameState s) { 
 				state = s; 
 				UpdateBGM(); 
-			}
-
-			void ResetGame() {
-				state = RESET;
-				quit = false;
-				pause = false;
-				InitialiseAssets();
 			}
 
 			bool Win() const { 
@@ -100,6 +93,7 @@ namespace NCL {
 			bool inSelectionMode;
 			bool debugDraw;
 			bool pause = false;
+			bool pausePressed = false;
 			bool quit = false;
 
 			float		forceMagnitude;

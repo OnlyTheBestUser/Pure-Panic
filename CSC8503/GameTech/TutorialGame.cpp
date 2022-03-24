@@ -42,7 +42,7 @@ TutorialGame::TutorialGame()	{
 
 	inSelectionMode = false;
 
-	state = PLAY;
+	state = GameState::PLAY;
 
 	Debug::SetRenderer(renderer);
 
@@ -84,7 +84,7 @@ TutorialGame::TutorialGame()	{
 
 	Command* toggleGrav = new ToggleGravityCommand(physics);
 	Command* toggleDebug = new ToggleBoolCommand(&debugDraw);
-	Command* togglePause = new ToggleBoolCommand(&pause);
+	Command* togglePause = new ToggleBoolCommand(&pausePressed);
 	Command* toggleMouse = new ToggleMouseCommand(&inSelectionMode);
 	Command* resetWorld = new ResetWorldCommand(&state);
 	Command* quitCommand = new QuitCommand(&quit, &pause);
@@ -117,19 +117,45 @@ TutorialGame::~TutorialGame() {
 
 void TutorialGame::UpdateGame(float dt) {
 	Debug::SetRenderer(renderer);
-	switch (state) {
-	case PLAY: UpdateGameWorld(dt); break;
-	case PAUSE: UpdatePauseScreen(dt); break;
-	case WIN: UpdateWinScreen(dt); break;
-	case RESET: {
-		InitCamera();
-		InitWorld();
-		renderer->ClearPaint();
-		selectionObject = nullptr;
-		state = PLAY;
-		quit = false;
-		break;
+
+	if (pausePressed) {
+		if (pause == false) {
+			pause = true;
+			SetState(GameState::PAUSE);
+		}
+		else {
+			pause = false;
+			SetState(GameState::PLAY);
+			
+		}
+		pausePressed = false;
 	}
+
+	switch (state) {
+		case GameState::PLAY: {
+			UpdateGameWorld(dt);
+			break;
+		}
+		case GameState::PAUSE: {
+			UpdatePauseScreen(dt); 
+			UpdateGameWorld(dt);
+			break;
+		}
+		case GameState::WIN: {
+			UpdateWinScreen(dt);
+			break;
+		}
+		case GameState::RESET: {
+			InitCamera();
+			InitWorld();
+			renderer->ClearPaint();
+			selectionObject = nullptr;
+			quit = false;
+			pause = false;
+			SetState(GameState::PLAY);
+
+			break;
+		}
 	}
 
 	inputHandler->HandleInput();
@@ -149,7 +175,6 @@ void TutorialGame::UpdateGameWorld(float dt)
 		world->GetMainCamera()->UpdateCamera(dt);
 	}
 
-	//UpdateKeys();
 
 	if (physics->GetGravity()) {
 		Debug::Print("(G)ravity on", Vector2(5, 95));
@@ -170,12 +195,9 @@ void TutorialGame::UpdateGameWorld(float dt)
 		}
 	}
 
-	//SelectObject();
-	//MoveSelectedObject(dt);
+
 	physics->Update(dt);
-
 	world->UpdateWorld(dt);
-
 	gameManager->Update(dt);
 
 	UpdateScores(dt);
@@ -258,78 +280,6 @@ void TutorialGame::UpdateWinScreen(float dt)
 	renderer->DrawString("YOU WIN", Vector2(5, 80), Debug::MAGENTA, 30.0f);
 	renderer->DrawString("Press R to Restart.", Vector2(5, 90), Debug::WHITE, 20.0f);
 	renderer->DrawString("Press Esc to return to Main Menu.", Vector2(5, 95), Debug::WHITE, 20.0f);
-}
-
-void TutorialGame::UpdateKeys() {
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F1)) {
-		InitWorld(); //We can reset the simulation at any time with F1
-		selectionObject = nullptr;
-	}
-
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F2)) {
-		InitCamera(); //F2 will reset the camera to a specific default place
-	}
-
-	//Running certain physics updates in a consistent order might cause some
-	//bias in the calculations - the same objects might keep 'winning' the constraint
-	//allowing the other one to stretch too much etc. Shuffling the order so that it
-	//is random every frame can help reduce such bias.
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F9)) {
-		world->ShuffleConstraints(true);
-	}
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F10)) {
-		world->ShuffleConstraints(false);
-	}
-
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F7)) {
-		world->ShuffleObjects(true);
-	}
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F8)) {
-		world->ShuffleObjects(false);
-	}
-	if (Window::GetKeyboard()->KeyPressed(NCL::KeyboardKeys::L)) {
-		player1->ChangeCamLock();
-	}
-
-	DebugObjectMovement();
-}
-
-void TutorialGame::DebugObjectMovement() {
-	//If we've selected an object, we can manipulate it with some key presses
-	if (inSelectionMode && selectionObject) {
-		//Twist the selected object!
-		//if (Window::GetKeyboard()->KeyDown(KeyboardKeys::LEFT)) {
-		//	selectionObject->GetPhysicsObject()->AddTorque(Vector3(-10, 0, 0));
-		//}
-
-		//if (Window::GetKeyboard()->KeyDown(KeyboardKeys::RIGHT)) {
-		//	selectionObject->GetPhysicsObject()->AddTorque(Vector3(10, 0, 0));
-		//}
-
-		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::NUM7)) {
-			selectionObject->GetPhysicsObject()->AddTorque(Vector3(0, 10, 0));
-		}
-
-		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::NUM8)) {
-			selectionObject->GetPhysicsObject()->AddTorque(Vector3(0, -10, 0));
-		}
-
-		//if (Window::GetKeyboard()->KeyDown(KeyboardKeys::RIGHT)) {
-		//	selectionObject->GetPhysicsObject()->AddTorque(Vector3(10, 0, 0));
-		//}
-
-		//if (Window::GetKeyboard()->KeyDown(KeyboardKeys::UP)) {
-		//	selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 0, -10));
-		//}
-
-		//if (Window::GetKeyboard()->KeyDown(KeyboardKeys::DOWN)) {
-		//	selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 0, 10));
-		//}
-
-		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::NUM5)) {
-			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, -10, 0));
-		}
-	}
 }
 
 void TutorialGame::InitCamera() {
@@ -472,57 +422,21 @@ void TutorialGame::MoveSelectedObject(float dt) {
 	if (Window::GetKeyboard()->KeyHeld(NCL::KeyboardKeys::F))
 		selectionObject->Interact(dt);
 
-	/*if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::UP)) {
-		if (selectionObject->GetName() == "player")
-			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 0, -1) * ((Player*)selectionObject)->GetSpeed() * 0.1);
-		else
-			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 0, -1) * forceMagnitude * 0.1);
-	}
-	if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::DOWN)) {
-		if (selectionObject->GetName() == "player")
-			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 0, 1) * ((Player*)selectionObject)->GetSpeed() * 0.1);
-		else
-			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 0, 1) * forceMagnitude * 0.1);
-	}
-	if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::LEFT)) {
-		if (selectionObject->GetName() == "player")
-			selectionObject->GetPhysicsObject()->AddForce(Vector3(-1, 0, 0) * ((Player*)selectionObject)->GetSpeed() * 0.1);
-		else
-			selectionObject->GetPhysicsObject()->AddForce(Vector3(-1, 0, 0) * forceMagnitude * 0.1);
-	}
-	if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::RIGHT)) {
-		if (selectionObject->GetName() == "player")
-			selectionObject->GetPhysicsObject()->AddForce(Vector3(1, 0, 0) * ((Player*)selectionObject)->GetSpeed() * 0.1);
-		else
-			selectionObject->GetPhysicsObject()->AddForce(Vector3(1, 0, 0) * forceMagnitude * 0.1);
-	}
-	if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::SHIFT)) {
-		if (selectionObject->GetName() == "player")
-			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, -1, 0) * ((Player*)selectionObject)->GetSpeed() * 0.1);
-		else
-			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, -1, 0) * forceMagnitude * 0.1);
-	}
-	if (Window::GetKeyboard()->KeyDown(NCL::KeyboardKeys::SPACE)) {
-		if (selectionObject->GetName() == "player")
-			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 1, 0) * ((Player*)selectionObject)->GetSpeed() * 0.1);
-		else
-			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 1, 0) * forceMagnitude * 0.1);
-	}*/
 }
 
 void TutorialGame::UpdateBGM() {
 #ifndef _ORBIS
 
 	switch (state) {
-	case PLAY:
+	case GameState::PLAY:
 		std::cout << "play";
 		bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 3.0f);
 		break;
-	case PAUSE:
+	case GameState::PAUSE:
 		std::cout << "pause";
 		bgm->StopMusic();
 		break;
-	case RESET:
+	case GameState::RESET:
 		std::cout << "reset";
 		bgm->StopMusic();
 		break;

@@ -17,14 +17,14 @@ namespace NCL {
 				if (!level)
 					return PushdownResult::Pop;
 
-				if (level->GetQuit()) {
-					level->SetQuit(false);
+				level->UpdateGame(dt);
+
+				if (level->GetPaused() && level->GetQuit()) {
 					level->SetState(GameState::RESET);
+					level->UpdateGame(dt);
 					return PushdownResult::Pop;
 				}
 
-				level->UpdateGame(dt);
-				
 				return PushdownState::PushdownResult::NoChange;
 			}
 		protected:

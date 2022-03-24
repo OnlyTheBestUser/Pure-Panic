@@ -142,8 +142,9 @@ namespace NCL {
 				QuitCommand(bool* quit, bool* paused) : paused(paused), quit(quit) {};
 				virtual ~QuitCommand() {};
 				void execute() {
-					if (paused)
+					if (*paused == true) {
 						*quit = true;
+					}
 				}
 			protected:
 				bool* paused;
@@ -155,7 +156,7 @@ namespace NCL {
 			ResetWorldCommand(GameState* s) : state(s) {};
 			virtual ~ResetWorldCommand() {};
 			void execute() {
-				*state = RESET;
+				*state = GameState::RESET;
 			}
 		protected:
 			GameState* state;
