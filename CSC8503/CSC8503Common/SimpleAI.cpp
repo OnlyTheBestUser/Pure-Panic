@@ -1,6 +1,7 @@
 #include "SimpleAI.h"
 #include "Debug.h"
 #include "../CSC8503Common/GameWorld.h"
+#include "../GameTech/LevelLoader.h"
 #include "../../Common/Maths.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -17,18 +18,17 @@ void SimpleAI::Update(float dt)
 		force = Arrive(target->GetTransform().GetPosition());
 
 		Vector3 magnitudeDir = Vector3::Cross(physicsObject->GetLinearVelocity(), Vector3(0, 1, 0)).Normalised() * avoid_magnitude;
-		Debug::DrawLine(transform.GetPosition(), transform.GetPosition() + magnitudeDir.Normalised() * avoid_distance, Debug::BLUE);
 		float magnitude = Avoid();
-		//Vector3 newForce = (force * (1.0f - magnitude)) + (magnitudeDir * magnitude);
-		//if (magnitude != 0.0f)
-		//	physicsObject->AddForce(magnitudeDir * magnitude);
-		//else
+
+		if (Vector3::Dot(force.Normalised(), physicsObject->GetLinearVelocity().Normalised()) < 0.0f && abs(magnitude) > 0.0f) {
+			physicsObject->AddForce(physicsObject->GetLinearVelocity().Normalised() * max_speed * 0.4f);
+		}
+		else {
 			physicsObject->AddForce((force * (1.0f - magnitude)) + (magnitudeDir * magnitude));
-		// Forwards
-		//Debug::DrawLine(transform.GetPosition(), transform.GetPosition() + physicsObject->GetLinearVelocity().Normalised() * avoid_distance, Debug::WHITE);
-		//Debug::DrawLine(transform.GetPosition(), transform.GetPosition() + (magnitudeDir * magnitude), Debug::RED);
+		}
 
 		RotateToVelocity();
+		Shoot(dt);
 	}
 }
 
@@ -83,22 +83,6 @@ Vector3 SimpleAI::Arrive(Vector3 arriveTarget)
 
 float SimpleAI::Avoid()
 {
-	// Raycast ahead, if it hits something, raycast to the sides, whichever gets the furthest, go in that direction.
-	Ray forwardRay(transform.GetPosition(), physicsObject->GetLinearVelocity().Normalised() + Vector3(0,0.0000000000000001f,0));
-	forwardRay.SetCollisionLayers(CollisionLayer::LAYER_ONE);
-	RayCollision forwardCollision;
-
-	if (!GameWorld::RaycastIgnoreObject(this, forwardRay, forwardCollision, true)) {
-		return 0.0f;
-	}
-	float distance = (forwardCollision.collidedAt - transform.GetPosition()).Length();
-	if (distance > avoid_distance) {
-		return 0.0f;
-	}
-
-	float magnitude = 1.0f - (forwardCollision.collidedAt - transform.GetPosition()).Length() / avoid_distance;
-	magnitude = Maths::Clamp(magnitude, 0.3f, 1.0f);
-
 	Vector3 leftAngle = (Matrix4::Rotation(-45, Vector3(0, 1, 0)) * Matrix4::Translation(physicsObject->GetLinearVelocity())).GetPositionVector();
 	Ray leftRay(transform.GetPosition(), leftAngle.Normalised() + Vector3(0, 0.000000000000000001f, 0));
 	leftRay.SetCollisionLayers(CollisionLayer::LAYER_ONE);
@@ -112,13 +96,37 @@ float SimpleAI::Avoid()
 	bool rightHit = GameWorld::RaycastIgnoreObject(this, rightRay, rightCollision, true);
 	
 	if (!leftHit && !rightHit)
-		return 1.0f;
+		return 0.0f;
 	else if (!leftHit)
 		return 1.0f;
 	else if (!rightHit)
 		return -1.0f;
 
+	float magnitude;
+	if(leftCollision.rayDistance < rightCollision.rayDistance){
+		magnitude = 1.0f - (leftCollision.rayDistance / avoid_distance);
+	}
+	else {
+		magnitude = 1.0f - (rightCollision.rayDistance / avoid_distance);
+	}
+	magnitude = Maths::Clamp(magnitude, 0.0f, 1.0f);
+
 	return magnitude * (leftCollision.rayDistance < rightCollision.rayDistance ? -1.0f : 1.0f);
+}
+
+void SimpleAI::Shoot(float dt)
+{
+	shoot_time -= dt;
+	
+	if (shoot_time > 0.0f) {
+		return;
+	}
+
+	if ((target->GetTransform().GetPosition() - transform.GetPosition()).Length() < shoot_radius) {
+		LevelLoader::SpawnProjectile((GameObject*)this, false, 0, 0, 1);
+	}
+
+	shoot_time = max_shoot_time;
 }
 
 Vector3 SimpleAI::Pursue()
