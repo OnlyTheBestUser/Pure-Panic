@@ -237,7 +237,6 @@ void TutorialGame::UpdateGameWorld(float dt)
 }
 
 void TutorialGame::UpdateDebugText(float dt) {
-	Debug::DebugPrint(physics->GetGravity() ? "(G)ravity on" : "(G)ravity off", Vector2(5, 5), 20, Vector4(.5, 1, 1, 1));
 	Debug::DebugPrint("FPS:" + std::to_string((1.0f / dt)), Vector2(5, 10), 20, Vector4(1, 1, .5, 1));
 
 #ifndef _ORBIS
