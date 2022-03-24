@@ -18,7 +18,6 @@ namespace NCL {
 
 			void OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vector3 localB, Vector3 normal) override;
 			void PaintCircle(const Vector3& position, const Quaternion& rotation, const Vector4& colour, int numberOfPoints, float circleRadius, float paintRadiusModifier);
-			void Paint();
 
 			float GetDamage() const { return damagePerShot; }
 
