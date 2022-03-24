@@ -32,13 +32,16 @@ NetworkedGame::NetworkedGame() {
 	packetsToSnapshot = 0;
 
 	singleton = this;
-
+	emptyPlayer = new GameObject();
+	emptyPlayer->SetPhysicsObject(new PhysicsObject(&emptyPlayer->GetTransform(), new CollisionVolume()));
+	
 	InitialiseAssets();
 }
 
 NetworkedGame::~NetworkedGame() {
 	delete thisServer;
 	delete thisClient;
+	delete emptyPlayer;
 }
 
 void NetworkedGame::StartAsServer() {
@@ -47,6 +50,7 @@ void NetworkedGame::StartAsServer() {
 
 	thisServer->RegisterPacketHandler(Received_State, this);
 	thisServer->RegisterPacketHandler(PowerUp_State, this);
+	thisServer->RegisterPacketHandler(Death_State, this);
 
 	SpawnPlayer();
 
@@ -64,6 +68,7 @@ void NetworkedGame::StartAsClient(char a, char b, char c, char d) {
 	thisClient->RegisterPacketHandler(Player_Disconnected, this);
 	thisClient->RegisterPacketHandler(Assign_ID, this);
 	thisClient->RegisterPacketHandler(PowerUp_State, this);
+	thisClient->RegisterPacketHandler(Death_State, this);
 	thisClient->RegisterPacketHandler(Game_State, this);
 }
 
@@ -101,7 +106,7 @@ void NetworkedGame::UpdateGame(float dt) {
 			PowerUpPacket powerUpPacket;
 			powerUpPacket.worldID = x->GetWorldID();
 			powerUpPacket.clientID = playerID;
-			if(thisClient)
+			if (thisClient)
 				thisClient->SendPacket(powerUpPacket);
 #ifndef ORBISNET
 			if (thisServer)
@@ -114,7 +119,6 @@ void NetworkedGame::UpdateGame(float dt) {
 }
 
 void NetworkedGame::UpdateAsServer(float dt) {
-
 	thisServer->UpdateServer();
 
 	if (localPlayer->IsFiring()) {
@@ -163,15 +167,11 @@ void NetworkedGame::UpdateAsClient(float dt) {
 
 	newPacket.firing = localPlayer->IsFiring();
 	newPacket.spread = (localPlayer->GetCurrentPowerup() == PowerUpType::MultiBullet);
-
 	newPacket.bulletCounter = localPlayer->BulletCounter;
 
-	if (newPacket.firing) {
-		std::cout << "Client: " << newPacket.bulletCounter << std::endl;
-	}
+	newPacket.hasDied = localPlayer->HasDied();
 
 	thisClient->SendPacket(newPacket);
-
 }
 
 void NetworkedGame::BroadcastSnapshot() {
@@ -245,9 +245,6 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
 		case(Player_Disconnected):
 			HandlePlayerDisconnect((PlayerDisconnectPacket*)payload);
 			return;
-		case(Game_State):
-			HandleGameState((GameStatePacket*)payload);
-			return;
 	}
 
 	if (!CheckExists((IDPacket*)payload))
@@ -257,8 +254,14 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
 		case(Full_State):
 			HandleFullState((FullPacket*)payload);
 			return;
+		case(Game_State):
+			HandleGameState((GameStatePacket*)payload);
+			return;
 		case(Fire_State):
 			HandleFireState((FirePacket*)payload);
+			return;
+		case(Death_State):
+			HandleDeathState((DeathPacket*)payload);
 			return;
 		case(PowerUp_State):
 			HandlePowerUp((PowerUpPacket*)payload);
@@ -288,9 +291,11 @@ void NetworkedGame::HandleClientPacket(ClientPacket* packet)
 		if (index->second < packet->lastID) {
 			index->second = packet->lastID;
 			auto obj = serverPlayers.find(packet->clientID);
+
 			Vector3 pos(packet->pos[0], packet->pos[1], packet->pos[2]);
 			obj->second->GetTransform().SetPosition(pos);
 			obj->second->GetTransform().SetOrientation(Quaternion::EulerAnglesToQuaternion(0, packet->yaw, 0));
+
 			if (packet->firing) {
 				std::cout << "Handle Client Packet: " << packet->bulletCounter << std::endl;
 				ServerFire(obj->second, packet->pitch, packet->bulletCounter, packet->spread, packet->clientID);
@@ -322,16 +327,36 @@ void NetworkedGame::AddNewPlayerToServer(int clientID, int lastID)
 void NetworkedGame::ServerFire(GameObject* owner, float pitch, int bulletCounter, bool spread, int clientID)
 {
 	Fire(owner, spread, bulletCounter, pitch, clientID);
+
 	std::cout << "ServerFire: " << bulletCounter << std::endl;
+
 	FirePacket newPacket;
 	newPacket.clientID = clientID;
 	newPacket.pitch = pitch;
 	newPacket.bulletCounter = bulletCounter;
 	newPacket.spread = spread;
+	
 #ifndef ORBISNET
 	thisServer->SendGlobalPacket(newPacket); 
 #endif
-  
+}
+
+void NetworkedGame::SendDeathPacket(int clientID, Vector3 pos)
+{
+	DeathPacket packet;
+
+	packet.clientID = clientID;
+	packet.x = pos.x;
+	packet.y = pos.y;
+	packet.z = pos.z;
+
+	if (singleton->thisServer) {
+		singleton->thisServer->SendGlobalPacket(packet);
+	}
+	else {
+		singleton->thisClient->SendPacket(packet);
+	}
+
 }
 
 void NetworkedGame::Fire(GameObject* owner, bool spread, int bulletCounter, float pitch, int clientID)
@@ -398,6 +423,20 @@ void NetworkedGame::HandleFireState(FirePacket* packet)
 	auto obj = networkObjects[packet->clientID];
 	if (obj) {
 		Fire(&obj->object, packet->spread, packet->bulletCounter, packet->pitch, packet->clientID);
+	}
+}
+
+void NetworkedGame::HandleDeathState(DeathPacket* packet)
+{
+	if (thisServer) {
+		thisServer->SendGlobalPacket(*packet);
+	}
+
+	emptyPlayer->GetTransform().SetPosition(Vector3(packet->x, packet->y, packet->z));
+
+	for (int i = 0; i < 10; ++i)
+	{
+		LevelLoader::SpawnProjectile(emptyPlayer, true, i, true, 90, packet->clientID, 10);
 	}
 }
 

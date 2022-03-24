@@ -120,7 +120,6 @@ namespace NCL {
 				health -= damageAmount;
 				if (health < 0) { 
 					health = 0;
-					SprayBullets();
 				}
 			}
 
@@ -142,8 +141,6 @@ namespace NCL {
 			void FireDeathProjectiles();
 
         protected:
-
-			void SprayBullets();
 			float CheckDistToGround();
 
 			int playerID;

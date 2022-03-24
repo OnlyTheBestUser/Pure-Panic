@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "../GameTech/LevelLoader.h"
+#include "../GameTech/NetworkedGame.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -57,10 +58,10 @@ void Player::Update(float dt)
 		physicsObject->SetGravity(true);
 	}
 
-	
 	force = Vector3(0, 0, 0);
 	
 	if (IsDead()) {
+		NetworkedGame::SendDeathPacket(playerID, GetTransform().GetPosition());
 		FireDeathProjectiles();
 		Respawn();
 	}
@@ -69,9 +70,10 @@ void Player::Update(float dt)
 }
 
 void Player::FireDeathProjectiles() {
-	bulletsPerShot = 10;
-	camera->ChangePitch(90.0f);
-	Fire();
+	for (int i = 0; i < 10; ++i)
+	{
+		LevelLoader::SpawnProjectile(this, true, i, true, 90, playerID, 10);
+	}
 }
 
 float Player::CheckDistToGround()
@@ -126,8 +128,4 @@ void Player::Respawn(){
 void Player::Reset() 
 {
 
-}
-
-void Player::SprayBullets() {
-	//LevelLoader::SpawnProjectile(this, 90, )
 }

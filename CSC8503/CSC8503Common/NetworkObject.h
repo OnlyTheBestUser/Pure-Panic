@@ -44,6 +44,14 @@ namespace NCL {
 			}
 		};
 
+		struct DeathPacket : public IDPacket {
+			float x, y, z;
+
+			DeathPacket() {
+				type = Death_State;
+				size = sizeof(DeathPacket) - sizeof(GamePacket);
+			}
+		};
 
 		struct PowerUpPacket : public IDPacket {
 			int worldID;
@@ -62,6 +70,7 @@ namespace NCL {
 			bool	firing;
 			bool	spread;
 			int		bulletCounter;
+			bool	hasDied;
 
 			ClientPacket() {
 				type = Received_State;

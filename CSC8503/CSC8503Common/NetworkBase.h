@@ -24,6 +24,7 @@ enum BasicNetworkMessages {
 	Fire_State,
 	PowerUp_State,
 	Game_State,
+	Death_State,
 	Player_Connected,
 	Player_Disconnected,
 	Assign_ID,

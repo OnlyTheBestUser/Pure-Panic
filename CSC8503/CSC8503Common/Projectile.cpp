@@ -43,21 +43,12 @@ void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vecto
 
 				Vector4 colour;
 				if (GetOwnerPlayerID() % 2 == 0) {
-					if (IsDeathProjectile) {
-						colour = COLOUR_B;
-					}
-					else colour = COLOUR_A;
+					colour = IsDeathProjectile ? COLOUR_B : COLOUR_A;
 				}
 				else {
-					if (IsDeathProjectile) {
-						colour = COLOUR_A;
-					}
-					else colour = COLOUR_B;
+					colour = IsDeathProjectile ? COLOUR_A : COLOUR_B;
 				}
 
-				if (IsDeathProjectile)
-					colour = Vector4(0, 0, 0, 1);
-				
 				float randRad = ((GameObject*)closestCollision.node)->GetPaintRadius() + (((static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * 2.0f) - 1.0f) * ((GameObject*)closestCollision.node)->GetPaintRadius() * 0.25f;
 
 				// Get the uv from the ray

@@ -513,7 +513,7 @@ Projectile* LevelLoader::SpawnProjectile(GameObject* owner, bool needBulletSprea
 #endif // !_ORBIS
 	Projectile* proj = singleton->AddProjectileToWorld((GameObject*) owner, needBulletSpread, bulletIndex, pitch, playerID, initialSpeed, meshSize);
 
-	proj->SetAsDeathProjectile();
+	if (deadSpray) proj->SetAsDeathProjectile();
 
 	return proj;
 }
