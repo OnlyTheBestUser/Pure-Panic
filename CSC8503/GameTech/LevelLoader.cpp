@@ -274,8 +274,8 @@ GameObject* LevelLoader::AddPillarToWorld(const Vector3& position, Vector3 dimen
 		.SetScale(dimensions * 2)
 		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
 
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, basicShader));
-	cube->GetRenderObject()->SetColour(Debug::BLACK);
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, nullptr, basicShader));
+	cube->GetRenderObject()->SetColour(Vector4(0.357f, 0.357f, 0.357f,1.0f));
 
 
 	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
