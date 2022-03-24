@@ -3,6 +3,7 @@
 #include "PhysicsSystem.h"
 #include "InputBase.h"
 #include "../GameTech/TutorialGame.h"
+#include "../GameTech/NetworkedGame.h"
 #include "Timer.h"
 #include "../GameTech/MainMenu.h"
 
@@ -181,6 +182,58 @@ namespace NCL {
 		protected:
 			bool* mouse;
 		};
+#pragma endregion
+
+#pragma region Multiplayer Commands
+
+		class StartServerCommand : public Command {
+		public:
+			StartServerCommand(NetworkedGame* game) : game(game) {};
+			virtual ~StartServerCommand() {};
+			void execute() {
+				game->StartAsServer();
+			}
+
+		protected:
+			NetworkedGame* game;
+		};
+
+		class StartClientCommand : public Command {
+		public:
+			StartClientCommand(NetworkedGame* game) : game(game) {};
+			virtual ~StartClientCommand() {};
+			void execute() {
+				game->StartAsClient(127, 0, 0, 1);
+			}
+
+		protected:
+			NetworkedGame* game;
+		};
+
+		class StartGameCommand : public Command {
+		public:
+			StartGameCommand(NetworkedGame* game) : game(game) {};
+			virtual ~StartGameCommand() {};
+			void execute() {
+				game->StartLevel();
+			}
+
+		protected:
+			NetworkedGame* game;
+		};
+
+		class ResetGameCommand : public Command {
+		public:
+			ResetGameCommand(NetworkedGame* game) : game(game) {};
+			virtual ~ResetGameCommand() {};
+			void execute() {
+				game->ResetLevel();
+			}
+
+		protected:
+			NetworkedGame* game;
+		};
+
 #pragma endregion
 
 #pragma region Menu Commands

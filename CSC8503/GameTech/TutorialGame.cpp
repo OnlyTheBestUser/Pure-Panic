@@ -37,9 +37,7 @@ TutorialGame::TutorialGame()	{
 	levelLoader		= new LevelLoader(physics, renderer, this);
 	LoadingScreen::AddProgress(50.0f);
 	LoadingScreen::UpdateGame(0.0f);
-
 	gameManager		= new GameManager(this);
-
 	LoadingScreen::ResetProgress();
 	LoadingScreen::SetCompletionState(true);
 	
