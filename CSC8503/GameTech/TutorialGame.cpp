@@ -13,6 +13,7 @@
 #include "../../Common/Assets.h"
 
 #include "../CSC8503Common/InputList.h"
+#include "../CSC8503Common/SimpleAI.h"
 #include "LoadingScreen.h"
 
 using namespace NCL;
@@ -28,22 +29,15 @@ TutorialGame::TutorialGame()	{
 	physics			= new PhysicsSystem(*world);
 	LoadingScreen::AddProgress(25.0f);
 	LoadingScreen::UpdateGame(0.0f);
-	levelLoader		= new LevelLoader(physics, renderer);
+	levelLoader		= new LevelLoader(physics, renderer, this);
 	LoadingScreen::AddProgress(50.0f);
 	LoadingScreen::UpdateGame(0.0f);
 
 	gameManager		= new GameManager(this);
+	LoadingScreen::SetCompletionState(true);
 	
 #ifndef _ORBIS
-	audio = NCL::AudioManager::GetInstance();
-	audio->Initialize();
-	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_01.ogg", true, false, false);
-	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_02.ogg", true, false, false);
-	audio->LoadSound(Assets::AUDIODIR + "gun_fire.ogg", true, false, false);
-	audio->LoadSound(Assets::AUDIODIR + "menu_music.ogg", false, true, true);
-
-	bgm = new BGMManager(audio);
-	bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 3.0f);
+	InitSounds();
 #endif
 
 	forceMagnitude = 30.0f;
@@ -52,7 +46,7 @@ TutorialGame::TutorialGame()	{
 
 	inSelectionMode = false;
 
-	state = PLAY;
+	state = GameState::PLAY;
 
 	Debug::SetRenderer(renderer);
 	
@@ -90,7 +84,7 @@ TutorialGame::TutorialGame()	{
 	inputHandler = new InputHandler();
 
 	Command* toggleDebug = new ToggleBoolCommand(&debugDraw);
-	Command* togglePause = new ToggleBoolCommand(&pause);
+	Command* togglePause = new ToggleBoolCommand(&pausePressed);
 	Command* toggleMouse = new ToggleMouseCommand(&inSelectionMode);
 	Command* resetWorld = new ResetWorldCommand(&state);
 	Command* quitCommand = new QuitCommand(&quit, &pause);
@@ -104,11 +98,39 @@ TutorialGame::TutorialGame()	{
 	inputHandler->BindButton(START_TIMER, startTimer);
 
 #pragma endregion
+
+	InitCamera();
+	InitWorld();
 }
 
 void TutorialGame::InitialiseAssets() {
 	InitCamera();
 	InitWorld();
+}
+
+
+void TutorialGame::InitSounds() {
+#ifndef _ORBIS
+	audio = NCL::AudioManager::GetInstance();
+	audio->Initialize();
+	//Menu Sounds
+	audio->LoadSound(Assets::AUDIODIR + "menu_music.ogg", false, true, true);
+	audio->LoadSound(Assets::AUDIODIR + "menu_move.ogg", false, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "menu_select.ogg", false, false, false);
+
+	//Shooting Sounds
+	audio->LoadSound(Assets::AUDIODIR + "gun_fire.ogg", true, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_01.ogg", true, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_02.ogg", true, false, false);
+
+	//Player Sounds
+	audio->LoadSound(Assets::AUDIODIR + "boy_whoa_01.ogg", true, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "boy_whoa_02.ogg", true, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "boy_whoa_03.ogg", true, false, false);
+
+	bgm = new BGMManager(audio);
+	bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 3.0f);
+#endif // !_ORBIS
 }
 
 TutorialGame::~TutorialGame() {
@@ -120,28 +142,60 @@ TutorialGame::~TutorialGame() {
 
 void TutorialGame::UpdateGame(float dt) {
 	Debug::SetRenderer(renderer);
-	switch (state) {
-	case PLAY: 
-		UpdateGameWorld(dt); break;
-	case PAUSE: UpdatePauseScreen(dt); break;
-	case WIN: UpdateWinScreen(dt); break;
-	case RESET: {
-		InitCamera();
-		InitWorld();
-		renderer->ClearPaint();
-		selectionObject = nullptr;
-		state = PLAY;
-		break;
+
+	if (pausePressed) {
+		if (pause == false) {
+			pause = true;
+			SetState(GameState::PAUSE);
+		}
+		else {
+			pause = false;
+			SetState(GameState::PLAY);
+			
+		}
+		pausePressed = false;
 	}
+
+	switch (state) {
+		case GameState::PLAY: {
+			UpdateGameWorld(dt);
+			break;
+		}
+		case GameState::PAUSE: {
+			UpdatePauseState(dt);
+			break;
+		}
+		case GameState::WIN: {
+			UpdateWinScreen(dt);
+			break;
+		}
+		case GameState::RESET: {
+			InitCamera();
+			InitWorld();
+			renderer->ClearPaint();
+			selectionObject = nullptr;
+			quit = false;
+			pause = false;
+			SetState(GameState::PLAY);
+
+			break;
+		}
 	}
 
 	inputHandler->HandleInput();
 
-	renderer->Update(dt);
-
 	Debug::FlushRenderables(dt);
+
 	renderer->scores = gameManager->CalcCurrentScoreRatio();
+
+	renderer->drawGUI = (LoadingScreen::GetCompletionState() && state == GameState::PLAY);
+
+
 	renderer->Render();
+}
+
+void TutorialGame::UpdatePauseState(float dt) {
+	UpdatePauseScreen(dt);
 }
 
 void TutorialGame::UpdateGameWorld(float dt)
@@ -154,7 +208,7 @@ void TutorialGame::UpdateGameWorld(float dt)
 	if (!inSelectionMode) {
 		world->GetMainCamera()->UpdateCamera(dt);
 	}
-	
+
 	if (debugDraw) {
 		GameObjectIterator first;
 		GameObjectIterator last;
@@ -168,9 +222,7 @@ void TutorialGame::UpdateGameWorld(float dt)
 	}
 
 	physics->Update(dt);
-
 	world->UpdateWorld(dt);
-
 	gameManager->Update(dt);
 
 	UpdateScores(dt);
@@ -193,8 +245,8 @@ void TutorialGame::UpdateScores(float dt) {
 			}
 		}
 
-		if ((*cur)->GetPaintRadius() == 0) {
-			currentObj++;
+		currentObj++;
+		if ((*cur)->GetPaintRadius() == 0 || (*cur)->GetRenderObject() == nullptr) {
 			return;
 		}
 		// Need to score the texture here.
@@ -205,7 +257,6 @@ void TutorialGame::UpdateScores(float dt) {
 		world->UpdateScore((*cur), scoreDif);
 
 		gameManager->UpdateScores(scoreDif);
-		currentObj++;
 		timeSinceLastScoreUpdate = 0;
 	}
 }
@@ -255,58 +306,6 @@ void TutorialGame::UpdateWinScreen(float dt)
 	renderer->DrawString("Press Esc to return to Main Menu.", Vector2(5, 95), Debug::WHITE, 20.0f);
 }
 
-void TutorialGame::UpdateKeys() {
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F1)) {
-		InitWorld(); //We can reset the simulation at any time with F1
-		selectionObject = nullptr;
-	}
-
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F2)) {
-		InitCamera(); //F2 will reset the camera to a specific default place
-	}
-
-	//Running certain physics updates in a consistent order might cause some
-	//bias in the calculations - the same objects might keep 'winning' the constraint
-	//allowing the other one to stretch too much etc. Shuffling the order so that it
-	//is random every frame can help reduce such bias.
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F9)) {
-		world->ShuffleConstraints(true);
-	}
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F10)) {
-		world->ShuffleConstraints(false);
-	}
-
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F7)) {
-		world->ShuffleObjects(true);
-	}
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F8)) {
-		world->ShuffleObjects(false);
-	}
-	if (Window::GetKeyboard()->KeyPressed(NCL::KeyboardKeys::L)) {
-		player1->ChangeCamLock();
-	}
-
-	DebugObjectMovement();
-}
-
-void TutorialGame::DebugObjectMovement() {
-	//If we've selected an object, we can manipulate it with some key presses
-	if (inSelectionMode && selectionObject) {
-
-		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::NUM7)) {
-			selectionObject->GetPhysicsObject()->AddTorque(Vector3(0, 10, 0));
-		}
-
-		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::NUM8)) {
-			selectionObject->GetPhysicsObject()->AddTorque(Vector3(0, -10, 0));
-		}
-
-		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::NUM5)) {
-			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, -10, 0));
-		}
-	}
-}
-
 void TutorialGame::InitCamera() {
 	world->GetMainCamera()->SetNearPlane(0.1f);
 	world->GetMainCamera()->SetFarPlane(500.0f);
@@ -319,7 +318,7 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	levelLoader->ReadInLevelFile(NCL::Assets::MAPDIR + "map1.txt");
+	levelLoader->ReadInLevelFile(NCL::Assets::MAPDIR + "training_map.txt");
 	Player* player = levelLoader->SpawnPlayer(Vector3(0, 5, 0));
 	
 	AxisCommand* m = new MoveCommand(player);
@@ -435,13 +434,13 @@ void TutorialGame::UpdateBGM() {
 #ifndef _ORBIS
 
 	switch (state) {
-	case PLAY:
+	case GameState::PLAY:
 		bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 3.0f);
 		break;
-	case PAUSE:
+	case GameState::PAUSE:
 		bgm->StopMusic();
 		break;
-	case RESET:
+	case GameState::RESET:
 		bgm->StopMusic();
 		break;
 	default:
