@@ -352,11 +352,13 @@ void NetworkedGame::SendDeathPacket(int clientID, Vector3 pos)
 	packet.y = pos.y;
 	packet.z = pos.z;
 
-	if (singleton->thisServer) {
-		singleton->thisServer->SendGlobalPacket(packet);
-	}
-	else {
-		singleton->thisClient->SendPacket(packet);
+	if (singleton) {
+		if (singleton->thisServer) {
+			singleton->thisServer->SendGlobalPacket(packet);
+		}
+		else {
+			singleton->thisClient->SendPacket(packet);
+		}
 	}
 
 }
@@ -439,7 +441,7 @@ void NetworkedGame::HandleDeathState(DeathPacket* packet)
 
 	for (int i = 0; i < 10; ++i)
 	{
-		LevelLoader::SpawnProjectile(emptyPlayer, true, i, true, 90, packet->clientID, 10);
+		LevelLoader::SpawnProjectile(emptyPlayer, true, i, false, 90, packet->clientID + 1, 10);
 	}
 }
 

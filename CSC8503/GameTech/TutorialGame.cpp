@@ -388,6 +388,8 @@ void TutorialGame::InitWorld() {
 
 	levelLoader->ReadInLevelFile(NCL::Assets::MAPDIR + "training_map.txt");
 	Player* player = levelLoader->SpawnPlayer(Vector3(0, 5, 0));
+
+	player->SetRenderObject(nullptr);
 	
 	AxisCommand* m = new MoveCommand(player);
 	inputHandler->BindAxis(0, m);

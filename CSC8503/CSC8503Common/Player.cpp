@@ -23,7 +23,9 @@ void Player::OnCollisionBegin(GameObject* other, Vector3 localA, Vector3 localB,
 }
 
 void Player::SetColour(Vector4 col) {
-	this->renderObject->SetColour(GameManager::GetColourForID(playerID));
+	if (renderObject) {
+		renderObject->SetColour(GameManager::GetColourForID(playerID));
+	}
 }
 
 void Player::Update(float dt)
