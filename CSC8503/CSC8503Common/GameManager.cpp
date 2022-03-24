@@ -1,6 +1,10 @@
 #include "GameManager.h"
 #include "../GameTech/TutorialGame.h"
 
+using namespace NCL::Maths;
+Vector4 GameManager::team1Colour = Vector4(1, 0.039, 0.941, 1);
+Vector4 GameManager::team2Colour = Vector4(0.011, 0.988, 0.941, 1);
+
 void GameManager::Update(const float& dt) {
 	timer->Update(dt);
 
@@ -39,6 +43,10 @@ void GameManager::PlacePlayersToSpawnPositions() {
 	}
 }
 
+Vector4 GameManager::GetColourForID(int playerID) {
+	return playerID % 2 == 0 ? GameManager::team1Colour : GameManager::team2Colour;
+}
+
 void GameManager::UpdateScores(Vector2 scores) {
 	Teams[0].score += scores.x;
 	Teams[1].score += scores.y;
@@ -55,7 +63,8 @@ Vector2 GameManager::CalcCurrentScoreRatio() {
 }
 
 void GameManager::HandleScoresAfterRound() {
-
+	Teams[0].score += 0.1f;
+	Teams[1].score += 0.1f;
 }
 
 void GameManager::StartRound() {

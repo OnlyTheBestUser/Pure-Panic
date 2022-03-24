@@ -2,9 +2,12 @@
 #include "../GameTech/Renderer.h"
 #include "../CSC8503Common/AudioManager.h"
 #include "../../Common/Assets.h"
+#include "../CSC8503Common/GameManager.h"
 
 const Vector4 COLOUR_A = Vector4(0.011, 0.988, 0.941, 1); // Turquoise
 const Vector4 COLOUR_B = Vector4(1, 0.039, 0.941, 1); // Pink
+
+using namespace NCL::CSC8503;
 
 void Projectile::Update(float dt) {
 	Vector3 velocityDir = (this->GetPhysicsObject()->GetLinearVelocity()).Normalised();
@@ -20,8 +23,13 @@ void Projectile::Update(float dt) {
 void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vector3 localB, Vector3 normal) {
 #ifndef _ORBIS
 	int soundToPlay = rand() % 2;
-	NCL::AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + (soundToPlay == 0 ? "splat_neutral_01.ogg" : "splat_neutral_02.ogg"), this->GetTransform().GetPosition());
+	float pitch = 1.0f + (((static_cast <float> (rand()) / static_cast <float> (RAND_MAX))-0.5) * 2.0f / 5.0f);
+	NCL::AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + (soundToPlay == 0 ? "splat_neutral_01.ogg" : "splat_neutral_02.ogg"), this->GetTransform().GetPosition(), 1.0f, 0.0f, pitch);
 #endif
+	string name = otherObject->GetName();
+	if (!(otherObject->GetName() == "Dummy" || otherObject->GetName() == "Player")) {
+		Ray ray(this->GetTransform().GetPosition() - this->GetPhysicsObject()->GetLinearVelocity().Normalised(), this->GetPhysicsObject()->GetLinearVelocity());
+		ray.SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
 
 	Ray ray(this->GetTransform().GetPosition() - this->GetPhysicsObject()->GetLinearVelocity().Normalised(), this->GetPhysicsObject()->GetLinearVelocity());
 	ray.SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
@@ -48,16 +56,23 @@ void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vecto
 				else {
 					colour = IsDeathProjectile ? COLOUR_A : COLOUR_B;
 				}
+					float randRad = ((GameObject*)closestCollision.node)->GetPaintRadius() + (((static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * 2.0f) - 1.0f) * ((GameObject*)closestCollision.node)->GetPaintRadius() * 0.25f;
 
-				float randRad = ((GameObject*)closestCollision.node)->GetPaintRadius() + (((static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * 2.0f) - 1.0f) * ((GameObject*)closestCollision.node)->GetPaintRadius() * 0.25f;
+					// Get the uv from the ray
+					renderInst->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, randRad, 0.7, 1, colour);
 
-				// Get the uv from the ray
-				renderInst->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, randRad, 0.7, 1, colour);
-
-				// Debug Rainbow Gun
-				//renderInst->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, randRad, 0.7, 1, Vector4(static_cast <float> (rand()) / static_cast <float> (RAND_MAX) , static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX), 1));
+					// Debug Rainbow Gun
+					//renderInst->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, randRad, 0.7, 1, Vector4(static_cast <float> (rand()) / static_cast <float> (RAND_MAX) , static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX), 1));
+				}
 			}
 		}
 	}
+	else {
+#ifndef _ORBIS
+		int sound = (rand() % 3) + 1;
+		NCL::AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + "boy_whoa_0" + std::to_string(sound) + ".ogg");
+#endif // !_ORBIS
+	}
+	
 	GameWorld::RemoveGameObject(this, true);
 }

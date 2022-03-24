@@ -8,6 +8,7 @@
 #include "../CSC8503Common/GameWorld.h"
 #include "../../Common/TextureLoader.h"
 #include "../../Common/Assets.h"
+#include "../CSC8503Common/GameManager.h"
 
 #ifdef _ORBIS
 	#include "../../Plugins/PlayStation4/PS4Mesh.h"
@@ -204,7 +205,6 @@ Player* LevelLoader::SpawnPlayer(const Vector3& position) {
 
 GameObject* LevelLoader::SpawnDummyPlayer(const Vector3& position) {
 	GameObject* character = new GameObject("Dummy");
-
 	return singleton->AddPlayerObjectToWorld(position, character);
 }
 
@@ -460,6 +460,7 @@ GameObject* LevelLoader::AddPlayerObjectToWorld(const Vector3& position, GameObj
 	CapsuleVolume* volume = new CapsuleVolume(0.85f * meshSize, 0.3f * meshSize);
 
 	SetMiscFields(character, volume, position, Vector3(meshSize, meshSize, meshSize), false);
+	character->GetTransform().SetOffset(Vector3(0, 0.001f, 0));
 	character->SetPhysicsObject(GetPhysicsObject(&character->GetTransform(), volume, CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE, true, 20.0f, DEF_ELASTICITY, 3.0f, false));
 	character->SetRenderObject(GetRenderObject(&character->GetTransform(), charMeshA, nullptr, basicShader, Vector4(0.5,1,0.5,1)));
 
@@ -540,6 +541,7 @@ Projectile* LevelLoader::AddProjectileToWorld(GameObject* owner, const bool& Nee
 		.SetPosition((owner->GetTransform().GetPosition() + Vector3(0, 2.5f, 0)) + camForwardVector * 5.0f); //+ offset);
 
 	projectile->SetRenderObject(new RenderObject(&projectile->GetTransform(), capsuleMesh, nullptr, basicShader));
+	projectile->GetRenderObject()->SetColour(GameManager::GetColourForID(playerID));
 	projectile->SetPhysicsObject(new PhysicsObject(&projectile->GetTransform(), projectile->GetBoundingVolume()));
 
 	projectile->GetPhysicsObject()->SetInverseMass(inverseMass);

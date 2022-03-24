@@ -13,6 +13,7 @@
 #include "../../Common/Assets.h"
 
 #include "../CSC8503Common/InputList.h"
+#include "LoadingScreen.h"
 
 #ifndef _ORBIS
 	#include "windows.h"
@@ -24,21 +25,21 @@ using namespace CSC8503;
 
 TutorialGame::TutorialGame()	{
 	world			= new GameWorld();
+	LoadingScreen::AddProgress(15.0f);
+	LoadingScreen::UpdateGame(0.0f);
 	renderer		= new Renderer(*world);
+	LoadingScreen::AddProgress(10.0f);
+	LoadingScreen::UpdateGame(0.0f);
 	physics			= new PhysicsSystem(*world);
+	LoadingScreen::AddProgress(25.0f);
+	LoadingScreen::UpdateGame(0.0f);
 	levelLoader		= new LevelLoader(physics, renderer);
+	LoadingScreen::AddProgress(50.0f);
+	LoadingScreen::UpdateGame(0.0f);
 	gameManager		= new GameManager(this);
 	
 #ifndef _ORBIS
-	audio = NCL::AudioManager::GetInstance();
-	audio->Initialize();
-	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_01.ogg", true, false, false);
-	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_02.ogg", true, false, false);
-	audio->LoadSound(Assets::AUDIODIR + "gun_fire.ogg", true, false, false);
-	audio->LoadSound(Assets::AUDIODIR + "menu_music.ogg", false, true, true);
-
-	bgm = new BGMManager(audio);
-	bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 3.0f);
+	InitSounds();
 #endif
 
 	forceMagnitude = 30.0f;
@@ -87,7 +88,6 @@ TutorialGame::TutorialGame()	{
 
 	inputHandler = new InputHandler();
 
-	Command* toggleGrav = new ToggleGravityCommand(physics);
 	Command* toggleDebug = new ToggleBoolCommand(&debugDraw);
 	Command* togglePause = new ToggleBoolCommand(&pause);
 	Command* toggleMouse = new ToggleMouseCommand(&inSelectionMode);
@@ -96,7 +96,6 @@ TutorialGame::TutorialGame()	{
 	//Command* paintFireCommand = new PaintFireCommand(this);
 	Command* startTimer = new StartTimerCommand(gameManager->GetTimer());
 	
-	inputHandler->BindButton(TOGGLE_GRAV, toggleGrav);
 	inputHandler->BindButton(TOGGLE_DEBUG, toggleDebug);
 	inputHandler->BindButton(TOGGLE_PAUSE, togglePause);
 	inputHandler->BindButton(RESET_WORLD, resetWorld);
@@ -113,6 +112,31 @@ void TutorialGame::InitialiseAssets() {
 	InitWorld();
 }
 
+
+void TutorialGame::InitSounds() {
+#ifndef _ORBIS
+	audio = NCL::AudioManager::GetInstance();
+	audio->Initialize();
+	//Menu Sounds
+	audio->LoadSound(Assets::AUDIODIR + "menu_music.ogg", false, true, true);
+	audio->LoadSound(Assets::AUDIODIR + "menu_move.ogg", false, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "menu_select.ogg", false, false, false);
+
+	//Shooting Sounds
+	audio->LoadSound(Assets::AUDIODIR + "gun_fire.ogg", true, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_01.ogg", true, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_02.ogg", true, false, false);
+
+	//Player Sounds
+	audio->LoadSound(Assets::AUDIODIR + "boy_whoa_01.ogg", true, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "boy_whoa_02.ogg", true, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "boy_whoa_03.ogg", true, false, false);
+
+	bgm = new BGMManager(audio);
+	bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 3.0f);
+#endif // !_ORBIS
+}
+
 TutorialGame::~TutorialGame() {
 	delete physics;
 	delete renderer;
@@ -123,7 +147,8 @@ TutorialGame::~TutorialGame() {
 void TutorialGame::UpdateGame(float dt) {
 	Debug::SetRenderer(renderer);
 	switch (state) {
-	case PLAY: UpdateGameWorld(dt); break;
+	case PLAY: 
+		UpdateGameWorld(dt); break;
 	case PAUSE: UpdatePauseScreen(dt); break;
 	case WIN: UpdateWinScreen(dt); break;
 	case RESET: {
@@ -141,6 +166,10 @@ void TutorialGame::UpdateGame(float dt) {
 	renderer->Update(dt);
 
 	Debug::FlushRenderables(dt);
+
+	renderer->scores = gameManager->CalcCurrentScoreRatio();
+	renderer->drawGUI = (!LoadingScreen::GetCompletionState() && state == PLAY);
+
 	renderer->Render();
 }
 
@@ -230,7 +259,7 @@ void TutorialGame::UpdateScores(float dt) {
 			return;
 		}
 		// Need to score the texture here.
-		Vector2 scoreDif = renderer->CountPaintMask((*cur)->GetRenderObject()->GetPaintMask(), world->GetScore((*cur)), Vector4(0.3, 0, 0.5, 1), Vector4(0.250, 0.878, 0.815, 1));
+		Vector2 scoreDif = renderer->CountPaintMask((*cur)->GetRenderObject()->GetPaintMask(), world->GetScoreForObject((*cur)), GameManager::team1Colour, GameManager::team2Colour);
 		if ((*cur)->GetPaintRadius() != 0){
 			scoreDif = scoreDif / (*cur)->GetPaintRadius();
 		}
@@ -398,6 +427,7 @@ void TutorialGame::InitWorld() {
 	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);*/
 
 	player1 = player;
+	renderer->playerColour = GameManager::GetColourForID(player1->GetPlayerID());
 
 	physics->BuildStaticList();
 }

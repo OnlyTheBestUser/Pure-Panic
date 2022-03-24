@@ -75,7 +75,7 @@ void AudioManager::LoadSound(const std::string& soundName, bool threeDimensional
 	if (newSound) { sounds[soundName] = newSound; };
 }
 
-int AudioManager::StartPlayingSound(const std::string& soundName, const Vector3& position, const float& volumePercent, const float& positionInSong) {
+int AudioManager::StartPlayingSound(const std::string& soundName, const Vector3& position, const float& volumePercent, const float& positionInSong, const float& pitch) {
 	int newChannel = nextChannelID;
 	FMOD::Channel* channel = nullptr;
 	Sound* sound = FindSound(soundName);
@@ -91,6 +91,7 @@ int AudioManager::StartPlayingSound(const std::string& soundName, const Vector3&
 				delete posF;
 			}
 			channel->setVolume(volumePercent);
+			channel->setPitch(pitch);
 			channel->setPaused(false);
 			channels.insert(std::pair<int, Channel*>(nextChannelID, channel));
 		}
