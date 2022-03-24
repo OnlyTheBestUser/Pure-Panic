@@ -50,8 +50,8 @@ void Projectile::OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vecto
 						colour = GameManager::GetColourForID(ownerPlayerID + 1);
 					}
 
-					PaintCircle(center, rotation, colour, 7, 1.2f, 0.5f);
-					PaintCircle(center, rotation, colour, 11, 3.0f, 0.4f);
+					PaintCircle(center, rotation, colour, 7, 1.2f, 0.6f);
+					PaintCircle(center, rotation, colour, 11, 3.0f, 0.3f);
 				}
 			}
 		}
