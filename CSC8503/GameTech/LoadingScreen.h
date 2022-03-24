@@ -11,6 +11,8 @@ namespace NCL {
 			~LoadingScreen();
 
 			static void UpdateGame(float dt);
+			static void SetCompletionState(bool state) { singleton->completed = state; }
+			static bool GetCompletionState() { return singleton->completed; }
 			static void AddProgress(float progress) { singleton->progression += progress; }
 			static void SetInstancesToLoad(int instances) { singleton->instancesToLoad += instances; }
 
@@ -18,6 +20,7 @@ namespace NCL {
 			static LoadingScreen* singleton;
 			int instancesToLoad;
 			float progression = 0.0f;
+			bool completed;
 
 			GameWorld* world;
 			Renderer* renderer;

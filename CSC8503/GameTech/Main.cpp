@@ -152,11 +152,14 @@ public:
 	PushdownResult OnUpdate(float dt, PushdownState** newState) override 
 	{
 		LoadingScreen::SetInstancesToLoad(2);
+		LoadingScreen::SetCompletionState(false);
 		LoadingScreen::UpdateGame(dt);
 
 		m = new MainMenu();
 		ng = new NetworkedGame();
 		tg = nullptr;
+
+		LoadingScreen::SetCompletionState(true);
 		
 		*newState = new Menu(m, tg, ng);
 		return PushdownResult::Push;

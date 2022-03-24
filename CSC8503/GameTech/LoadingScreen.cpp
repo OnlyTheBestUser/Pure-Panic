@@ -9,6 +9,7 @@ LoadingScreen::LoadingScreen()
 	singleton = this;
 	instancesToLoad = 1;
 	world = new GameWorld();
+	completed = false;
 	renderer = new Renderer(*world);
 	Debug::SetRenderer(renderer);
 }
