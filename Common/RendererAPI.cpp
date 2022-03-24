@@ -26,4 +26,5 @@ RendererAPI* NCL::Rendering::RendererAPI::GetInstance()
 
 RendererAPI::~RendererAPI()
 {
+	delete activeAPI;
 }
