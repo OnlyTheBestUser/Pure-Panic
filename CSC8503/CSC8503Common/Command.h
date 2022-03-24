@@ -6,6 +6,7 @@
 #include "../GameTech/NetworkedGame.h"
 #include "Timer.h"
 #include "../GameTech/MainMenu.h"
+#include "../../Common/Assets.h"
 
 namespace NCL {
 	namespace CSC8503 {
@@ -80,7 +81,7 @@ namespace NCL {
 			virtual ~PaintFireCommand() {};
 
 			void execute() {
-				game->PaintObject();
+			//	game->PaintObject();
 			}
 
 		protected:
@@ -145,6 +146,9 @@ namespace NCL {
 				void execute() {
 					if (*paused == true) {
 						*quit = true;
+#ifndef _ORBIS
+						NCL::BGMManager::GetInstance()->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 0.1f);
+#endif
 					}
 				}
 			protected:

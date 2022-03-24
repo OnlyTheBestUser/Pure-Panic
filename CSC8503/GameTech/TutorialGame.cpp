@@ -117,24 +117,18 @@ void TutorialGame::InitialiseAssets() {
 void TutorialGame::InitSounds() {
 #ifndef _ORBIS
 	audio = NCL::AudioManager::GetInstance();
-	audio->Initialize();
-	//Menu Sounds
-	audio->LoadSound(Assets::AUDIODIR + "menu_music.ogg", false, true, true);
-	audio->LoadSound(Assets::AUDIODIR + "menu_move.ogg", false, false, false);
-	audio->LoadSound(Assets::AUDIODIR + "menu_select.ogg", false, false, false);
-
 	//Shooting Sounds
 	audio->LoadSound(Assets::AUDIODIR + "gun_fire.ogg", true, false, false);
 	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_01.ogg", true, false, false);
 	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_02.ogg", true, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "game_music.ogg", false, true, true);
 
 	//Player Sounds
 	audio->LoadSound(Assets::AUDIODIR + "boy_whoa_01.ogg", true, false, false);
 	audio->LoadSound(Assets::AUDIODIR + "boy_whoa_02.ogg", true, false, false);
 	audio->LoadSound(Assets::AUDIODIR + "boy_whoa_03.ogg", true, false, false);
 
-	bgm = new BGMManager(audio);
-	bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 3.0f);
+	bgm = NCL::BGMManager::GetInstance();
 #endif // !_ORBIS
 }
 
@@ -181,7 +175,6 @@ void TutorialGame::UpdateGame(float dt) {
 			quit = false;
 			pause = false;
 			SetState(GameState::PLAY);
-
 			break;
 		}
 	}
@@ -468,16 +461,19 @@ void TutorialGame::UpdateBGM() {
 
 	switch (state) {
 	case GameState::PLAY:
+		std::cout << "play";
 		bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 3.0f);
 		break;
-	case GameState::PAUSE:
+		std::cout << "pause";
+		std::cout << "pause";
 		bgm->StopMusic();
-		break;
+		std::cout << "reset";
 	case GameState::RESET:
+		std::cout << "reset";
 		bgm->StopMusic();
 		break;
 	default:
-		bgm->StopMusic();
+		bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 0.1f);
 		break;
 	}
 
@@ -497,7 +493,8 @@ void TutorialGame::PaintObject() {
 			Vector2 texUV_a, texUV_b, texUV_c;
 			Vector3 collisionPoint;
 			Vector3 barycentric;
-			CollisionDetection::GetBarycentricFromRay(ray, *test, texUV_a, texUV_b, texUV_c, barycentric, collisionPoint);
+			Vector3 norm;
+			CollisionDetection::GetBarycentricFromRay(ray, *test, texUV_a, texUV_b, texUV_c, barycentric, collisionPoint, norm);
 			
 			// Get the uv from the ray
 			renderer->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, ((GameObject*)closestCollision.node)->GetPaintRadius(), 0.2, 0.2, Vector4(0.3, 0, 0.5, 1));
