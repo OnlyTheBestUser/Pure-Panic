@@ -26,7 +26,7 @@ namespace NCL {
 		public:
 
 			GameManager(TutorialGame* tg) : game(tg) {
-				timer = new Timer(abs(10.0f));
+				timer = new Timer(abs(90.0f));
 			}
 
 			void Update(const float& dt);
