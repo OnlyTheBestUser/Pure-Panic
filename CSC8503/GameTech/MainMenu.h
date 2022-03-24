@@ -1,13 +1,14 @@
 #pragma once
 #include "TutorialGame.h"
 
-#include "../CSC8503Common/InputHandler.h"
 #include "../CSC8503Common/PushdownState.h"
 #include "../CSC8503Common/PushdownMachine.h"
 #include <algorithm>
 
 namespace NCL {
 	namespace CSC8503 {
+		class InputHandler;
+
 		class LevelState : public PushdownState {
 		public:
 			LevelState(TutorialGame* level) : level(level) {};
@@ -34,11 +35,18 @@ namespace NCL {
 		{
 		public:
 			MainMenu(TutorialGame* start, TutorialGame* training);
+			~MainMenu();
+
 			bool UpdateGame(float dt);
+
+			void HandleMenuMove(Vector2 moveInput);
+			void HandleMenuPress();
 
 			PushdownState::PushdownResult OnUpdate(float dt, PushdownState** newState) override;
 
 		protected:
+			void UpdateMenu(float dt);
+
 			InputHandler* inputHandler;
 			RendererBase renderer;
 
@@ -47,6 +55,7 @@ namespace NCL {
 			PushdownMachine* pushMachine;
 
 			int selectedItem = 0;
+			bool pressed = false;
 		};
 	}
 }

@@ -4,6 +4,7 @@
 #include "InputBase.h"
 #include "../GameTech/TutorialGame.h"
 #include "Timer.h"
+#include "../GameTech/MainMenu.h"
 
 namespace NCL {
 	namespace CSC8503 {
@@ -178,6 +179,33 @@ namespace NCL {
 			}
 		protected:
 			bool* mouse;
+		};
+#pragma endregion
+
+#pragma region Menu Commands
+
+		class MenuEnterCommand : public Command {
+		public:
+			MenuEnterCommand(MainMenu* menu) : menu(menu) {};
+			virtual ~MenuEnterCommand() {};
+			void execute() {
+				menu->HandleMenuPress();
+			}
+		protected:
+			MainMenu* menu;
+		};
+
+		class MenuMoveCommand : public AxisCommand{
+		public:
+			MenuMoveCommand(MainMenu* menu) : menu(menu) {};
+			virtual ~MenuMoveCommand() {};
+
+			void execute(AXIS* axis) {
+				menu->HandleMenuMove({axis->x,axis->y});
+			}
+
+		protected:
+			MainMenu* menu;
 		};
 #pragma endregion
 	}

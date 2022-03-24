@@ -93,10 +93,12 @@ RendererBase::~RendererBase() {
 void RendererBase::Render() {
 	rendererAPI->BeginFrame();
 	rendererAPI->SetClearColour(0.2, 0.2, 0.2, 1);
+	rendererAPI->SetCullFace(false);
 	rendererAPI->EndFrame();
 	DrawDebugData();
 	rendererAPI->SwapBuffers();
 	frameNumber++;
+	frameNumber = frameNumber % 3600;
 }
 
 void RendererBase::DrawString(const std::string& text, const Maths::Vector2& pos, const Maths::Vector4& colour, float size) {
@@ -119,13 +121,14 @@ void RendererBase::DrawLine(const Maths::Vector3& start, const Maths::Vector3& e
 void RendererBase::DrawDebugData() {
 
 	if (debugStrings.empty() && debugLines.empty()) {
-		return; //don't mess with OGL state if there's no point!
+		return;
 	}
 	debugShader->BindShader();
 
 	if (forceValidDebugState) {
 		rendererAPI->SetBlend(true);
 		rendererAPI->SetDepth(false);
+		rendererAPI->SetCullFace(false);
 	}
 
 	Matrix4 pMat;
@@ -149,6 +152,7 @@ void RendererBase::DrawDebugData() {
 	if (forceValidDebugState) {
 		rendererAPI->SetBlend(false);
 		rendererAPI->SetDepth(true);
+		rendererAPI->SetCullFace(true);
 	}
 }
 

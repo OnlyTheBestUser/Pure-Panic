@@ -65,10 +65,7 @@ int main() {
 	float totalTime = 0.0f;
 	int totalFrames = 0;
 
-	//TutorialGame* g = new TutorialGame();
 	NetworkedGame* level = new NetworkedGame();
-	// MainMenu* m = new MainMenu();
-	// PushdownMachine p = new Menu(m, g, h, g);
 	MainMenu menu(level, nullptr);
 	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
 	float smallestFrameRate = 144.0f;
@@ -80,16 +77,6 @@ int main() {
 			std::cout << "Skipping large time delta" << std::endl;
 			continue; //must have hit a breakpoint or something to have a 1 second frame time!
 		}
-		/*if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::PRIOR)) {
-			w->ShowConsole(true);
-		}
-		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NEXT)) {
-			w->ShowConsole(false);
-		}
-
-		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::T)) {
-			w->SetWindowPosition(0, 0);
-		}*/
 
 		float frameRate = (1.0f / dt);
 		if (frameRate < smallestFrameRate)

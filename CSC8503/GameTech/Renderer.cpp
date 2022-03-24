@@ -116,6 +116,7 @@ void Renderer::Render() {
 	DrawDebugData();
 	rendererAPI->SwapBuffers();
 	frameNumber++;
+	frameNumber = frameNumber % 3600;
 }
 
 void Renderer::BuildObjectList() {
