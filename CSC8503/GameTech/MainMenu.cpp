@@ -10,7 +10,8 @@ MainMenu::MainMenu(TutorialGame* start, TutorialGame* training)
 
 	AxisCommand* m = new MenuMoveCommand(this);
 	inputHandler->BindAxis(0, m);
-	inputHandler->BindButton(Input::FIRE, new MenuEnterCommand(this));
+	Command* enter = new MenuEnterCommand(this);
+	inputHandler->BindButton(Input::JUMP, enter);
 }
 
 MainMenu::~MainMenu() {
@@ -47,14 +48,14 @@ PushdownState::PushdownResult MainMenu::OnUpdate(float dt, PushdownState** newSt
 void MainMenu::UpdateMenu(float dt) {
 	renderer.Render();
 
-	float framed = (renderer.GetFrameNumber() / 180.f);
+	float framed = (renderer.GetFrameNumber() / 240.f);
 	float size = (50.0f * abs(sin(framed))) + 40.0f;
 
 	if (renderer.GetFrameNumber() % 5 == 1) {
 		inputHandler->HandleInput();
 	}
 
-	renderer.DrawString("Spitoon", { 20,30 }, { 0.6f,0.3f,0.8f,1.0f }, { size });
+	renderer.DrawString("Spitoon", { 20,30 }, { 0.6f,0.3f,0.8f,1.0f },  size );
 
 	auto drawMenuOption = [=](const std::string& string, const Maths::Vector2 pos, int selection, int menuNumber) {
 		if (selection == menuNumber) {
@@ -71,11 +72,11 @@ void MainMenu::UpdateMenu(float dt) {
 }
 
 void MainMenu::HandleMenuMove(const Vector2 axis) {
-	if (axis.y > 0.1) {
-		selectedItem -= 1;
-	}
-	if (axis.y < -0.1) {
+	if (axis.y > 0.1f) {
 		selectedItem += 1;
+	}
+	if (axis.y < -0.1f) {
+		selectedItem -= 1;
 	}
 	selectedItem = std::clamp(selectedItem, 0, 2);
 }

@@ -30,19 +30,6 @@ using namespace CSC8503;
 using namespace NCL;
 using namespace NCL::PS4;
 
-/*
-
-The main function should look pretty familar to you!
-We make a window, and then go into a while loop that repeatedly
-runs our 'game' until we press escape. Instead of making a 'renderer'
-and updating it, we instead make a whole game, and repeatedly update that,
-instead.
-
-This time, we've added some extra functionality to the window class - we can
-hide or show the
-
-*/
-
 int main() {
 #ifdef _WIN64
 	Window* w = Window::CreateGameWindow("CSC8503 Game technology!", 1280, 720);
@@ -66,16 +53,16 @@ int main() {
 	int totalFrames = 0;
 
 	NetworkedGame* level = new NetworkedGame();
-	MainMenu menu(level, nullptr);
-	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
+	NetworkedGame* level2 = new NetworkedGame();
+	MainMenu menu(level, level2);
+	w->GetTimer()->GetTimeDeltaSeconds(); 
 	float smallestFrameRate = 144.0f;
-	while (w->UpdateWindow()) { //&& !w->GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
+	while (w->UpdateWindow()) {
 
-		//DisplayPathfinding();
 		float dt = w->GetTimer()->GetTimeDeltaSeconds();
 		if (dt > 0.1f) {
 			std::cout << "Skipping large time delta" << std::endl;
-			continue; //must have hit a breakpoint or something to have a 1 second frame time!
+			continue;
 		}
 
 		float frameRate = (1.0f / dt);
