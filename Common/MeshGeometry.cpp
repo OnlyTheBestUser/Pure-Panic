@@ -206,19 +206,43 @@ bool MeshGeometry::GetTriangle(unsigned int i, Vector3& va, Vector3& vb, Vector3
 	return true;
 }
 
+bool MeshGeometry::GetTriangleIndices(unsigned int i, int& ia, int& ib, int& ic) const {
+	bool hasTri = false;
+	unsigned int a, b, c;
+	hasTri = GetVertexIndicesForTri(i, a, b, c);
+	if (!hasTri) {
+		return false;
+	}
+	ia = a;
+	ib = b;
+	ic = c;
+	return true;
+}
+
+bool MeshGeometry::GetTriangleUV(unsigned int i, Vector2& va, Vector2& vb, Vector2& vc) const {
+	bool hasTri = false;
+	unsigned int a, b, c;
+	hasTri = GetVertexIndicesForTri(i, a, b, c);
+	if (!hasTri) {
+		return false;
+	}
+	va = texCoords[a];
+	vb = texCoords[b];
+	vc = texCoords[c];
+	return true;
+}
+
 
 bool MeshGeometry::GetNormalForTri(unsigned int i, Vector3& n) const {
-	Vector3 a, b, c;
+	unsigned int a, b, c;
 
-	bool hasTri = GetTriangle(i, a, b, c);
+	bool hasTri = GetVertexIndicesForTri(i, a, b, c);
 	if (!hasTri) {
 		return false;
 	}
 
-	Vector3 ba = b - a;
-	Vector3 ca = c - a;
-	n = Vector3::Cross(ba, ca);
-	n.Normalise();
+	n = normals[a];
+
 	return true;
 }
 

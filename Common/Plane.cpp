@@ -52,7 +52,6 @@ Plane Plane::PlaneFromTri(const Vector3 &v0, const Vector3 &v1, const Vector3 &v
 
 	Vector3 normal = Vector3::Cross(v1v0,v2v0);
 
-	
 	normal.Normalise();
 	float d = -Vector3::Dot(v0,normal);
 	return Plane(normal,d,false);

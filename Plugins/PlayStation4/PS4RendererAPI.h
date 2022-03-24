@@ -12,6 +12,7 @@
 #include "PS4Frame.h"
 #include "PS4Texture.h"
 #include "../../Common/Window.h"
+#include "../../CSC8503/GameTech/Renderer.h"
 
 using namespace sce;
 using namespace Gnmx;
@@ -48,6 +49,10 @@ namespace NCL::PS4 {
 		public RendererAPI, public PS4MemoryAware
 	{
 	friend class PS4UniformBuffer;
+	friend class PS4Shader;
+	friend class PS4Texture;
+	friend class PS4FrameBuffer;
+	friend class NCL::Rendering::Renderer;
 	public:
 		PS4RendererAPI(Window& window);
 		~PS4RendererAPI();
@@ -63,27 +68,17 @@ namespace NCL::PS4 {
 		void	SwapCommandBuffer();
 		void	SetRenderBuffer(PS4ScreenBuffer*buffer, bool clearColour, bool clearDepth, bool clearStencil);
 		PS4ScreenBuffer* GenerateScreenBuffer(uint width, uint height, bool colour = true, bool depth = true, bool stencil = false);
-
-		void UpdateAllUniform(PS4Shader* shader, std::string uniform, Gnm::Buffer buffer);
+		void SetPaintBuffer(Gnm::RenderTarget target);
 
 		//Render commands
 		void DrawMesh(MeshGeometry* mesh) override;
 		void DrawMeshAndSubMesh(MeshGeometry* mesh) override;
 
-		void BindShader(ShaderBase* shader) override;
-		void BindTexture(const TextureBase* tex, std::string uniform, int texSlot) override;
-		void BindCubemap(const TextureBase* tex, std::string uniform, int texSlot) override;
 		void BindFrameBuffer() override;
 		void BindFrameBuffer(const FrameBufferBase* fbo) override;
 
-		void UpdateUniformInt(ShaderBase* shader, std::string uniform, const int f) override;
-		void UpdateUniformFloat(ShaderBase* shader, std::string uniform, const float f) override;
-		void UpdateUniformVector3(ShaderBase* shader, std::string uniform, const Maths::Vector3 vec) override;
-		void UpdateUniformVector4(ShaderBase* shader, std::string uniform, const Maths::Vector4 vec) override;
-		void UpdateUniformMatrix4(ShaderBase* shader, std::string uniform, const Maths::Matrix4 matrix) override;
-
 		void SetDepth(bool depth) override;
-		void SetBlend(bool blend) override;
+		void SetBlend(bool blend, BlendType srcFunc = BlendType::ONE, BlendType dstFunc = BlendType::ONE) override;
 
 		void SetCullFace(bool cull) override;
 		void SetCullType(CULL_TYPE type) override;

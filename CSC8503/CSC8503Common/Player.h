@@ -6,18 +6,17 @@
 #include"../CSC8503Common/PowerUp.h"
 #include "Projectile.h"
 #include <chrono>
+#include <algorithm>
 
 namespace NCL {
     using namespace Maths;
     namespace CSC8503 {
-
+		class LevelLoader;
         class Player : public GameActor
         {
         public:
-			Player(Camera* camera, GameWorld& g, MeshGeometry* pm, ShaderBase* shd, string name = "", Vector3 ch = Vector3(0, 2, 0)) : GameActor(name), checkpoint(ch), spawnPos(ch), gameWorld(g), projectileMesh(pm), basicShader(shd) {
-				this->camera = camera;
-				camLocked = true;
-			};
+
+			Player(Camera* camera, string name = "", Vector3 ch = Vector3(0, 3, 0));
             ~Player() {};
 
             void OnCollisionBegin(GameObject* other, Vector3 localA, Vector3 localB, Vector3 normal) override;
@@ -26,31 +25,43 @@ namespace NCL {
             float GetTimeTaken() const { return timeTaken; }
             int GetScore() const { return score; }
             Vector3 GetCheckpoint() const { return checkpoint; }
+			
+			bool IsDead();
+			void Respawn();
 
+			void SetColour(Vector4 col);
+			
             bool Win() const { return finish; }
             void Reset();
 
 			bool HasKey() const { return key; }
 
-			/* TODO: 
-			Change it so it doesnt increase the strength of the powerup every frame while increasing duration aswell. 
-			Also thought powerups were simply going to be a multiplier */
 			void IncreaseSpeed(const float& speedIncrease, const float& duration) {
-				curSpeed += speedIncrease;
+				if (speedIncrease <= 0 || duration <= 0) return;
+				curSpeed *= speedIncrease;
 				powerupTime = duration;
+				currentPowerUp = PowerUpType::SpeedBoost;
 			};
 
 			void IncreaseFireRate(const float& increaseFireRateFactor, const float& duration) {
 				if (increaseFireRateFactor <= 0 || duration <= 0) return;
-				fireRate /= increaseFireRateFactor;
+				fireRate *= increaseFireRateFactor;
 				powerupTime = duration;
 				currentPowerUp = PowerUpType::FireRate;
-				std::cout << "Picked up the firerate powerup" << std::endl;
+			}
+
+			void ActivateMultiBullet(const int& NoOfBullets, const float& duration) {
+				if (NoOfBullets <= 0) return;
+				bulletsPerShot = NoOfBullets;
+				powerupTime = duration;
+				currentPowerUp = PowerUpType::MultiBullet;
 			}
 
 			void IncreaseHealth(const float& increaseHealthBy) {
 				if (increaseHealthBy <= 0) return;
-				health = std::min(health + increaseHealthBy, maxHealth);
+				health += increaseHealthBy;
+				if (health > maxHealth) health = maxHealth;
+
 				currentPowerUp = PowerUpType::Heal;
 			}
 			
@@ -58,6 +69,7 @@ namespace NCL {
 			{
 				fireRate = defaultFireRate;
 				curSpeed = defaultCurSpeed;
+				bulletsPerShot = defaultBulletsPerShot;
 				currentPowerUp = PowerUpType::None;
 			}
 
@@ -101,11 +113,31 @@ namespace NCL {
 				return currentPowerUp;
 			}
 
+			void DealDamage(float damageAmount) {
+				health -= damageAmount;
+				if (health < 0) health = 0;
+			}
+
 			void ChangeCamLock() { camLocked = !camLocked; }
 			bool* GetCamLock() { return &camLocked; }
 
+			bool IsFiring() { 
+				bool ret = fired;
+				fired = false;
+				return ret;
+			}
+
+			Camera* GetCam() { return camera; }
+
+			int GetPlayerID() const { return playerID; }
+			void SetPlayerID(int playerID);
+
+			int BulletCounter = 0;
+
         protected:
 			float CheckDistToGround();
+
+			int playerID;
 
             bool start = false;
             bool finish = false;
@@ -115,11 +147,13 @@ namespace NCL {
             Vector3 checkpoint;
 			bool key = false;
 			float defaultFireRate = 0.2f;
-			float defaultCurSpeed = 50.0f;
+			float defaultCurSpeed = 80.0f;
 			float fireRate = 0.2f;
+			int defaultBulletsPerShot = 1;
+			int bulletsPerShot = defaultBulletsPerShot;
 			float timeSincePrevShot = 0.0f;
 			float powerupTime = 0.0f;
-			float curSpeed = 50.0f;
+			float curSpeed = 80.0f;
 			Vector3 force = Vector3(0,0,0);
 
 			float inAirSpeed = 500.0f;
@@ -132,14 +166,9 @@ namespace NCL {
 
 			float cameraVertMult = 0.5f;
 			Camera* camera;
-			GameWorld& gameWorld;
 			bool camLocked;
 			
-			ShaderBase* basicShader;
-			MeshGeometry* projectileMesh;
-
-		private:
-			Projectile* spawnProjectile(const float& initialSpeed = 25.0f, const float& meshSize = 0.5f);
+			bool fired = false;
         };
     }
 }

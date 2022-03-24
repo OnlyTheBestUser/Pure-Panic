@@ -15,12 +15,18 @@ namespace NCL {
 			bool Initialise();
 			void Shutdown();
 
-			void SetGameWorld(GameWorld &g);
+			void SetGameWorld(GameWorld& g);
 
 			//void ThreadedUpdate();
 
+#ifndef ORBISNET
 			bool SendGlobalPacket(int msgID);
 			bool SendGlobalPacket(GamePacket& packet);
+
+			bool SendPacketToPeer(int peerID, int msgID);
+			bool SendPacketToPeer(int peerID, GamePacket& packet);
+			bool SendPacketToPeer(ENetPeer* peer, GamePacket& packet);
+#endif
 
 			virtual void UpdateServer();
 
@@ -28,11 +34,14 @@ namespace NCL {
 			int			port;
 			int			clientMax;
 			int			clientCount;
-			GameWorld*	gameWorld;
+			GameWorld*  gameWorld;
 
 			//std::atomic<bool> threadAlive;
 
-			
+			// peerId, peer*
+#ifndef ORBISNET
+			std::map<int, ENetPeer*> connectedClients;
+#endif
 
 			//std::thread updateThread;
 

@@ -6,6 +6,7 @@
 #include "../../Common/Vector2.h"
 #include "../../Common/Window.h"
 #include "../../Common/Maths.h"
+#include "../../Common/MeshGeometry.h"
 #include "Debug.h"
 
 #include <list>
@@ -30,7 +31,23 @@ bool CollisionDetection::RayPlaneIntersection(const Ray&r, const Plane&p, RayCol
 	return true;
 }
 
+bool CollisionDetection::RayTriangleIntersection(const Ray& r, const Triangle& t, const Vector3& norm,  RayCollision& collision, Matrix4 mat4)
+{
+	Plane p0 = Plane::PlaneFromTri(t.pos_a, t.pos_b, t.pos_c);
+	Plane p1 = Plane::PlaneFromTri(t.pos_a, t.pos_b, t.pos_a + norm);
+	Plane p2 = Plane::PlaneFromTri(t.pos_b, t.pos_c, t.pos_b + norm);
+	Plane p3 = Plane::PlaneFromTri(t.pos_c, t.pos_a, t.pos_c + norm);
+	
+	if (RayPlaneIntersection(r, p0, collision)) {
+		if (!p1.PointInPlane(collision.collidedAt) && !p2.PointInPlane(collision.collidedAt) && !p3.PointInPlane(collision.collidedAt)) {
+			return true;
+		}
+	}
+	return false;
+}
+
 bool CollisionDetection::RayIntersection(const Ray& r,GameObject& object, RayCollision& collision) {
+
 	bool hasCollided = false;
 
 	const Transform& worldTransform = object.GetTransform();
@@ -39,10 +56,9 @@ bool CollisionDetection::RayIntersection(const Ray& r,GameObject& object, RayCol
 	if (!volume) {
 		return false;
 	}
-
 	switch (volume->type) {
 		case VolumeType::AABB:		hasCollided = RayAABBIntersection(r, worldTransform, (const AABBVolume&)*volume	, collision); break;
-		case VolumeType::OBB:		hasCollided = RayOBBIntersection(r, worldTransform, (const OBBVolume&)*volume	, collision); break;
+		case VolumeType::OBB:		hasCollided = RayOBBIntersection(r, worldTransform, (const OBBVolume&)*volume	, collision, object.GetName()); break;
 		case VolumeType::Sphere:	hasCollided = RaySphereIntersection(r, worldTransform, (const SphereVolume&)*volume	, collision); break;
 		case VolumeType::Capsule:	hasCollided = RayCapsuleIntersection(r, worldTransform, (const CapsuleVolume&)*volume, collision); break;
 	}
@@ -91,7 +107,9 @@ bool CollisionDetection::RayAABBIntersection(const Ray&r, const Transform& world
 	return RayBoxIntersection(r, boxPos, boxSize, collision);
 }
 
-bool CollisionDetection::RayOBBIntersection(const Ray&r, const Transform& worldTransform, const OBBVolume& volume, RayCollision& collision) {
+bool CollisionDetection::RayOBBIntersection(const Ray&r, const Transform& worldTransform, const OBBVolume& volume, RayCollision& collision, string name) {
+	//if (name == "PAINT_WALL")
+	//	std::cout << ".";
 	Quaternion orientation = worldTransform.GetOrientation();
 	Vector3 position = worldTransform.GetPosition();
 
@@ -288,6 +306,76 @@ Matrix4::Rotation(yaw, Vector3(0, 1, 0)) *
 Matrix4::Rotation(pitch, Vector3(1, 0, 0));
 
 return iview;
+}
+
+bool CollisionDetection::GetBarycentricFromRay(const Ray ray, const RenderObject obj, Vector2& va, Vector2& vb, Vector2& vc, Vector3& barycentric, Vector3& collisionPoint)
+{
+
+	Triangle	closest;
+	Vector3		closestnorm;
+	Vector3		closestcollision;
+	float		distance = FLT_MAX;
+	
+	const MeshGeometry* mesh = obj.GetMesh();
+	const vector<unsigned int> indicies = mesh->GetIndexData();
+
+	for (int i = 0; i < (indicies.size()) / 3; i++) {
+
+		Triangle currentTri;
+		Vector3 currentNorm;
+		RayCollision currentCollision;
+
+		mesh->GetTriangle(i, currentTri.pos_a, currentTri.pos_b, currentTri.pos_c);
+		mesh->GetTriangleUV(i, currentTri.texUV_a, currentTri.texUV_b, currentTri.texUV_c);
+		mesh->GetNormalForTri(i, currentNorm);
+
+		currentNorm = obj.GetTransform()->GetOrientation() * currentNorm;
+		currentTri.pos_a = obj.GetTransform()->GetMatrix() * currentTri.pos_a;
+		currentTri.pos_b = obj.GetTransform()->GetMatrix() * currentTri.pos_b;
+		currentTri.pos_c = obj.GetTransform()->GetMatrix() * currentTri.pos_c;
+
+		if (RayTriangleIntersection(ray, currentTri, currentNorm, currentCollision, obj.GetTransform()->GetMatrix())) {
+			float rayDist = (currentCollision.collidedAt - ray.GetPosition()).Length();
+			if (rayDist < distance) {
+				closest = currentTri;
+				closestnorm = currentNorm;
+				closestcollision = currentCollision.collidedAt;
+				distance = rayDist;
+			}
+		}
+	}
+	//Debug::DrawArrow(closestcollision, closestcollision + closestnorm, Vector4(0,1,0,1), 1.0f);
+
+	if (distance == FLT_MAX) {
+		return false;
+	}
+
+	va = closest.texUV_a;
+	vb = closest.texUV_b;
+	vc = closest.texUV_c;
+	collisionPoint = closestcollision;
+	barycentric = CalcTriBaryCoord(closest, closestcollision);
+
+	// Draws collided mesh triangle 
+	// Debug::DrawTriangle(closest.pos_a, closest.pos_b, closest.pos_c, Vector4(1,1,1,1), 1.0f);
+
+	return true;
+}
+
+Vector3 CollisionDetection::CalcTriBaryCoord(const Triangle& t, const Vector3& point) {
+	Vector3 v0 = t.pos_b - t.pos_a, v1 = t.pos_c - t.pos_a, v2 = point - t.pos_a;
+	float d00 = Vector3::Dot(v0, v0);
+	float d01 = Vector3::Dot(v0, v1);
+	float d11 = Vector3::Dot(v1, v1);
+	float d20 = Vector3::Dot(v2, v0);
+	float d21 = Vector3::Dot(v2, v1);
+	float denom = d00 * d11 - d01 * d01;
+
+	float v = (d11 * d20 - d01 * d21) / denom;
+	float w = (d00 * d21 - d01 * d20) / denom;
+	float u = 1.0f - v - w;
+
+	return Vector3(u, v, w);
 }
 
 /*

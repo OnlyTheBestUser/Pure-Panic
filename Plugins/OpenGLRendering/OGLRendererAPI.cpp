@@ -46,7 +46,6 @@ OGLRendererAPI::OGLRendererAPI(Window& w) : RendererAPI(w)	{
 	InitWithWin32(w);
 #endif
 	boundMesh	= nullptr;
-	boundShader = nullptr;
 
 	currentWidth	= (int)w.GetScreenSize().x;
 	currentHeight	= (int)w.GetScreenSize().y;
@@ -68,8 +67,9 @@ void OGLRendererAPI::OnWindowResize(int w, int h)	 {
 void OGLRendererAPI::BeginFrame()		{
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	BindShader(nullptr);
-	BindMesh(nullptr);
+	glUseProgram(0);
+	//BindShader(nullptr);
+	//BindMesh(nullptr);
 }
 
 void OGLRendererAPI::RenderFrame()		{
@@ -82,21 +82,6 @@ void OGLRendererAPI::EndFrame()		{
 
 void OGLRendererAPI::SwapBuffers()   {
 	::SwapBuffers(deviceContext);
-}
-
-void OGLRendererAPI::BindShader(ShaderBase*s) {
-	if (!s) {
-		glUseProgram(0);
-		boundShader = nullptr;
-	}
-	else if (OGLShader* oglShader = dynamic_cast<OGLShader*>(s)) {
-		glUseProgram(oglShader->programID);
-		boundShader = oglShader;
-	}
-	else {
-		std::cout << __FUNCTION__ << " has received invalid shader?!" << std::endl;
-		boundShader = nullptr;
-	}
 }
 
 void OGLRendererAPI::BindMesh(MeshGeometry*m) {
@@ -120,10 +105,6 @@ void OGLRendererAPI::BindMesh(MeshGeometry*m) {
 void OGLRendererAPI::DrawBoundMesh(int subLayer, int numInstances) {
 	if (!boundMesh) {
 		std::cout << __FUNCTION__ << " has been called without a bound mesh!" << std::endl;
-		return;
-	}
-	if (!boundShader) {
-		std::cout << __FUNCTION__ << " has been called without a bound shader!" << std::endl;
 		return;
 	}
 	GLuint	mode	= 0;
@@ -161,39 +142,6 @@ void OGLRendererAPI::DrawBoundMesh(int subLayer, int numInstances) {
 	}
 }
 
-void OGLRendererAPI::BindTextureToShader(TextureType type, const TextureBase*t, const std::string& uniform, int texUnit) const{
-	GLint texID = 0;
-
-	if (!boundShader) {
-		std::cout << __FUNCTION__ << " has been called without a bound shader!" << std::endl;
-		return;//Debug message time!
-	}
-	
-	GLuint slot = glGetUniformLocation(boundShader->programID, uniform.c_str());
-
-	if (slot < 0) {
-		return;
-	}
-
-	if (const OGLTexture* oglTexture = dynamic_cast<const OGLTexture*>(t)) {
-		texID = oglTexture->GetObjectID();
-	}
-
-	glUniform1i(slot, texUnit);
-	glActiveTexture(GL_TEXTURE0 + texUnit);
-	switch (type)
-	{
-	default:
-		break;
-	case TextureType::TEXTURE2D:
-		glBindTexture(GL_TEXTURE_2D, texID);
-		break;
-	case TextureType::CUBEMAP:
-		glBindTexture(GL_TEXTURE_CUBE_MAP, texID);
-		break;
-	}
-
-}
 
 void OGLRendererAPI::DrawMesh(MeshGeometry* mesh) {
 	BindMesh(mesh);
@@ -208,14 +156,6 @@ void OGLRendererAPI::DrawMeshAndSubMesh(MeshGeometry* mesh) {
 	}
 }
 
-void OGLRendererAPI::BindTexture(const TextureBase* tex, std::string uniform, int texSlot) {
-	BindTextureToShader(TextureType::TEXTURE2D, tex, uniform, texSlot);
-}
-
-void OGLRendererAPI::BindCubemap(const TextureBase* tex, std::string uniform, int texSlot) {
-	BindTextureToShader(TextureType::CUBEMAP, tex, uniform, texSlot);
-}
-
 void OGLRendererAPI::BindFrameBuffer() {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -228,62 +168,40 @@ void OGLRendererAPI::BindFrameBuffer(const FrameBufferBase* fbo) {
 	glBindFramebuffer(GL_FRAMEBUFFER, oglFbo->GetBufferObject());
 }
 
-void OGLRendererAPI::UpdateUniformInt(ShaderBase* shader, std::string uniform, const int i) {
-	OGLShader* oglShader = dynamic_cast<OGLShader*>(shader);
-	if (!oglShader) {
-		return;
-	}
-
-	int fLoc = glGetUniformLocation(oglShader->GetProgramID(), uniform.c_str());
-	glUniform1i(fLoc, i);
-}
-
-void OGLRendererAPI::UpdateUniformFloat(ShaderBase* shader, std::string uniform, const float f) {
-	OGLShader* oglShader = dynamic_cast<OGLShader*>(shader);
-	if (!oglShader) {
-		return;
-	}
-
-	int fLoc = glGetUniformLocation(oglShader->GetProgramID(), uniform.c_str());
-	glUniform1i(fLoc, f);
-}
-
-void OGLRendererAPI::UpdateUniformVector3(ShaderBase* shader, std::string uniform, const Maths::Vector3 vec) {
-	OGLShader* oglShader = dynamic_cast<OGLShader*>(shader);
-	if (!oglShader) {
-		return;
-	}
-
-	int vecLoc = glGetUniformLocation(oglShader->GetProgramID(), uniform.c_str());
-	glUniform3fv(vecLoc, 1, (float*)&vec);
-}
-
-void OGLRendererAPI::UpdateUniformVector4(ShaderBase* shader, std::string uniform, const Maths::Vector4 vec) {
-	OGLShader* oglShader = dynamic_cast<OGLShader*>(shader);
-	if (!oglShader) {
-		return;
-	}
-
-	int vecLoc = glGetUniformLocation(oglShader->GetProgramID(), uniform.c_str());
-	glUniform4fv(vecLoc, 1, (float*)&vec);
-}
-
-void OGLRendererAPI::UpdateUniformMatrix4(ShaderBase* shader, std::string uniform, const Maths::Matrix4 matrix) {
-	OGLShader* oglShader = dynamic_cast<OGLShader*>(shader);
-	if (!oglShader) {
-		return;
-	}
-
-	int matLoc = glGetUniformLocation(oglShader->GetProgramID(), uniform.c_str());
-	glUniformMatrix4fv(matLoc, 1, false, (float*)&matrix);
-}
-
 void OGLRendererAPI::SetDepth(bool d) {
 	d ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST);
 }
 
-void OGLRendererAPI::SetBlend(bool b) {
+void OGLRendererAPI::SetBlend(bool b, RendererAPI::BlendType srcFunc, BlendType dstFunc) {
 	b ? glEnable(GL_BLEND) : glDisable(GL_BLEND);
+
+	auto toGLenum = [](const BlendType func)->GLenum {
+		switch (func)
+		{
+		case BlendType::NONE:
+			return GL_NONE;
+			break;
+		case BlendType::ONE:
+			return GL_ONE;
+			break;
+		case BlendType::ALPHA:
+			return GL_SRC_ALPHA;
+			break;
+		case BlendType::ONE_MINUS_ALPHA:
+			return GL_ONE_MINUS_SRC_ALPHA;
+			break;
+		case BlendType::SRC_COLOR:
+			return GL_SRC_COLOR;
+			break;
+		case BlendType::ONE_MINUS_SRC_COLOR:
+			return GL_ONE_MINUS_SRC_COLOR;
+			break;
+		default:
+			break;
+		}
+	};
+
+	glBlendFunc(toGLenum(srcFunc), toGLenum(dstFunc));
 }
 
 void OGLRendererAPI::SetCullFace(bool b) {

@@ -6,6 +6,9 @@
 #include <.\graphics\api_gnm\toolkit\allocators.h>
 #include <.\graphics\api_gnm\toolkit\stack_allocator.h>
 
+#include "../../CSC8503/GameTech/RendererBase.h"
+#include "PS4RendererAPI.h"
+
 using namespace sce;
 using namespace NCL::PS4;
 PS4Texture::PS4Texture()
@@ -15,6 +18,48 @@ PS4Texture::PS4Texture()
 
 PS4Texture::~PS4Texture()
 {
+}
+
+void PS4Texture::Bind(int slot) const {
+	Gnm::Sampler trilinearSampler;
+	trilinearSampler.init();
+	trilinearSampler.setMipFilterMode(Gnm::kMipFilterModeLinear);
+
+	((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->setTextures(Gnm::kShaderStagePs, slot, 1, &GetAPITexture());
+	((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->setSamplers(Gnm::kShaderStagePs, slot, 1, &trilinearSampler);
+}
+
+PS4Texture* NCL::PS4::PS4Texture::EmptyTex(int width, int height)
+{
+	PS4Texture* tex = new PS4Texture();
+
+
+	PS4::PS4ScreenBuffer* buffer = ((PS4RendererAPI*)RendererBase::rendererAPI)->GenerateScreenBuffer(width, height, true, false, false);
+	tex->target = buffer->colourTarget;
+
+	tex->apiTexture.initFromRenderTarget(&buffer->colourTarget, false);
+	tex->width = tex->apiTexture.getWidth();
+	tex->height = tex->apiTexture.getHeight();
+	//tex->bpp	= tex->apiTexture.getDepth();
+
+	tex->apiTexture.setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
+
+	return tex;
+}
+
+PS4Texture* NCL::PS4::PS4Texture::GenTexFromBuffer(const sce::Gnm::RenderTarget& fbo)
+{
+	PS4Texture* tex = new PS4Texture;
+
+	tex->apiTexture.initFromRenderTarget(&fbo, false);
+	tex->width = tex->apiTexture.getWidth();
+	tex->height = tex->apiTexture.getHeight();
+
+	return tex;
+}
+
+void PS4Texture::ResetTexture() {
+
 }
 
 PS4Texture* PS4Texture::LoadTextureFromFile(const std::string& filename) {
@@ -48,8 +93,8 @@ PS4Texture* PS4Texture::LoadTextureFromFile(const std::string& filename) {
 	PS4Texture* tex = new PS4Texture();
 	tex->apiTexture = *patchTextures(contentsDesc, 0, 1, &pixelsAddr);
 
-	//tex->width  = tex->apiTexture.getWidth();
-	//tex->height = tex->apiTexture.getHeight();
+	tex->width  = tex->apiTexture.getWidth();
+	tex->height = tex->apiTexture.getHeight();
 	//tex->bpp	= tex->apiTexture.getDepth();
 
 	tex->apiTexture.setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
@@ -91,8 +136,8 @@ PS4Texture* PS4Texture::LoadSkyboxFromFile(const std::string& filename) {
 	tex->apiTexture = *patchTextures(contentsDesc, 0, 1, &pixelsAddr);
 	tex->apiTexture.setTextureType(Gnm::kTextureTypeCubemap);
 
-	//tex->width  = tex->apiTexture.getWidth();
-	//tex->height = tex->apiTexture.getHeight();
+	tex->width  = tex->apiTexture.getWidth();
+	tex->height = tex->apiTexture.getHeight();
 	//tex->bpp	= tex->apiTexture.getDepth();
 
 	tex->apiTexture.setResourceMemoryType(Gnm::kResourceMemoryTypeRO);

@@ -11,10 +11,10 @@ using std::vector;
 
 namespace NCL {
 	namespace CSC8503 {
-
+		class NetworkObject;
 		class GameObject	{
 		public:
-			GameObject(string name = "");
+			GameObject(string name = "", float paintRad = 0);
 			virtual ~GameObject();
 
 			void SetBoundingVolume(CollisionVolume* vol) {
@@ -34,6 +34,10 @@ namespace NCL {
 				return transform;
 			}
 
+			NetworkObject* GetNetworkObject() const {
+				return networkObject;
+			}
+
 			RenderObject* GetRenderObject() const {
 				return renderObject;
 			}
@@ -48,6 +52,10 @@ namespace NCL {
 
 			void SetPhysicsObject(PhysicsObject* newObject) {
 				physicsObject = newObject;
+			}
+
+			void SetNetworkObject(NetworkObject* newObject) {
+				networkObject = newObject;
 			}
 
 			const string& GetName() const {
@@ -76,11 +84,16 @@ namespace NCL {
 			void SetWorldID(int newID) { worldID = newID; }
 			int GetWorldID() const { return worldID; }
 
+			void SetPaintRadius(int newRad) { paintRadius = newRad; }
+			int GetPaintRadius() const { return paintRadius; }
+
 			void SetCollisionLayers(int layers) { GetPhysicsObject()->SetCollisionLayers(layers); }
 			int	GetCollisionLayers() const { return GetPhysicsObject()->GetCollisionLayers(); }
 
 			void SetTrigger(bool x) { isTrigger = x; }
 			bool IsTrigger() const { return isTrigger; }
+
+			bool IsPaintable() const { return renderObject->GetPaintMask() != nullptr; }
 
 		protected:
 			Transform			transform;
@@ -88,6 +101,7 @@ namespace NCL {
 			CollisionVolume*	boundingVolume;
 			PhysicsObject*		physicsObject;
 			RenderObject*		renderObject;
+			NetworkObject*		networkObject;
 
 			bool	isActive;
 			int		worldID;
@@ -95,6 +109,7 @@ namespace NCL {
 
 			int collisionLayers = CollisionLayer::LAYER_ONE;
 			bool isTrigger = false;
+			float paintRadius = 0.0f;
 
 			Vector3 broadphaseAABB;
 		};

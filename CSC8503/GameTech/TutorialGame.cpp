@@ -4,6 +4,8 @@
 #include "../../Common/MeshGeometry.h"
 
 #include "../../Common/Quaternion.h"
+#include "../CSC8503Common/CollisionDetection.h"
+#include "../CSC8503Common/Timer.h"
 
 #include "../CSC8503Common/InputHandler.h"
 #include "../CSC8503Common/GameActor.h"
@@ -11,36 +13,37 @@
 #include "../../Common/Assets.h"
 
 #include "../CSC8503Common/InputList.h"
+#include "../CSC8503Common/SimpleAI.h"
+#include "LoadingScreen.h"
 
 using namespace NCL;
 using namespace CSC8503;
 
 TutorialGame::TutorialGame()	{
-	world		= new GameWorld();
-	renderer	= new Renderer(*world);
-	physics		= new PhysicsSystem(*world);
-
+	world			= new GameWorld();
+	LoadingScreen::AddProgress(15.0f);
+	LoadingScreen::UpdateGame(0.0f);
+	renderer		= new Renderer(*world);
+	LoadingScreen::AddProgress(10.0f);
+	LoadingScreen::UpdateGame(0.0f);
+	physics			= new PhysicsSystem(*world);
+	LoadingScreen::AddProgress(25.0f);
+	LoadingScreen::UpdateGame(0.0f);
+	levelLoader		= new LevelLoader(physics, renderer, this);
+	LoadingScreen::AddProgress(50.0f);
+	LoadingScreen::UpdateGame(0.0f);
+	gameManager		= new GameManager(this);
+	LoadingScreen::SetCompletionState(true);
+	
 #ifndef _ORBIS
-	audio = audio->GetInstance();
-	audio->Initialize();
-	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_01.ogg", true, false, false);
-	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_02.ogg", true, false, false);
-	audio->LoadSound(Assets::AUDIODIR + "menu_music.ogg", false, true, true);
-
-	bgm = new BGMManager(audio);
-	bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 3.0f);
+	InitSounds();
 #endif
-
-	paintManager = PaintManager::GetInstance();
-	levelLoader = new LevelLoader(world, physics);
 
 	forceMagnitude = 30.0f;
 	useGravity = true;
 	physics->UseGravity(useGravity);
 
 	inSelectionMode = false;
-
-	testStateObject = nullptr;
 
 	state = PLAY;
 
@@ -82,29 +85,56 @@ TutorialGame::TutorialGame()	{
 
 	inputHandler = new InputHandler();
 
-	Command* toggleGrav = new ToggleGravityCommand(physics);
 	Command* toggleDebug = new ToggleBoolCommand(&debugDraw);
 	Command* togglePause = new ToggleBoolCommand(&pause);
+	Command* toggleMouse = new ToggleMouseCommand(&inSelectionMode);
+	Command* resetWorld = new ResetWorldCommand(&state);
 	Command* quitCommand = new QuitCommand(&quit, &pause);
-	inputHandler->BindButton(TOGGLE_GRAV, toggleGrav);
+	//Command* paintFireCommand = new PaintFireCommand(this);
+	Command* startTimer = new StartTimerCommand(gameManager->GetTimer());
+	
 	inputHandler->BindButton(TOGGLE_DEBUG, toggleDebug);
 	inputHandler->BindButton(TOGGLE_PAUSE, togglePause);
+	inputHandler->BindButton(RESET_WORLD, resetWorld);
 	inputHandler->BindButton(QUIT, quitCommand);
+	//inputHandler->BindButton(FIRE, paintFireCommand);
+	inputHandler->BindButton(TOGGLE_MOUSE, toggleMouse);
+	inputHandler->BindButton(START_TIMER, startTimer);
 
 #pragma endregion
 
-	InitialiseAssets();
+	InitCamera();
+	InitWorld();
 }
-/*
 
-Each of the little demo scenarios used in the game uses the same 2 meshes,
-and the same texture and shader. There's no need to ever load in anything else
-for this module, even in the coursework, but you can add it if you like!
-
-*/
 void TutorialGame::InitialiseAssets() {
 	InitCamera();
 	InitWorld();
+}
+
+
+void TutorialGame::InitSounds() {
+#ifndef _ORBIS
+	audio = NCL::AudioManager::GetInstance();
+	audio->Initialize();
+	//Menu Sounds
+	audio->LoadSound(Assets::AUDIODIR + "menu_music.ogg", false, true, true);
+	audio->LoadSound(Assets::AUDIODIR + "menu_move.ogg", false, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "menu_select.ogg", false, false, false);
+
+	//Shooting Sounds
+	audio->LoadSound(Assets::AUDIODIR + "gun_fire.ogg", true, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_01.ogg", true, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "splat_neutral_02.ogg", true, false, false);
+
+	//Player Sounds
+	audio->LoadSound(Assets::AUDIODIR + "boy_whoa_01.ogg", true, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "boy_whoa_02.ogg", true, false, false);
+	audio->LoadSound(Assets::AUDIODIR + "boy_whoa_03.ogg", true, false, false);
+
+	bgm = new BGMManager(audio);
+	bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 3.0f);
+#endif // !_ORBIS
 }
 
 TutorialGame::~TutorialGame() {
@@ -117,28 +147,29 @@ TutorialGame::~TutorialGame() {
 void TutorialGame::UpdateGame(float dt) {
 	Debug::SetRenderer(renderer);
 	switch (state) {
-	case PLAY: UpdateGameWorld(dt); break;
+	case PLAY: 
+		UpdateGameWorld(dt); break;
 	case PAUSE: UpdatePauseScreen(dt); break;
 	case WIN: UpdateWinScreen(dt); break;
 	case RESET: {
 		InitCamera();
 		InitWorld();
+		renderer->ClearPaint();
 		selectionObject = nullptr;
+		state = PLAY;
 		break;
 	}
 	}
 
 	inputHandler->HandleInput();
 
-	//Debug::DrawLine(Vector3(), Vector3(0, 20, 0), Debug::RED);
-	//Debug::DrawLine(Vector3(), Vector3(360, 0, 0), Debug::RED);
-	//Debug::DrawLine(Vector3(360, 0, 0), Vector3(360, 0, 360), Debug::RED);
-	//Debug::DrawLine(Vector3(360, 0, 360), Vector3(0, 0, 360), Debug::RED);
-	//Debug::DrawLine(Vector3(0, 0, 360), Vector3(0, 0, 0), Debug::RED);
-
 	renderer->Update(dt);
 
 	Debug::FlushRenderables(dt);
+
+	renderer->scores = gameManager->CalcCurrentScoreRatio();
+	renderer->drawGUI = (LoadingScreen::GetCompletionState() && state == PLAY);
+
 	renderer->Render();
 }
 
@@ -154,13 +185,6 @@ void TutorialGame::UpdateGameWorld(float dt)
 	}
 
 	//UpdateKeys();
-
-	if (physics->GetGravity()) {
-		Debug::Print("(G)ravity on", Vector2(5, 95));
-	}
-	else {
-		Debug::Print("(G)ravity off", Vector2(5, 95));
-	}
 
 	if (debugDraw) {
 		GameObjectIterator first;
@@ -179,10 +203,50 @@ void TutorialGame::UpdateGameWorld(float dt)
 	physics->Update(dt);
 
 	world->UpdateWorld(dt);
+
+	gameManager->Update(dt);
+
+	UpdateScores(dt);
+}
+
+void TutorialGame::UpdateScores(float dt) {
+	timeSinceLastScoreUpdate += dt;
+	//Can change time for better performance
+	if (timeSinceLastScoreUpdate > 1.0f/60.0f) {
+		GameObjectIterator start;
+		GameObjectIterator cur;
+		GameObjectIterator end;
+		world->GetPaintableObjectIterators(start, end);
+		cur = start;
+		for (int i = 0; i < currentObj; i++) {
+			cur++;
+			if (cur == end) {
+				currentObj = 0;
+				cur = start;
+			}
+		}
+
+		if ((*cur)->GetPaintRadius() == 0) {
+			currentObj++;
+			return;
+		}
+		// Need to score the texture here.
+		Vector2 scoreDif = renderer->CountPaintMask((*cur)->GetRenderObject()->GetPaintMask(), world->GetScoreForObject((*cur)), GameManager::team1Colour, GameManager::team2Colour);
+		if ((*cur)->GetPaintRadius() != 0){
+			scoreDif = scoreDif / (*cur)->GetPaintRadius();
+		}
+		world->UpdateScore((*cur), scoreDif);
+		//std::cout << (*cur)->GetName() << "\n" << "Team 1: " << scoreDif.x << "\n" << "Team 2: " << scoreDif.y << "\n\n";
+
+		gameManager->UpdateScores(scoreDif);
+		currentObj++;
+		timeSinceLastScoreUpdate = 0;
+	}
 }
 
 void TutorialGame::DebugDrawCollider(const CollisionVolume* c, Transform* worldTransform) {
 	Vector4 col = Vector4(1, 0, 0, 1);
+
 	if (c == nullptr)
 		return;
 	switch (c->type) {
@@ -262,14 +326,6 @@ void TutorialGame::UpdateKeys() {
 void TutorialGame::DebugObjectMovement() {
 	//If we've selected an object, we can manipulate it with some key presses
 	if (inSelectionMode && selectionObject) {
-		//Twist the selected object!
-		//if (Window::GetKeyboard()->KeyDown(KeyboardKeys::LEFT)) {
-		//	selectionObject->GetPhysicsObject()->AddTorque(Vector3(-10, 0, 0));
-		//}
-
-		//if (Window::GetKeyboard()->KeyDown(KeyboardKeys::RIGHT)) {
-		//	selectionObject->GetPhysicsObject()->AddTorque(Vector3(10, 0, 0));
-		//}
 
 		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::NUM7)) {
 			selectionObject->GetPhysicsObject()->AddTorque(Vector3(0, 10, 0));
@@ -278,18 +334,6 @@ void TutorialGame::DebugObjectMovement() {
 		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::NUM8)) {
 			selectionObject->GetPhysicsObject()->AddTorque(Vector3(0, -10, 0));
 		}
-
-		//if (Window::GetKeyboard()->KeyDown(KeyboardKeys::RIGHT)) {
-		//	selectionObject->GetPhysicsObject()->AddTorque(Vector3(10, 0, 0));
-		//}
-
-		//if (Window::GetKeyboard()->KeyDown(KeyboardKeys::UP)) {
-		//	selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 0, -10));
-		//}
-
-		//if (Window::GetKeyboard()->KeyDown(KeyboardKeys::DOWN)) {
-		//	selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 0, 10));
-		//}
 
 		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::NUM5)) {
 			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, -10, 0));
@@ -309,19 +353,9 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	levelLoader->ReadInLevelFile(NCL::Assets::DATADIR + "../../Assets/Maps/map1.txt");
-	Player* player = levelLoader->AddPlayerToWorld(Vector3(0, 5, 0));
-	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 20), PowerUpType::FireRate);
-	levelLoader->AddPowerUpToWorld(Vector3(0, 5, 30), PowerUpType::Heal);
-
-	//Command* f = new MoveForwardCommand(player);
-	//Command* b = new MoveBackwardCommand(player);
-	//Command* l = new MoveLeftCommand(player);
-	//Command* r = new MoveRightCommand(player);
-	//inputHandler->BindButton(FORWARD, f);
-	//inputHandler->BindButton(BACK, b);
-	//inputHandler->BindButton(LEFT, l);
-	//inputHandler->BindButton(RIGHT, r);
+	levelLoader->ReadInLevelFile(NCL::Assets::MAPDIR + "training_map.txt");
+	Player* player = levelLoader->SpawnPlayer(Vector3(0, 5, 0));
+	
 	AxisCommand* m = new MoveCommand(player);
 	inputHandler->BindAxis(0, m);
 
@@ -340,13 +374,12 @@ void TutorialGame::InitWorld() {
 	Command* f = new FireCommand(player);
 	inputHandler->BindButton(FIRE, f);
 
-	/*GameObject* cap1 = levelLoader->AddCapsuleToWorld(Vector3(15, 15, 0), 3.0f, 1.5f);
+	/*GameObject* cap1 = LevelLoader->AddCapsuleToWorld(Vector3(15, 15, 0), 3.0f, 1.5f);
 	cap1->GetPhysicsObject()->SetDynamic(true);
 	cap1->SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_TWO);*/
 
 	player1 = player;
-
-	//Projectile* spit = AddProjectileToWorld(Vector3(5, 5, 0), 0.3f, 1.0f);
+	renderer->playerColour = GameManager::GetColourForID(player1->GetPlayerID());
 
 	physics->BuildStaticList();
 }
@@ -511,19 +544,25 @@ void TutorialGame::UpdateBGM() {
 #endif // !_ORBIS
 }
 
-void TutorialGame::PaintSelectedObject() {
-	if (!selectionObject)
-		return;
+void TutorialGame::PaintObject() {
 
-	if (Window::GetMouse()->ButtonPressed(NCL::MouseButtons::RIGHT)) {
-		Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
-		RayCollision closestCollision;
-		if (world->Raycast(ray, closestCollision, true)) {
-			if (closestCollision.node == selectionObject) {
-				//Paint that node
-				selectionObject->GetPhysicsObject()->AddForceAtPosition(ray.GetDirection() * forceMagnitude, closestCollision.collidedAt);
-			}
+	Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
+	RayCollision closestCollision;
+	if (world->Raycast(ray, closestCollision, true)) {
+		auto test = ((GameObject*)closestCollision.node)->GetRenderObject();
+
+		//Debug::DrawLine(ray.GetPosition(), ray.GetPosition() * ray.GetDirection());
+		Debug::DrawSphere(closestCollision.collidedAt, 0.5, Vector4(1,0,0,1), 0.f);
+		if (test) {
+			
+			Vector2 texUV_a, texUV_b, texUV_c;
+			Vector3 collisionPoint;
+			Vector3 barycentric;
+			CollisionDetection::GetBarycentricFromRay(ray, *test, texUV_a, texUV_b, texUV_c, barycentric, collisionPoint);
+			
+			
+			// Get the uv from the ray
+			renderer->Paint(test, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, ((GameObject*)closestCollision.node)->GetPaintRadius(), 0.2, 0.2, Vector4(0.3, 0, 0.5, 1));
 		}
 	}
-
 }

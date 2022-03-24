@@ -13,6 +13,7 @@
 
 namespace NCL::PS4 {
 	using namespace sce;
+
 	class PS4Mesh :
 		public NCL::MeshGeometry, public PS4MemoryAware
 	{
@@ -33,20 +34,24 @@ namespace NCL::PS4 {
 		void	InitAttributeBuffer(sce::Gnm::Buffer &buffer, Gnm::DataFormat format, void*offset);
 
 	protected:
+
+		const int MAX_DEBUG_VERTEX_LIMIT = 5000;
 		//Gpu simply has a 4 byte alignment!
 		struct MeshVertex
 		{
 			float position[3];
 			float textureCoord[2];
 			float normal[3];
-			float tangent[3];
+			float tangent[4];
+			float colour[4];
 		};
 
 		sce::Gnm::IndexSize		indexType;
-		sce::Gnm::PrimitiveType primitiveType;
 
 		int*		indexBuffer;
+		sce::Gnm::ResourceHandle indexHandle;
 		MeshVertex*	vertexBuffer;
+		sce::Gnm::ResourceHandle vertexHandle;
 
 		int	vertexDataSize;
 		int indexDataSize;

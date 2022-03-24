@@ -27,7 +27,6 @@
 using namespace NCL::Maths;
 
 namespace NCL {
-	namespace CSC8503 {
 		class AudioManager
 		{
 			//Singleton AudioManager, should be called by anything that wants
@@ -61,7 +60,7 @@ namespace NCL {
 			void					LoadSoundBank(const std::string& bankName);
 			void					LoadSound(const std::string& soundName, bool threeDimensional = false, bool looping = false, bool stream = false);
 			void					UnLoadSound(const std::string& soundName);
-			int						StartPlayingSound(const std::string& soundName, const Vector3& position = Vector3(0, 0, 0), const float& volumePercent = 1.0f, const float& positionInSong = 0.0f);
+			int						StartPlayingSound(const std::string& soundName, const Vector3& position = Vector3(0, 0, 0), const float& volumePercent = 1.0f, const float& positionInSong = 0.0f, const float& pitch = 1.0f);
 			int						FadeInSound(const std::string& soundName, float fadeInTime, const Vector3& position = Vector3(0, 0, 0), const float& volumePercent = 1.0f, const float& positionInSong = 0.0f);
 			AudioManager&			SetChannelVolume(int channelID, const float& volPercent);
 			AudioManager&			SetChannelPitch(int channelID, const float& pitch);
@@ -76,7 +75,6 @@ namespace NCL {
 			FMOD_VECTOR*			VectorToFMODVector(const Vector3& v);
 		};
 	}
-}
 
 #endif //Not On PS4
 

@@ -23,14 +23,20 @@ namespace NCL {
 				texture = t;
 			}
 
+			void SetMaskTexture(TextureBase* t) {
+				paintMask = t;
+			}
+
 			TextureBase* GetDefaultTexture() const {
 				return texture;
 			}
 
 			TextureBase* GetPaintMask() const {
-				return paintMask;
+				if (paintMask)
+					return paintMask;
+				else
+					return nullptr;
 			}
-
 
 			MeshGeometry*	GetMesh() const {
 				return mesh;
@@ -50,6 +56,10 @@ namespace NCL {
 
 			Vector4 GetColour() const {
 				return colour;
+			}
+
+			void SetVisibility(bool IsVisible) {
+				colour.w = int(IsVisible);
 			}
 
 		protected:

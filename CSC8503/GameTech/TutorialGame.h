@@ -1,11 +1,10 @@
 #pragma once
-#include "Renderer.h"
-#include "../CSC8503Common/PaintManager.h"
 #include "LevelLoader.h"
 #include "../CSC8503Common/PhysicsSystem.h"
 #include "../CSC8503Common/Player.h"
 #include "../CSC8503Common/AudioManager.h"
 #include "../CSC8503Common/BGMManager.h"
+#include "../CSC8503Common/GameManager.h"
 //#include "../CSC8503Common/Projectile.h"
 
 namespace NCL {
@@ -39,6 +38,7 @@ namespace NCL {
 				state = RESET;
 				quit = false;
 				pause = false;
+				InitialiseAssets();
 			}
 
 			bool Win() const { 
@@ -53,41 +53,48 @@ namespace NCL {
 				return quit;
 			}
 
+			Player* GetPlayer() {
+				return player1;
+			}
+
+			void PaintObject();
+
+			void AddPowerUp(PowerUp* powerup) { powerups.emplace_back(powerup); }
+			void AddSpawnPoint(Vector3 pos) { spawnPoints.emplace_back(pos); }
+
 		protected:
 			InputHandler* inputHandler;
 
 			void InitialiseAssets();
 
+			void InitSounds();
 			void InitCamera();
 			void UpdateKeys();
 
 			virtual void InitWorld();
 
-			/*void InitSphereGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, float radius);
-			void InitCapsuleGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing);
-			void InitMixedGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing);
-			void InitCubeGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, const Maths::Vector3& cubeDims);*/
-	
 			bool SelectObject();
 			void MoveSelectedObject(float dt);
-			void PaintSelectedObject();
 			void DebugObjectMovement();
 			void DebugDrawCollider(const CollisionVolume* c, Transform* worldTransform);
 			void DebugDrawVelocity(const Vector3& vel, Transform* worldTransform);
 			void DebugDrawObjectInfo(const GameObject* obj);
 			void UpdateBGM();
+			void UpdateScores(float dt);
 
-			StateGameObject* testStateObject;
+			int currentObj;
 
-			PaintManager* paintManager;
+			float timeSinceLastScoreUpdate;
+
 			Renderer*			renderer;
 			PhysicsSystem*		physics;
 			GameWorld*			world;
-			AudioManager*		audio;
-			BGMManager*	bgm;
+			NCL::AudioManager*	audio;
+			BGMManager*			bgm;
 			LevelLoader*		levelLoader;
 
 			GameState state;
+			GameManager* gameManager;
 
 			void UpdateGameWorld(float dt);
 			void UpdatePauseScreen(float dt);
@@ -98,6 +105,9 @@ namespace NCL {
 			bool debugDraw;
 			bool pause = false;
 			bool quit = false;
+
+			std::vector<PowerUp*>		powerups;
+			std::vector<Vector3>		spawnPoints;
 
 			float		forceMagnitude;
 

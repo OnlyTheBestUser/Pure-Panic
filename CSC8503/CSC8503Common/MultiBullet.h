@@ -5,22 +5,23 @@
 
 namespace NCL {
 	namespace CSC8503 {
-		class MultipleBullets : public PowerUp {
+		class MultiBullet : public PowerUp {
 		public:
-			MultipleBullets(GameWorld& gw, const float& bps = 10.0f) : PowerUp(PowerUpType::MultipleBullets, gw), bulletsPerShot(bps) {}
+			MultiBullet(const int& NoOfBullets = 5) : PowerUp(PowerUpType::MultiBullet), BulletsPerShot(NoOfBullets) {}
 
 			void OnCollisionBegin(GameObject* otherObject, Vector3 localA, Vector3 localB, Vector3 normal) override {
-				std::cout << "Weapons Freeeee" << std::endl;
-				if (otherObject->GetName() == "Player") {
+				if (!IsPicked && otherObject->GetName() == "Player") {
+
 					Player* player = ((Player*)otherObject);
 					if (player->GetCurrentPowerup() != PowerUpType::None) return;
-					
-					gameWorld.RemoveGameObject(this, true);
+					((Player*)otherObject)->ActivateMultiBullet(BulletsPerShot, powerupDuration);
+					IsPicked = true;
+					PickUp();
 				}
 			}
 
 		private:
-			float bulletsPerShot;
+			int BulletsPerShot;
 		};
 	}
 }

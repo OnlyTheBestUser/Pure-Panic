@@ -19,11 +19,12 @@ namespace NCL {
 			~Transform();
 
 			Transform& SetPosition(const Vector3& worldPos);
+			Transform& SetOffset(const Vector3& offset);
 			Transform& SetScale(const Vector3& worldScale);
 			Transform& SetOrientation(const Quaternion& newOr);
 
 			Vector3 GetPosition() const {
-				return position;
+				return position + offset;
 			}
 
 			Vector3 GetScale() const {
@@ -42,6 +43,7 @@ namespace NCL {
 			Matrix4		matrix;
 			Quaternion	orientation;
 			Vector3		position;
+			Vector3		offset;
 
 			Vector3		scale;
 		};

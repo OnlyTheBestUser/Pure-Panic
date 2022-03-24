@@ -3,7 +3,6 @@
 #ifndef _ORBIS
 
 using namespace NCL;
-using namespace NCL::CSC8503;
 using namespace FMOD;
 
 AudioManager* AudioManager::inst = nullptr;
@@ -26,7 +25,7 @@ void AudioManager::Initialize() {
 
 	system = nullptr;
 	studioSystem->getCoreSystem(&system);
-	system->set3DSettings(1.0f, 1.0f, 50.0f);
+	system->set3DSettings(1.0f, 1.0f, 0.05f);
 }
 
 AudioManager* AudioManager::GetInstance()
@@ -69,7 +68,6 @@ void AudioManager::LoadSound(const std::string& soundName, bool threeDimensional
 	mode = mode | (threeDimensional ? FMOD_3D : FMOD_2D);
 	mode = mode | (looping ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
 	mode = mode | (stream ? FMOD_CREATESTREAM : FMOD_CREATECOMPRESSEDSAMPLE);
-	mode = (mode | FMOD_3D_LINEARROLLOFF);
 
 	FMOD::Sound* newSound = nullptr;
 	IsErroneous(system->createSound(soundName.c_str(), mode, nullptr, &newSound));
@@ -77,7 +75,7 @@ void AudioManager::LoadSound(const std::string& soundName, bool threeDimensional
 	if (newSound) { sounds[soundName] = newSound; };
 }
 
-int AudioManager::StartPlayingSound(const std::string& soundName, const Vector3& position, const float& volumePercent, const float& positionInSong) {
+int AudioManager::StartPlayingSound(const std::string& soundName, const Vector3& position, const float& volumePercent, const float& positionInSong, const float& pitch) {
 	int newChannel = nextChannelID;
 	FMOD::Channel* channel = nullptr;
 	Sound* sound = FindSound(soundName);
@@ -93,6 +91,7 @@ int AudioManager::StartPlayingSound(const std::string& soundName, const Vector3&
 				delete posF;
 			}
 			channel->setVolume(volumePercent);
+			channel->setPitch(pitch);
 			channel->setPaused(false);
 			channels.insert(std::pair<int, Channel*>(nextChannelID, channel));
 		}

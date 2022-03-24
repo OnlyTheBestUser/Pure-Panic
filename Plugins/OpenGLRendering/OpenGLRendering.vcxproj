@@ -150,7 +150,7 @@
     <ClInclude Include="OGLRendererAPI.h" />
     <ClInclude Include="OGLShader.h" />
     <ClInclude Include="OGLTexture.h" />
-    <ClInclude Include="OpenGLUniformBuffer.h" />
+    <ClInclude Include="OGLUniformBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glad.c" />
@@ -160,7 +160,7 @@
     <ClCompile Include="OGLRendererAPI.cpp" />
     <ClCompile Include="OGLShader.cpp" />
     <ClCompile Include="OGLTexture.cpp" />
-    <ClCompile Include="OpenGLUniformBuffer.cpp" />
+    <ClCompile Include="OGLUniformBuffer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

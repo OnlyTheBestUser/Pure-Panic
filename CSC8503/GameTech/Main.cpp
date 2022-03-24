@@ -25,6 +25,10 @@ size_t       sceLibcHeapSize = 256 * 1024 * 1024;	/* Set up heap area upper limi
 #include "../CSC8503Common/PushdownMachine.h"
 #include <iostream>
 
+#include "NetworkedGame.h"
+#include "TrainingGame.h"
+#include "LoadingScreen.h"
+
 using namespace NCL;
 using namespace CSC8503;
 using namespace NCL;
@@ -114,43 +118,58 @@ protected:
 
 class Menu : public PushdownState {
 public:
-	Menu(MainMenu* m, TutorialGame* g, TutorialGame* f, TutorialGame* h) : m(m), g(g), f(f), h(h) {};
+	Menu(MainMenu* m, TutorialGame* g, NetworkedGame* h) : m(m), tg(g), ng(h) {};
 
 	PushdownResult OnUpdate(float dt, PushdownState** newState) override {
 		m->UpdateGame(dt);
 
-		/*if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM1)) {
-			*newState = new Game(f);
+		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM1)) {
+			*newState = new Game(new TrainingGame());
 			return PushdownResult::Push;
 		}
 
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM2)) {
-			*newState = new Game(h);
-			return PushdownResult::Push;
-		}
-
-		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM3)) {
-			*newState = new Game(g);
+			*newState = new Game(new NetworkedGame());
 			return PushdownResult::Push;
 		}
 
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
 			return PushdownResult::Exit;
-		}*/
-
-		if (m->GetPaused()) {
-			
-			*newState = new PauseGame(m);
-			return PushdownResult::Push;
 		}
 
 		return PushdownResult::NoChange;
 	}
 
 protected:
-	TutorialGame* g;
-	TutorialGame* f;
-	TutorialGame* h;
+	TutorialGame* tg;
+	NetworkedGame* ng;
+	MainMenu* m;
+};
+
+class Loading : public PushdownState
+{
+public:
+	Loading(LoadingScreen* l) : ls(l) {};
+	PushdownResult OnUpdate(float dt, PushdownState** newState) override 
+	{
+		LoadingScreen::SetInstancesToLoad(1);
+		LoadingScreen::SetCompletionState(false);
+		LoadingScreen::UpdateGame(dt);
+
+		m = new MainMenu();
+		/*tg = new TutorialGame();*/ tg = nullptr;
+		/*ng = new NetworkedGame();*/ ng = nullptr;
+
+		LoadingScreen::SetCompletionState(true);
+		
+		*newState = new Menu(m, tg, ng);
+		return PushdownResult::Push;
+	}
+
+protected:
+	LoadingScreen* ls;
+	TutorialGame* tg;
+	NetworkedGame* ng;
 	MainMenu* m;
 };
 
@@ -169,7 +188,7 @@ hide or show the
 
 int main() {
 #ifdef _WIN64
-	Window* w = Window::CreateGameWindow("CSC8503 Game technology!", 1600, 900);
+	Window* w = Window::CreateGameWindow("CSC8503 Game technology!", 1280, 720);
 #endif
 #ifdef _ORBIS
 	Window* w = (PS4Window*)Window::CreateGameWindow("PS4 Example Code", 1920, 1080);
@@ -189,12 +208,21 @@ int main() {
 	float totalTime = 0.0f;
 	int totalFrames = 0;
 
-	TutorialGame* g = new TutorialGame();
-	//MainMenu* m = new MainMenu();
-	//PushdownMachine p = new Menu(m, g, g, g);
+	w->SetTitle("Loading");
+
+	LoadingScreen* l = new LoadingScreen();
+	PushdownMachine p = new Loading(l);	
+	//TutorialGame* h = new TutorialGame();
+	//NetworkedGame* h = new NetworkedGame();
+		
 	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
 	float smallestFrameRate = 144.0f;
 	while (w->UpdateWindow()) { //&& !w->GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE)) {
+#if _WIN64
+		if (w->GetKeyboard()->KeyPressed(KeyboardKeys::ESCAPE))
+			break;
+#endif
+
 		//DisplayPathfinding();
 		float dt = w->GetTimer()->GetTimeDeltaSeconds();
 		if (dt > 0.1f) {
@@ -226,11 +254,11 @@ int main() {
 			curTimeWait = avgTimeWait;
 		}
 
-		g->UpdateGame(dt);
+		//h->UpdateGame(dt);
 
-		//if (!p.Update(dt)) {
-		//	return 0;
-		//}
+		if (!p.Update(dt)) {
+			return 0;
+		}
 	}
 	Window::DestroyGameWindow();
 }

@@ -8,29 +8,57 @@ enum PowerUpType
 {
 	SpeedBoost,
 	FireRate,
-	MultipleBullets,
 	Heal,
+	MultiBullet,
 	None,
 };
 
 namespace NCL {
 	namespace CSC8503 {
+
+		const float REAPPEAR_AFTER_DURATION = 5.f;
+		const float POWERUP_DURATION = 5.f;
+
 		class PowerUp : public GameObject
 		{
 		public:
-			~PowerUp() {}
+			virtual ~PowerUp() {}
 
-			//virtual void GetAbility() const = 0;
+			bool networked = false;
+
+			virtual void Update(float dt) override {
+				if (IsPicked || reappearAfter >= 0.0f) {
+					reappearAfter -= dt;
+					if (reappearAfter <= 0.f) {
+						GetRenderObject()->SetVisibility(true);
+						IsPicked = false;	
+					}
+				}
+			}
+
+			bool IsPickedUp() {
+				bool x = IsPicked;
+				IsPicked = false;
+				return x;
+			}
+
+			void PickUp() {
+				reappearAfter = REAPPEAR_AFTER_DURATION;
+				GetRenderObject()->SetVisibility(false);
+			}
+
 		protected:
-			
-			PowerUp(PowerUpType powerType, GameWorld& gw) : GameObject("PowerUp"), powerUpType(powerType), gameWorld(gw) {
-				powerupDuration = 5.0f;
+			PowerUp(PowerUpType powerType, bool networked = false) : GameObject("PowerUp"), powerUpType(powerType) {
+				powerupDuration = POWERUP_DURATION;
+				reappearAfter = REAPPEAR_AFTER_DURATION;
+				IsPicked = false;
 			}
 
 			PowerUpType powerUpType;
 			float powerupDuration;
-			GameWorld& gameWorld;
-
+			
+			bool IsPicked;
+			float reappearAfter;
 		};
 	}
 }
