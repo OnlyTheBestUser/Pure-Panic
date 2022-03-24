@@ -211,8 +211,8 @@ int main() {
 
 	LoadingScreen* l = new LoadingScreen();
 	//PushdownMachine p = new Loading(l);	
-	//TutorialGame* h = new TutorialGame();
-	NetworkedGame* h = new NetworkedGame();
+	TutorialGame* h = new TutorialGame();
+	//NetworkedGame* h = new NetworkedGame();
 		
 	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
 	float smallestFrameRate = 144.0f;
