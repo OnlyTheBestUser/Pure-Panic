@@ -14,6 +14,7 @@ namespace NCL {
 			static void SetCompletionState(bool state) { singleton->completed = state; }
 			static bool GetCompletionState() { return singleton->completed; }
 			static void AddProgress(float progress) { singleton->progression += progress; }
+			static void ResetProgress() { singleton->progression = 0.0f; }
 			static void SetInstancesToLoad(int instances) { singleton->instancesToLoad += instances; }
 
 		protected:

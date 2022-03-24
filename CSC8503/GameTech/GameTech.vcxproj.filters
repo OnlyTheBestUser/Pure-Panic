@@ -64,14 +64,12 @@
     <ClInclude Include="TrainingGame.h" />
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Renderers">
-      <UniqueIdentifier>{6b948179-b9f7-47fd-8331-89b49380fcf1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{91bab995-b9b4-48aa-b1b7-30015ff0e104}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{703444ae-8037-4a5c-8b01-81b85cff2836}</UniqueIdentifier>
-    </Filter>
+    <ClInclude Include="LevelLoader.h" />
+    <ClInclude Include="MainMenu.h" />
+    <ClInclude Include="NetworkedGame.h" />
+    <ClInclude Include="NetworkedPlayer.h" />
+    <ClInclude Include="Renderer.h" />
+    <ClInclude Include="RendererBase.h" />
+    <ClInclude Include="TutorialGame.h" />
   </ItemGroup>
 </Project>

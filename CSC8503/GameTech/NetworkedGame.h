@@ -19,8 +19,8 @@ namespace NCL {
 			void UpdateGame(float dt) override;
 
 			void SpawnPlayer();
-
 			void StartLevel();
+			void ResetLevel();
 
 			void ReceivePacket(int type, GamePacket* payload, int source) override;
 
@@ -36,6 +36,8 @@ namespace NCL {
 			/*static void AddPowerUp(PowerUp* powerup) { singleton->powerups.emplace_back(powerup); }
 			static void AddSpawnPoint(Vector3 pos) { singleton->spawnPoints.emplace_back(pos); }*/
 
+			static void SendDeathPacket(int clientID, Vector3 pos);
+
 		protected:
 			void UpdateAsServer(float dt);
 			void UpdateAsClient(float dt);
@@ -47,6 +49,7 @@ namespace NCL {
 
 			GameServer* thisServer;
 			GameClient* thisClient;
+
 			float timeToNextPacket;
 			int packetsToSnapshot;
 			int clientLastPacketID = 0;
@@ -60,9 +63,9 @@ namespace NCL {
 			// client IDs, GameObjects
 			std::map<int, Player*> serverPlayers;
 			Player* localPlayer;
+			GameObject* emptyPlayer;
 
 			// Packet Handling Functions
-
 			void HandleClientPacket(ClientPacket* packet);
 			void AddNewPlayerToServer(int clientID, int lastID);
 			void ServerFire(GameObject* owner, float pitch, int bulletCounter, bool spread, int clientID);
@@ -71,11 +74,18 @@ namespace NCL {
 			bool CheckExists(IDPacket* packet);
 
 			void HandleFullState(FullPacket* packet);
+			void HandleGameState(GameStatePacket* packet);
 			void HandleFireState(FirePacket* packet);
+			void HandleDeathState(DeathPacket* packet);
 			void HandleAssignID(AssignIDPacket* packet);
 			void HandlePlayerConnect(NewPlayerPacket* packet);
 			void HandlePlayerDisconnect(PlayerDisconnectPacket* packet);
 			void HandlePowerUp(PowerUpPacket* packet);
+
+			void SendResetGamePacket();
+			void SendStartGamePacket();
+			void SendUpdateGamePacket();
+			void SendEndGamePacket();
 		};
 	}
 }
