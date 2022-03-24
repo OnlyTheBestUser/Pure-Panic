@@ -31,7 +31,7 @@ namespace NCL {
 		class RendererAPI {
 		public:
 			friend class NCL::Window;
-			RendererAPI(Window& w);
+			static RendererAPI* GetInstance();
 			virtual ~RendererAPI();
 			virtual bool HasInitialised() const { return true; }
 			virtual void Update(float dt) {}
@@ -84,9 +84,12 @@ namespace NCL {
 			bool GetInitState() { return initState; }
 
 		protected:
+			RendererAPI(Window& w);
 			virtual void OnWindowResize(int w, int h) = 0;
 			virtual void OnWindowDetach() {}; //Most renderers won't care about this
 			
+			static RendererAPI* activeAPI;
+
 			Window& hostWindow;
 
 			int currentWidth;

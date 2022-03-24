@@ -48,7 +48,7 @@ namespace NCL {
 			void DrawDebugStrings();
 
 		protected:
-			static RendererAPI* rendererAPI;
+			RendererAPI* rendererAPI;
 
 			NCL::Rendering::SimpleFont* font;
 			MeshGeometry* debugTextMesh;
