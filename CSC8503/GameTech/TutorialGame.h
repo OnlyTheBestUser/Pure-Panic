@@ -33,7 +33,6 @@ namespace NCL {
 
 			void SetState(GameState s) { 
 				state = s; 
-				UpdateBGM(); 
 			}
 
 			bool Win() const { 
@@ -73,7 +72,6 @@ namespace NCL {
 			void DebugDrawCollider(const CollisionVolume* c, Transform* worldTransform);
 			void DebugDrawVelocity(const Vector3& vel, Transform* worldTransform);
 			void DebugDrawObjectInfo(const GameObject* obj);
-			void UpdateBGM();
 			void UpdateScores(float dt);
 			virtual void UpdatePauseState(float dt);
 

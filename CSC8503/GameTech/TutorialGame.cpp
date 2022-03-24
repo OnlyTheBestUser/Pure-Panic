@@ -463,30 +463,6 @@ void TutorialGame::MoveSelectedObject(float dt) {
 		selectionObject->Interact(dt);
 }
 
-void TutorialGame::UpdateBGM() {
-#ifndef _ORBIS
-
-	switch (state) {
-	case GameState::PLAY:
-		std::cout << "play";
-		bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 3.0f);
-		break;
-		std::cout << "pause";
-		std::cout << "pause";
-		bgm->StopMusic();
-		std::cout << "reset";
-	case GameState::RESET:
-		std::cout << "reset";
-		bgm->StopMusic();
-		break;
-	default:
-		//bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 0.1f);
-		break;
-	}
-
-#endif // !_ORBIS
-}
-
 void TutorialGame::PaintObject() {
 
 	Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
