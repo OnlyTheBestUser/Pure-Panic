@@ -342,7 +342,7 @@ void NetworkedGame::Fire(GameObject* owner, bool spread, int bulletCounter, floa
 	}
 
 	for (int i = 0; i < num; i++) {
-		LevelLoader::SpawnProjectile(owner, spread, bulletCounter, pitch, clientID);
+		LevelLoader::SpawnProjectile(owner, spread, bulletCounter, false, pitch, clientID);
 	}
 }
 
