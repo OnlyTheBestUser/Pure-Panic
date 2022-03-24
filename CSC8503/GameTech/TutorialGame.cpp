@@ -22,7 +22,7 @@ TutorialGame::TutorialGame()	{
 	world			= new GameWorld();
 	renderer		= new Renderer(*world);
 	physics			= new PhysicsSystem(*world);
-	levelLoader		= new LevelLoader(physics, renderer);
+	levelLoader		= new LevelLoader(physics, renderer, this);
 	gameManager		= new GameManager(this);
 	
 #ifndef _ORBIS
@@ -102,6 +102,9 @@ TutorialGame::TutorialGame()	{
 	inputHandler->BindButton(START_TIMER, startTimer);
 
 #pragma endregion
+
+	InitCamera();
+	InitWorld();
 }
 
 void TutorialGame::InitialiseAssets() {
@@ -327,7 +330,7 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	levelLoader->ReadInLevelFile(NCL::Assets::MAPDIR + "map1.txt");
+	levelLoader->ReadInLevelFile(NCL::Assets::MAPDIR + "training_map.txt");
 	Player* player = levelLoader->SpawnPlayer(Vector3(0, 5, 0));
 	
 	AxisCommand* m = new MoveCommand(player);

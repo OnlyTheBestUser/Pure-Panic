@@ -14,7 +14,7 @@ namespace NCL {
 				avoid_magnitude = 50.0f;
 				health			= 100.0f;
 				shoot_radius	= 50.0f;
-				max_shoot_time	= 1.0f;
+				max_shoot_time	= 0.2f;
 				shoot_time		= 0.0f;
 			};
 			virtual ~SimpleAI() {};

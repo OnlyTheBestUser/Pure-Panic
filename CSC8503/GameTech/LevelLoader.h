@@ -11,6 +11,7 @@
 
 namespace NCL {
 	namespace CSC8503 {
+		class TutorialGame;
 		class LevelLoader {
 
 		#define DEF_MASS 10.0f
@@ -22,7 +23,7 @@ namespace NCL {
 		#define PROJ_SIZE  0.5f
 
 		public:
-			LevelLoader(PhysicsSystem* physics, Renderer* renderer);
+			LevelLoader(PhysicsSystem* physics, Renderer* renderer, TutorialGame* game);
 			~LevelLoader();
 
 			static void ReadInLevelFile(std::string filename);
@@ -74,8 +75,9 @@ namespace NCL {
 
 			static LevelLoader* singleton;
 
-			PhysicsSystem* physics;
-			Renderer*	   renderer;
+			PhysicsSystem*	physics;
+			Renderer*		renderer;
+			TutorialGame*	game;
 
 			ShaderBase*	  basicShader				= nullptr;
 			TextureBase*  basicTex					= nullptr;

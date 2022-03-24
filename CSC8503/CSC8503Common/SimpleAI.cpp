@@ -21,7 +21,7 @@ void SimpleAI::Update(float dt)
 		float magnitude = Avoid();
 
 		if (Vector3::Dot(force.Normalised(), physicsObject->GetLinearVelocity().Normalised()) < 0.0f && abs(magnitude) > 0.0f) {
-			physicsObject->AddForce(physicsObject->GetLinearVelocity().Normalised() * max_speed * 0.4f);
+			physicsObject->AddForce((physicsObject->GetLinearVelocity().Normalised() * max_speed * 0.2f) + (magnitudeDir * magnitude));
 		}
 		else {
 			physicsObject->AddForce((force * (1.0f - magnitude)) + (magnitudeDir * magnitude));
@@ -85,13 +85,13 @@ float SimpleAI::Avoid()
 {
 	Vector3 leftAngle = (Matrix4::Rotation(-45, Vector3(0, 1, 0)) * Matrix4::Translation(physicsObject->GetLinearVelocity())).GetPositionVector();
 	Ray leftRay(transform.GetPosition(), leftAngle.Normalised() + Vector3(0, 0.000000000000000001f, 0));
-	leftRay.SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	leftRay.SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
 	RayCollision leftCollision;
 	bool leftHit = GameWorld::RaycastIgnoreObject(this, leftRay, leftCollision, true);
 
 	Vector3 rightAngle = (Matrix4::Rotation(45, Vector3(0, 1, 0)) * Matrix4::Translation(physicsObject->GetLinearVelocity())).GetPositionVector();
 	Ray rightRay(transform.GetPosition(), rightAngle.Normalised() + Vector3(0,0.000000000000000001f,0));
-	rightRay.SetCollisionLayers(CollisionLayer::LAYER_ONE);
+	rightRay.SetCollisionLayers(CollisionLayer::LAYER_ONE | CollisionLayer::LAYER_THREE);
 	RayCollision rightCollision;
 	bool rightHit = GameWorld::RaycastIgnoreObject(this, rightRay, rightCollision, true);
 	
@@ -123,7 +123,7 @@ void SimpleAI::Shoot(float dt)
 	}
 
 	if ((target->GetTransform().GetPosition() - transform.GetPosition()).Length() < shoot_radius) {
-		LevelLoader::SpawnProjectile((GameObject*)this, false, 0, 0, 1);
+		LevelLoader::SpawnProjectile((GameObject*)this, false, 3, -5.0f, 1);
 	}
 
 	shoot_time = max_shoot_time;

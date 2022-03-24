@@ -25,7 +25,7 @@ using namespace CSC8503;
 
 LevelLoader* LevelLoader::singleton = nullptr;
 
-LevelLoader::LevelLoader(PhysicsSystem* physics, Renderer* renderer) : physics(physics), renderer(renderer) {
+LevelLoader::LevelLoader(PhysicsSystem* physics, Renderer* renderer, TutorialGame* game) : physics(physics), renderer(renderer), game(game) {
 	singleton = this;
 
 	auto loadFunc = [](const string& name, MeshGeometry** into) {
@@ -511,7 +511,7 @@ PowerUp*    LevelLoader::AddPowerUpToWorld(const Vector3& position, const PowerU
 	if (powerup) powerup->GetRenderObject()->SetColour(colour);
 	
 	GameWorld::AddGameObject(powerup);
-	NetworkedGame::AddPowerUp(powerup);
+	game->AddPowerUp(powerup);
 	return powerup;
 }
 
@@ -587,8 +587,7 @@ Projectile* LevelLoader::AddProjectileToWorld(GameObject* owner, const bool& Nee
 }
 
 Vector3     LevelLoader::AddSpawnPointToWorld(const Vector3& position) {
-	NetworkedGame::AddSpawnPoint(position);
-
+	game->AddSpawnPoint(position);
 	return position;
 }
 

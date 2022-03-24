@@ -15,7 +15,7 @@ namespace NCL {
         class Player : public GameActor
         {
         public:
-			Player(Camera* camera, string name = "", Vector3 ch = Vector3(0, 2, 0)) : GameActor(name), checkpoint(ch), spawnPos(ch) {
+			Player(Camera* camera, string name = "", Vector3 ch = Vector3(0, 3, 0)) : GameActor(name), checkpoint(ch), spawnPos(ch) {
 				this->camera = camera;
 				camLocked = true;
 				playerID = 0;
