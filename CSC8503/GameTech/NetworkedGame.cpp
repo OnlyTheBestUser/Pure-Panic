@@ -226,6 +226,11 @@ void NetworkedGame::StartLevel() {
 	SendStartGamePacket();
 }
 
+void NetworkedGame::ServerResetLevel() {
+	ResetLevel();
+	SendResetGamePacket();
+}
+
 void NetworkedGame::ResetLevel() {
 	renderer->ClearPaint();
 	gameManager->GetTimer()->ResetTimer();
