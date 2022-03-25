@@ -66,7 +66,8 @@ LevelLoader::LevelLoader(PhysicsSystem* physics, Renderer* renderer, TutorialGam
 		#endif
 	};
 
-	loadTexFunc("Corridor_Light_Colour", &corridorFloorTex);
+	loadTexFunc("inner_sanctum_max_floortile_m", &corridorFloorTex);
+	loadTexFunc("inner_sanctum_max_floortile_n", &corridorFloorNormal);
 	loadTexFunc("corridor_wall_c", &corridorWallAlertTex);
 	loadTexFunc("corridor_wall_n", &corridorWallNormal);
 	loadTexFunc("Corridor_Walls_Redux_Metal", &corridorWallCornerTex);
@@ -690,7 +691,7 @@ void LevelLoader::SetFieldsForCube(GameObject* cube, const Vector3& position, Ve
 	cube->SetPhysicsObject(GetPhysicsObject(&cube->GetTransform(), volume, layers, dynamic, inverseMass, elasticity, lDamping, friction));
 
 	#ifdef _WIN64
-		cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, basicShader, OGLTexture::RGBATextureEmpty(basicTex->GetWidth(), basicTex->GetHeight())));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, corridorFloorTex, basicShader, OGLTexture::RGBATextureEmpty(basicTex->GetWidth(), basicTex->GetHeight()), corridorFloorNormal));
 	#elif _ORBIS
 		cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, basicShader, PS4::PS4Texture::EmptyTex(basicTex->GetWidth(), basicTex->GetHeight())));
 	#endif
