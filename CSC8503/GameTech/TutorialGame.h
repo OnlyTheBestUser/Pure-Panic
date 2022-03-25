@@ -26,7 +26,7 @@ namespace NCL {
 		class Checkpoint;
 		class TutorialGame		{
 		public:
-			TutorialGame();
+			TutorialGame(string mapString = "training_map.txt");
 			virtual ~TutorialGame();
 
 			virtual void UpdateGame(float dt);
@@ -102,6 +102,8 @@ namespace NCL {
 			bool pause = false;
 			bool pausePressed = false;
 			bool quit = false;
+
+			string mapString;
 
 			std::vector<PowerUp*>		powerups;
 			std::vector<Vector3>		spawnPoints;

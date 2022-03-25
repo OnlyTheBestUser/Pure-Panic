@@ -43,7 +43,7 @@ PushdownState::PushdownResult MainMenu::OnUpdate(float dt, PushdownState** newSt
 		break;
 	case 0:
 		if (networkedLevel) delete networkedLevel;
-		networkedLevel = new NetworkedGame();
+		networkedLevel = new NetworkedGame("map1.txt");
 		*newState = new LevelState(networkedLevel);
 		pressed = false;
 #ifndef _ORBIS
