@@ -34,7 +34,7 @@ using namespace NCL::PS4;
 
 int main() {
 #ifdef _WIN64
-	Window* w = Window::CreateGameWindow("CSC8503 Game technology!", 1280, 720);
+	Window* w = Window::CreateGameWindow("CSC8503 Game technology!", 1280, 720, true);
 #endif
 #ifdef _ORBIS
 	Window* w = (PS4Window*)Window::CreateGameWindow("PS4 Example Code", 1920, 1080);
