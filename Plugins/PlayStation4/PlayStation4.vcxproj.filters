@@ -204,6 +204,9 @@
     <CustomBuild Include="..\..\Assets\Textures\noise.png">
       <Filter>Assets\Textures</Filter>
     </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\InSanct_Max_Throne_B_Normal.png">
+      <Filter>Assets\Textures</Filter>
+    </CustomBuild>
     <CustomBuild Include="..\..\Assets\Textures\inner_sanctum_max_floortile_m.png">
       <Filter>Assets\Textures</Filter>
     </CustomBuild>
@@ -223,9 +226,6 @@
       <Filter>Assets\Textures</Filter>
     </CustomBuild>
     <CustomBuild Include="..\..\Assets\Textures\InSanct_Max_Throne_B_Metal.png">
-      <Filter>Assets\Textures</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\Assets\Textures\InSanct_Max_Throne_B_Normal.png">
       <Filter>Assets\Textures</Filter>
     </CustomBuild>
   </ItemGroup>
