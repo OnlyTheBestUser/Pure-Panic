@@ -287,7 +287,6 @@ void NCL::PS4::PS4RendererAPI::SetPaintBuffer(Gnm::RenderTarget target) {
 void NCL::PS4::PS4RendererAPI::ClearBuffer(bool colour, bool depth, bool stencil) {
 	if (colour) {
 		//Vector4 defaultClearColour(rand() / (float)RAND_MAX, rand() / (float)RAND_MAX, rand() / (float)RAND_MAX, 1.0f);
-		SonyMath::Vector4 defaultClearColour(0.1f, 0.1f, 0.1f, 1.0f);
 		SurfaceUtil::clearRenderTarget(*currentGFXContext, &currentPS4Buffer->colourTarget, defaultClearColour);
 	}
 
@@ -304,10 +303,12 @@ void NCL::PS4::PS4RendererAPI::ClearBuffer(bool colour, bool depth, bool stencil
 
 void NCL::PS4::PS4RendererAPI::SetClearColour(float r, float g, float b, float a)
 {
+	defaultClearColour = SonyMath::Vector4(r,g,b,a);
 }
 
 void NCL::PS4::PS4RendererAPI::SetColourMask(bool r, bool g, bool b, bool a)
 {
+
 }
 
 void NCL::PS4::PS4RendererAPI::DrawMesh(MeshGeometry* mesh) {

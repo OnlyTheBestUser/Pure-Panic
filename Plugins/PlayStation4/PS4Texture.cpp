@@ -29,6 +29,13 @@ void PS4Texture::Bind(int slot) const {
 	((PS4RendererAPI*)RendererAPI::GetInstance())->currentGFXContext->setSamplers(Gnm::kShaderStagePs, slot, 1, &trilinearSampler);
 }
 
+/*
+
+Generating textures like this WILL cause memory leaks. This is due to the stack allocator
+used in the PS4 libraries. A dynamic allocator will fix this, but was a low priority due to
+the other issues we encountered in PS4 development.
+*/
+
 PS4Texture* NCL::PS4::PS4Texture::EmptyTex(int width, int height)
 {
 	PS4Texture* tex = new PS4Texture();
@@ -40,26 +47,16 @@ PS4Texture* NCL::PS4::PS4Texture::EmptyTex(int width, int height)
 	tex->apiTexture.initFromRenderTarget(&buffer->colourTarget, false);
 	tex->width = tex->apiTexture.getWidth();
 	tex->height = tex->apiTexture.getHeight();
-	//tex->bpp	= tex->apiTexture.getDepth();
 
 	tex->apiTexture.setResourceMemoryType(Gnm::kResourceMemoryTypeRO);
 
 	return tex;
 }
 
-PS4Texture* NCL::PS4::PS4Texture::GenTexFromBuffer(const sce::Gnm::RenderTarget& fbo)
-{
-	PS4Texture* tex = new PS4Texture;
-
-	tex->apiTexture.initFromRenderTarget(&fbo, false);
-	tex->width = tex->apiTexture.getWidth();
-	tex->height = tex->apiTexture.getHeight();
-
-	return tex;
-}
-
 void PS4Texture::ResetTexture() {
-
+	PS4Texture* newTex = EmptyTex(this->width, this->height);
+	this->apiTexture = newTex->apiTexture;
+	this->target = newTex->target;
 }
 
 PS4Texture* PS4Texture::LoadTextureFromFile(const std::string& filename) {

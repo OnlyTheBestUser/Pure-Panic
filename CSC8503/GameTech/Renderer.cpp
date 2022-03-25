@@ -160,7 +160,6 @@ void Renderer::Render() {
 	rendererAPI->SetCullFace(true);
 	rendererAPI->SetClearColour(1, 1, 1, 1);
 	BuildObjectList();
-	SortObjectList();
 
 	ApplyPaintToMasks();
 	RenderScene();
@@ -185,12 +184,6 @@ void Renderer::BuildObjectList() {
 			}
 		}
 	);
-}
-
-
-
-void Renderer::SortObjectList() {
-	//Who cares!
 }
 
 void Renderer::RenderScene() {
