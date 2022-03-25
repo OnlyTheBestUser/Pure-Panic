@@ -498,7 +498,6 @@ void NetworkedGame::HandlePlayerDisconnect(PlayerDisconnectPacket* packet) {
 void NetworkedGame::HandlePowerUp(PowerUpPacket* packet)
 {
 	for (PowerUp* x : powerups) {
-		std::cout << "p" << std::endl;
 		if (x->GetWorldID() == packet->worldID) {
 			x->PickUp();
 		}
