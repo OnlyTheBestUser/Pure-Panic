@@ -27,7 +27,7 @@ using namespace Maths;
 using namespace Rendering;
 using namespace CSC8503;
 
-Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
+Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world), drawGUI(false) {
 #ifdef _WIN64
 
 	shadowShader = new OGLShader("GameTechShadowVert.glsl", "GameTechShadowFrag.glsl");

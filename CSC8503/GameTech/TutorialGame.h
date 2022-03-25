@@ -98,7 +98,7 @@ namespace NCL {
 
 			bool useGravity;
 			bool inSelectionMode;
-			bool debugDraw;
+			bool debugDraw = false;
 			bool pause = false;
 			bool pausePressed = false;
 			bool quit = false;
