@@ -92,9 +92,10 @@ namespace NCL {
 
 			MeshGeometry* corridorFloor				= nullptr;
 			TextureBase*  corridorFloorTex			= nullptr;
+			TextureBase*  corridorFloorNormal		= nullptr;
 			MeshGeometry* corridorWallAlert			= nullptr;
 			TextureBase*  corridorWallAlertTex		= nullptr;
-			TextureBase* corridorWallNormal = nullptr;
+			TextureBase* corridorWallNormal			= nullptr;
 			MeshGeometry* corridorWallCorner		= nullptr;
 			TextureBase*  corridorWallCornerTex		= nullptr;
 			MeshGeometry* corridorWallLight			= nullptr;
