@@ -231,7 +231,7 @@ namespace NCL {
 			ResetGameCommand(NetworkedGame* game) : game(game) {};
 			virtual ~ResetGameCommand() {};
 			void execute() {
-				game->ResetLevel();
+				game->ServerResetLevel();
 			}
 
 		protected:

@@ -22,6 +22,8 @@ namespace NCL {
 			void StartLevel();
 			void ResetLevel();
 
+			void ServerResetLevel();
+
 			void ReceivePacket(int type, GamePacket* payload, int source) override;
 
 			void OnPlayerCollision(NetworkPlayer* a, NetworkPlayer* b);
