@@ -68,6 +68,7 @@ LevelLoader::LevelLoader(PhysicsSystem* physics, Renderer* renderer, TutorialGam
 
 	loadTexFunc("Corridor_Light_Colour", &corridorFloorTex);
 	loadTexFunc("corridor_wall_c", &corridorWallAlertTex);
+	loadTexFunc("corridor_wall_n", &corridorWallNormal);
 	loadTexFunc("Corridor_Walls_Redux_Metal", &corridorWallCornerTex);
 	loadTexFunc("checkerboard", &corridorWallLightTex);
 	loadTexFunc("checkerboard", &securityCameraTex);
@@ -317,7 +318,7 @@ GameObject* LevelLoader::AddLongWallToWorld(const Vector3& position, Vector3 dim
 	{
 		for (int i = -dimensions.z; i < dimensions.z; i += 10)
 		{
-			AddRenderPartToWorld(Vector3(position.x, position.y, position.z + i), Vector3(5, 4, 4), rotation, corridorWallStraight, corridorWallAlertTex);
+			AddRenderPartToWorld(Vector3(position.x, position.y, position.z + i), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallAlertTex, corridorWallNormal);
 		}
 		return physicalObject;
 	}
@@ -325,7 +326,7 @@ GameObject* LevelLoader::AddLongWallToWorld(const Vector3& position, Vector3 dim
 	{
 		for (int i = -dimensions.x; i < dimensions.x; i += 10)
 		{
-			AddRenderPartToWorld(Vector3(position.x + i, position.y, position.z), Vector3(5, 4, 4), rotation, corridorWallStraight, corridorWallAlertTex);
+			AddRenderPartToWorld(Vector3(position.x + i, position.y, position.z), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallAlertTex, corridorWallNormal);
 		}
 		return physicalObject;
 	}
@@ -353,9 +354,9 @@ GameObject* LevelLoader::AddPaintWallToWorld(const Vector3& position, Vector3 di
 		cube->GetTransform().SetOffset(Vector3(-6.5f, 15, 0));
 
 #ifdef _WIN64
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, OGLTexture::RGBATextureEmpty(corridorWallAlertTex->GetHeight()/16, corridorWallAlertTex->GetWidth()/16), basicShader));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, basicShader , OGLTexture::RGBATextureEmpty(corridorWallAlertTex->GetHeight()/16, corridorWallAlertTex->GetWidth()/16), corridorWallNormal));
 #else
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, PS4::PS4Texture::EmptyTex(corridorWallAlertTex->GetHeight() / 16, corridorWallAlertTex->GetWidth() / 16), basicShader));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, basicShader, PS4::PS4Texture::EmptyTex(corridorWallAlertTex->GetHeight() / 16, corridorWallAlertTex->GetWidth() / 16), corridorWallNormal));
 #endif
 	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
 
@@ -382,10 +383,10 @@ GameObject* LevelLoader::AddAssetToWorld(const Vector3& position, Vector3 dimens
 		.SetOffset(phyLocation - position);
 
 #ifdef _WIN64
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, OGLTexture::RGBATextureEmpty(texture->GetWidth() / 16, texture->GetHeight() / 16), basicShader));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, basicShader, OGLTexture::RGBATextureEmpty(texture->GetWidth() / 16, texture->GetHeight() / 16)));
 #endif
 #ifdef _ORBIS
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, basicShader));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, basicShader, PS4::PS4Texture::EmptyTex(basicTex->GetWidth(), basicTex->GetHeight())));
 #endif
 
 	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
@@ -489,7 +490,7 @@ void LevelLoader::AddThroneToWorld(const Vector3& position, int rotation, const 
 	return;
 }
 
-GameObject* LevelLoader::AddRenderPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture) {
+GameObject* LevelLoader::AddRenderPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture, TextureBase* normal) {
 	GameObject* cube = new GameObject();
 	cube->SetBoundingVolume(nullptr);
 	cube->SetPhysicsObject(nullptr);
@@ -500,10 +501,10 @@ GameObject* LevelLoader::AddRenderPartToWorld(const Vector3& position, Vector3 d
 		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
 
 #ifdef _WIN64
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, OGLTexture::RGBATextureEmpty(texture->GetWidth()/16,texture->GetHeight()/16), basicShader));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, basicShader, OGLTexture::RGBATextureEmpty(texture->GetWidth()/16,texture->GetHeight()/16), normal));
 #endif
 #ifdef _ORBIS
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, PS4::PS4Texture::EmptyTex(texture->GetWidth() / 16, texture->GetHeight() / 16), basicShader));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, basicShader, PS4::PS4Texture::EmptyTex(texture->GetWidth() / 16, texture->GetHeight() / 16), normal));
 #endif
 
 	GameWorld::AddGameObject(cube);
@@ -689,9 +690,9 @@ void LevelLoader::SetFieldsForCube(GameObject* cube, const Vector3& position, Ve
 	cube->SetPhysicsObject(GetPhysicsObject(&cube->GetTransform(), volume, layers, dynamic, inverseMass, elasticity, lDamping, friction));
 
 	#ifdef _WIN64
-		cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, OGLTexture::RGBATextureEmpty(basicTex->GetWidth(), basicTex->GetHeight()), basicShader));
+		cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, basicShader, OGLTexture::RGBATextureEmpty(basicTex->GetWidth(), basicTex->GetHeight())));
 	#elif _ORBIS
-		cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, PS4::PS4Texture::EmptyTex(basicTex->GetWidth(), basicTex->GetHeight()),basicShader));
+		cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, basicShader, PS4::PS4Texture::EmptyTex(basicTex->GetWidth(), basicTex->GetHeight())));
 	#endif
 	
 	cube->GetPhysicsObject()->InitCubeInertia();

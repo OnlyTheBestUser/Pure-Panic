@@ -57,7 +57,7 @@ namespace NCL {
 			
 			void AddWallHammerToWorld    (const Vector3& position, int rotation);
 
-			GameObject* AddRenderPartToWorld  (const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture);
+			GameObject* AddRenderPartToWorld  (const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture, TextureBase* normal = nullptr);
 			GameObject* AddPlayerObjectToWorld(const Vector3& position, GameObject* character);
 			PowerUp*    AddPowerUpToWorld     (const Vector3& position, const PowerUpType& ability, const float& radius = 1.0f);
 			Projectile* AddProjectileToWorld  (GameObject* owner, const bool& NeedBulletSpread, const int bulletIndex, float pitch, int playerID, const float initialSpeed = PROJ_SPEED, const float meshSize = PROJ_SIZE);
@@ -94,6 +94,7 @@ namespace NCL {
 			TextureBase*  corridorFloorTex			= nullptr;
 			MeshGeometry* corridorWallAlert			= nullptr;
 			TextureBase*  corridorWallAlertTex		= nullptr;
+			TextureBase* corridorWallNormal = nullptr;
 			MeshGeometry* corridorWallCorner		= nullptr;
 			TextureBase*  corridorWallCornerTex		= nullptr;
 			MeshGeometry* corridorWallLight			= nullptr;
