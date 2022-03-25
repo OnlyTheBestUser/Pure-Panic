@@ -1,7 +1,10 @@
 #include "Debug.h"
 #include "../../Common/Matrix4.h"
 #include "../../Common/Matrix3.h"
+
 #define _USE_MATH_DEFINES
+#define DEBUG_PRINT
+
 #include <math.h>
 using namespace NCL;
 
@@ -28,9 +31,15 @@ void Debug::Print(const std::string& text, const Vector2&pos, const float& size,
 	newEntry.data		= text;
 	newEntry.position	= pos;
 	newEntry.colour		= colour;
-	newEntry.size = size;
+	newEntry.size       = size;
 
 	stringEntries.emplace_back(newEntry);
+}
+
+void Debug::DebugPrint(const std::string& text, const Vector2& pos, const float& size, const Vector4& colour) {
+#ifdef DEBUG_PRINT
+	Print(text, pos, size, colour);
+#endif
 }
 
 void Debug::DrawLine(const Vector3& startpoint, const Vector3& endpoint, const Vector4& colour, float time) {

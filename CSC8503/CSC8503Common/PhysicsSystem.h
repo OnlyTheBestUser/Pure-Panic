@@ -27,6 +27,8 @@ namespace NCL {
 						
 			void BuildStaticList();
 
+			bool debug = false;
+
 		protected:
 			void BroadPhase();
 			void NarrowPhase();
@@ -41,7 +43,6 @@ namespace NCL {
 
 			void UpdateConstraints(float dt);
 
-			//void UpdateCollisionList();
 			void UpdateObjectAABBs();
 
 			void ImpulseResolveCollision(GameObject& a , GameObject&b, CollisionDetection::ContactPoint& p) const;
@@ -52,6 +53,7 @@ namespace NCL {
 			GameWorld& gameWorld;
 			Octree<GameObject*>* staticTree;
 
+
 			bool	applyGravity;
 			Vector3 gravity;
 			float	dTOffset;
@@ -59,7 +61,7 @@ namespace NCL {
 			std::set<CollisionDetection::CollisionInfo> allCollisions;
 			std::set<CollisionDetection::CollisionInfo> broadphaseCollisions;
 
-			vector<Vector2> validLayers;
+			vector<std::pair<int, int>> validLayers;
 
 			bool useBroadPhase		= true;
 			int numCollisionFrames	= 5;

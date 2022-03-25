@@ -11,6 +11,7 @@
 #include "../../Common/SimpleFont.h"
 #include "../../Common/TextureLoader.h"
 #include "../../Common/MeshGeometry.h"
+#include "../CSC8503Common/GameManager.h"
 
 
 #ifdef _WIN64
@@ -40,6 +41,13 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 	skyboxMesh->SetVertexIndices({ 0,1,2,2,3,0 });
 	skyboxMesh->UploadToGPU();
 
+	uiBarMesh = new OGLMesh();
+
+
+	uiCrosshairMesh = new OGLMesh();
+
+	//ui = new RenderObject(nullptr, uiMesh, nullptr, uiShader);
+
 	ForceValidDebugState(true);
 
 	skyboxTex = OGLTexture::RGBATextureCubemapFromFilename(
@@ -50,15 +58,19 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 		"/Cubemap/skyrender0002.png",
 		"/Cubemap/skyrender0005.png"
 	);
-
+	
 	shadowFBO = new OGLFrameBuffer();
 	shadowFBO->AddTexture();
 
-	//maskFBO = new OGLFrameBuffer();
-	//maskFBO->AddTexture(2048 / 4, 2048 / 4);
 	maskShader = new OGLShader("MaskVertex.glsl", "MaskFragment.glsl");
 
-	// Uniform block bindings
+	uiBarShader = new OGLShader("UIBarVert.glsl", "UIBarFrag.glsl");
+
+
+	crosshairTex = OGLTexture::RGBATextureFromFilename("crosshair.png");
+	uiCrosshairShader = new OGLShader("UICrosshairVert.glsl", "UICrosshairFrag.glsl");
+
+
 	camBuffer = new OGLUniformBuffer(sizeof(CameraMatrix), 0);
 
 #endif
@@ -78,8 +90,38 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 		Assets::SHADERDIR + "PS4/maskPixel.sb"
 	);
 
+	uiBarShader = PS4::PS4Shader::GenerateShader(
+		Assets::SHADERDIR + "PS4/UIBarVert.sb",
+		Assets::SHADERDIR + "PS4/UIBarPixel.sb"
+	);
+
+	crosshairTex = PS4::PS4Texture::LoadTextureFromFile(NCL::Assets::TEXTUREDIR + "crosshair.gnf");
+	uiCrosshairShader = PS4::PS4Shader::GenerateShader(
+		Assets::SHADERDIR + "PS4/UICrosshairVert.sb",
+		Assets::SHADERDIR + "PS4/UICrosshairPixel.sb"
+	);
+	//crosshairTex = OGLTexture::RGBATextureFromFilename("crosshair.png");
+	//uiCrosshairShader = new OGLShader("UICrosshairVert.glsl", "UICrosshairFrag.glsl");
+
+	uiBarMesh = new PS4::PS4Mesh();
+	uiCrosshairMesh = new PS4::PS4Mesh();
+
 	camBuffer = new PS4::PS4UniformBuffer(sizeof(CameraMatrix));
 #endif
+
+	uiBarMesh->SetVertexPositions({ Vector3(-0.5f, 0.2f,-0.5f), Vector3(-0.5f,0.1f,-0.5f) , Vector3(0.5f,0.1f,-0.5f) , Vector3(0.5f,0.2f,-0.5f) });
+	uiBarMesh->SetVertexTextureCoords({ Vector2(0,1), Vector2(0,0), Vector2(1,0) , Vector2(1,1) });
+	uiBarMesh->SetVertexIndices({ 0,1,2,2,3,0 });
+	uiBarMesh->SetVertexTangents(std::vector<Vector4>(4, Vector4()));
+	uiBarMesh->SetVertexNormals(std::vector<Vector3>(4, Vector3()));
+	uiBarMesh->UploadToGPU();
+
+	uiCrosshairMesh->SetVertexPositions({ Vector3(-0.025f, 0.2f,-0.025f), Vector3(-0.025f,0.1f,-0.025f) , Vector3(0.025f,0.1f,-0.025f) , Vector3(0.025f,0.2f,-0.025f) });
+	uiCrosshairMesh->SetVertexTextureCoords({ Vector2(0,1), Vector2(0,0), Vector2(1,0) , Vector2(1,1) });
+	uiCrosshairMesh->SetVertexIndices({ 0,1,2,2,3,0 });
+	uiCrosshairMesh->SetVertexTangents(std::vector<Vector4>(4, Vector4()));
+	uiCrosshairMesh->SetVertexNormals(std::vector<Vector3>(4, Vector3()));
+	uiCrosshairMesh->UploadToGPU();
 
 	//Set up the light properties
 	lightColour = Vector4(0.8f, 0.8f, 0.5f, 1.0f);
@@ -97,11 +139,13 @@ Renderer::~Renderer() {
 	delete skyboxMesh;
 	delete skyboxTex;
 
+	delete uiBarMesh;
+	delete uiBarShader;
+
+	delete uiCrosshairMesh;
+	delete uiCrosshairShader;
+
 	delete maskShader;
-}
-
-void Renderer::Update(float dt) {
-
 }
 
 void Renderer::Render() {
@@ -119,6 +163,7 @@ void Renderer::Render() {
 	rendererAPI->EndFrame();
 	DrawDebugData();
 	rendererAPI->SwapBuffers();
+	frameNumber = frameNumber + 1 % 6000;
 }
 
 void Renderer::BuildObjectList() {
@@ -154,6 +199,8 @@ void Renderer::RenderScene() {
 
 	RenderSkybox();
 	RenderObjects();
+	if (drawGUI) { DrawGUI(); }
+
 }
 
 void Renderer::RenderShadows() {
@@ -263,14 +310,15 @@ void Renderer::RenderObjects() {
 void NCL::Rendering::Renderer::ClearPaint()
 {
 	GameObjectIterator start;
-	GameObjectIterator cur;
 	GameObjectIterator end;
 	gameWorld.GetPaintableObjectIterators(start, end);
-	cur = start;
 
-	while (cur != end) {
-		(*cur)->GetRenderObject()->GetPaintMask()->ResetTexture();
-		cur++;
+	for (auto it = start; it != end; ++it){
+		if (!(*it)->GetRenderObject()) return;
+
+		if (!(*it)->GetRenderObject()->GetPaintMask()) return;
+
+		(*it)->GetRenderObject()->GetPaintMask()->ResetTexture();
 	}
 }
 
@@ -317,6 +365,7 @@ NCL::Maths::Vector2 Renderer::CountPaintMask(TextureBase* paintMask, NCL::Maths:
 		}
 		
 	}
+	delete[] data;
 	return Vector2(team1Score - prevScores.x , team2Score - prevScores.y);
 #endif
 }
@@ -411,6 +460,56 @@ void Renderer::ApplyPaintToMasks() {
 	paintInstances.clear();
 }
 
+void Renderer::DrawGUI() {
+
+	uiBarShader->BindShader();
+
+	rendererAPI->SetCullFace(false);
+	rendererAPI->SetBlend(false);
+	rendererAPI->SetDepth(false);
+
+	uiBarShader->UpdateUniformMatrix4("viewProjMatrix", Matrix4::Translation(Vector3(0, 1, 0)) * Matrix4::Orthographic(-1, 1.0f, 1, -1, -1, 1));
+	uiBarShader->UpdateUniformVector2("ratio", scores);
+	uiBarShader->UpdateUniformVector4("team1Colour", GameManager::team1Colour);
+	uiBarShader->UpdateUniformVector4("team2Colour", GameManager::team2Colour);
+	uiBarShader->UpdateUniformVector2("screenSize", Vector2(rendererAPI->GetCurrentWidth(), rendererAPI->GetCurrentHeight()));
+	rendererAPI->DrawMesh(uiBarMesh);
+
+	rendererAPI->SetBlend(true, RendererAPI::BlendType::ALPHA, RendererAPI::BlendType::ONE_MINUS_ALPHA);
+
+	crosshairTex->Bind(0);
+	uiCrosshairShader->BindShader();
+	uiCrosshairShader->UpdateUniformMatrix4("viewProjMatrix", Matrix4::Translation(Vector3(0, 0.1f, 0)) * Matrix4::Orthographic(-1, 1.0f, 1, -1, -1, 1));
+	uiCrosshairShader->UpdateUniformVector4("colour", playerColour);
+	rendererAPI->DrawMesh(uiCrosshairMesh);
+
+	rendererAPI->SetBlend(false, RendererAPI::BlendType::ONE, RendererAPI::BlendType::NONE);
+	rendererAPI->SetCullFace(true);
+	rendererAPI->SetDepth(true);
+}
+
+Maths::Vector2 Renderer::GetUVCoord(const RenderObject* paintable, NCL::Maths::Vector3 pos) {
+	const vector<Vector3> vertices = paintable->GetMesh()->GetPositionData();
+
+	Vector3 localPos = paintable->GetTransform()->GetMatrix().Inverse() * pos;
+	Vector3 closestDistance = Vector3(10000,10000,10000);
+	int closestVertex = -1;
+	for (auto i = 0; i < paintable->GetMesh()->GetVertexCount(); ++i) {
+		Vector3 distance = vertices[i] - localPos;
+		float t1 = distance.Length();
+		float t2 = closestDistance.Length();
+		if (distance.Length() < closestDistance.Length()) {
+			closestDistance = distance;
+			closestVertex = i;
+		}
+	}
+
+	if (closestVertex != -1) {
+		return paintable->GetMesh()->GetTextureCoordData()[closestVertex];
+	}
+	return Vector2();
+}
+
 Maths::Matrix4 Renderer::SetupDebugLineMatrix()	const {
 	float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
 	Matrix4 viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
@@ -422,4 +521,3 @@ Maths::Matrix4 Renderer::SetupDebugLineMatrix()	const {
 Maths::Matrix4 Renderer::SetupDebugStringMatrix()	const {
 	return Matrix4::Orthographic(-1, 1.0f, 100, 0, 0, 100);
 }
-

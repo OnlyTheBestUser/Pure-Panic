@@ -3,7 +3,10 @@
 #include "PhysicsSystem.h"
 #include "InputBase.h"
 #include "../GameTech/TutorialGame.h"
+#include "../GameTech/NetworkedGame.h"
 #include "Timer.h"
+#include "../GameTech/MainMenu.h"
+#include "../../Common/Assets.h"
 
 namespace NCL {
 	namespace CSC8503 {
@@ -78,7 +81,7 @@ namespace NCL {
 			virtual ~PaintFireCommand() {};
 
 			void execute() {
-				game->PaintObject();
+			//	game->PaintObject();
 			}
 
 		protected:
@@ -141,8 +144,12 @@ namespace NCL {
 				QuitCommand(bool* quit, bool* paused) : paused(paused), quit(quit) {};
 				virtual ~QuitCommand() {};
 				void execute() {
-					if (paused)
+					if (*paused == true) {
 						*quit = true;
+#ifndef _ORBIS
+						NCL::BGMManager::GetInstance()->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 0.1f);
+#endif
+					}
 				}
 			protected:
 				bool* paused;
@@ -154,7 +161,7 @@ namespace NCL {
 			ResetWorldCommand(GameState* s) : state(s) {};
 			virtual ~ResetWorldCommand() {};
 			void execute() {
-				*state = RESET;
+				*state = GameState::RESET;
 			}
 		protected:
 			GameState* state;
@@ -178,6 +185,85 @@ namespace NCL {
 			}
 		protected:
 			bool* mouse;
+		};
+#pragma endregion
+
+#pragma region Multiplayer Commands
+
+		class StartServerCommand : public Command {
+		public:
+			StartServerCommand(NetworkedGame* game) : game(game) {};
+			virtual ~StartServerCommand() {};
+			void execute() {
+				game->StartAsServer();
+			}
+
+		protected:
+			NetworkedGame* game;
+		};
+
+		class StartClientCommand : public Command {
+		public:
+			StartClientCommand(NetworkedGame* game) : game(game) {};
+			virtual ~StartClientCommand() {};
+			void execute() {
+				game->StartAsClient(127, 0, 0, 1);
+			}
+
+		protected:
+			NetworkedGame* game;
+		};
+
+		class StartGameCommand : public Command {
+		public:
+			StartGameCommand(NetworkedGame* game) : game(game) {};
+			virtual ~StartGameCommand() {};
+			void execute() {
+				game->StartLevel();
+			}
+
+		protected:
+			NetworkedGame* game;
+		};
+
+		class ResetGameCommand : public Command {
+		public:
+			ResetGameCommand(NetworkedGame* game) : game(game) {};
+			virtual ~ResetGameCommand() {};
+			void execute() {
+				game->ResetLevel();
+			}
+
+		protected:
+			NetworkedGame* game;
+		};
+
+#pragma endregion
+
+#pragma region Menu Commands
+
+		class MenuEnterCommand : public Command {
+		public:
+			MenuEnterCommand(MainMenu* menu) : menu(menu) {};
+			virtual ~MenuEnterCommand() {};
+			void execute() {
+				menu->HandleMenuPress();
+			}
+		protected:
+			MainMenu* menu;
+		};
+
+		class MenuMoveCommand : public AxisCommand{
+		public:
+			MenuMoveCommand(MainMenu* menu) : menu(menu) {};
+			virtual ~MenuMoveCommand() {};
+
+			void execute(AXIS* axis) {
+				menu->HandleMenuMove({axis->x,axis->y});
+			}
+
+		protected:
+			MainMenu* menu;
 		};
 #pragma endregion
 	}

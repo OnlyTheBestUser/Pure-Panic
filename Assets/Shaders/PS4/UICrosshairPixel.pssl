@@ -1,0 +1,23 @@
+SamplerState samp0 : register(s0);
+
+Texture2D crosshairTex : register( t0 );
+
+struct VS_OUTPUT
+{
+	float4 Position		: S_POSITION;
+	float2 UV			: TEXCOORD0;
+	float4 Color		: COLOR0;
+};
+
+float4 main(VS_OUTPUT In) : S_TARGET_OUTPUT
+{
+
+	float4 colour = In.Color;
+	colour *= crosshairTex.Sample(samp0, In.UV.xy);
+
+	if (colour.a == 0){
+		discard;
+	}
+
+	return colour;
+}

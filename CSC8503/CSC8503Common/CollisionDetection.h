@@ -110,7 +110,7 @@ namespace NCL {
 
 
 		static bool RayAABBIntersection(const Ray&r, const Transform& worldTransform, const AABBVolume&	volume, RayCollision& collision);
-		static bool RayOBBIntersection(const Ray&r, const Transform& worldTransform, const OBBVolume&	volume, RayCollision& collision);
+		static bool RayOBBIntersection(const Ray&r, const Transform& worldTransform, const OBBVolume&	volume, RayCollision& collision, string name);
 		static bool RaySphereIntersection(const Ray&r, const Transform& worldTransform, const SphereVolume& volume, RayCollision& collision);
 		static bool RayCapsuleIntersection(const Ray& r, const Transform& worldTransform, const CapsuleVolume& volume, RayCollision& collision);
 
@@ -142,7 +142,7 @@ namespace NCL {
 		static Vector3		UnprojectScreenPosition(Vector3 position, float aspect, float fov, const Camera &c);
 		static Matrix4		GenerateInverseProjection(float aspect, float fov, float nearPlane, float farPlane);
 		static Matrix4		GenerateInverseView(const Camera &c);
-		static bool			GetBarycentricFromRay(const Ray ray, const RenderObject obj, Vector2& va, Vector2& vb, Vector2& vc, Vector3& barycentric, Vector3& collisionPoint);
+		static bool			GetBarycentricFromRay(const Ray ray, const RenderObject obj, Vector2& va, Vector2& vb, Vector2& vc, Vector3& barycentric, Vector3& collisionPoint, Vector3& collisionNorm);
 
 	protected:
 	

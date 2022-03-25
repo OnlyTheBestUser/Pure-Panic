@@ -6,7 +6,7 @@
 #include <gnmx\shader_parser.h>
 #include <..\samples\sample_code\graphics\api_gnm\toolkit\shader_loader.h>
 
-#include "../../CSC8503/GameTech/RendererBase.h"
+#include "../../Common/RendererAPI.h"
 #include "PS4RendererAPI.h"
 using std::ifstream;
 
@@ -34,12 +34,12 @@ PS4Shader::~PS4Shader()
 }
 
 void PS4Shader::BindShader() {
-	this->SubmitShaderSwitch(*((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext);
+	this->SubmitShaderSwitch(*((PS4RendererAPI*)RendererAPI::GetInstance())->currentGFXContext);
 }
 
 void NCL::PS4::PS4Shader::UpdateUniformInt(std::string uniform, const int f)
 {
-	int* uniformInt = (int*)((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->allocateFromCommandBuffer(sizeof(int), Gnm::kEmbeddedDataAlignment4);
+	int* uniformInt = (int*)((PS4RendererAPI*)RendererAPI::GetInstance())->currentGFXContext->allocateFromCommandBuffer(sizeof(int), Gnm::kEmbeddedDataAlignment4);
 	*uniformInt = f;
 
 	Gnm::Buffer constantBuffer;
@@ -50,7 +50,7 @@ void NCL::PS4::PS4Shader::UpdateUniformInt(std::string uniform, const int f)
 }
 
 void NCL::PS4::PS4Shader::UpdateUniformFloat(std::string uniform, float f) {
-	float* uniformFloat = (float*)((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->allocateFromCommandBuffer(sizeof(float), Gnm::kEmbeddedDataAlignment4);
+	float* uniformFloat = (float*)((PS4RendererAPI*)RendererAPI::GetInstance())->currentGFXContext->allocateFromCommandBuffer(sizeof(float), Gnm::kEmbeddedDataAlignment4);
 	*uniformFloat = f;
 
 	Gnm::Buffer constantBuffer;
@@ -62,7 +62,7 @@ void NCL::PS4::PS4Shader::UpdateUniformFloat(std::string uniform, float f) {
 
 void NCL::PS4::PS4Shader::UpdateUniformVector2(std::string uniform, const Maths::Vector2 vec)
 {
-	Vector3* modelData = (Vector3*)((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->allocateFromCommandBuffer(sizeof(Vector3), Gnm::kEmbeddedDataAlignment4);
+	Vector3* modelData = (Vector3*)((PS4RendererAPI*)RendererAPI::GetInstance())->currentGFXContext->allocateFromCommandBuffer(sizeof(Vector3), Gnm::kEmbeddedDataAlignment4);
 	*modelData = vec;
 
 	Gnm::Buffer constantBuffer;
@@ -74,7 +74,7 @@ void NCL::PS4::PS4Shader::UpdateUniformVector2(std::string uniform, const Maths:
 
 void NCL::PS4::PS4Shader::UpdateUniformVector3(std::string uniform, const Maths::Vector3 vec)
 {
-	Vector3* modelData = (Vector3*)((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->allocateFromCommandBuffer(sizeof(Vector3), Gnm::kEmbeddedDataAlignment4);
+	Vector3* modelData = (Vector3*)((PS4RendererAPI*)RendererAPI::GetInstance())->currentGFXContext->allocateFromCommandBuffer(sizeof(Vector3), Gnm::kEmbeddedDataAlignment4);
 	*modelData = vec;
 
 	Gnm::Buffer constantBuffer;
@@ -86,7 +86,7 @@ void NCL::PS4::PS4Shader::UpdateUniformVector3(std::string uniform, const Maths:
 
 void NCL::PS4::PS4Shader::UpdateUniformVector4(std::string uniform, const Maths::Vector4 vec)
 {
-	Vector4* modelData = (Vector4*)((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->allocateFromCommandBuffer(sizeof(Vector4), Gnm::kEmbeddedDataAlignment4);
+	Vector4* modelData = (Vector4*)((PS4RendererAPI*)RendererAPI::GetInstance())->currentGFXContext->allocateFromCommandBuffer(sizeof(Vector4), Gnm::kEmbeddedDataAlignment4);
 	*modelData = vec;
 
 	Gnm::Buffer constantBuffer;
@@ -97,7 +97,7 @@ void NCL::PS4::PS4Shader::UpdateUniformVector4(std::string uniform, const Maths:
 }
 
 void NCL::PS4::PS4Shader::UpdateUniformMatrix4(std::string uniform, Maths::Matrix4 matrix) {
-	Matrix4* modelData = (Matrix4*)((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->allocateFromCommandBuffer(sizeof(Matrix4), Gnm::kEmbeddedDataAlignment4);
+	Matrix4* modelData = (Matrix4*)((PS4RendererAPI*)RendererAPI::GetInstance())->currentGFXContext->allocateFromCommandBuffer(sizeof(Matrix4), Gnm::kEmbeddedDataAlignment4);
 	*modelData = matrix;
 
 	Gnm::Buffer constantBuffer;
@@ -110,11 +110,11 @@ void NCL::PS4::PS4Shader::UpdateUniformMatrix4(std::string uniform, Maths::Matri
 void NCL::PS4::PS4Shader::UpdateAllUniform(std::string uniform, Gnm::Buffer buffer) {
 	int vsIndex = this->GetConstantBufferIndex(Gnm::kShaderStageVs, uniform.c_str());
 	if (vsIndex != -1) {
-		((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->setConstantBuffers(Gnm::kShaderStageVs, vsIndex, 1, &buffer);
+		((PS4RendererAPI*)RendererAPI::GetInstance())->currentGFXContext->setConstantBuffers(Gnm::kShaderStageVs, vsIndex, 1, &buffer);
 	}
 	int psIndex = this->GetConstantBufferIndex(Gnm::kShaderStagePs, uniform.c_str());
 	if (psIndex != -1) {
-		((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->setConstantBuffers(Gnm::kShaderStagePs, psIndex, 1, &buffer);
+		((PS4RendererAPI*)RendererAPI::GetInstance())->currentGFXContext->setConstantBuffers(Gnm::kShaderStagePs, psIndex, 1, &buffer);
 	}
 }
 

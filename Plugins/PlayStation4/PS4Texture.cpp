@@ -6,7 +6,7 @@
 #include <.\graphics\api_gnm\toolkit\allocators.h>
 #include <.\graphics\api_gnm\toolkit\stack_allocator.h>
 
-#include "../../CSC8503/GameTech/RendererBase.h"
+#include "../../Common/RendererAPI.h"
 #include "PS4RendererAPI.h"
 
 using namespace sce;
@@ -25,8 +25,8 @@ void PS4Texture::Bind(int slot) const {
 	trilinearSampler.init();
 	trilinearSampler.setMipFilterMode(Gnm::kMipFilterModeLinear);
 
-	((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->setTextures(Gnm::kShaderStagePs, slot, 1, &GetAPITexture());
-	((PS4RendererAPI*)RendererBase::rendererAPI)->currentGFXContext->setSamplers(Gnm::kShaderStagePs, slot, 1, &trilinearSampler);
+	((PS4RendererAPI*)RendererAPI::GetInstance())->currentGFXContext->setTextures(Gnm::kShaderStagePs, slot, 1, &GetAPITexture());
+	((PS4RendererAPI*)RendererAPI::GetInstance())->currentGFXContext->setSamplers(Gnm::kShaderStagePs, slot, 1, &trilinearSampler);
 }
 
 PS4Texture* NCL::PS4::PS4Texture::EmptyTex(int width, int height)
@@ -34,7 +34,7 @@ PS4Texture* NCL::PS4::PS4Texture::EmptyTex(int width, int height)
 	PS4Texture* tex = new PS4Texture();
 
 
-	PS4::PS4ScreenBuffer* buffer = ((PS4RendererAPI*)RendererBase::rendererAPI)->GenerateScreenBuffer(width, height, true, false, false);
+	PS4::PS4ScreenBuffer* buffer = ((PS4RendererAPI*)RendererAPI::GetInstance())->GenerateScreenBuffer(width, height, true, false, false);
 	tex->target = buffer->colourTarget;
 
 	tex->apiTexture.initFromRenderTarget(&buffer->colourTarget, false);

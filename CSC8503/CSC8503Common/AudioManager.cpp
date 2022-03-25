@@ -75,7 +75,7 @@ void AudioManager::LoadSound(const std::string& soundName, bool threeDimensional
 	if (newSound) { sounds[soundName] = newSound; };
 }
 
-int AudioManager::StartPlayingSound(const std::string& soundName, const Vector3& position, const float& volumePercent, const float& positionInSong) {
+int AudioManager::StartPlayingSound(const std::string& soundName, const Vector3& position, const float& volumePercent, const float& positionInSong, const float& pitch) {
 	int newChannel = nextChannelID;
 	FMOD::Channel* channel = nullptr;
 	Sound* sound = FindSound(soundName);
@@ -91,13 +91,14 @@ int AudioManager::StartPlayingSound(const std::string& soundName, const Vector3&
 				delete posF;
 			}
 			channel->setVolume(volumePercent);
+			channel->setPitch(pitch);
 			channel->setPaused(false);
 			channels.insert(std::pair<int, Channel*>(nextChannelID, channel));
 		}
 		nextChannelID++;
 		return newChannel;
 	}
-	std::cout << "FMOD Sound hasn't been loaded - " << soundName << std::endl;
+	//std::cout << "FMOD Sound hasn't been loaded - " << soundName << std::endl;
 	return -1;
 }
 
@@ -132,7 +133,7 @@ int AudioManager::FadeInSound(const std::string& soundName, float fadeInTime, co
 		nextChannelID++;
 		return newChannel;
 	}
-	std::cout << "FMOD Sound hasn't been loaded - " << soundName << std::endl;
+	//std::cout << "FMOD Sound hasn't been loaded - " << soundName << std::endl;
 	return -1;
 }
 
@@ -194,7 +195,7 @@ FMOD_VECTOR* AudioManager::VectorToFMODVector(const Vector3& v) {
 
 bool AudioManager::IsErroneous(FMOD_RESULT result) {
 	if (result != FMOD_OK) {
-		std::cout << "FMOD Error No: " << result << std::endl;
+		//std::cout << "FMOD Error No: " << result << std::endl;
 		return true;
 	}
 	return true;

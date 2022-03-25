@@ -24,19 +24,21 @@ namespace NCL {
 			RendererBase();
 			~RendererBase();
 
-			virtual void Update(float dt) = 0;
-			virtual void Render() = 0;
+			virtual void Render();
 
-			RendererAPI* GetRendererAPI() { return rendererAPI; }
+			RendererAPI* GetRendererAPI() const { return rendererAPI; }
 
 			void ForceValidDebugState(bool newState) {
 				forceValidDebugState = newState;
 			}
 
+			int GetFrameNumber() const {
+				return frameNumber;
+			}
+
 			// Render commands
 			void DrawString(const std::string& text, const Maths::Vector2& pos, const Maths::Vector4& colour = Vector4(0.75f, 0.75f, 0.75f, 1), float size = 20.0f);
 			void DrawLine(const Maths::Vector3& start, const Maths::Vector3& end, const Maths::Vector4& colour);
-
 
 			// Debug
 			virtual Maths::Matrix4 SetupDebugLineMatrix() const;
@@ -46,12 +48,13 @@ namespace NCL {
 			void DrawDebugStrings();
 
 		protected:
-			static RendererAPI* rendererAPI;
+			RendererAPI* rendererAPI;
 
 			NCL::Rendering::SimpleFont* font;
 			MeshGeometry* debugTextMesh;
 			MeshGeometry* debugLinesMesh;
 			ShaderBase* debugShader;
+			int frameNumber;
 
 
 		private:

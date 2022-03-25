@@ -25,6 +25,7 @@ GameWorld::~GameWorld()	{
 
 void GameWorld::Clear() {
 	gameObjects.clear();
+	paintableObjects.clear();
 	constraints.clear();
 }
 
@@ -45,15 +46,6 @@ void GameWorld::AddGameObject(GameObject* o) {
 		singleton->paintableObjectScores.insert({ o, Vector2(0,0) });
 	}
 	o->SetWorldID(singleton->worldIDCounter++);
-}
-
-bool GameWorld::GetScoreForObject(GameObject* object, Vector2& outScore) {
-	auto it = paintableObjectScores.find(object);
-	if (it != paintableObjectScores.end()) {
-		outScore = (*it).second;
-		return true;
-	}
-	return false;
 }
 
 void GameWorld::RemoveGameObject(GameObject* o, bool andDelete) {
@@ -108,10 +100,10 @@ void GameWorld::GetPaintableObjectIterators(
 }
 
 void GameWorld::UpdateScore(GameObject* paintableScore, Vector2 scoreChange) {
-	paintableObjectScores[paintableScore] + scoreChange;
+	paintableObjectScores[paintableScore] += scoreChange;
 }
 
-Vector2 GameWorld::GetScore(GameObject* paintableScore) {
+Vector2 GameWorld::GetScoreForObject(GameObject* paintableScore) {
 	return paintableObjectScores[paintableScore];
 }
 
@@ -146,6 +138,7 @@ bool GameWorld::Raycast(Ray& r, RayCollision& closestCollision, bool closestObje
 	RayCollision collision;
 
 	for (auto& i : singleton->gameObjects) {
+
 		if (!i->GetBoundingVolume()) { //objects might not be collideable etc...
 			continue;
 		}
@@ -157,7 +150,6 @@ bool GameWorld::Raycast(Ray& r, RayCollision& closestCollision, bool closestObje
 		if (!skip) {
 			RayCollision thisCollision;
 			if (CollisionDetection::RayIntersection(r, *i, thisCollision)) {
-
 				if (!closestObject) {
 					closestCollision = collision;
 					closestCollision.node = i;

@@ -13,9 +13,8 @@ namespace NCL {
 				if (!IsPicked && otherObject->GetName() == "Player") {
 					
 					Player* player = ((Player*)otherObject);
-					if (player->GetCurrentPowerup() != PowerUpType::None) return;
 					((Player*)otherObject)->IncreaseHealth(healthTake);
-					
+					IsPicked = true;
 					PickUp();
 				}
 			}

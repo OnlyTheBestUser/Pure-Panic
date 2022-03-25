@@ -37,7 +37,10 @@ namespace NCL {
 			}
 
 			TextureBase* GetPaintMask() const {
-				return paintMask;
+				if (paintMask)
+					return paintMask;
+				else
+					return nullptr;
 			}
 
 			MeshGeometry*	GetMesh() const {

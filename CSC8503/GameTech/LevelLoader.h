@@ -11,6 +11,7 @@
 
 namespace NCL {
 	namespace CSC8503 {
+		class TutorialGame;
 		class LevelLoader {
 
 		#define DEF_MASS 10.0f
@@ -22,7 +23,7 @@ namespace NCL {
 		#define PROJ_SIZE  0.5f
 
 		public:
-			LevelLoader(PhysicsSystem* physics, Renderer* renderer);
+			LevelLoader(PhysicsSystem* physics, Renderer* renderer, TutorialGame* game);
 			~LevelLoader();
 
 			static void ReadInLevelFile(std::string filename);
@@ -30,8 +31,10 @@ namespace NCL {
 			static Player*     SpawnPlayer(const Vector3& position);
 			static GameObject* SpawnDummyPlayer(const Vector3& position);
 			
-			static Projectile* SpawnProjectile(Player* owner, const bool& NeedBulletSpread, const float& initialSpeed = PROJ_SPEED, const float& meshSize = PROJ_SIZE);
-			static Projectile* SpawnProjectile(GameObject* owner, const bool& NeedBulletSpread, const int bulletIndex, float pitch, int playerID, const float& initialSpeed = PROJ_SPEED, const float& meshSize = PROJ_SIZE);
+			static Projectile* SpawnProjectile(Player* owner, bool needBulletSpread, float initialSpeed = PROJ_SPEED, float meshSize = PROJ_SIZE);
+			static Projectile* SpawnProjectile(GameObject* owner, bool needBulletSpread, int bulletIndex, bool deadSpray, float pitch, int playerID, float initialSpeed = PROJ_SPEED, float meshSize = PROJ_SIZE);
+
+			static GameObject* SpawnAIEnemy(const Vector3& position, GameObject* target = nullptr);
 
 		protected:
 			GameObject* AddFloorToWorld    (const Vector3& position);
@@ -46,12 +49,18 @@ namespace NCL {
 
 			void AddCornerWallToWorld    (const Vector3& position, Vector3 dimensions, int rotation);
 			void AddSecurityCameraToWorld(const Vector3& position, int rotation);
+			void AddThroneToWorld(const Vector3& position, int rotation, const Vector3& scale);
+
+			GameObject* AddAssetToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture, const Vector3& phyLocation, const Vector3& phyDimensions, const float& paintRad = 3.f, const string& name = "PaintableAsset");
+
+			GameObject* AddPillarToWorld(const Vector3& position, Vector3 dimensions, int rotation);
+			
 			void AddWallHammerToWorld    (const Vector3& position, int rotation);
 
 			GameObject* AddRenderPartToWorld  (const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture, TextureBase* normal = nullptr);
 			GameObject* AddPlayerObjectToWorld(const Vector3& position, GameObject* character);
 			PowerUp*    AddPowerUpToWorld     (const Vector3& position, const PowerUpType& ability, const float& radius = 1.0f);
-			Projectile* AddProjectileToWorld  (GameObject* owner, const bool& NeedBulletSpread, const int bulletIndex, float pitch, int playerID, const float& initialSpeed = PROJ_SPEED, const float& meshSize = PROJ_SIZE);
+			Projectile* AddProjectileToWorld  (GameObject* owner, const bool& NeedBulletSpread, const int bulletIndex, float pitch, int playerID, const float initialSpeed = PROJ_SPEED, const float meshSize = PROJ_SIZE);
 			Vector3		AddSpawnPointToWorld  (const Vector3& position);
 
 			void SetFieldsForCube(GameObject* sphere, const Vector3& position, Vector3 dimensions, CollisionLayer layers, bool isTrigger = false, bool dynamic = false, bool OBB = false, 
@@ -73,8 +82,9 @@ namespace NCL {
 
 			static LevelLoader* singleton;
 
-			PhysicsSystem* physics;
-			Renderer*	   renderer;
+			PhysicsSystem*	physics;
+			Renderer*		renderer;
+			TutorialGame*	game;
 
 			ShaderBase*	  basicShader				= nullptr;
 			TextureBase*  basicTex					= nullptr;
@@ -97,6 +107,8 @@ namespace NCL {
 			TextureBase*  corridorWallHammerTex		= nullptr;
 			MeshGeometry* securityCamera			= nullptr;
 			TextureBase*  securityCameraTex			= nullptr;
+			MeshGeometry* sanctumThrone				= nullptr;
+			TextureBase*  sanctumThroneTex			= nullptr;
 
 			MeshGeometry* sphereMesh				= nullptr;
 			MeshGeometry* cubeMesh					= nullptr;
