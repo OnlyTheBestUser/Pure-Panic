@@ -37,7 +37,7 @@ namespace NCL {
 			static GameObject* SpawnAIEnemy(const Vector3& position, GameObject* target = nullptr);
 
 		protected:
-			GameObject* AddFloorToWorld    (const Vector3& position);
+			GameObject* AddFloorToWorld	   (const Vector3& position, const Vector3& scale, const float& paintRad);
 			GameObject* AddAABBWallToWorld (const Vector3& position, Vector3 dimensions, int rotation, string name = "AABBWall");
 			GameObject* AddOBBWallToWorld  (const Vector3& position, Vector3 dimensions, int rotation, string name = "OBBWall");
 			GameObject* AddLongWallToWorld (const Vector3& position, Vector3 dimensions, int rotation, string name = "LongWall");
