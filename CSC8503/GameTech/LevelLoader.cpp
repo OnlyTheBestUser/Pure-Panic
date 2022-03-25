@@ -137,7 +137,7 @@ void LevelLoader::ReadInLevelFile(std::string filename) {
 
 			if (lineContents.size() > 0) {
 				if (lineContents[0] == "FLOOR") {
-					singleton->AddFloorToWorld(Vec3FromStr(lineContents[1]));
+					singleton->AddFloorToWorld(Vec3FromStr(lineContents[1]), Vec3FromStr(lineContents[2]), std::stof(lineContents[3]));
 				}
 				else if (lineContents[0] == "LONG_WALL") {
 					singleton->AddLongWallToWorld(Vec3FromStr(lineContents[1]), Vec3FromStr(lineContents[2]), std::stof(lineContents[3]));
@@ -228,9 +228,9 @@ GameObject* LevelLoader::SpawnAIEnemy(const Vector3& position, GameObject* targe
 	return singleton->AddPlayerObjectToWorld(position, character);
 }
 
-GameObject* LevelLoader::AddFloorToWorld(const Vector3& position) {
-	GameObject* floor = new GameObject("Floor", 1.5f);
-	Vector3 floorSize = Vector3(250, 1, 250);
+GameObject* LevelLoader::AddFloorToWorld(const Vector3& position, const Vector3& scale, const float& paintRad) {
+	GameObject* floor = new GameObject("Floor", paintRad);
+	Vector3 floorSize = scale;
 
 	SetFieldsForCube(floor, position, floorSize, CollisionLayer::LAYER_ONE, false, false, false, 0, DEF_ELASTICITY, DEF_LDAMPING, DEF_FRICTION);
 
