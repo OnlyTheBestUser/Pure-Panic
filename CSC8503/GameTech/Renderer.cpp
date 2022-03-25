@@ -192,7 +192,7 @@ void Renderer::RenderScene() {
 	RenderShadows();
 #endif
 	// Set scene uniform buffers
-	float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
+	const float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
 	camMatrix.projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);
 	camMatrix.viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
 	camBuffer->SetData(&camMatrix, sizeof(CameraMatrix));
@@ -217,16 +217,16 @@ void Renderer::RenderShadows() {
 
 	shadowShader->BindShader();
 
-	Matrix4 shadowViewMatrix = Matrix4::BuildViewMatrix(lightPos, Vector3(0, 0, 0), Vector3(1, 1, 1));
-	Matrix4 shadowProjMatrix = Matrix4::Perspective(100.0f, 500.0f, 1, 45.0f);
-	Matrix4 mvMatrix = shadowProjMatrix * shadowViewMatrix;
-	Matrix4 biasMat = Matrix4::Translation(Vector3(0.5, 0.5, 0.5)) * Matrix4::Scale(Vector3(0.5, 0.5, 0.5));
+	const Matrix4 shadowViewMatrix = Matrix4::BuildViewMatrix(lightPos, Vector3(0, 0, 0), Vector3(1, 1, 1));
+	const Matrix4 shadowProjMatrix = Matrix4::Perspective(100.0f, 500.0f, 1, 45.0f);
+	const Matrix4 mvMatrix = shadowProjMatrix * shadowViewMatrix;
+	const Matrix4 biasMat = Matrix4::Translation(Vector3(0.5, 0.5, 0.5)) * Matrix4::Scale(Vector3(0.5, 0.5, 0.5));
 
 	shadowMatrix = biasMat * mvMatrix;
 
 	for (const auto& i : activeObjects) {
-		Matrix4 modelMatrix = (*i).GetTransform()->GetMatrix();
-		Matrix4 mvpMatrix = mvMatrix * modelMatrix;
+		const Matrix4 modelMatrix = (*i).GetTransform()->GetMatrix();
+		const Matrix4 mvpMatrix = mvMatrix * modelMatrix;
 		shadowShader->UpdateUniformMatrix4("mvpMatrix", mvpMatrix);
 
 		rendererAPI->DrawMeshAndSubMesh((*i).GetMesh());
@@ -288,9 +288,9 @@ void Renderer::RenderObjects() {
 		shader->UpdateUniformInt("hasPaintMask", (*i).GetPaintMask() ? 1 : 0);
 
 
-		Matrix4 modelMatrix = (*i).GetTransform()->GetMatrix();
+		const Matrix4 modelMatrix = (*i).GetTransform()->GetMatrix();
 #ifdef _WIN64
-		Matrix4 fullShadowMat = shadowMatrix * modelMatrix;
+		const Matrix4 fullShadowMat = shadowMatrix * modelMatrix;
 #endif
 		shader->UpdateUniformMatrix4("modelMatrix", modelMatrix);
 		shader->UpdateUniformMatrix4("invModelMatrix", modelMatrix.Inverse());
@@ -330,7 +330,7 @@ NCL::Maths::Vector2 Renderer::CountPaintMask(TextureBase* paintMask, NCL::Maths:
 
 	paintMask->Bind();
 
-	int pixelDataSize = paintMask->GetHeight() * paintMask->GetWidth() * 4;
+	const int pixelDataSize = paintMask->GetHeight() * paintMask->GetWidth() * 4;
 	GLubyte* data = new GLubyte[pixelDataSize];
 	glGetTextureImage(((OGLTexture*)paintMask)->GetObjectID(), 0, GL_RGBA, GL_UNSIGNED_BYTE, pixelDataSize * 4, data);
 
@@ -486,28 +486,6 @@ void Renderer::DrawGUI() {
 	rendererAPI->SetBlend(false, RendererAPI::BlendType::ONE, RendererAPI::BlendType::NONE);
 	rendererAPI->SetCullFace(true);
 	rendererAPI->SetDepth(true);
-}
-
-Maths::Vector2 Renderer::GetUVCoord(const RenderObject* paintable, NCL::Maths::Vector3 pos) {
-	const vector<Vector3> vertices = paintable->GetMesh()->GetPositionData();
-
-	Vector3 localPos = paintable->GetTransform()->GetMatrix().Inverse() * pos;
-	Vector3 closestDistance = Vector3(10000,10000,10000);
-	int closestVertex = -1;
-	for (auto i = 0; i < paintable->GetMesh()->GetVertexCount(); ++i) {
-		Vector3 distance = vertices[i] - localPos;
-		float t1 = distance.Length();
-		float t2 = closestDistance.Length();
-		if (distance.Length() < closestDistance.Length()) {
-			closestDistance = distance;
-			closestVertex = i;
-		}
-	}
-
-	if (closestVertex != -1) {
-		return paintable->GetMesh()->GetTextureCoordData()[closestVertex];
-	}
-	return Vector2();
 }
 
 Maths::Matrix4 Renderer::SetupDebugLineMatrix()	const {
