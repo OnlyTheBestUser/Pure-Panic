@@ -208,7 +208,7 @@ namespace NCL {
 			StartClientCommand(NetworkedGame* game) : game(game) {};
 			virtual ~StartClientCommand() {};
 			void execute() {
-				game->StartAsClient(10, 70, 32, 238);
+				game->StartAsClient(10, 70, 32, 126);
 			}
 
 		protected:
