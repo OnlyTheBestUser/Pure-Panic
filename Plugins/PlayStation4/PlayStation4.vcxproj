@@ -371,6 +371,48 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
     </CustomBuild>
   </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\Assets\Textures\noise.png">
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\Assets\Textures\inner_sanctum_max_floortile_m.png">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\inner_sanctum_max_floortile_n.png">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\inner_sanctum_max_wall_low_C.png">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\inner_sanctum_max_wall_low_N.png">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\InSanct_Max_Throne_B_Colour.png">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\InSanct_Max_Throne_B_Emissive.png">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\InSanct_Max_Throne_B_Metal.png">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\InSanct_Max_Throne_B_Normal.png">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">"$(SCE_ORBIS_SDK_DIR)\host_tools\bin\orbis-image2gnf" -i "%(FullPath)" -o "%(RootDir)%(Directory)%(Filename).gnf" -f Auto</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">%(RootDir)%(Directory)%(Filename).gnf</Outputs>
+    </CustomBuild>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

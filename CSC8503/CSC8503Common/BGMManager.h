@@ -7,6 +7,7 @@ namespace NCL {
 		int PlaySong(std::string songName, float posInSong = 0.0f);
 		int PlaySongFade(std::string songName, float fadeInTime, float posInSong = 0.0f);
 		void StopMusic();
+		void SetVolume(float percentVol);
 		static BGMManager* GetInstance();
 	private:
 		static BGMManager* inst;

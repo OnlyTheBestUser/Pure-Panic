@@ -10,7 +10,7 @@ namespace NCL {
 
 		class NetworkedGame : public TutorialGame, public PacketReceiver {
 		public:
-			NetworkedGame();
+			NetworkedGame(string mapString);
 			~NetworkedGame();
 
 			void StartAsServer();
@@ -21,6 +21,8 @@ namespace NCL {
 			void SpawnPlayer();
 			void StartLevel();
 			void ResetLevel();
+
+			void ServerResetLevel();
 
 			void ReceivePacket(int type, GamePacket* payload, int source) override;
 

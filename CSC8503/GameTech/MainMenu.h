@@ -22,7 +22,7 @@ namespace NCL {
 
 				level->UpdateGame(dt);
 
-				if (level->GetPaused() && level->GetQuit()) {
+				if (level->GetQuit()) {
 					level->SetState(GameState::RESET);
 					level->UpdateGame(dt);
 					return PushdownResult::Pop;

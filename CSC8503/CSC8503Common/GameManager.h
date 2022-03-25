@@ -58,6 +58,7 @@ namespace NCL {
 			void StartRound();
 
 			bool printResults = false;
+			bool printScores = false;
 			static Vector4 team1Colour;
 			static Vector4 team2Colour;
 

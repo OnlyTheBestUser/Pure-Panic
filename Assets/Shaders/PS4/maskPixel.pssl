@@ -8,11 +8,6 @@ ConstantBuffer viewport
 	float2 m_viewport;
 };
 
-ConstantBuffer textureScale
-{
-	float3 m_textureScale;
-};
-
 ConstantBuffer radius
 {
 	float m_radius;

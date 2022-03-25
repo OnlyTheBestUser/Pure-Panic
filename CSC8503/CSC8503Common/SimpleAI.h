@@ -16,6 +16,7 @@ namespace NCL {
 				shoot_radius	= 50.0f;
 				max_shoot_time	= 0.2f;
 				shoot_time		= 0.0f;
+				spawnPoint = Vector3(10, 3, 10);
 			};
 			virtual ~SimpleAI() {};
 
@@ -34,6 +35,10 @@ namespace NCL {
 				target = t;
 			}
 
+			void Respawn() {
+				transform.SetPosition(spawnPoint);
+			}
+
 		protected:
 			GameObject* target;
 			float max_speed;
@@ -46,6 +51,7 @@ namespace NCL {
 			float shoot_radius;
 			float shoot_time;
 			float max_shoot_time;
+			Vector3 spawnPoint;
 		};
 	}
 }

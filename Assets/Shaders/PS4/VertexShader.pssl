@@ -8,10 +8,6 @@ ConstantBuffer viewProjMatrix{
 	column_major matrix viewProjMatrix;
 };
 
-ConstantBuffer invProjMatrix{
-	float4x4 invProjMatrix;
-};
-
 ConstantBuffer modelMatrix{
 	float4x4 modelMatrix;
 }
@@ -35,7 +31,7 @@ struct VS_INPUT
 	float3 Position		: POSITION0;
 	float2 UV			: TEXCOORD0;
 	float3 Normal		: TEXCOORD1;
-	float3 Tangent		: TEXCOORD2;
+	float4 Tangent		: TANGENT;
 	float4 Color		: COLOR0;
 };
 
@@ -43,8 +39,10 @@ struct VS_OUTPUT
 {
 	float4 Position		: S_POSITION;
 	float2 UV			: TEXCOORD0; 
-	float3 Normal		: NORMAL;
-	float3 WorldPos		: TANGENT;
+	float3 Normal		: TEXCOORD1;
+	float3 WorldPos		: TEXCOORD2;
+	float3 tangent		: TANGENT;
+	float3 binormal		: TEXCOORD3;
 	float4 Color		: COLOR0;
 };
 
@@ -54,9 +52,16 @@ VS_OUTPUT main(VS_INPUT Input)
 
 	Output.Position = mul(mul(viewProjMatrix,modelMatrix), float4(Input.Position.xyz, 1));
 	float3x3 normalMatrix = transpose(float3x3(invModelMatrix));
-
-	Output.Normal = normalize(mul(normalMatrix, normalize(Input.Normal)));
 	Output.WorldPos = mul(modelMatrix, float4(Input.Position,1)).xyz;
+
+	float3 wNormal = normalize(mul(normalMatrix,normalize(Input.Normal )));
+    float3 wTangent = normalize(mul(normalMatrix,normalize(Input.Tangent.xyz )));
+
+    Output.Normal = wNormal;
+    Output.tangent = wTangent;
+    Output.binormal = cross(wTangent , wNormal) * Input.Tangent.w;
+
+
 	Output.UV = Input.UV;
 	Output.Color = m_objectColour;
 

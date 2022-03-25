@@ -10,6 +10,9 @@
     <ClCompile Include="LevelLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LoadingScreen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -22,19 +25,12 @@
     <ClCompile Include="NetworkedPlayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer.cpp">
-      <Filter>Renderers</Filter>
-    </ClCompile>
-    <ClCompile Include="RendererBase.cpp">
-      <Filter>Renderers</Filter>
+    <ClCompile Include="TrainingGame.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TutorialGame.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LoadingScreen.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TrainingGame.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Renderer.h">
@@ -46,6 +42,9 @@
     <ClInclude Include="LevelLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LoadingScreen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="MainMenu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -55,21 +54,22 @@
     <ClInclude Include="NetworkedPlayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TrainingGame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="TutorialGame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LoadingScreen.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TrainingGame.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="LevelLoader.h" />
-    <ClInclude Include="MainMenu.h" />
-    <ClInclude Include="NetworkedGame.h" />
-    <ClInclude Include="NetworkedPlayer.h" />
-    <ClInclude Include="Renderer.h" />
-    <ClInclude Include="RendererBase.h" />
-    <ClInclude Include="TutorialGame.h" />
+    <Filter Include="Renderers">
+      <UniqueIdentifier>{7902acbe-73a0-4fde-b802-67c78c77448c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{1d441fa4-7a4a-4e26-baf0-3a7c5d3222e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{132bea53-f0af-4005-80f2-703ae8689c9a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

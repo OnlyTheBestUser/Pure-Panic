@@ -37,7 +37,7 @@ namespace NCL {
 			static GameObject* SpawnAIEnemy(const Vector3& position, GameObject* target = nullptr);
 
 		protected:
-			GameObject* AddFloorToWorld    (const Vector3& position);
+			GameObject* AddFloorToWorld	   (const Vector3& position, const Vector3& scale, const float& paintRad);
 			GameObject* AddAABBWallToWorld (const Vector3& position, Vector3 dimensions, int rotation, string name = "AABBWall");
 			GameObject* AddOBBWallToWorld  (const Vector3& position, Vector3 dimensions, int rotation, string name = "OBBWall");
 			GameObject* AddLongWallToWorld (const Vector3& position, Vector3 dimensions, int rotation, string name = "LongWall");
@@ -57,7 +57,7 @@ namespace NCL {
 			
 			void AddWallHammerToWorld    (const Vector3& position, int rotation);
 
-			GameObject* AddRenderPartToWorld  (const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture);
+			GameObject* AddRenderPartToWorld  (const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture, TextureBase* normal = nullptr);
 			GameObject* AddPlayerObjectToWorld(const Vector3& position, GameObject* character);
 			PowerUp*    AddPowerUpToWorld     (const Vector3& position, const PowerUpType& ability, const float& radius = 1.0f);
 			Projectile* AddProjectileToWorld  (GameObject* owner, const bool& NeedBulletSpread, const int bulletIndex, float pitch, int playerID, const float initialSpeed = PROJ_SPEED, const float meshSize = PROJ_SIZE);
@@ -92,8 +92,13 @@ namespace NCL {
 
 			MeshGeometry* corridorFloor				= nullptr;
 			TextureBase*  corridorFloorTex			= nullptr;
+			TextureBase*  corridorFloorNormal		= nullptr;
 			MeshGeometry* corridorWallAlert			= nullptr;
 			TextureBase*  corridorWallAlertTex		= nullptr;
+			TextureBase* corridorWallNormal			= nullptr;
+			MeshGeometry* corridorWallMesh2			= nullptr;
+			TextureBase* corridorWall2Tex			= nullptr;
+			TextureBase* corridorWallNormal2		= nullptr;
 			MeshGeometry* corridorWallCorner		= nullptr;
 			TextureBase*  corridorWallCornerTex		= nullptr;
 			MeshGeometry* corridorWallLight			= nullptr;

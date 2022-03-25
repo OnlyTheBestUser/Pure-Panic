@@ -126,6 +126,8 @@ namespace NCL::PS4 {
 		PS4ScreenBuffer*		currentPS4Buffer;  //Pointer to whichever buffer we're currently using...
 		Gnmx::GnmxGfxContext*	currentGFXContext;
 		PS4Frame*				currentFrame;
+
+		sce::Vectormath::Scalar::Aos::Vector4 defaultClearColour;
 	};
 }
 #endif

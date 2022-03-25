@@ -141,10 +141,10 @@ namespace NCL {
 
 		class QuitCommand : public Command {
 			public:
-				QuitCommand(bool* quit, bool* paused) : paused(paused), quit(quit) {};
+				QuitCommand(bool* quit, bool* paused, bool* won) : paused(paused), quit(quit), won(won) {};
 				virtual ~QuitCommand() {};
 				void execute() {
-					if (*paused == true) {
+					if (*paused || *won) {
 						*quit = true;
 #ifndef _ORBIS
 						NCL::BGMManager::GetInstance()->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 0.1f);
@@ -154,6 +154,7 @@ namespace NCL {
 			protected:
 				bool* paused;
 				bool* quit;
+				bool* won;
 		};
 
 		class ResetWorldCommand : public Command {
@@ -207,7 +208,7 @@ namespace NCL {
 			StartClientCommand(NetworkedGame* game) : game(game) {};
 			virtual ~StartClientCommand() {};
 			void execute() {
-				game->StartAsClient(127, 0, 0, 1);
+				game->StartAsClient(10, 70, 32, 126);
 			}
 
 		protected:
@@ -231,7 +232,7 @@ namespace NCL {
 			ResetGameCommand(NetworkedGame* game) : game(game) {};
 			virtual ~ResetGameCommand() {};
 			void execute() {
-				game->ResetLevel();
+				game->ServerResetLevel();
 			}
 
 		protected:

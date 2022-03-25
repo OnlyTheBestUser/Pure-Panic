@@ -8,11 +8,8 @@ Vector4 GameManager::team2Colour = Vector4(0.011, 0.988, 0.941, 1);
 void GameManager::Update(const float& dt) {
 	timer->Update(dt);
 
-	if (printResults) {
-		PrintResult(Teams[A].score, Teams[B].score);
-	}
-
-	PrintScores(Teams[A].score, Teams[B].score);
+	if (printResults) PrintResult(Teams[A].score, Teams[B].score);
+	if (printScores)  PrintScores(Teams[A].score, Teams[B].score);
 }
 
 void GameManager::PrintScores(float scoreA, float scoreB) {
@@ -27,9 +24,9 @@ void GameManager::PrintScores(float scoreA, float scoreB) {
 
 void GameManager::PrintResult(float scoreA, float scoreB) {
 	if (scoreA > scoreB)
-		Debug::Print("Team A Wins", { 30.f, 70.f });
+		Debug::Print("Purple Wins", { 30.f, 70.f });
 	else if (scoreA < scoreB)
-		Debug::Print("Team B Wins", { 30.f, 70.f });
+		Debug::Print("Blue Wins", { 30.f, 70.f });
 	else
 		Debug::Print("Tie", { 30.f, 70.f });
 }

@@ -51,6 +51,7 @@ LevelLoader::LevelLoader(PhysicsSystem* physics, Renderer* renderer, TutorialGam
 	loadFunc("SanctumThrone.msh", &sanctumThrone);
 	loadFunc("Corridor_Floor_Basic.msh", &corridorFloor);
 	loadFunc("Corridor_Wall_Alert.msh", &corridorWallAlert);
+	loadFunc("inner_sanctum_max_wall_straight_mid.msh", &corridorWallMesh2);
 	loadFunc("Corridor_Wall_Corner_In_Both.msh", &corridorWallCorner);
 	loadFunc("Corridor_Wall_Light.msh", &corridorWallLight);
 	loadFunc("Security_Camera.msh", &securityCamera);
@@ -66,8 +67,12 @@ LevelLoader::LevelLoader(PhysicsSystem* physics, Renderer* renderer, TutorialGam
 		#endif
 	};
 
-	loadTexFunc("Corridor_Light_Colour", &corridorFloorTex);
+	loadTexFunc("inner_sanctum_max_floortile_m", &corridorFloorTex);
+	loadTexFunc("inner_sanctum_max_floortile_n", &corridorFloorNormal);
 	loadTexFunc("corridor_wall_c", &corridorWallAlertTex);
+	loadTexFunc("corridor_wall_n", &corridorWallNormal);
+	loadTexFunc("inner_sanctum_max_wall_low_C", &corridorWall2Tex);
+	loadTexFunc("inner_sanctum_max_wall_low_N", &corridorWallNormal2);
 	loadTexFunc("Corridor_Walls_Redux_Metal", &corridorWallCornerTex);
 	loadTexFunc("checkerboard", &corridorWallLightTex);
 	loadTexFunc("checkerboard", &securityCameraTex);
@@ -137,7 +142,7 @@ void LevelLoader::ReadInLevelFile(std::string filename) {
 
 			if (lineContents.size() > 0) {
 				if (lineContents[0] == "FLOOR") {
-					singleton->AddFloorToWorld(Vec3FromStr(lineContents[1]));
+					singleton->AddFloorToWorld(Vec3FromStr(lineContents[1]), Vec3FromStr(lineContents[2]), std::stof(lineContents[3]));
 				}
 				else if (lineContents[0] == "LONG_WALL") {
 					singleton->AddLongWallToWorld(Vec3FromStr(lineContents[1]), Vec3FromStr(lineContents[2]), std::stof(lineContents[3]));
@@ -228,9 +233,9 @@ GameObject* LevelLoader::SpawnAIEnemy(const Vector3& position, GameObject* targe
 	return singleton->AddPlayerObjectToWorld(position, character);
 }
 
-GameObject* LevelLoader::AddFloorToWorld(const Vector3& position) {
-	GameObject* floor = new GameObject("Floor", 1.5f);
-	Vector3 floorSize = Vector3(250, 1, 250);
+GameObject* LevelLoader::AddFloorToWorld(const Vector3& position, const Vector3& scale, const float& paintRad) {
+	GameObject* floor = new GameObject("Floor", paintRad);
+	Vector3 floorSize = scale;
 
 	SetFieldsForCube(floor, position, floorSize, CollisionLayer::LAYER_ONE, false, false, false, 0, DEF_ELASTICITY, DEF_LDAMPING, DEF_FRICTION);
 
@@ -317,7 +322,10 @@ GameObject* LevelLoader::AddLongWallToWorld(const Vector3& position, Vector3 dim
 	{
 		for (int i = -dimensions.z; i < dimensions.z; i += 10)
 		{
-			AddRenderPartToWorld(Vector3(position.x, position.y, position.z + i), Vector3(5, 4, 4), rotation, corridorWallStraight, corridorWallAlertTex);
+			if (rotation == 90)
+				AddRenderPartToWorld(Vector3(position.x + 12, position.y, position.z + i), Vector3(5, 5, 4), rotation, corridorWallMesh2, corridorWall2Tex, corridorWallNormal2);
+			if (rotation == 270)
+				AddRenderPartToWorld(Vector3(position.x - 12, position.y, position.z + i), Vector3(5, 5, 4), rotation, corridorWallMesh2, corridorWall2Tex, corridorWallNormal2);
 		}
 		return physicalObject;
 	}
@@ -325,7 +333,10 @@ GameObject* LevelLoader::AddLongWallToWorld(const Vector3& position, Vector3 dim
 	{
 		for (int i = -dimensions.x; i < dimensions.x; i += 10)
 		{
-			AddRenderPartToWorld(Vector3(position.x + i, position.y, position.z), Vector3(5, 4, 4), rotation, corridorWallStraight, corridorWallAlertTex);
+			if (rotation == 180)
+				AddRenderPartToWorld(Vector3(position.x + i, position.y, position.z - 12), Vector3(5, 5, 4), rotation, corridorWallMesh2, corridorWall2Tex, corridorWallNormal2);
+			if (rotation == 0)
+				AddRenderPartToWorld(Vector3(position.x + i, position.y, position.z + 12), Vector3(5, 5, 4), rotation, corridorWallMesh2, corridorWall2Tex, corridorWallNormal2);
 		}
 		return physicalObject;
 	}
@@ -353,9 +364,9 @@ GameObject* LevelLoader::AddPaintWallToWorld(const Vector3& position, Vector3 di
 		cube->GetTransform().SetOffset(Vector3(-6.5f, 15, 0));
 
 #ifdef _WIN64
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, OGLTexture::RGBATextureEmpty(corridorWallAlertTex->GetHeight()/16, corridorWallAlertTex->GetWidth()/16), basicShader));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, basicShader , OGLTexture::RGBATextureEmpty(corridorWallAlertTex->GetHeight()/16, corridorWallAlertTex->GetWidth()/16), corridorWallNormal));
 #else
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, PS4::PS4Texture::EmptyTex(corridorWallAlertTex->GetHeight() / 16, corridorWallAlertTex->GetWidth() / 16), basicShader));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), corridorWallStraight, corridorWallAlertTex, basicShader, PS4::PS4Texture::EmptyTex(corridorWallAlertTex->GetHeight() / 16, corridorWallAlertTex->GetWidth() / 16), corridorWallNormal));
 #endif
 	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
 
@@ -382,10 +393,10 @@ GameObject* LevelLoader::AddAssetToWorld(const Vector3& position, Vector3 dimens
 		.SetOffset(phyLocation - position);
 
 #ifdef _WIN64
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, OGLTexture::RGBATextureEmpty(texture->GetWidth() / 16, texture->GetHeight() / 16), basicShader));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, basicShader, OGLTexture::RGBATextureEmpty(texture->GetWidth() / 16, texture->GetHeight() / 16)));
 #endif
 #ifdef _ORBIS
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, basicShader));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, basicShader, PS4::PS4Texture::EmptyTex(basicTex->GetWidth(), basicTex->GetHeight())));
 #endif
 
 	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
@@ -443,7 +454,7 @@ void		LevelLoader::AddSecurityCameraToWorld(const Vector3& position, int rotatio
 		location += Vector3(4, 0, 0);
 	}
 
-	AddAssetToWorld(position, Vector3(5, 5, 5), rotation, securityCamera, securityCameraTex, location, dimensions, 10.f, "Security Camera")
+	AddAssetToWorld(position, Vector3(5, 5, 5), rotation, securityCamera, securityCameraTex, location, dimensions, 20.f, "Security Camera")
 		->GetPhysicsObject()->Sleep();
 	return;
 }
@@ -473,7 +484,7 @@ void		LevelLoader::AddWallHammerToWorld(const Vector3& position, int rotation)
 		location += Vector3(5.5, 0, -0.25);
 	}
 
-	AddAssetToWorld(position, Vector3(10, 10, 6), rotation, corridorWallHammer, corridorWallHammerTex, location, dimensions, 10.f, "Wall Hammer")
+	AddAssetToWorld(position, Vector3(10, 10, 6), rotation, corridorWallHammer, corridorWallHammerTex, location, dimensions, 7.f, "Wall Hammer")
 		->GetPhysicsObject()->Sleep();
 	return;
 }
@@ -484,12 +495,12 @@ void LevelLoader::AddThroneToWorld(const Vector3& position, int rotation, const 
 	Vector3 phyDimensions = Vector3(2, 4, 2) * scale;
 	Vector3 meshDimensions = Vector3(1.5f, 1.5f, 1.5f) * scale;
 
-	AddAssetToWorld(position, meshDimensions, rotation, sanctumThrone, sanctumThroneTex, location, phyDimensions, 10.f, "Sanctum Throne")
+	AddAssetToWorld(position, meshDimensions, rotation, sanctumThrone, sanctumThroneTex, location, phyDimensions, 20.f, "Sanctum Throne")
 		->GetPhysicsObject()->Sleep();
 	return;
 }
 
-GameObject* LevelLoader::AddRenderPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture) {
+GameObject* LevelLoader::AddRenderPartToWorld(const Vector3& position, Vector3 dimensions, int rotation, MeshGeometry* mesh, TextureBase* texture, TextureBase* normal) {
 	GameObject* cube = new GameObject();
 	cube->SetBoundingVolume(nullptr);
 	cube->SetPhysicsObject(nullptr);
@@ -500,10 +511,10 @@ GameObject* LevelLoader::AddRenderPartToWorld(const Vector3& position, Vector3 d
 		.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0));
 
 #ifdef _WIN64
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, OGLTexture::RGBATextureEmpty(texture->GetWidth()/16,texture->GetHeight()/16), basicShader));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, basicShader, OGLTexture::RGBATextureEmpty(texture->GetWidth()/16,texture->GetHeight()/16), normal));
 #endif
 #ifdef _ORBIS
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, PS4::PS4Texture::EmptyTex(texture->GetWidth() / 16, texture->GetHeight() / 16), basicShader));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, basicShader, PS4::PS4Texture::EmptyTex(texture->GetWidth() / 16, texture->GetHeight() / 16), normal));
 #endif
 
 	GameWorld::AddGameObject(cube);
@@ -689,9 +700,9 @@ void LevelLoader::SetFieldsForCube(GameObject* cube, const Vector3& position, Ve
 	cube->SetPhysicsObject(GetPhysicsObject(&cube->GetTransform(), volume, layers, dynamic, inverseMass, elasticity, lDamping, friction));
 
 	#ifdef _WIN64
-		cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, OGLTexture::RGBATextureEmpty(basicTex->GetWidth(), basicTex->GetHeight()), basicShader));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, corridorFloorTex, basicShader, OGLTexture::RGBATextureEmpty(basicTex->GetWidth(), basicTex->GetHeight()), corridorFloorNormal));
 	#elif _ORBIS
-		cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, PS4::PS4Texture::EmptyTex(basicTex->GetWidth(), basicTex->GetHeight()),basicShader));
+		cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, corridorFloorTex, basicShader, PS4::PS4Texture::EmptyTex(basicTex->GetWidth(), basicTex->GetHeight()), corridorFloorNormal));
 	#endif
 	
 	cube->GetPhysicsObject()->InitCubeInertia();

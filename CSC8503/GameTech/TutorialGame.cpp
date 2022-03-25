@@ -24,7 +24,7 @@
 using namespace NCL;
 using namespace CSC8503;
 
-TutorialGame::TutorialGame()	{
+TutorialGame::TutorialGame(string mapString) : mapString(mapString)	{
 	world			= new GameWorld();
 	LoadingScreen::AddProgress(15.0f);
 	LoadingScreen::UpdateGame(0.0f);
@@ -40,7 +40,8 @@ TutorialGame::TutorialGame()	{
 	gameManager		= new GameManager(this);
 	LoadingScreen::ResetProgress();
 	LoadingScreen::SetCompletionState(true);
-	
+
+
 #ifndef _ORBIS
 	InitSounds();
 #endif
@@ -91,13 +92,11 @@ TutorialGame::TutorialGame()	{
 	Command* toggleDebug = new ToggleBoolCommand(&debugDraw);
 	Command* togglePause = new ToggleBoolCommand(&pausePressed);
 	Command* toggleMouse = new ToggleMouseCommand(&inSelectionMode);
-	Command* resetWorld = new ResetWorldCommand(&state);
-	Command* quitCommand = new QuitCommand(&quit, &pause);
+	Command* quitCommand = new QuitCommand(&quit, &pause, &won);
 	Command* startTimer = new StartTimerCommand(gameManager->GetTimer());
 	
 	inputHandler->BindButton(TOGGLE_DEBUG, toggleDebug);
 	inputHandler->BindButton(TOGGLE_PAUSE, togglePause);
-	inputHandler->BindButton(RESET_WORLD, resetWorld);
 	inputHandler->BindButton(QUIT, quitCommand);
 	inputHandler->BindButton(TOGGLE_MOUSE, toggleMouse);
 	inputHandler->BindButton(START_TIMER, startTimer);
@@ -154,26 +153,41 @@ void TutorialGame::UpdateGame(float dt) {
 		pausePressed = false;
 	}
 
+
 	switch (state) {
 		case GameState::PLAY: {
 			UpdateGameWorld(dt);
+			if (gameManager->GetTimer()->GetState() == Ended) state = GameState::WIN;
+#ifndef _ORBIS
+			bgm->GetInstance()->SetVolume(0.7f);
+#endif
 			break;
 		}
 		case GameState::PAUSE: {
 			UpdatePauseState(dt);
+#ifndef _ORBIS
+			bgm->GetInstance()->SetVolume(0.0f);
+#endif
 			break;
 		}
 		case GameState::WIN: {
 			UpdateWinScreen(dt);
+#ifndef _ORBIS
+			bgm->GetInstance()->SetVolume(0.2f);
+#endif
 			break;
 		}
 		case GameState::RESET: {
 			InitCamera();
 			InitWorld();
+			gameManager->GetTimer()->StartTimer();
+			gameManager->SetScores(Vector2(0.1f, 0.1f));
 			renderer->ClearPaint();
 			selectionObject = nullptr;
 			quit = false;
 			pause = false;
+			won = false;
+			finalSoundPlayed = false;
 			SetState(GameState::PLAY);
 			break;
 		}
@@ -230,6 +244,7 @@ void TutorialGame::UpdateGameWorld(float dt)
 void TutorialGame::UpdateDebugText(float dt) {
 	if (!debugDraw) {
 		physics->debug = false;
+		gameManager->printScores = false;
 		return;
 	}
 
@@ -243,57 +258,60 @@ void TutorialGame::UpdateDebugText(float dt) {
 	PROCESS_MEMORY_COUNTERS_EX pmc;
 	GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
 
-	DWORDLONG totalVirtualMem = memInfo.ullTotalPageFile;
-	DWORDLONG virtualMemUsed = memInfo.ullTotalPageFile - memInfo.ullAvailPageFile;
+	const DWORDLONG totalVirtualMem = memInfo.ullTotalPageFile;
+	const DWORDLONG virtualMemUsed = memInfo.ullTotalPageFile - memInfo.ullAvailPageFile;
 
-	DWORDLONG totalPhysMem = memInfo.ullTotalPhys;
-	DWORDLONG physMemUsed = memInfo.ullTotalPhys - memInfo.ullAvailPhys;
+	const DWORDLONG totalPhysMem = memInfo.ullTotalPhys;
+	const DWORDLONG physMemUsed = memInfo.ullTotalPhys - memInfo.ullAvailPhys;
 
-	SIZE_T virtualMemUsedByMe = pmc.PrivateUsage;
-	SIZE_T physMemUsedByMe = pmc.WorkingSetSize;
+	const SIZE_T virtualMemUsedByMe = pmc.PrivateUsage;
+	const SIZE_T physMemUsedByMe = pmc.WorkingSetSize;
 
 	Debug::DebugPrint("Virt Mem: " + std::to_string(virtualMemUsedByMe / 1000000) + "MB/" + std::to_string(totalVirtualMem / 1000000) + "MB", Vector2(5, 15), 20, Vector4(1, .5, 1, 1));
 	Debug::DebugPrint("Phys Mem: " + std::to_string(physMemUsedByMe / 1000000)    + "MB/" + std::to_string(totalPhysMem / 1000000)    + "MB", Vector2(5, 20), 20, Vector4(1, .5, 1, 1));
 
 	physics->debug = true;
+	gameManager->printScores = true;
 #endif
 }
 
 void TutorialGame::UpdateScores(float dt) {
 	timeSinceLastScoreUpdate += dt;
-	//Can change time for better performance
-	if (timeSinceLastScoreUpdate > 1.0f/60.0f) {
+	bool objectChecked = false;
+	if (timeSinceLastScoreUpdate > 1.0f / 60.0f) {
 		GameObjectIterator start;
-		GameObjectIterator cur;
 		GameObjectIterator end;
 		world->GetPaintableObjectIterators(start, end);
-		cur = start;
-		for (int i = 0; i < currentObj; i++) {
-			cur++;
+		
+		GameObjectIterator cur;
+		while (!objectChecked) {
+			cur = start + currentObj;
 			if (cur == end) {
 				currentObj = 0;
 				cur = start;
+				break;
 			}
-		}
 
-		currentObj++;
-		if ((*cur)->GetPaintRadius() == 0 || (*cur)->GetRenderObject() == nullptr) {
-			return;
-		}
-		// Need to score the texture here.
-		Vector2 scoreDif = renderer->CountPaintMask((*cur)->GetRenderObject()->GetPaintMask(), world->GetScoreForObject((*cur)), GameManager::team1Colour, GameManager::team2Colour);
-		if ((*cur)->GetPaintRadius() != 0){
+			currentObj++;
+			if ((*cur)->GetPaintRadius() == 0 || (*cur)->GetRenderObject() == nullptr || !(*cur)->GetPaintedRecently()) {
+				continue;
+			}
+
+			const Vector2 prevScore = world->GetScoreForObject(*cur) * (*cur)->GetPaintRadius();
+			Vector2 scoreDif = renderer->CountPaintMask((*cur)->GetRenderObject()->GetPaintMask(), prevScore, GameManager::team1Colour, GameManager::team2Colour);
 			scoreDif = scoreDif / (*cur)->GetPaintRadius();
-		}
-		world->UpdateScore((*cur), scoreDif);
+			world->UpdateScore((*cur), scoreDif);
 
-		gameManager->UpdateScores(scoreDif);
-		timeSinceLastScoreUpdate = 0;
+			gameManager->UpdateScores(scoreDif);
+			timeSinceLastScoreUpdate = 0;
+			(*cur)->SetPaintedRecently(false);
+			objectChecked = true;
+		}
 	}
 }
 
 void TutorialGame::DebugDrawCollider(const CollisionVolume* c, Transform* worldTransform) {
-	Vector4 col = Vector4(1, 0, 0, 1);
+	const Vector4 col = Vector4(1, 0, 0, 1);
 
 	if (c == nullptr)
 		return;
@@ -307,17 +325,17 @@ void TutorialGame::DebugDrawCollider(const CollisionVolume* c, Transform* worldT
 }
 
 void TutorialGame::DebugDrawVelocity(const Vector3& velocity, Transform* worldTransform) {
-	Vector4 col = Vector4(1, 0, 1, 1);
+	const Vector4 col = Vector4(1, 0, 1, 1);
 	Debug::DrawArrow(worldTransform->GetPosition(), worldTransform->GetPosition() + velocity, col);
 }
 
 void TutorialGame::DebugDrawObjectInfo(const GameObject* obj) {
-	Vector3 pos = selectionObject->GetTransform().GetPosition();
-	Vector3 rot = selectionObject->GetTransform().GetOrientation().ToEuler();
-	string name = obj->GetName();
-	string n = "Name: " + (name == "" ? "-" : name);
-	string p = "Pos: (" + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z) + ")";
-	string r = "Rot: (" + std::to_string(rot.x) + ", " + std::to_string(rot.y) + ", " + std::to_string(rot.z) + ")";
+	const Vector3 pos = selectionObject->GetTransform().GetPosition();
+	const Vector3 rot = selectionObject->GetTransform().GetOrientation().ToEuler();
+	const string name = obj->GetName();
+	const string n = "Name: " + (name == "" ? "-" : name);
+	const string p = "Pos: (" + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z) + ")";
+	const string r = "Rot: (" + std::to_string(rot.x) + ", " + std::to_string(rot.y) + ", " + std::to_string(rot.z) + ")";
 	renderer->DrawString(n, Vector2(1, 3), Debug::WHITE, 15.0f);
 	renderer->DrawString(p, Vector2(1, 6), Debug::WHITE, 15.0f);
 	renderer->DrawString(r, Vector2(1, 9), Debug::WHITE, 15.0f);
@@ -330,11 +348,8 @@ void TutorialGame::UpdatePauseScreen(float dt)
 	renderer->DrawString("Press Esc to return to Main Menu.", Vector2(5, 95), Debug::WHITE, 20.0f);
 }
 
-void TutorialGame::UpdateWinScreen(float dt)
-{
-	renderer->DrawString("YOU WIN", Vector2(5, 80), Debug::MAGENTA, 30.0f);
-	renderer->DrawString("Press R to Restart.", Vector2(5, 90), Debug::WHITE, 20.0f);
-	renderer->DrawString("Press Esc to return to Main Menu.", Vector2(5, 95), Debug::WHITE, 20.0f);
+void TutorialGame::UpdateWinScreen(float dt){
+	UpdateGameWorld(dt);
 }
 
 void TutorialGame::InitCamera() {
@@ -348,9 +363,9 @@ void TutorialGame::InitCamera() {
 void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
-
-	levelLoader->ReadInLevelFile(NCL::Assets::MAPDIR + "training_map.txt");
 	
+	levelLoader->ReadInLevelFile(NCL::Assets::MAPDIR + mapString);
+
 	Player* player = levelLoader->SpawnPlayer(Vector3(-50, 5, -50));
 	player->SetRenderObject(nullptr);
 	
@@ -461,30 +476,6 @@ void TutorialGame::MoveSelectedObject(float dt) {
 
 	if (Window::GetKeyboard()->KeyHeld(NCL::KeyboardKeys::F))
 		selectionObject->Interact(dt);
-}
-
-void TutorialGame::UpdateBGM() {
-#ifndef _ORBIS
-
-	switch (state) {
-	case GameState::PLAY:
-		std::cout << "play";
-		bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 3.0f);
-		break;
-		std::cout << "pause";
-		std::cout << "pause";
-		bgm->StopMusic();
-		std::cout << "reset";
-	case GameState::RESET:
-		std::cout << "reset";
-		bgm->StopMusic();
-		break;
-	default:
-		bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 0.1f);
-		break;
-	}
-
-#endif // !_ORBIS
 }
 
 void TutorialGame::PaintObject() {

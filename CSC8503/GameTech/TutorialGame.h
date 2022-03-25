@@ -8,7 +8,7 @@
 #endif
 #include "../CSC8503Common/GameManager.h"
 //#include "../CSC8503Common/Projectile.h"
-
+#include "../CSC8503Common/SimpleAI.h"
 namespace NCL {
 	namespace PS4 {
 		class InputBase;
@@ -26,14 +26,13 @@ namespace NCL {
 		class Checkpoint;
 		class TutorialGame		{
 		public:
-			TutorialGame();
+			TutorialGame(string mapString = "training_map.txt");
 			virtual ~TutorialGame();
 
 			virtual void UpdateGame(float dt);
 
 			void SetState(GameState s) { 
 				state = s; 
-				UpdateBGM(); 
 			}
 
 			bool Win() const { 
@@ -73,7 +72,6 @@ namespace NCL {
 			void DebugDrawCollider(const CollisionVolume* c, Transform* worldTransform);
 			void DebugDrawVelocity(const Vector3& vel, Transform* worldTransform);
 			void DebugDrawObjectInfo(const GameObject* obj);
-			void UpdateBGM();
 			void UpdateScores(float dt);
 			virtual void UpdatePauseState(float dt);
 
@@ -96,14 +94,17 @@ namespace NCL {
 			void UpdateGameWorld(float dt);
 			void UpdateDebugText(float dt);
 			virtual void UpdatePauseScreen(float dt);
-			void UpdateWinScreen(float dt);
+			virtual void UpdateWinScreen(float dt);
 
 			bool useGravity;
 			bool inSelectionMode;
-			bool debugDraw;
+			bool debugDraw = false;
 			bool pause = false;
 			bool pausePressed = false;
 			bool quit = false;
+			bool finalSoundPlayed = false;
+
+			string mapString;
 
 			std::vector<PowerUp*>		powerups;
 			std::vector<Vector3>		spawnPoints;

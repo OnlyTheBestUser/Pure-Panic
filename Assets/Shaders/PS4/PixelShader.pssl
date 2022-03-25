@@ -4,13 +4,8 @@ ConstantBuffer cameraMatrix
 	column_major matrix viewMatrix;
 }
 
-
 ConstantBuffer viewProjMatrix{
 	column_major matrix viewProjMatrix;
-};
-
-ConstantBuffer invProjMatrix{
-	float4x4 invProjMatrix;
 };
 
 ConstantBuffer lightPos
@@ -36,6 +31,17 @@ ConstantBuffer hasPaintMask
 	int m_usePaintMask;
 };
 
+ConstantBuffer hasNormal
+{
+	int m_hasNormal;
+};
+
+ConstantBuffer cameraPos
+{
+	float3 m_cameraPos;
+};
+
+
 SamplerState samp0 : register(s0);
 
 Texture2D colorMap : register( t0 );
@@ -44,25 +50,32 @@ SamplerState samp1: register(s2);
 
 Texture2D mask : register( t2 );
 
+SamplerState samp2: register(s3);
+
+Texture2D normalTex : register( t3 );
+
+SamplerState samp3: register(s4);
+
+Texture2D noise : register( t4 );
+
 struct VS_OUTPUT
 {
 	float4 Position		: S_POSITION;
-	float2 UV			: TEXCOORD0;
-	float3 Normal		: NORMAL;
-	float3 WorldPos		: TANGENT;
+	float2 UV			: TEXCOORD0; 
+	float3 Normal		: TEXCOORD1;
+	float3 WorldPos		: TEXCOORD2;
+	float3 tangent		: TANGENT;
+	float3 binormal		: TEXCOORD3;
 	float4 Color		: COLOR0;
 };
 
 float4 main(VS_OUTPUT In) : S_TARGET_OUTPUT
 {
-	float3  incident = normalize ( LightPos - In.WorldPos );
-	float lambert  = max (0.0 , dot ( incident , In.Normal )) * 0.9; 
-	
-	float3 viewDir = mul(transpose(float3x3(viewMatrix)),normalize(In.Position.xyz));
-	float3 halfDir = normalize ( incident + viewDir );
+	float3 useNormal = In.Normal;
 
-	float rFactor = max (0.0 , dot(halfDir , In.Normal ));
-	float sFactor = pow ( rFactor , 80.0 );
+	float3 incident = normalize( LightPos - In.WorldPos );
+	float3 viewDir = normalize( m_cameraPos - In.WorldPos );
+	float3 halfDir = normalize( incident + viewDir );
 
 	float4 albedo = In.Color;
 
@@ -71,19 +84,36 @@ float4 main(VS_OUTPUT In) : S_TARGET_OUTPUT
 	}
 
 	if (m_hasTexture == 1){
-		albedo *= colorMap.Sample(samp1, In.UV.xy);
+		albedo *= colorMap.Sample(samp0, In.UV.xy);
+	}
+
+	float3x3 TBN = float3x3(normalize(In.tangent), normalize(In.binormal), normalize(In.Normal ));
+
+	if (m_hasNormal == 1){
+		float3 bumpNormal = normalTex.Sample(samp1, In.UV.xy).rgb;
+    	bumpNormal = normalize(mul(TBN,normalize(bumpNormal * 2.0 - 1.0)));
+		useNormal = bumpNormal;
 	}
 
 	if (m_usePaintMask == 1){
-		float4 maskAlbedo = mask.Sample(samp1, In.UV.xy);
-		if (maskAlbedo.r > 0.01 || maskAlbedo.g > 0.01 || maskAlbedo.b > 0.01){
-			albedo.rgb = maskAlbedo.rgb;
+		float4 col = mask.Sample(samp1, In.UV.xy);
+		albedo.rgb = (albedo.rgb * (1-col.a)) + (float3(col.r, col.g, col.b) * col.a);
+		if (col.a > 0.1){
+			float3 bumpNormal = noise.Sample(samp3, In.UV.xy).rgb;
+    		bumpNormal = normalize(mul(TBN,normalize(bumpNormal * 2.0 - 1.0)));
+			useNormal = bumpNormal;
 		}
 	}
 
+	float lambert  = max (0.0 , dot ( incident , useNormal )) * 0.9; 
+	float rFactor = max (0.0 , dot ( halfDir , useNormal ));
+	float sFactor = pow ( rFactor , 80.0 );
+
+
 	albedo.rgb = pow(albedo.rgb, float3(2.2));
 
-	float4 colour = albedo * 0.05f;
+	float4 colour;
+	colour.rgb = albedo.rgb * 0.05f;
 	colour.rgb += albedo.rgb * LightColour.rgb * lambert;
 	colour.rgb += LightColour.rgb * sFactor;
 	colour.rgb = pow(colour.rgb, float3(1.0 / 2.2f));

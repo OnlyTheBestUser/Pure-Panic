@@ -22,7 +22,7 @@ struct MessagePacket : public GamePacket {
 	}
 };
 
-NetworkedGame::NetworkedGame() {
+NetworkedGame::NetworkedGame(string mapString) : TutorialGame(mapString) {
 	levelLoader = new LevelLoader(physics, renderer, this);
 
 	thisServer = nullptr;
@@ -94,6 +94,12 @@ void NetworkedGame::StartAsClient(char a, char b, char c, char d) {
 }
 
 void NetworkedGame::UpdateGame(float dt) {
+
+	if (!thisServer && !thisClient) {
+		Debug::Print("Press 1 to Start as Host", Vector2(5, 30), 20.0f, Debug::BLUE);
+		Debug::Print("Press 2 to Start as Client", Vector2(5, 45), 20.0f, Debug::BLUE);
+	}
+
 	timeToNextPacket -= dt;
 	if (timeToNextPacket < 0) {
 		if (thisServer) {
@@ -215,15 +221,22 @@ void NetworkedGame::SpawnPlayer() {
 }
 
 void NetworkedGame::StartLevel() {
+	renderer->drawGUI = true;
+	SetState(GameState::PLAY);
 	ResetLevel();
 	gameManager->StartRound();
 	SendStartGamePacket();
 }
 
+void NetworkedGame::ServerResetLevel() {
+	ResetLevel();
+	SendResetGamePacket();
+}
+
 void NetworkedGame::ResetLevel() {
 	renderer->ClearPaint();
 	gameManager->GetTimer()->ResetTimer();
-	gameManager->SetScores(Vector2(0, 0));
+	gameManager->SetScores(Vector2(0.01f, 0.01f));
 	gameManager->printResults = false;
 }
 
@@ -299,7 +312,7 @@ void NetworkedGame::HandleClientPacket(ClientPacket* packet)
 			obj->second->GetTransform().SetOrientation(Quaternion::EulerAnglesToQuaternion(0, packet->yaw, 0));
 
 			if (packet->firing) {
-				std::cout << "Handle Client Packet: " << packet->bulletCounter << std::endl;
+				//std::cout << "Handle Client Packet: " << packet->bulletCounter << std::endl;
 				ServerFire(obj->second, packet->pitch, packet->bulletCounter, packet->spread, packet->clientID);
 			}
 		}
@@ -324,14 +337,14 @@ void NetworkedGame::AddNewPlayerToServer(int clientID, int lastID)
 	if (!(clientID < networkObjects.size()))
 		networkObjects.resize(clientID + 1);
 	networkObjects[clientID] = client->GetNetworkObject();
-	std::cout << "New player added to server: ClientID (" << clientID << "), LastID(" << lastID << ")\n";
+	//std::cout << "New player added to server: ClientID (" << clientID << "), LastID(" << lastID << ")\n";
 }
 
 void NetworkedGame::ServerFire(GameObject* owner, float pitch, int bulletCounter, bool spread, int clientID)
 {
 	Fire(owner, spread, bulletCounter, pitch, clientID);
 
-	std::cout << "ServerFire: " << bulletCounter << std::endl;
+	//std::cout << "ServerFire: " << bulletCounter << std::endl;
 
 	FirePacket newPacket;
 	newPacket.clientID = clientID;
@@ -359,7 +372,7 @@ void NetworkedGame::SendDeathPacket(int clientID, Vector3 pos)
 			singleton->thisServer->SendGlobalPacket(packet);
 #endif
 		}
-		else {
+		else if(singleton->thisClient) {
 			singleton->thisClient->SendPacket(packet);
 		}
 	}
@@ -452,7 +465,7 @@ void NetworkedGame::HandleDeathState(DeathPacket* packet)
 
 void NetworkedGame::HandleAssignID(AssignIDPacket* packet)
 {
-	std::cout << "ID Assigned: " << packet->clientID << std::endl;
+	//std::cout << "ID Assigned: " << packet->clientID << std::endl;
 	playerID = packet->clientID;
 
 	SpawnPlayer();
@@ -462,14 +475,14 @@ void NetworkedGame::HandleAssignID(AssignIDPacket* packet)
 
 void NetworkedGame::HandlePlayerConnect(NewPlayerPacket* packet)
 {
-	std::cout << "Client: New player connected!" << std::endl;
-	std::cout << "_Player ID: " << packet->clientID << std::endl;
+	//std::cout << "Client: New player connected!" << std::endl;
+	//std::cout << "_Player ID: " << packet->clientID << std::endl;
 
 	if (packet->clientID != playerID) {
 		GameObject* newPlayer = LevelLoader::SpawnDummyPlayer(Vector3(10, 15, 10));
 		newPlayer->SetNetworkObject(new NetworkObject(*newPlayer, packet->clientID));
 		newPlayer->GetPhysicsObject()->SetDynamic(true);
-		std::cout << "Player Spawned with Network ID: " << newPlayer->GetNetworkObject()->GetNetID() << "." << std::endl;
+		//std::cout << "Player Spawned with Network ID: " << newPlayer->GetNetworkObject()->GetNetID() << "." << std::endl;
 		if (!(packet->clientID < networkObjects.size())) {
 			networkObjects.resize(packet->clientID + 1);
 		}
@@ -517,8 +530,8 @@ void NetworkedGame::SendResetGamePacket() {
 	GameStatePacket newPacket;
 
 	newPacket.state = Game_Reset;
-	newPacket.team1Score = 0;
-	newPacket.team2Score = 0;
+	newPacket.team1Score = 0.1f;
+	newPacket.team2Score = 0.1f;
 
 #ifndef ORBISNET
 	thisServer->SendGlobalPacket(newPacket);
@@ -530,8 +543,8 @@ void NetworkedGame::SendStartGamePacket() {
 	GameStatePacket newPacket;
 
 	newPacket.state = Game_Start;
-	newPacket.team1Score = 0;
-	newPacket.team2Score = 0;
+	newPacket.team1Score = 0.1f;
+	newPacket.team2Score = 0.1f;
 
 #ifndef ORBISNET
 	thisServer->SendGlobalPacket(newPacket);
