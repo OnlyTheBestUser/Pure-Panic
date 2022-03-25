@@ -137,7 +137,7 @@ void LevelLoader::ReadInLevelFile(std::string filename) {
 
 			if (lineContents.size() > 0) {
 				if (lineContents[0] == "FLOOR") {
-					singleton->AddFloorToWorld(Vec3FromStr(lineContents[1]));
+					singleton->AddFloorToWorld(Vec3FromStr(lineContents[1]), Vec3FromStr(lineContents[2]), std::stof(lineContents[3]));
 				}
 				else if (lineContents[0] == "LONG_WALL") {
 					singleton->AddLongWallToWorld(Vec3FromStr(lineContents[1]), Vec3FromStr(lineContents[2]), std::stof(lineContents[3]));
@@ -228,9 +228,9 @@ GameObject* LevelLoader::SpawnAIEnemy(const Vector3& position, GameObject* targe
 	return singleton->AddPlayerObjectToWorld(position, character);
 }
 
-GameObject* LevelLoader::AddFloorToWorld(const Vector3& position) {
-	GameObject* floor = new GameObject("Floor", 1.5f);
-	Vector3 floorSize = Vector3(250, 1, 250);
+GameObject* LevelLoader::AddFloorToWorld(const Vector3& position, const Vector3& scale, const float& paintRad) {
+	GameObject* floor = new GameObject("Floor", paintRad);
+	Vector3 floorSize = scale;
 
 	SetFieldsForCube(floor, position, floorSize, CollisionLayer::LAYER_ONE, false, false, false, 0, DEF_ELASTICITY, DEF_LDAMPING, DEF_FRICTION);
 
@@ -443,7 +443,7 @@ void		LevelLoader::AddSecurityCameraToWorld(const Vector3& position, int rotatio
 		location += Vector3(4, 0, 0);
 	}
 
-	AddAssetToWorld(position, Vector3(5, 5, 5), rotation, securityCamera, securityCameraTex, location, dimensions, 10.f, "Security Camera")
+	AddAssetToWorld(position, Vector3(5, 5, 5), rotation, securityCamera, securityCameraTex, location, dimensions, 20.f, "Security Camera")
 		->GetPhysicsObject()->Sleep();
 	return;
 }
@@ -473,7 +473,7 @@ void		LevelLoader::AddWallHammerToWorld(const Vector3& position, int rotation)
 		location += Vector3(5.5, 0, -0.25);
 	}
 
-	AddAssetToWorld(position, Vector3(10, 10, 6), rotation, corridorWallHammer, corridorWallHammerTex, location, dimensions, 10.f, "Wall Hammer")
+	AddAssetToWorld(position, Vector3(10, 10, 6), rotation, corridorWallHammer, corridorWallHammerTex, location, dimensions, 7.f, "Wall Hammer")
 		->GetPhysicsObject()->Sleep();
 	return;
 }
@@ -484,7 +484,7 @@ void LevelLoader::AddThroneToWorld(const Vector3& position, int rotation, const 
 	Vector3 phyDimensions = Vector3(2, 4, 2) * scale;
 	Vector3 meshDimensions = Vector3(1.5f, 1.5f, 1.5f) * scale;
 
-	AddAssetToWorld(position, meshDimensions, rotation, sanctumThrone, sanctumThroneTex, location, phyDimensions, 10.f, "Sanctum Throne")
+	AddAssetToWorld(position, meshDimensions, rotation, sanctumThrone, sanctumThroneTex, location, phyDimensions, 20.f, "Sanctum Throne")
 		->GetPhysicsObject()->Sleep();
 	return;
 }
