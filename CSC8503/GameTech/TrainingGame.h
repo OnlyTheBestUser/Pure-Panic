@@ -9,6 +9,7 @@ namespace NCL {
 			virtual ~TrainingGame() {}
 
 			void InitWorld() override;
+			void UpdateWinScreen(float dt) override;
 		};
 	}
 }

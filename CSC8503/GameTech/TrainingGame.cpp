@@ -26,3 +26,23 @@ void TrainingGame::InitWorld() {
 	
 	gameManager->GetTimer()->StartTimer();
 }
+
+void TrainingGame::UpdateWinScreen(float dt)
+{
+	won = true;
+
+	if (gameManager->GetScores().x > gameManager->GetScores().y) {
+		renderer->DrawString("YOU WIN", Vector2(5, 80), Debug::MAGENTA, 30.0f);
+		if (!finalSoundPlayed)
+			NCL::AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + "win.ogg");
+		finalSoundPlayed = true;
+	}
+	else {
+		renderer->DrawString("YOU LOSE", Vector2(5, 80), Debug::MAGENTA, 30.0f);
+		if (!finalSoundPlayed)
+			NCL::AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + "lose.ogg");
+		finalSoundPlayed = true;
+	}
+	renderer->DrawString("Press F1 to Restart.", Vector2(5, 90), Debug::WHITE, 20.0f);
+	renderer->DrawString("Press Esc to return to Main Menu.", Vector2(5, 95), Debug::WHITE, 20.0f);
+}

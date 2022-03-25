@@ -221,6 +221,8 @@ void NetworkedGame::SpawnPlayer() {
 }
 
 void NetworkedGame::StartLevel() {
+	renderer->drawGUI = true;
+	SetState(GameState::PLAY);
 	ResetLevel();
 	gameManager->StartRound();
 	SendStartGamePacket();
@@ -234,7 +236,7 @@ void NetworkedGame::ServerResetLevel() {
 void NetworkedGame::ResetLevel() {
 	renderer->ClearPaint();
 	gameManager->GetTimer()->ResetTimer();
-	/*gameManager->SetScores(Vector2(0, 0));*/
+	gameManager->SetScores(Vector2(0.01f, 0.01f));
 	gameManager->printResults = false;
 }
 
