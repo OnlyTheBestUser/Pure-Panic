@@ -141,10 +141,10 @@ namespace NCL {
 
 		class QuitCommand : public Command {
 			public:
-				QuitCommand(bool* quit, bool* paused) : paused(paused), quit(quit) {};
+				QuitCommand(bool* quit, bool* paused, bool* won) : paused(paused), quit(quit), won(won) {};
 				virtual ~QuitCommand() {};
 				void execute() {
-					if (*paused == true) {
+					if (*paused || *won) {
 						*quit = true;
 #ifndef _ORBIS
 						NCL::BGMManager::GetInstance()->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 0.1f);
@@ -154,6 +154,7 @@ namespace NCL {
 			protected:
 				bool* paused;
 				bool* quit;
+				bool* won;
 		};
 
 		class ResetWorldCommand : public Command {

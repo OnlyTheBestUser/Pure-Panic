@@ -22,6 +22,8 @@ MainMenu::MainMenu()
 	a->LoadSound(Assets::AUDIODIR + "menu_music.ogg", false, true, true);
 	a->LoadSound(Assets::AUDIODIR + "menu_move.ogg", false, false, false);
 	a->LoadSound(Assets::AUDIODIR + "menu_select.ogg", false, false, false);
+	a->LoadSound(Assets::AUDIODIR + "win.ogg", false, false, false);
+	a->LoadSound(Assets::AUDIODIR + "lose.ogg", false, false, false);
 
 	bgm = NCL::BGMManager::GetInstance();
 	bgm->PlaySongFade(Assets::AUDIODIR + "menu_music.ogg", 0.5f);

@@ -8,7 +8,7 @@
 #endif
 #include "../CSC8503Common/GameManager.h"
 //#include "../CSC8503Common/Projectile.h"
-
+#include "../CSC8503Common/SimpleAI.h"
 namespace NCL {
 	namespace PS4 {
 		class InputBase;
@@ -102,6 +102,7 @@ namespace NCL {
 			bool pause = false;
 			bool pausePressed = false;
 			bool quit = false;
+			bool finalSoundPlayed = false;
 
 			string mapString;
 
