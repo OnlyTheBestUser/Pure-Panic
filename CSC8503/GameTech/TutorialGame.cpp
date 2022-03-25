@@ -231,6 +231,7 @@ void TutorialGame::UpdateGameWorld(float dt)
 void TutorialGame::UpdateDebugText(float dt) {
 	if (!debugDraw) {
 		physics->debug = false;
+		gameManager->printScores = false;
 		return;
 	}
 
@@ -257,6 +258,7 @@ void TutorialGame::UpdateDebugText(float dt) {
 	Debug::DebugPrint("Phys Mem: " + std::to_string(physMemUsedByMe / 1000000)    + "MB/" + std::to_string(totalPhysMem / 1000000)    + "MB", Vector2(5, 20), 20, Vector4(1, .5, 1, 1));
 
 	physics->debug = true;
+	gameManager->printScores = true;
 #endif
 }
 
