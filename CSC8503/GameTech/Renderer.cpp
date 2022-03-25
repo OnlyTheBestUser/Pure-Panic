@@ -12,6 +12,7 @@
 #include "../../Common/TextureLoader.h"
 #include "../../Common/MeshGeometry.h"
 #include "../CSC8503Common/GameManager.h"
+#include "../CSC8503Common/RenderObject.h"
 
 
 #ifdef _WIN64
@@ -86,7 +87,7 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 	);
 
 	skyboxTex = PS4::PS4Texture::LoadSkyboxFromFile(NCL::Assets::TEXTUREDIR + "Cubemap/cubemap.gnf");
-	noiseTex = PS4::PS4Texture::LoadTextureFromFile(NCL::Assets::TEXTUREDIR + "noise.gnf");
+	normalTex = PS4::PS4Texture::LoadTextureFromFile(NCL::Assets::TEXTUREDIR + "noise.gnf");
 
 	maskShader = PS4::PS4Shader::GenerateShader(
 		Assets::SHADERDIR + "PS4/maskVertex.sb",
@@ -305,9 +306,6 @@ void Renderer::RenderObjects() {
 #endif
 		shader->UpdateUniformVector4("objectColour", i->GetColour());
 		shader->UpdateUniformInt("hasVertexColours", !(*i).GetMesh()->GetColourData().empty());
-
-
-
 
 		rendererAPI->DrawMeshAndSubMesh((*i).GetMesh());
 	}

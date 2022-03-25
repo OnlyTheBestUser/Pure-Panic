@@ -201,5 +201,8 @@
     <CustomBuild Include="..\..\Assets\Textures\crosshair.png">
       <Filter>Assets\Textures</Filter>
     </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\noise.png">
+      <Filter>Assets\Textures</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>
