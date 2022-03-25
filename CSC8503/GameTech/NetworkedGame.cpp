@@ -370,7 +370,7 @@ void NetworkedGame::SendDeathPacket(int clientID, Vector3 pos)
 			singleton->thisServer->SendGlobalPacket(packet);
 #endif
 		}
-		else {
+		else if(singleton->thisClient) {
 			singleton->thisClient->SendPacket(packet);
 		}
 	}
