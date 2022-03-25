@@ -22,7 +22,7 @@ namespace NCL {
 #endif
 		public:
 			RendererBase();
-			~RendererBase();
+			virtual ~RendererBase();
 
 			virtual void Render();
 
