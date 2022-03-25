@@ -171,7 +171,6 @@ void TutorialGame::UpdateGame(float dt) {
 			break;
 		}
 		case GameState::WIN: {
-			won = true;
 			UpdateWinScreen(dt);
 #ifndef _ORBIS
 			bgm->GetInstance()->SetVolume(0.2f);
@@ -349,26 +348,8 @@ void TutorialGame::UpdatePauseScreen(float dt)
 	renderer->DrawString("Press Esc to return to Main Menu.", Vector2(5, 95), Debug::WHITE, 20.0f);
 }
 
-void TutorialGame::UpdateWinScreen(float dt)
-{ 
-	if (gameManager->GetScores().x > gameManager->GetScores().y) {
-		renderer->DrawString("YOU WIN", Vector2(5, 80), Debug::MAGENTA, 30.0f);
-		if(!finalSoundPlayed)
-#ifndef _ORBIS
-			NCL::AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + "win.ogg");
-#endif
-		finalSoundPlayed = true;
-	}
-	else {
-		renderer->DrawString("YOU LOSE", Vector2(5, 80), Debug::MAGENTA, 30.0f);
-		if (!finalSoundPlayed)
-#ifndef _ORBIS
-			NCL::AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + "lose.ogg");
-#endif
-		finalSoundPlayed = true;
-	}
-	renderer->DrawString("Press F1 to Restart.", Vector2(5, 90), Debug::WHITE, 20.0f);
-	renderer->DrawString("Press Esc to return to Main Menu.", Vector2(5, 95), Debug::WHITE, 20.0f);
+void TutorialGame::UpdateWinScreen(float dt){
+	UpdateGameWorld(dt);
 }
 
 void TutorialGame::InitCamera() {

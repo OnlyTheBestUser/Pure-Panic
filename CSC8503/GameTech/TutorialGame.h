@@ -94,7 +94,7 @@ namespace NCL {
 			void UpdateGameWorld(float dt);
 			void UpdateDebugText(float dt);
 			virtual void UpdatePauseScreen(float dt);
-			void UpdateWinScreen(float dt);
+			virtual void UpdateWinScreen(float dt);
 
 			bool useGravity;
 			bool inSelectionMode;

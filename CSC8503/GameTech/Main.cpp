@@ -47,18 +47,12 @@ int main() {
 	srand(time(NULL));
 	w->ShowOSPointer(false);
 	w->LockMouseToWindow(true);
-
-	float avgTimeWait = 3.0f;
-	float curTimeWait = 3.0f;
-	float totalTime = 0.0f;
-	int totalFrames = 0;
-
+	
 	LoadingScreen* l = new LoadingScreen();
 	MainMenu menu;
 
 	w->GetTimer()->GetTimeDeltaSeconds(); 
 
-	float smallestFrameRate = 144.0f;
 	while (w->UpdateWindow()) {
 
 		float dt = w->GetTimer()->GetTimeDeltaSeconds();
@@ -68,14 +62,8 @@ int main() {
 		}
 
 		float frameRate = (1.0f / dt);
-		if (frameRate < smallestFrameRate)
-			smallestFrameRate = frameRate;
 
 		w->SetTitle("Gametech frame time:" + std::to_string(1000.0f * dt) + " | Gametech frame rate:" + std::to_string(frameRate));
-
-		curTimeWait -= dt;
-		totalTime += dt;
-		totalFrames++;
 
 		if (!menu.UpdateGame(dt)) {
 			return 0;
