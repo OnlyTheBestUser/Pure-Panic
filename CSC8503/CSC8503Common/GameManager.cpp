@@ -24,9 +24,9 @@ void GameManager::PrintScores(float scoreA, float scoreB) {
 
 void GameManager::PrintResult(float scoreA, float scoreB) {
 	if (scoreA > scoreB)
-		Debug::Print("Team A Wins", { 30.f, 70.f });
+		Debug::Print("Purple Wins", { 30.f, 70.f });
 	else if (scoreA < scoreB)
-		Debug::Print("Team B Wins", { 30.f, 70.f });
+		Debug::Print("Blue Wins", { 30.f, 70.f });
 	else
 		Debug::Print("Tie", { 30.f, 70.f });
 }
