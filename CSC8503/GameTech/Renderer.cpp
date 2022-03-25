@@ -126,7 +126,7 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 	//Set up the light properties
 	lightColour = Vector4(0.8f, 0.8f, 0.5f, 1.0f);
 	lightRadius = 1000.0f;
-	lightPos = Vector3(-200.0f, 60.0f, -200.0f);
+	lightPos = Vector3(-200.0f, 200.0f, -200.0f);
 }
 
 Renderer::~Renderer() {
@@ -217,7 +217,7 @@ void Renderer::RenderShadows() {
 
 	shadowShader->BindShader();
 
-	Matrix4 shadowViewMatrix = Matrix4::BuildViewMatrix(lightPos, Vector3(0, 0, 0), Vector3(0, 1, 0));
+	Matrix4 shadowViewMatrix = Matrix4::BuildViewMatrix(lightPos, Vector3(0, 0, 0), Vector3(1, 1, 1));
 	Matrix4 shadowProjMatrix = Matrix4::Perspective(100.0f, 500.0f, 1, 45.0f);
 	Matrix4 mvMatrix = shadowProjMatrix * shadowViewMatrix;
 	Matrix4 biasMat = Matrix4::Translation(Vector3(0.5, 0.5, 0.5)) * Matrix4::Scale(Vector3(0.5, 0.5, 0.5));

@@ -383,10 +383,10 @@ GameObject* LevelLoader::AddAssetToWorld(const Vector3& position, Vector3 dimens
 		.SetOffset(phyLocation - position);
 
 #ifdef _WIN64
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, OGLTexture::RGBATextureEmpty(texture->GetWidth() / 16, texture->GetHeight() / 16), basicShader));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, basicShader, OGLTexture::RGBATextureEmpty(texture->GetWidth() / 16, texture->GetHeight() / 16)));
 #endif
 #ifdef _ORBIS
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, basicShader));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), mesh, texture, basicShader, PS4::PS4Texture::EmptyTex(basicTex->GetWidth(), basicTex->GetHeight())));
 #endif
 
 	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
