@@ -334,14 +334,12 @@ NCL::Maths::Vector2 Renderer::CountPaintMask(TextureBase* paintMask, NCL::Maths:
 	return prevScores;
 #elif _WIN64
 
-	paintMask->Bind();
-
 	const int pixelDataSize = paintMask->GetHeight() * paintMask->GetWidth() * 4;
 	GLubyte* data = new GLubyte[pixelDataSize];
 	glGetTextureImage(((OGLTexture*)paintMask)->GetObjectID(), 0, GL_RGBA, GL_UNSIGNED_BYTE, pixelDataSize * 4, data);
 
-	int team1Score = 0;
-	int team2Score = 0;
+	float team1Score = 0;
+	float team2Score = 0;
 
 	//Read data from paint mask for scoring
 	for (size_t x= 0;x < paintMask->GetWidth(); x++){

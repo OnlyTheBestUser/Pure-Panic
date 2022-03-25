@@ -280,11 +280,9 @@ void TutorialGame::UpdateScores(float dt) {
 		if ((*cur)->GetPaintRadius() == 0 || (*cur)->GetRenderObject() == nullptr) {
 			return;
 		}
-		// Need to score the texture here.
-		Vector2 scoreDif = renderer->CountPaintMask((*cur)->GetRenderObject()->GetPaintMask(), world->GetScoreForObject((*cur)), GameManager::team1Colour, GameManager::team2Colour);
-		if ((*cur)->GetPaintRadius() != 0){
-			scoreDif = scoreDif / (*cur)->GetPaintRadius();
-		}
+		const Vector2 prevScore = world->GetScoreForObject(*cur) * (*cur)->GetPaintRadius();
+		Vector2 scoreDif = renderer->CountPaintMask((*cur)->GetRenderObject()->GetPaintMask(), prevScore, GameManager::team1Colour, GameManager::team2Colour);
+		scoreDif = scoreDif / (*cur)->GetPaintRadius();
 		world->UpdateScore((*cur), scoreDif);
 
 		gameManager->UpdateScores(scoreDif);
