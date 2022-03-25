@@ -83,6 +83,9 @@ namespace NCL {
 			void SetPaintRadius(int newRad) { paintRadius = newRad; }
 			int GetPaintRadius() const { return paintRadius; }
 
+			void SetPaintedRecently(bool painted) { this->painted = painted; }
+			bool GetPaintedRecently() { return painted; }
+
 			void SetCollisionLayers(int layers) { GetPhysicsObject()->SetCollisionLayers(layers); }
 			int	GetCollisionLayers() const { return GetPhysicsObject()->GetCollisionLayers(); }
 
@@ -102,6 +105,8 @@ namespace NCL {
 			bool	isActive;
 			int		worldID;
 			string	name;
+
+			bool painted;
 
 			int collisionLayers = CollisionLayer::LAYER_ONE;
 			bool isTrigger = false;

@@ -262,32 +262,36 @@ void TutorialGame::UpdateDebugText(float dt) {
 
 void TutorialGame::UpdateScores(float dt) {
 	timeSinceLastScoreUpdate += dt;
-	//Can change time for better performance
-	if (timeSinceLastScoreUpdate > 1.0f/60.0f) {
+	bool objectChecked = false;
+	if (timeSinceLastScoreUpdate > 1.0f / 60.0f) {
 		GameObjectIterator start;
-		GameObjectIterator cur;
 		GameObjectIterator end;
 		world->GetPaintableObjectIterators(start, end);
-		cur = start;
-		for (int i = 0; i < currentObj; i++) {
-			cur++;
+		
+		GameObjectIterator cur;
+		while (!objectChecked) {
+			cur = start + currentObj;
 			if (cur == end) {
 				currentObj = 0;
 				cur = start;
+				break;
 			}
-		}
 
-		currentObj++;
-		if ((*cur)->GetPaintRadius() == 0 || (*cur)->GetRenderObject() == nullptr) {
-			return;
-		}
-		const Vector2 prevScore = world->GetScoreForObject(*cur) * (*cur)->GetPaintRadius();
-		Vector2 scoreDif = renderer->CountPaintMask((*cur)->GetRenderObject()->GetPaintMask(), prevScore, GameManager::team1Colour, GameManager::team2Colour);
-		scoreDif = scoreDif / (*cur)->GetPaintRadius();
-		world->UpdateScore((*cur), scoreDif);
+			currentObj++;
+			if ((*cur)->GetPaintRadius() == 0 || (*cur)->GetRenderObject() == nullptr || !(*cur)->GetPaintedRecently()) {
+				continue;
+			}
 
-		gameManager->UpdateScores(scoreDif);
-		timeSinceLastScoreUpdate = 0;
+			const Vector2 prevScore = world->GetScoreForObject(*cur) * (*cur)->GetPaintRadius();
+			Vector2 scoreDif = renderer->CountPaintMask((*cur)->GetRenderObject()->GetPaintMask(), prevScore, GameManager::team1Colour, GameManager::team2Colour);
+			scoreDif = scoreDif / (*cur)->GetPaintRadius();
+			world->UpdateScore((*cur), scoreDif);
+
+			gameManager->UpdateScores(scoreDif);
+			timeSinceLastScoreUpdate = 0;
+			(*cur)->SetPaintedRecently(false);
+			objectChecked = true;
+		}
 	}
 }
 

@@ -105,6 +105,7 @@ void Projectile::PaintCircle(const Vector3& centre, const Quaternion& rotation, 
 					CollisionDetection::GetBarycentricFromRay(ray, *rendObj, texUV_a, texUV_b, texUV_c, barycentric, collisionPoint, norm);
 					float randRad = (((GameObject*)closestCollision.node)->GetPaintRadius() + (((static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * 2.0f) - 1.0f) * ((GameObject*)closestCollision.node)->GetPaintRadius() * 0.25f) * paintRadiusModifier;
 					renderInst->Paint(rendObj, barycentric, collisionPoint, texUV_a, texUV_b, texUV_c, randRad, 0.7, 1, colour);
+					((GameObject*)closestCollision.node)->SetPaintedRecently(true);
 				}
 			}
 		}
