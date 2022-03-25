@@ -73,8 +73,8 @@ void MainMenu::UpdateMenu(float dt) {
 #endif
 	renderer.Render();
 
-	float framed = (renderer.GetFrameNumber() / 240.f);
-	float size = (50.0f * abs(sin(framed))) + 40.0f;
+	const float framed = (renderer.GetFrameNumber() / 240.f);
+	const float size = (50.0f * abs(sin(framed))) + 40.0f;
 
 	if (renderer.GetFrameNumber() % 5 == 1) {
 		inputHandler->HandleInput();
@@ -82,7 +82,7 @@ void MainMenu::UpdateMenu(float dt) {
 
 	renderer.DrawString("Spitoon", { 20,30 }, { 0.6f,0.3f,0.8f,1.0f },  size );
 
-	auto drawMenuOption = [=](const std::string& string, const Maths::Vector2 pos, int selection, int menuNumber) {
+	const auto drawMenuOption = [=](const std::string& string, const Maths::Vector2 pos, int selection, int menuNumber) {
 		if (selection == menuNumber) {
 			renderer.DrawString(string, pos, { 1.0f,0.2f,0.2f,1.0f });
 		}

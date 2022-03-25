@@ -293,7 +293,7 @@ void TutorialGame::UpdateScores(float dt) {
 }
 
 void TutorialGame::DebugDrawCollider(const CollisionVolume* c, Transform* worldTransform) {
-	Vector4 col = Vector4(1, 0, 0, 1);
+	const Vector4 col = Vector4(1, 0, 0, 1);
 
 	if (c == nullptr)
 		return;
@@ -307,17 +307,17 @@ void TutorialGame::DebugDrawCollider(const CollisionVolume* c, Transform* worldT
 }
 
 void TutorialGame::DebugDrawVelocity(const Vector3& velocity, Transform* worldTransform) {
-	Vector4 col = Vector4(1, 0, 1, 1);
+	const Vector4 col = Vector4(1, 0, 1, 1);
 	Debug::DrawArrow(worldTransform->GetPosition(), worldTransform->GetPosition() + velocity, col);
 }
 
 void TutorialGame::DebugDrawObjectInfo(const GameObject* obj) {
-	Vector3 pos = selectionObject->GetTransform().GetPosition();
-	Vector3 rot = selectionObject->GetTransform().GetOrientation().ToEuler();
-	string name = obj->GetName();
-	string n = "Name: " + (name == "" ? "-" : name);
-	string p = "Pos: (" + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z) + ")";
-	string r = "Rot: (" + std::to_string(rot.x) + ", " + std::to_string(rot.y) + ", " + std::to_string(rot.z) + ")";
+	const Vector3 pos = selectionObject->GetTransform().GetPosition();
+	const Vector3 rot = selectionObject->GetTransform().GetOrientation().ToEuler();
+	const string name = obj->GetName();
+	const string n = "Name: " + (name == "" ? "-" : name);
+	const string p = "Pos: (" + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z) + ")";
+	const string r = "Rot: (" + std::to_string(rot.x) + ", " + std::to_string(rot.y) + ", " + std::to_string(rot.z) + ")";
 	renderer->DrawString(n, Vector2(1, 3), Debug::WHITE, 15.0f);
 	renderer->DrawString(p, Vector2(1, 6), Debug::WHITE, 15.0f);
 	renderer->DrawString(r, Vector2(1, 9), Debug::WHITE, 15.0f);

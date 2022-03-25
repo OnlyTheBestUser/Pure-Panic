@@ -124,19 +124,17 @@ void RendererBase::DrawDebugData() {
 		rendererAPI->SetCullFace(false);
 	}
 
-	Matrix4 pMat;
-
 	font->GetTexture()->Bind(0);
 
 	if (debugLines.size() > 0) {
-		pMat = SetupDebugLineMatrix();
+		const Matrix4 pMat = SetupDebugLineMatrix();
 		debugShader->UpdateUniformMatrix4("viewProjMatrix", pMat);
 		debugShader->UpdateUniformInt("useTexture", 0);
 		DrawDebugLines();
 	}
 
 	if (debugStrings.size() > 0) {
-		pMat = SetupDebugStringMatrix();
+		const Matrix4 pMat = SetupDebugStringMatrix();
 		debugShader->UpdateUniformMatrix4("viewProjMatrix", pMat);
 		debugShader->UpdateUniformInt("useTexture", 1);
 		DrawDebugStrings();

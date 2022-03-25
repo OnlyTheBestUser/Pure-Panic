@@ -407,22 +407,13 @@ void Renderer::ApplyPaintToMasks() {
 			rendererAPI->SetViewportSize(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight());
 		}
 
-		maskShader->UpdateUniformMatrix4("modelMatrix", i.object->GetTransform()->GetMatrix());
-		maskShader->UpdateUniformVector3("barycentricCoord", i.barycentric);
-		maskShader->UpdateUniformVector3("collisionPoint", i.colPoint);
-		maskShader->UpdateUniformVector2("nearTexCoord_a", i.texUV_a);
-		maskShader->UpdateUniformVector2("nearTexCoord_b", i.texUV_b);
-		maskShader->UpdateUniformVector2("nearTexCoord_c", i.texUV_c);
-
-		Vector2 pos = i.texUV_a * i.barycentric.x 
+		const Vector2 pos = i.texUV_a * i.barycentric.x 
 			+ i.texUV_b * i.barycentric.y 
 			+ i.texUV_c * i.barycentric.z;
 		maskShader->UpdateUniformVector2("uvHitPoint", pos);
 
 		maskShader->UpdateUniformVector2("viewport", Vector2(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight()));
 
-		maskShader->UpdateUniformVector2("textureSize", Vector2(i.object->GetPaintMask()->GetWidth(), i.object->GetPaintMask()->GetHeight()));
-		maskShader->UpdateUniformVector3("textureScale", i.object->GetTransform()->GetScale());
 		maskShader->UpdateUniformFloat("radius", i.radius);
 		maskShader->UpdateUniformFloat("hardness", i.hardness);
 		maskShader->UpdateUniformFloat("strength", i.strength);
@@ -489,7 +480,7 @@ void Renderer::DrawGUI() {
 }
 
 Maths::Matrix4 Renderer::SetupDebugLineMatrix()	const {
-	float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
+	const float screenAspect = (float)rendererAPI->GetCurrentWidth() / (float)rendererAPI->GetCurrentHeight();
 	Matrix4 viewMatrix = gameWorld.GetMainCamera()->BuildViewMatrix();
 	Matrix4 projMatrix = gameWorld.GetMainCamera()->BuildProjectionMatrix(screenAspect);
 

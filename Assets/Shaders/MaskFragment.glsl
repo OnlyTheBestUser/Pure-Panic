@@ -1,18 +1,9 @@
 #version 330 core
 
-uniform mat4  modelMatrix;
-
-uniform vec3  barycentricCoord;
-uniform vec3  collisionPoint;
-uniform vec2  nearTexCoord_a;
-uniform vec2  nearTexCoord_b;
-uniform vec2  nearTexCoord_c;
 uniform vec2 uvHitPoint;
 
 uniform vec2 viewport;
 
-uniform vec2  textureSize;
-uniform vec3 textureScale;
 uniform float radius;
 uniform float hardness;
 uniform float strength;
