@@ -24,7 +24,7 @@
 using namespace NCL;
 using namespace CSC8503;
 
-TutorialGame::TutorialGame()	{
+TutorialGame::TutorialGame(string mapString) : mapString(mapString)	{
 	world			= new GameWorld();
 	LoadingScreen::AddProgress(15.0f);
 	LoadingScreen::UpdateGame(0.0f);
@@ -40,7 +40,8 @@ TutorialGame::TutorialGame()	{
 	gameManager		= new GameManager(this);
 	LoadingScreen::ResetProgress();
 	LoadingScreen::SetCompletionState(true);
-	
+
+
 #ifndef _ORBIS
 	InitSounds();
 #endif
@@ -346,9 +347,9 @@ void TutorialGame::InitCamera() {
 void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
-
-	levelLoader->ReadInLevelFile(NCL::Assets::MAPDIR + "training_map.txt");
 	
+	levelLoader->ReadInLevelFile(NCL::Assets::MAPDIR + mapString);
+
 	Player* player = levelLoader->SpawnPlayer(Vector3(-50, 5, -50));
 	player->SetRenderObject(nullptr);
 	

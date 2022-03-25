@@ -22,7 +22,7 @@ struct MessagePacket : public GamePacket {
 	}
 };
 
-NetworkedGame::NetworkedGame() {
+NetworkedGame::NetworkedGame(string mapString) : TutorialGame(mapString) {
 	levelLoader = new LevelLoader(physics, renderer, this);
 
 	thisServer = nullptr;
@@ -94,6 +94,12 @@ void NetworkedGame::StartAsClient(char a, char b, char c, char d) {
 }
 
 void NetworkedGame::UpdateGame(float dt) {
+
+	if (!thisServer && !thisClient) {
+		Debug::Print("Press 1 to Start as Host", Vector2(5, 30), 20.0f, Debug::BLUE);
+		Debug::Print("Press 2 to Start as Client", Vector2(5, 45), 20.0f, Debug::BLUE);
+	}
+
 	timeToNextPacket -= dt;
 	if (timeToNextPacket < 0) {
 		if (thisServer) {
@@ -220,10 +226,15 @@ void NetworkedGame::StartLevel() {
 	SendStartGamePacket();
 }
 
+void NetworkedGame::ServerResetLevel() {
+	ResetLevel();
+	SendResetGamePacket();
+}
+
 void NetworkedGame::ResetLevel() {
 	renderer->ClearPaint();
 	gameManager->GetTimer()->ResetTimer();
-	gameManager->SetScores(Vector2(0, 0));
+	/*gameManager->SetScores(Vector2(0, 0));*/
 	gameManager->printResults = false;
 }
 
@@ -359,7 +370,7 @@ void NetworkedGame::SendDeathPacket(int clientID, Vector3 pos)
 			singleton->thisServer->SendGlobalPacket(packet);
 #endif
 		}
-		else {
+		else if(singleton->thisClient) {
 			singleton->thisClient->SendPacket(packet);
 		}
 	}
