@@ -204,5 +204,29 @@
     <CustomBuild Include="..\..\Assets\Textures\noise.png">
       <Filter>Assets\Textures</Filter>
     </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\inner_sanctum_max_floortile_m.png">
+      <Filter>Assets\Textures</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\inner_sanctum_max_floortile_n.png">
+      <Filter>Assets\Textures</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\inner_sanctum_max_wall_low_C.png">
+      <Filter>Assets\Textures</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\inner_sanctum_max_wall_low_N.png">
+      <Filter>Assets\Textures</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\InSanct_Max_Throne_B_Colour.png">
+      <Filter>Assets\Textures</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\InSanct_Max_Throne_B_Emissive.png">
+      <Filter>Assets\Textures</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\InSanct_Max_Throne_B_Metal.png">
+      <Filter>Assets\Textures</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\Assets\Textures\InSanct_Max_Throne_B_Normal.png">
+      <Filter>Assets\Textures</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>
