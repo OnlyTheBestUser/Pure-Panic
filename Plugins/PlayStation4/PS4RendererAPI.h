@@ -127,7 +127,7 @@ namespace NCL::PS4 {
 		Gnmx::GnmxGfxContext*	currentGFXContext;
 		PS4Frame*				currentFrame;
 
-		SonyMath::Vector4 defaultClearColour;
+		sce::Vectormath::Scalar::Aos::Vector4 defaultClearColour;
 	};
 }
 #endif

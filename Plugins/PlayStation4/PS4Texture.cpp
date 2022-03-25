@@ -53,6 +53,15 @@ PS4Texture* NCL::PS4::PS4Texture::EmptyTex(int width, int height)
 	return tex;
 }
 
+PS4Texture* NCL::PS4::PS4Texture::GenTexFromBuffer(const sce::Gnm::RenderTarget& fbo)
+{
+	PS4Texture* tex = new PS4Texture;
+	tex->apiTexture.initFromRenderTarget(&fbo, false);
+	tex->width = tex->apiTexture.getWidth();
+	tex->height = tex->apiTexture.getHeight();
+	return tex;
+}
+
 void PS4Texture::ResetTexture() {
 	PS4Texture* newTex = EmptyTex(this->width, this->height);
 	this->apiTexture = newTex->apiTexture;
