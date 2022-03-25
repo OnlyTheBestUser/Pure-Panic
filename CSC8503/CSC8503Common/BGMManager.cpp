@@ -20,7 +20,7 @@ BGMManager* BGMManager::GetInstance()
 
 int BGMManager::PlaySong(std::string songName, float posInSong) {
 	StopMusic();
-	curSongChannel = audioManager->StartPlayingSound(songName);
+	curSongChannel = audioManager->StartPlayingSound(songName, Vector3(0,0,0), 0.7f);
 	return curSongChannel;
 }
 
@@ -28,6 +28,10 @@ int BGMManager::PlaySongFade(std::string songName, float fadeInTime, float posIn
 	StopMusic();
 	curSongChannel = audioManager->FadeInSound(songName, fadeInTime);
 	return curSongChannel;
+}
+
+void BGMManager::SetVolume(float percentVol) {
+	audioManager->SetChannelVolume(curSongChannel, percentVol);
 }
 
 

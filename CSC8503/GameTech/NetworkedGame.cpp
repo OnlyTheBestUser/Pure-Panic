@@ -528,8 +528,8 @@ void NetworkedGame::SendResetGamePacket() {
 	GameStatePacket newPacket;
 
 	newPacket.state = Game_Reset;
-	newPacket.team1Score = 0;
-	newPacket.team2Score = 0;
+	newPacket.team1Score = 0.1f;
+	newPacket.team2Score = 0.1f;
 
 #ifndef ORBISNET
 	thisServer->SendGlobalPacket(newPacket);
@@ -541,8 +541,8 @@ void NetworkedGame::SendStartGamePacket() {
 	GameStatePacket newPacket;
 
 	newPacket.state = Game_Start;
-	newPacket.team1Score = 0;
-	newPacket.team2Score = 0;
+	newPacket.team1Score = 0.1f;
+	newPacket.team2Score = 0.1f;
 
 #ifndef ORBISNET
 	thisServer->SendGlobalPacket(newPacket);

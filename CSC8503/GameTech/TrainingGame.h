@@ -8,7 +8,7 @@ namespace NCL {
 			TrainingGame();
 			virtual ~TrainingGame() {}
 
-
+			void InitWorld() override;
 		};
 	}
 }

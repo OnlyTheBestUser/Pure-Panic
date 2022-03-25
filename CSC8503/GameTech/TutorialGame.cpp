@@ -92,13 +92,11 @@ TutorialGame::TutorialGame(string mapString) : mapString(mapString)	{
 	Command* toggleDebug = new ToggleBoolCommand(&debugDraw);
 	Command* togglePause = new ToggleBoolCommand(&pausePressed);
 	Command* toggleMouse = new ToggleMouseCommand(&inSelectionMode);
-	Command* resetWorld = new ResetWorldCommand(&state);
-	Command* quitCommand = new QuitCommand(&quit, &pause);
+	Command* quitCommand = new QuitCommand(&quit, &pause, &won);
 	Command* startTimer = new StartTimerCommand(gameManager->GetTimer());
 	
 	inputHandler->BindButton(TOGGLE_DEBUG, toggleDebug);
 	inputHandler->BindButton(TOGGLE_PAUSE, togglePause);
-	inputHandler->BindButton(RESET_WORLD, resetWorld);
 	inputHandler->BindButton(QUIT, quitCommand);
 	inputHandler->BindButton(TOGGLE_MOUSE, toggleMouse);
 	inputHandler->BindButton(START_TIMER, startTimer);
@@ -155,26 +153,36 @@ void TutorialGame::UpdateGame(float dt) {
 		pausePressed = false;
 	}
 
+
 	switch (state) {
 		case GameState::PLAY: {
 			UpdateGameWorld(dt);
+			if (gameManager->GetTimer()->GetState() == Ended) state = GameState::WIN;
+			bgm->GetInstance()->SetVolume(0.7f);
 			break;
 		}
 		case GameState::PAUSE: {
 			UpdatePauseState(dt);
+			bgm->GetInstance()->SetVolume(0.0f);
 			break;
 		}
 		case GameState::WIN: {
+			won = true;
 			UpdateWinScreen(dt);
+			bgm->GetInstance()->SetVolume(0.2f);
 			break;
 		}
 		case GameState::RESET: {
 			InitCamera();
 			InitWorld();
+			gameManager->GetTimer()->StartTimer();
+			gameManager->SetScores(Vector2(0.1f, 0.1f));
 			renderer->ClearPaint();
 			selectionObject = nullptr;
 			quit = false;
 			pause = false;
+			won = false;
+			finalSoundPlayed = false;
 			SetState(GameState::PLAY);
 			break;
 		}
@@ -334,9 +342,20 @@ void TutorialGame::UpdatePauseScreen(float dt)
 }
 
 void TutorialGame::UpdateWinScreen(float dt)
-{
-	renderer->DrawString("YOU WIN", Vector2(5, 80), Debug::MAGENTA, 30.0f);
-	renderer->DrawString("Press R to Restart.", Vector2(5, 90), Debug::WHITE, 20.0f);
+{ 
+	if (gameManager->GetScores().x > gameManager->GetScores().y) {
+		renderer->DrawString("YOU WIN", Vector2(5, 80), Debug::MAGENTA, 30.0f);
+		if(!finalSoundPlayed)
+			NCL::AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + "win.ogg");
+		finalSoundPlayed = true;
+	}
+	else {
+		renderer->DrawString("YOU LOSE", Vector2(5, 80), Debug::MAGENTA, 30.0f);
+		if (!finalSoundPlayed)
+			NCL::AudioManager::GetInstance()->StartPlayingSound(Assets::AUDIODIR + "lose.ogg");
+		finalSoundPlayed = true;
+	}
+	renderer->DrawString("Press F1 to Restart.", Vector2(5, 90), Debug::WHITE, 20.0f);
 	renderer->DrawString("Press Esc to return to Main Menu.", Vector2(5, 95), Debug::WHITE, 20.0f);
 }
 
