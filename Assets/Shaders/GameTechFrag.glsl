@@ -5,6 +5,7 @@ layout (binding = 0) uniform sampler2D mainTex;
 layout (binding = 2) uniform sampler2D paintMaskTex;
 layout (binding = 1) uniform sampler2DShadow shadowTex;
 layout (binding = 3) uniform sampler2D normalTex;
+layout (binding = 4) uniform sampler2D noiseTex;
 
 uniform vec3	lightPos;
 uniform float	lightRadius;
@@ -31,11 +32,10 @@ out vec4 fragColor;
 
 void main(void)
 {
-	float shadow = 1.0; // New !
+	float shadow = 1.0;
 	vec3 useNormal = IN.normal;
 
-	
-	if( IN . shadowProj . w > 0.0) { // New !
+	if( IN . shadowProj . w > 0.0) {
 		shadow = textureProj ( shadowTex , IN . shadowProj ) * 0.5f;
 	}
 
@@ -43,18 +43,6 @@ void main(void)
 	vec3 viewDir = normalize ( cameraPos - IN . worldPos );
 	vec3 halfDir = normalize ( incident + viewDir );
 
-	if (hasNormal){
-		mat3 TBN = mat3(normalize(IN.tangent),
-    	normalize(IN.binormal), normalize(IN.normal ));
-    	vec3 bumpNormal = texture(normalTex , IN.texCoord ).rgb;
-    	bumpNormal = normalize(TBN * normalize(bumpNormal * 2.0 - 1.0));
-		useNormal = bumpNormal;
-	}
-
-	float lambert  = max (0.0 , dot ( incident , useNormal )) * 0.9; 
-	float rFactor = max (0.0 , dot ( halfDir , useNormal ));
-	float sFactor = pow ( rFactor , 80.0 );
-	
 	vec4 albedo = IN.colour;
 
 	if (albedo.a < 0.01){
@@ -62,16 +50,32 @@ void main(void)
 	}
 	
 	if(hasTexture) {
-	 albedo *= texture(mainTex, IN.texCoord);
+		albedo *= texture(mainTex, IN.texCoord);
+	}
+
+	mat3 TBN = mat3(normalize(IN.tangent),
+    normalize(IN.binormal), normalize(IN.normal ));
+
+	if (hasNormal){
+    	vec3 bumpNormal = texture(normalTex , IN.texCoord ).rgb;
+    	bumpNormal = normalize(TBN * normalize(bumpNormal * 2.0 - 1.0));
+		useNormal = bumpNormal;
 	}
 
 	if(hasPaintMask) {
-		    vec4 col = texture(paintMaskTex, IN.texCoord).rgba;
-            //float f = mask(i.worldPos, _PainterPosition, _Radius, _Hardness);
-            //float edge = f * _Strength;
-               //return lerp(col, _PainterColor, edge);
-			albedo.rgb = (albedo.rgb * (1-col.a)) + (vec3(col.r, col.g, col.b) * col.a);
+		vec4 col = texture(paintMaskTex, IN.texCoord).rgba;
+		albedo.rgb = (albedo.rgb * (1-col.a)) + (vec3(col.r, col.g, col.b) * col.a);
+		if (col.a > 0.1){
+			vec3 bumpNormal = texture(noiseTex , IN.texCoord ).rgb;
+    		bumpNormal = normalize(TBN * normalize(bumpNormal * 2.0 - 1.0));
+			useNormal = bumpNormal;
+		}
 	}
+
+	
+	float lambert  = max (0.0 , dot ( incident , useNormal )) * 0.9; 
+	float rFactor = max (0.0 , dot ( halfDir , useNormal ));
+	float sFactor = pow ( rFactor , 80.0 );
 
 
 	
@@ -86,12 +90,4 @@ void main(void)
 	fragColor.rgb = pow(fragColor.rgb, vec3(1.0 / 2.2f));
 	
 	fragColor.a = albedo.a;
-
-//fragColor.rgb = IN.normal;
-
-	//fragColor = IN.colour;
-	
-	//fragColor.xy = IN.texCoord.xy;
-	
-	//fragColor = IN.colour;
 }

@@ -70,6 +70,8 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 	crosshairTex = OGLTexture::RGBATextureFromFilename("crosshair.png");
 	uiCrosshairShader = new OGLShader("UICrosshairVert.glsl", "UICrosshairFrag.glsl");
 
+	normalTex = OGLTexture::RGBATextureFromFilename("noise.png");
+
 
 	camBuffer = new OGLUniformBuffer(sizeof(CameraMatrix), 0);
 
@@ -84,6 +86,7 @@ Renderer::Renderer(GameWorld& world) : RendererBase(), gameWorld(world) {
 	);
 
 	skyboxTex = PS4::PS4Texture::LoadSkyboxFromFile(NCL::Assets::TEXTUREDIR + "Cubemap/cubemap.gnf");
+	noiseTex = PS4::PS4Texture::LoadTextureFromFile(NCL::Assets::TEXTUREDIR + "noise.gnf");
 
 	maskShader = PS4::PS4Shader::GenerateShader(
 		Assets::SHADERDIR + "PS4/maskVertex.sb",
@@ -144,6 +147,8 @@ Renderer::~Renderer() {
 
 	delete uiCrosshairMesh;
 	delete uiCrosshairShader;
+
+	delete normalTex;
 
 	delete maskShader;
 }
@@ -279,6 +284,7 @@ void Renderer::RenderObjects() {
 		shader->UpdateUniformInt("hasTexture", (*i).GetDefaultTexture() ? 1 : 0);
 		if ((*i).GetNormalMap()) (*i).GetNormalMap()->Bind(3);
 		shader->UpdateUniformInt("hasNormal", (*i).GetNormalMap() ? 1 : 0);
+		normalTex->Bind(4);
 #ifdef _WIN64
 		if (shadowFBO->GetTexture()) shadowFBO->GetTexture()->Bind(1);
 #endif

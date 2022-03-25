@@ -79,6 +79,8 @@ namespace NCL {
 			MeshGeometry* skyboxMesh;
 			TextureBase* skyboxTex;
 
+			TextureBase* normalTex;
+
 			Vector4 lightColour;
 			float lightRadius;
 			Vector3 lightPos;

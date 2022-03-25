@@ -243,14 +243,14 @@ void TutorialGame::UpdateDebugText(float dt) {
 	PROCESS_MEMORY_COUNTERS_EX pmc;
 	GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
 
-	DWORDLONG totalVirtualMem = memInfo.ullTotalPageFile;
-	DWORDLONG virtualMemUsed = memInfo.ullTotalPageFile - memInfo.ullAvailPageFile;
+	const DWORDLONG totalVirtualMem = memInfo.ullTotalPageFile;
+	const DWORDLONG virtualMemUsed = memInfo.ullTotalPageFile - memInfo.ullAvailPageFile;
 
-	DWORDLONG totalPhysMem = memInfo.ullTotalPhys;
-	DWORDLONG physMemUsed = memInfo.ullTotalPhys - memInfo.ullAvailPhys;
+	const DWORDLONG totalPhysMem = memInfo.ullTotalPhys;
+	const DWORDLONG physMemUsed = memInfo.ullTotalPhys - memInfo.ullAvailPhys;
 
-	SIZE_T virtualMemUsedByMe = pmc.PrivateUsage;
-	SIZE_T physMemUsedByMe = pmc.WorkingSetSize;
+	const SIZE_T virtualMemUsedByMe = pmc.PrivateUsage;
+	const SIZE_T physMemUsedByMe = pmc.WorkingSetSize;
 
 	Debug::DebugPrint("Virt Mem: " + std::to_string(virtualMemUsedByMe / 1000000) + "MB/" + std::to_string(totalVirtualMem / 1000000) + "MB", Vector2(5, 15), 20, Vector4(1, .5, 1, 1));
 	Debug::DebugPrint("Phys Mem: " + std::to_string(physMemUsedByMe / 1000000)    + "MB/" + std::to_string(totalPhysMem / 1000000)    + "MB", Vector2(5, 20), 20, Vector4(1, .5, 1, 1));
