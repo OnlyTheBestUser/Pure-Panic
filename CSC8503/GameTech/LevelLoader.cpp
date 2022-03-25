@@ -51,6 +51,7 @@ LevelLoader::LevelLoader(PhysicsSystem* physics, Renderer* renderer, TutorialGam
 	loadFunc("SanctumThrone.msh", &sanctumThrone);
 	loadFunc("Corridor_Floor_Basic.msh", &corridorFloor);
 	loadFunc("Corridor_Wall_Alert.msh", &corridorWallAlert);
+	loadFunc("inner_sanctum_max_wall_straight_mid.msh", &corridorWallMesh2);
 	loadFunc("Corridor_Wall_Corner_In_Both.msh", &corridorWallCorner);
 	loadFunc("Corridor_Wall_Light.msh", &corridorWallLight);
 	loadFunc("Security_Camera.msh", &securityCamera);
@@ -70,6 +71,8 @@ LevelLoader::LevelLoader(PhysicsSystem* physics, Renderer* renderer, TutorialGam
 	loadTexFunc("inner_sanctum_max_floortile_n", &corridorFloorNormal);
 	loadTexFunc("corridor_wall_c", &corridorWallAlertTex);
 	loadTexFunc("corridor_wall_n", &corridorWallNormal);
+	loadTexFunc("inner_sanctum_max_wall_low_C", &corridorWall2Tex);
+	loadTexFunc("inner_sanctum_max_wall_low_N", &corridorWallNormal2);
 	loadTexFunc("Corridor_Walls_Redux_Metal", &corridorWallCornerTex);
 	loadTexFunc("checkerboard", &corridorWallLightTex);
 	loadTexFunc("checkerboard", &securityCameraTex);
@@ -319,7 +322,10 @@ GameObject* LevelLoader::AddLongWallToWorld(const Vector3& position, Vector3 dim
 	{
 		for (int i = -dimensions.z; i < dimensions.z; i += 10)
 		{
-			AddRenderPartToWorld(Vector3(position.x, position.y, position.z + i), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallCornerTex, corridorWallNormal);
+			if (rotation == 90)
+				AddRenderPartToWorld(Vector3(position.x + 12, position.y, position.z + i), Vector3(5, 5, 4), rotation, corridorWallMesh2, corridorWall2Tex, corridorWallNormal2);
+			if (rotation == 270)
+				AddRenderPartToWorld(Vector3(position.x - 12, position.y, position.z + i), Vector3(5, 5, 4), rotation, corridorWallMesh2, corridorWall2Tex, corridorWallNormal2);
 		}
 		return physicalObject;
 	}
@@ -327,7 +333,10 @@ GameObject* LevelLoader::AddLongWallToWorld(const Vector3& position, Vector3 dim
 	{
 		for (int i = -dimensions.x; i < dimensions.x; i += 10)
 		{
-			AddRenderPartToWorld(Vector3(position.x + i, position.y, position.z), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallCornerTex, corridorWallNormal);
+			if (rotation == 180)
+				AddRenderPartToWorld(Vector3(position.x + i, position.y, position.z - 12), Vector3(5, 5, 4), rotation, corridorWallMesh2, corridorWall2Tex, corridorWallNormal2);
+			if (rotation == 0)
+				AddRenderPartToWorld(Vector3(position.x + i, position.y, position.z + 12), Vector3(5, 5, 4), rotation, corridorWallMesh2, corridorWall2Tex, corridorWallNormal2);
 		}
 		return physicalObject;
 	}
