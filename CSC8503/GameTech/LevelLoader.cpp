@@ -318,7 +318,7 @@ GameObject* LevelLoader::AddLongWallToWorld(const Vector3& position, Vector3 dim
 	{
 		for (int i = -dimensions.z; i < dimensions.z; i += 10)
 		{
-			AddRenderPartToWorld(Vector3(position.x, position.y, position.z + i), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallAlertTex, corridorWallNormal);
+			AddRenderPartToWorld(Vector3(position.x, position.y, position.z + i), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallCornerTex, corridorWallNormal);
 		}
 		return physicalObject;
 	}
@@ -326,7 +326,7 @@ GameObject* LevelLoader::AddLongWallToWorld(const Vector3& position, Vector3 dim
 	{
 		for (int i = -dimensions.x; i < dimensions.x; i += 10)
 		{
-			AddRenderPartToWorld(Vector3(position.x + i, position.y, position.z), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallAlertTex, corridorWallNormal);
+			AddRenderPartToWorld(Vector3(position.x + i, position.y, position.z), Vector3(5, 5, 4), rotation, corridorWallStraight, corridorWallCornerTex, corridorWallNormal);
 		}
 		return physicalObject;
 	}
