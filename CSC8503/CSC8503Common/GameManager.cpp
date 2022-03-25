@@ -8,7 +8,8 @@ Vector4 GameManager::team2Colour = Vector4(0.011, 0.988, 0.941, 1);
 void GameManager::Update(const float& dt) {
 	timer->Update(dt);
 
-	PrintScores(Teams[A].score, Teams[B].score);
+	if (printResults) PrintResult(Teams[A].score, Teams[B].score);
+	if (printScores)  PrintScores(Teams[A].score, Teams[B].score);
 }
 
 void GameManager::PrintScores(float scoreA, float scoreB) {
