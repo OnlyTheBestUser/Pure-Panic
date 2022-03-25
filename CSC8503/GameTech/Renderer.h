@@ -15,7 +15,7 @@ namespace NCL {
 		{
 		public:
 			Renderer(CSC8503::GameWorld& world);
-			~Renderer();
+			virtual ~Renderer();
 
 			void Render() override;
 
