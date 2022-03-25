@@ -310,7 +310,7 @@ void NetworkedGame::HandleClientPacket(ClientPacket* packet)
 			obj->second->GetTransform().SetOrientation(Quaternion::EulerAnglesToQuaternion(0, packet->yaw, 0));
 
 			if (packet->firing) {
-				std::cout << "Handle Client Packet: " << packet->bulletCounter << std::endl;
+				//std::cout << "Handle Client Packet: " << packet->bulletCounter << std::endl;
 				ServerFire(obj->second, packet->pitch, packet->bulletCounter, packet->spread, packet->clientID);
 			}
 		}
@@ -335,14 +335,14 @@ void NetworkedGame::AddNewPlayerToServer(int clientID, int lastID)
 	if (!(clientID < networkObjects.size()))
 		networkObjects.resize(clientID + 1);
 	networkObjects[clientID] = client->GetNetworkObject();
-	std::cout << "New player added to server: ClientID (" << clientID << "), LastID(" << lastID << ")\n";
+	//std::cout << "New player added to server: ClientID (" << clientID << "), LastID(" << lastID << ")\n";
 }
 
 void NetworkedGame::ServerFire(GameObject* owner, float pitch, int bulletCounter, bool spread, int clientID)
 {
 	Fire(owner, spread, bulletCounter, pitch, clientID);
 
-	std::cout << "ServerFire: " << bulletCounter << std::endl;
+	//std::cout << "ServerFire: " << bulletCounter << std::endl;
 
 	FirePacket newPacket;
 	newPacket.clientID = clientID;
@@ -463,7 +463,7 @@ void NetworkedGame::HandleDeathState(DeathPacket* packet)
 
 void NetworkedGame::HandleAssignID(AssignIDPacket* packet)
 {
-	std::cout << "ID Assigned: " << packet->clientID << std::endl;
+	//std::cout << "ID Assigned: " << packet->clientID << std::endl;
 	playerID = packet->clientID;
 
 	SpawnPlayer();
@@ -473,14 +473,14 @@ void NetworkedGame::HandleAssignID(AssignIDPacket* packet)
 
 void NetworkedGame::HandlePlayerConnect(NewPlayerPacket* packet)
 {
-	std::cout << "Client: New player connected!" << std::endl;
-	std::cout << "_Player ID: " << packet->clientID << std::endl;
+	//std::cout << "Client: New player connected!" << std::endl;
+	//std::cout << "_Player ID: " << packet->clientID << std::endl;
 
 	if (packet->clientID != playerID) {
 		GameObject* newPlayer = LevelLoader::SpawnDummyPlayer(Vector3(10, 15, 10));
 		newPlayer->SetNetworkObject(new NetworkObject(*newPlayer, packet->clientID));
 		newPlayer->GetPhysicsObject()->SetDynamic(true);
-		std::cout << "Player Spawned with Network ID: " << newPlayer->GetNetworkObject()->GetNetID() << "." << std::endl;
+		//std::cout << "Player Spawned with Network ID: " << newPlayer->GetNetworkObject()->GetNetID() << "." << std::endl;
 		if (!(packet->clientID < networkObjects.size())) {
 			networkObjects.resize(packet->clientID + 1);
 		}
